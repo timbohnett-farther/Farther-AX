@@ -21,6 +21,13 @@ const navItems = [
   { step: 13, label: "Knowledge Check", href: "/knowledge-check" },
 ];
 
+const commandCenterItems = [
+  { label: 'Pipeline', href: '/command-center', icon: '◈' },
+  { label: 'Onboarding', href: '/command-center/onboarding', icon: '✓' },
+  { label: 'Metrics', href: '/command-center/metrics', icon: '▲' },
+  { label: 'AI Assistant', href: '/command-center/ai', icon: '✦' },
+];
+
 const externalLinks = [
   { label: "Farther Portal", href: "#" },
   { label: "Transition Tracker", href: "#" },
@@ -85,6 +92,40 @@ export default function Sidebar() {
                     style={{ color: isActive ? "#1d7682" : "#4a5a62" }}
                   >
                     {String(item.step).padStart(2, "0")}
+                  </span>
+                  <span className="leading-snug">{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* Command Center */}
+        <div className="my-4 border-t border-white/10" />
+        <p
+          className="px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
+          style={{ color: '#1d7682' }}
+        >
+          Command Center
+        </p>
+        <ul className="space-y-0.5">
+          {commandCenterItems.map((item) => {
+            const isActive = pathname === item.href || (item.href !== '/command-center' && pathname.startsWith(item.href));
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all duration-150 ${
+                    isActive ? 'text-white' : 'text-white/50 hover:text-white/80'
+                  }`}
+                  style={
+                    isActive
+                      ? { background: 'rgba(29,118,130,0.25)', borderLeft: '2px solid #1d7682' }
+                      : {}
+                  }
+                >
+                  <span className="text-xs w-5 shrink-0 text-center" style={{ color: '#1d7682' }}>
+                    {item.icon}
                   </span>
                   <span className="leading-snug">{item.label}</span>
                 </Link>
