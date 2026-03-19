@@ -97,7 +97,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     return NextResponse.json({ deal, notes, team });
   } catch (err) {
     console.error('[advisor detail]', err);
-    return NextResponse.json({ error: 'Failed to fetch advisor' }, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

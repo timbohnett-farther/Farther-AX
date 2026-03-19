@@ -106,7 +106,8 @@ export async function GET(
     return NextResponse.json({ deal, notes, team });
   } catch (err) {
     console.error('[deal detail]', err);
-    return NextResponse.json({ error: 'Failed to fetch deal' }, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

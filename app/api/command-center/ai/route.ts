@@ -122,7 +122,8 @@ Be concise, factual, and action-oriented. Format responses with markdown when he
     return NextResponse.json({ reply });
   } catch (err) {
     console.error('[grok ai]', err);
-    return NextResponse.json({ error: 'AI request failed' }, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
