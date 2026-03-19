@@ -69,7 +69,7 @@ export default function LPOAPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               At a Glance
             </h2>
@@ -90,7 +90,7 @@ export default function LPOAPage() {
                 </p>
                 <p
                   className="font-serif text-xl leading-snug"
-                  style={{ color: "#1d7682", fontFamily: "'Playfair Display', Georgia, serif" }}
+                  style={{ color: "#1d7682", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
                 >
                   {card.value}
                 </p>
@@ -105,7 +105,7 @@ export default function LPOAPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               How LPOA Works
             </h2>
@@ -122,7 +122,7 @@ export default function LPOAPage() {
                   key={idx}
                   className="flex items-start gap-5 px-6 py-5 border-b last:border-b-0 relative"
                   style={{
-                    backgroundColor: idx % 2 === 0 ? "#ffffff" : "#f0f5f9",
+                    backgroundColor: idx % 2 === 0 ? "#FAF7F2" : "#f0f5f9",
                     borderColor: "#dde8f0",
                   }}
                 >
@@ -132,7 +132,7 @@ export default function LPOAPage() {
                       className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold font-sans shrink-0"
                       style={{
                         backgroundColor: isLast ? "#1d7682" : "#333333",
-                        color: "#ffffff",
+                        color: "#FAF7F2",
                       }}
                     >
                       {idx + 1}
@@ -165,7 +165,7 @@ export default function LPOAPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               Custodian Availability
             </h2>
@@ -181,13 +181,13 @@ export default function LPOAPage() {
                 <div className="flex items-center gap-3 mb-4">
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center font-serif font-bold text-lg shrink-0"
-                    style={{ backgroundColor: "#333333", color: "#ffffff" }}
+                    style={{ backgroundColor: "#333333", color: "#FAF7F2" }}
                   >
                     {c.icon}
                   </div>
                   <h3
                     className="font-serif text-lg"
-                    style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
+                    style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
                   >
                     {c.name}
                   </h3>
@@ -206,7 +206,7 @@ export default function LPOAPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               Key Considerations
             </h2>
@@ -214,7 +214,7 @@ export default function LPOAPage() {
 
           <div
             className="rounded-xl border overflow-hidden"
-            style={{ backgroundColor: "#ffffff", borderColor: "#dde8f0" }}
+            style={{ backgroundColor: "#FAF7F2", borderColor: "#dde8f0" }}
           >
             {/* Dark header bar */}
             <div

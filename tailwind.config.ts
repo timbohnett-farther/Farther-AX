@@ -9,9 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        cream: "#ffffff",
-        "cream-dark": "#f0f5f9",
-        "cream-border": "#dde8f0",
+        cream: "#FAF7F2",
+        "cream-dark": "#F2EDE5",
+        "cream-border": "#E8E0D5",
         gold: "#1d7682",
         "gold-dark": "#155961",
         "gold-light": "#b6d0ed",
@@ -24,8 +24,8 @@ const config: Config = {
         slate: "#5b6a71",
       },
       fontFamily: {
-        serif: ["var(--font-playfair)", "Georgia", "serif"],
-        sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
+        serif: ["'ABC Arizona Text'", "Georgia", "serif"],
+        sans: ["'Fakt'", "system-ui", "sans-serif"],
       },
     },
   },

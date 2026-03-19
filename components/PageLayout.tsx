@@ -27,12 +27,12 @@ export default function PageLayout({
   const totalStr = String(totalSteps).padStart(2, "0");
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#ffffff" }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#FAF7F2" }}>
       {/* Top bar */}
       <header
         className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b"
         style={{
-          backgroundColor: "#ffffff",
+          backgroundColor: "#FAF7F2",
           borderColor: "#dde8f0",
         }}
       >
@@ -40,7 +40,7 @@ export default function PageLayout({
           <h1
             className="text-2xl font-bold leading-tight"
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'ABC Arizona Text', Georgia, serif",
               color: "#333333",
             }}
           >
@@ -56,7 +56,7 @@ export default function PageLayout({
           <span
             className="text-2xl font-bold"
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'ABC Arizona Text', Georgia, serif",
               color: "#1d7682",
             }}
           >

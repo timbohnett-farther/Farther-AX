@@ -171,7 +171,7 @@ export default function KnowledgeCheckPage() {
             >
               <span
                 className="text-white text-3xl font-bold"
-                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                style={{ fontFamily: "'ABC Arizona Text', Georgia, serif" }}
               >
                 {score}/7
               </span>
@@ -180,7 +180,7 @@ export default function KnowledgeCheckPage() {
             <h2
               className="text-3xl font-bold mb-3"
               style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
+                fontFamily: "'ABC Arizona Text', Georgia, serif",
                 color: "#333333",
               }}
             >
@@ -287,7 +287,7 @@ export default function KnowledgeCheckPage() {
               <h2
                 className="text-xl font-bold mb-6 leading-snug"
                 style={{
-                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontFamily: "'ABC Arizona Text', Georgia, serif",
                   color: "#333333",
                 }}
               >
@@ -301,7 +301,7 @@ export default function KnowledgeCheckPage() {
                   const isCorrect = i === currentQuestion.correctIndex;
 
                   let borderColor = "#dde8f0";
-                  let bgColor = "#ffffff";
+                  let bgColor = "#FAF7F2";
                   let textColor = "#333333";
 
                   if (isAnswered) {
@@ -314,7 +314,7 @@ export default function KnowledgeCheckPage() {
                       bgColor = "rgba(252,165,165,0.18)";
                       textColor = "#7F1D1D";
                     } else {
-                      bgColor = "#ffffff";
+                      bgColor = "#FAF7F2";
                       borderColor = "#dde8f0";
                       textColor = "#8a9aa1";
                     }

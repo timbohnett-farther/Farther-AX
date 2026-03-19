@@ -65,7 +65,7 @@ export default function NoToLowAUMPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               When This Pathway Applies
             </h2>
@@ -84,7 +84,7 @@ export default function NoToLowAUMPage() {
             <div className="flex items-start gap-4">
               <div
                 className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mt-0.5"
-                style={{ backgroundColor: "#5B9BD5", color: "#ffffff" }}
+                style={{ backgroundColor: "#5B9BD5", color: "#FAF7F2" }}
               >
                 i
               </div>
@@ -103,7 +103,7 @@ export default function NoToLowAUMPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               Key Characteristics
             </h2>
@@ -119,13 +119,13 @@ export default function NoToLowAUMPage() {
                 <div className="flex items-center gap-3 mb-3">
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0"
-                    style={{ backgroundColor: "#1d7682", color: "#ffffff" }}
+                    style={{ backgroundColor: "#1d7682", color: "#FAF7F2" }}
                   >
                     {item.icon}
                   </div>
                   <h3
                     className="font-serif text-lg leading-tight"
-                    style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
+                    style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
                   >
                     {item.title}
                   </h3>
@@ -144,7 +144,7 @@ export default function NoToLowAUMPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               The Focus Team Review
             </h2>
@@ -164,7 +164,7 @@ export default function NoToLowAUMPage() {
                 advisor&apos;s profile to the Focus Team before initiating any onboarding steps.
               </p>
             </div>
-            <div className="px-7 py-6" style={{ backgroundColor: "#ffffff" }}>
+            <div className="px-7 py-6" style={{ backgroundColor: "#FAF7F2" }}>
               <ul className="space-y-3">
                 {focusTeamItems.map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3">
@@ -185,7 +185,7 @@ export default function NoToLowAUMPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               Training Curriculum Priority
             </h2>
@@ -206,7 +206,7 @@ export default function NoToLowAUMPage() {
                 Required Training Modules — In Order
               </span>
             </div>
-            <div style={{ backgroundColor: "#ffffff" }}>
+            <div style={{ backgroundColor: "#FAF7F2" }}>
               {trainingItems.map((item, idx) => (
                 <div
                   key={idx}

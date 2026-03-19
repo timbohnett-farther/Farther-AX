@@ -81,7 +81,7 @@ export default function BreakawayProcessPage() {
                 <h3
                   className="text-xl font-bold"
                   style={{
-                    fontFamily: "'Playfair Display', Georgia, serif",
+                    fontFamily: "'ABC Arizona Text', Georgia, serif",
                     color: "#333333",
                   }}
                 >
@@ -115,7 +115,7 @@ export default function BreakawayProcessPage() {
                       <tr
                         key={itemIdx}
                         style={{
-                          backgroundColor: itemIdx % 2 === 0 ? "rgba(255,255,255,0.6)" : "#ffffff",
+                          backgroundColor: itemIdx % 2 === 0 ? "rgba(250,247,242,0.9)" : "#FAF7F2",
                           borderTop: "1px solid #dde8f0",
                         }}
                       >

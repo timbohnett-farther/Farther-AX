@@ -27,7 +27,7 @@ export default function MAPage() {
           <h2
             className="text-2xl font-bold mb-3"
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'ABC Arizona Text', Georgia, serif",
               color: "#333333",
             }}
           >
@@ -43,12 +43,12 @@ export default function MAPage() {
         {/* Preview of what's coming */}
         <div
           className="rounded-lg p-6 border"
-          style={{ borderColor: "#dde8f0", backgroundColor: "rgba(255,255,255,0.5)" }}
+          style={{ borderColor: "#dde8f0", backgroundColor: "rgba(250,247,242,0.8)" }}
         >
           <h3
             className="text-lg font-semibold mb-4"
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'ABC Arizona Text', Georgia, serif",
               color: "#333333",
             }}
           >

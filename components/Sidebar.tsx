@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 const navItems = [
@@ -36,17 +37,14 @@ export default function Sidebar() {
     >
       {/* Logo / Brand */}
       <div className="px-6 pt-8 pb-6 border-b border-white/10">
-        <div className="flex items-center gap-2 mb-1">
-          <span
-            className="text-2xl font-bold tracking-tight"
-            style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              color: "#ffffff",
-            }}
-          >
-            Farther
-          </span>
-        </div>
+        <Image
+          src="/images/farther-wordmark-cream.png"
+          alt="Farther"
+          width={120}
+          height={28}
+          className="mb-2"
+          style={{ objectFit: "contain", objectPosition: "left" }}
+        />
         <p className="text-xs tracking-widest uppercase" style={{ color: "#5b6a71" }}>
           AX Playbook
         </p>

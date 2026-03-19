@@ -71,11 +71,11 @@ export default function CalendarGeneratorPage() {
         {/* Form */}
         <div
           className="rounded-xl border p-6 mb-6"
-          style={{ borderColor: "#dde8f0", backgroundColor: "rgba(255,255,255,0.5)" }}
+          style={{ borderColor: "#dde8f0", backgroundColor: "rgba(250,247,242,0.8)" }}
         >
           <h2
             className="text-xl font-bold mb-5"
-            style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#333333" }}
+            style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: "#333333" }}
           >
             Advisor Details
           </h2>
@@ -90,7 +90,7 @@ export default function CalendarGeneratorPage() {
                 onChange={(e) => setAdvisorName(e.target.value)}
                 placeholder="e.g. Jane Smith"
                 className="w-full px-3 py-2 rounded-md border text-sm outline-none"
-                style={{ borderColor: "#dde8f0", backgroundColor: "#ffffff", color: "#333333" }}
+                style={{ borderColor: "#dde8f0", backgroundColor: "#FAF7F2", color: "#333333" }}
               />
             </div>
             <div>
@@ -101,7 +101,7 @@ export default function CalendarGeneratorPage() {
                 value={pathway}
                 onChange={(e) => setPathway(e.target.value)}
                 className="w-full px-3 py-2 rounded-md border text-sm outline-none"
-                style={{ borderColor: "#dde8f0", backgroundColor: "#ffffff", color: "#333333" }}
+                style={{ borderColor: "#dde8f0", backgroundColor: "#FAF7F2", color: "#333333" }}
               >
                 <option value="breakaway">Breakaway</option>
                 <option value="independent_ria">Independent RIA</option>
@@ -118,7 +118,7 @@ export default function CalendarGeneratorPage() {
                 value={launchDate}
                 onChange={(e) => setLaunchDate(e.target.value)}
                 className="w-full px-3 py-2 rounded-md border text-sm outline-none"
-                style={{ borderColor: "#dde8f0", backgroundColor: "#ffffff", color: "#333333" }}
+                style={{ borderColor: "#dde8f0", backgroundColor: "#FAF7F2", color: "#333333" }}
               />
             </div>
             <div>
@@ -131,7 +131,7 @@ export default function CalendarGeneratorPage() {
                 onChange={(e) => setAdvisorEmail(e.target.value)}
                 placeholder="advisor@example.com"
                 className="w-full px-3 py-2 rounded-md border text-sm outline-none"
-                style={{ borderColor: "#dde8f0", backgroundColor: "#ffffff", color: "#333333" }}
+                style={{ borderColor: "#dde8f0", backgroundColor: "#FAF7F2", color: "#333333" }}
               />
             </div>
             <div>
@@ -144,7 +144,7 @@ export default function CalendarGeneratorPage() {
                 onChange={(e) => setAxmEmail(e.target.value)}
                 placeholder="axm@farther.com"
                 className="w-full px-3 py-2 rounded-md border text-sm outline-none"
-                style={{ borderColor: "#dde8f0", backgroundColor: "#ffffff", color: "#333333" }}
+                style={{ borderColor: "#dde8f0", backgroundColor: "#FAF7F2", color: "#333333" }}
               />
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function CalendarGeneratorPage() {
             >
               <h2
                 className="text-xl font-bold"
-                style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#333333" }}
+                style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: "#333333" }}
               >
                 {advisorName ? `${advisorName} — Meeting Schedule` : "Meeting Schedule"}
               </h2>

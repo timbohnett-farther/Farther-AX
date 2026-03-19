@@ -20,7 +20,7 @@ export default function RepaperAcatPage() {
             <div
               key={stat.label}
               className="rounded-lg p-5 border text-center"
-              style={{ borderColor: "#dde8f0", backgroundColor: "rgba(255,255,255,0.5)" }}
+              style={{ borderColor: "#dde8f0", backgroundColor: "rgba(250,247,242,0.8)" }}
             >
               <p className="text-xs tracking-widest uppercase mb-1" style={{ color: "#155961" }}>
                 {stat.label}
@@ -28,7 +28,7 @@ export default function RepaperAcatPage() {
               <p
                 className="text-xl font-bold"
                 style={{
-                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontFamily: "'ABC Arizona Text', Georgia, serif",
                   color: "#333333",
                 }}
               >
@@ -47,7 +47,7 @@ export default function RepaperAcatPage() {
           <h2
             className="text-2xl font-bold mb-3"
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'ABC Arizona Text', Georgia, serif",
               color: "#333333",
             }}
           >
@@ -63,12 +63,12 @@ export default function RepaperAcatPage() {
         {/* Preview */}
         <div
           className="rounded-lg p-6 border"
-          style={{ borderColor: "#dde8f0", backgroundColor: "rgba(255,255,255,0.5)" }}
+          style={{ borderColor: "#dde8f0", backgroundColor: "rgba(250,247,242,0.8)" }}
         >
           <h3
             className="text-lg font-semibold mb-4"
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'ABC Arizona Text', Georgia, serif",
               color: "#333333",
             }}
           >

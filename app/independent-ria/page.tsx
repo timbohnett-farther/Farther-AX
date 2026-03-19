@@ -4,7 +4,7 @@ const COLORS = {
   charcoal: "#333333",
   charcoalMuted: "#5b6a71",
   gold: "#1d7682",
-  cream: "#ffffff",
+  cream: "#FAF7F2",
   creamDark: "#f0f5f9",
   creamBorder: "#dde8f0",
   blueBg: "#EFF6FF",
@@ -85,7 +85,7 @@ export default function IndependentRIAPage() {
         <section style={{ marginBottom: "2.5rem" }}>
           <h2
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'ABC Arizona Text', Georgia, serif",
               fontSize: "1.25rem",
               fontWeight: 700,
               color: COLORS.charcoal,
@@ -161,7 +161,7 @@ export default function IndependentRIAPage() {
         <section style={{ marginBottom: "2.5rem" }}>
           <h2
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'ABC Arizona Text', Georgia, serif",
               fontSize: "1.25rem",
               fontWeight: 700,
               color: COLORS.charcoal,
@@ -223,7 +223,7 @@ export default function IndependentRIAPage() {
         <section style={{ marginBottom: "2.5rem" }}>
           <h2
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'ABC Arizona Text', Georgia, serif",
               fontSize: "1.25rem",
               fontWeight: 700,
               color: COLORS.charcoal,
@@ -345,7 +345,7 @@ export default function IndependentRIAPage() {
         <section style={{ marginBottom: "1rem" }}>
           <h2
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'ABC Arizona Text', Georgia, serif",
               fontSize: "1.25rem",
               fontWeight: 700,
               color: COLORS.charcoal,
