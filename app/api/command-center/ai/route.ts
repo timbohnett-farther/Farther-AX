@@ -3,11 +3,6 @@ import OpenAI from 'openai';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-const xai = new OpenAI({
-  apiKey: process.env.GROK_API_KEY!,
-  baseURL: 'https://api.x.ai/v1',
-});
-
 const HUBSPOT_PAT = process.env.HUBSPOT_PAT!;
 const PIPELINE_ID = '751770';
 
@@ -66,6 +61,12 @@ async function fetchPipelineSummary() {
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  // Lazy-initialize at request time so build doesn't fail without the env var
+  const xai = new OpenAI({
+    apiKey: process.env.GROK_API_KEY!,
+    baseURL: 'https://api.x.ai/v1',
+  });
 
   const { messages } = await req.json() as { messages: Array<{ role: string; content: string }> };
 
