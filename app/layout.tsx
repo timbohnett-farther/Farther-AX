@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
+import SessionProvider from "@/components/SessionProvider";
 
 export const metadata: Metadata = {
   title: "Farther AX Playbook",
@@ -22,12 +23,14 @@ export default function RootLayout({
           color: "#333333",
         }}
       >
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main className="flex-1 ml-64 min-h-screen">
-            {children}
-          </main>
-        </div>
+        <SessionProvider>
+          <div className="flex min-h-screen">
+            <Sidebar />
+            <main className="flex-1 ml-64 min-h-screen">
+              {children}
+            </main>
+          </div>
+        </SessionProvider>
       </body>
     </html>
   );

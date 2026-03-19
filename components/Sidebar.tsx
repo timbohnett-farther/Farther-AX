@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 
 const navItems = [
   { step: 1, label: "Introduction", href: "/introduction" },
@@ -29,6 +30,9 @@ const externalLinks = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  const firstName = session?.user?.name?.split(" ")[0] ?? "";
 
   return (
     <aside
@@ -116,15 +120,53 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      {/* Footer */}
-      <div className="px-6 py-4 border-t border-white/10">
-        <p className="text-xs" style={{ color: "#4a5a62" }}>
-          Farther Wealth Management
-        </p>
-        <p className="text-xs mt-0.5" style={{ color: "#4a5a62" }}>
-          Internal Use Only
-        </p>
-      </div>
+      {/* User / Sign Out */}
+      {session?.user && (
+        <div className="px-4 py-4 border-t border-white/10">
+          <div className="flex items-center gap-3 mb-3">
+            {session.user.image ? (
+              <Image
+                src={session.user.image}
+                alt={session.user.name ?? "User"}
+                width={32}
+                height={32}
+                className="rounded-full"
+              />
+            ) : (
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shrink-0"
+                style={{ backgroundColor: "#1d7682" }}
+              >
+                {firstName.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-white truncate">
+                {session.user.name}
+              </p>
+              <p className="text-xs truncate" style={{ color: "#5b6a71" }}>
+                {session.user.email}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+            className="w-full text-left px-3 py-2 rounded-md text-xs transition-colors text-white/40 hover:text-white/70 hover:bg-white/5"
+            style={{ fontFamily: "'Fakt', system-ui, sans-serif" }}
+          >
+            ← Sign out
+          </button>
+        </div>
+      )}
+
+      {/* Footer (shown when not signed in) */}
+      {!session?.user && (
+        <div className="px-6 py-4 border-t border-white/10">
+          <p className="text-xs" style={{ color: "#4a5a62" }}>
+            Farther Wealth Management
+          </p>
+        </div>
+      )}
     </aside>
   );
 }
