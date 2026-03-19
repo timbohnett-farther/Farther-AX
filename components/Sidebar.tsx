@@ -1,0 +1,132 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const navItems = [
+  { step: 1, label: "Introduction", href: "/introduction" },
+  { step: 2, label: "Onboarding vs. Transitions", href: "/onboarding-vs-transitions" },
+  { step: 3, label: "Key Documents", href: "/key-documents" },
+  { step: 4, label: "Breakaway", href: "/breakaway" },
+  { step: 5, label: "Independent RIA", href: "/independent-ria" },
+  { step: 6, label: "M&A", href: "/ma" },
+  { step: 7, label: "No to Low AUM", href: "/no-to-low-aum" },
+  { step: 8, label: "Master Merge", href: "/master-merge" },
+  { step: 9, label: "LPOA", href: "/lpoa" },
+  { step: 10, label: "Repaper / ACAT", href: "/repaper-acat" },
+  { step: 11, label: "Breakaway Process", href: "/breakaway-process" },
+  { step: 12, label: "Calendar Generator", href: "/calendar-generator" },
+  { step: 13, label: "Knowledge Check", href: "/knowledge-check" },
+];
+
+const externalLinks = [
+  { label: "Farther Portal", href: "#" },
+  { label: "Transition Tracker", href: "#" },
+  { label: "AX — Notion", href: "#" },
+  { label: "AX Email Templates", href: "#" },
+];
+
+export default function Sidebar() {
+  const pathname = usePathname();
+
+  return (
+    <aside
+      className="fixed top-0 left-0 h-full w-64 flex flex-col z-40"
+      style={{ background: "#1E1A17" }}
+    >
+      {/* Logo / Brand */}
+      <div className="px-6 pt-8 pb-6 border-b border-white/10">
+        <div className="flex items-center gap-2 mb-1">
+          <span
+            className="text-2xl font-bold tracking-tight"
+            style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
+              color: "#D4B896",
+            }}
+          >
+            Farther
+          </span>
+        </div>
+        <p className="text-xs tracking-widest uppercase" style={{ color: "#7A6A5E" }}>
+          AX Playbook
+        </p>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
+        <p
+          className="px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
+          style={{ color: "#5A4A40" }}
+        >
+          Sections
+        </p>
+        <ul className="space-y-0.5">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all duration-150 group ${
+                    isActive
+                      ? "text-white"
+                      : "text-white/50 hover:text-white/80"
+                  }`}
+                  style={
+                    isActive
+                      ? { background: "rgba(184,151,126,0.2)", borderLeft: "2px solid #B8977E" }
+                      : {}
+                  }
+                >
+                  <span
+                    className="text-xs font-mono w-5 shrink-0 text-right"
+                    style={{ color: isActive ? "#B8977E" : "#5A4A40" }}
+                  >
+                    {String(item.step).padStart(2, "0")}
+                  </span>
+                  <span className="leading-snug">{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* Divider */}
+        <div className="my-4 border-t border-white/10" />
+
+        {/* External Links */}
+        <p
+          className="px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
+          style={{ color: "#5A4A40" }}
+        >
+          Resources
+        </p>
+        <ul className="space-y-0.5">
+          {externalLinks.map((link) => (
+            <li key={link.label}>
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/40 hover:text-white/70 transition-colors"
+              >
+                <span className="text-xs" style={{ color: "#5A4A40" }}>↗</span>
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {/* Footer */}
+      <div className="px-6 py-4 border-t border-white/10">
+        <p className="text-xs" style={{ color: "#3A2E28" }}>
+          Farther Wealth Management
+        </p>
+        <p className="text-xs mt-0.5" style={{ color: "#3A2E28" }}>
+          Internal Use Only
+        </p>
+      </div>
+    </aside>
+  );
+}
