@@ -10,6 +10,7 @@ const TEAM_ROLES = [
   'CX Manager',     // Customer Experience Manager
   'Compliance',     // Compliance Officer
   'RIA Leadership', // RIA Manager/Leader
+  'Director',       // AX Director
 ] as const;
 
 // ── GET: List all team members (optionally filter by role or active status) ──

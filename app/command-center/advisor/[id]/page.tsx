@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import useSWR from 'swr';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -12,6 +12,8 @@ const C = {
   lightBlue: '#b6d0ed', teal: '#1d7682', bg: '#FAF7F2',
   cardBg: '#ffffff', border: '#e8e2d9', amber: '#d97706',
   green: '#059669', red: '#dc2626',
+  redBg: 'rgba(220,38,38,0.08)', redBorder: 'rgba(220,38,38,0.18)',
+  amberBg: 'rgba(217,119,6,0.08)', amberBorder: 'rgba(217,119,6,0.18)',
 };
 
 const STAGE_LABELS: Record<string, string> = {
@@ -291,6 +293,289 @@ function ComplexityPanel({ dealId }: { dealId: string }) {
   );
 }
 
+// ── Team Assignment Panel ─────────────────────────────────────────────────────
+const ASSIGNMENT_ROLES = ['AXM', 'AXA', 'CTM', 'CTA'] as const;
+
+const ROLE_LABELS: Record<string, string> = {
+  'AXM': 'Advisor Experience Manager',
+  'AXA': 'Advisor Experience Associate',
+  'CTM': 'Customer Transition Manager',
+  'CTA': 'Customer Transition Associate',
+};
+
+const ROLE_COLORS_MAP: Record<string, string> = {
+  'AXM': C.teal,
+  'AXA': C.teal,
+  'CTM': '#c8a951',
+  'CTA': '#c8a951',
+};
+
+interface AssignmentMember {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  phone: string | null;
+  calendar_link: string | null;
+}
+
+interface AssignmentRow {
+  deal_id: string;
+  role: string;
+  member_id: number;
+  member_name: string;
+  member_email: string;
+  member_phone: string | null;
+  member_calendar: string | null;
+  member_role: string;
+}
+
+interface CapacityWarning {
+  member_name: string;
+  warning: string | null;
+  projected: {
+    deals: number;
+    complexity: number;
+    capacity_pct: number;
+    status: 'green' | 'amber' | 'red';
+    over_capacity: boolean;
+    would_exceed_red: boolean;
+  };
+}
+
+interface StaffRec {
+  role: string;
+  recommended: AssignmentMember | null;
+  alternatives: AssignmentMember[];
+  reason: string;
+  current_load: number;
+  projected_load: number;
+  capacity_status: 'green' | 'amber' | 'red';
+}
+
+function TeamAssignmentPanel({ dealId, complexityScore }: { dealId: string; complexityScore: number }) {
+  const { data: assignmentData, mutate: mutateAssignments } = useSWR<{ assignments: AssignmentRow[] }>(
+    `/api/command-center/assignments?dealId=${dealId}`, fetcher
+  );
+  const { data: teamData } = useSWR<{ members: AssignmentMember[] }>(
+    '/api/command-center/team?active=true', fetcher
+  );
+  const { data: recData } = useSWR<{ recommendations: StaffRec[]; dealComplexity: number }>(
+    `/api/command-center/staff-recommendation?dealId=${dealId}`, fetcher
+  );
+
+  const [saving, setSaving] = useState<string | null>(null);
+  const [capacityWarnings, setCapacityWarnings] = useState<Record<string, CapacityWarning>>({});
+  const [showRec, setShowRec] = useState(false);
+
+  const assignments = assignmentData?.assignments ?? [];
+  const allMembers = teamData?.members ?? [];
+  const recommendations = recData?.recommendations ?? [];
+
+  const getAssignedMemberId = (role: string): number | null => {
+    const a = assignments.find(a => a.role === role);
+    return a ? a.member_id : null;
+  };
+
+  const checkCapacity = useCallback(async (memberId: number, role: string) => {
+    try {
+      const res = await fetch('/api/command-center/workload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ member_id: memberId, deal_complexity_score: complexityScore || 30 }),
+      });
+      const data = await res.json();
+      setCapacityWarnings(prev => ({ ...prev, [role]: data }));
+    } catch {
+      // Silent
+    }
+  }, [complexityScore]);
+
+  const handleAssign = async (role: string, memberId: number | null) => {
+    if (!memberId) return;
+
+    // Check capacity before assigning
+    await checkCapacity(memberId, role);
+
+    setSaving(role);
+    try {
+      await fetch('/api/command-center/assignments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deal_id: dealId, role, member_id: memberId }),
+      });
+      mutateAssignments();
+    } catch {
+      // Silent
+    }
+    setSaving(null);
+  };
+
+  const handleRemove = async (role: string) => {
+    setSaving(role);
+    await fetch(`/api/command-center/assignments?dealId=${dealId}&role=${role}`, { method: 'DELETE' });
+    setCapacityWarnings(prev => {
+      const next = { ...prev };
+      delete next[role];
+      return next;
+    });
+    mutateAssignments();
+    setSaving(null);
+  };
+
+  const applyRecommendation = async (rec: StaffRec) => {
+    if (!rec.recommended) return;
+    await handleAssign(rec.role, rec.recommended.id);
+  };
+
+  return (
+    <Section title="Team Assignments" highlight>
+      {/* Recommendation banner */}
+      {recommendations.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <button
+            onClick={() => setShowRec(!showRec)}
+            style={{
+              width: '100%', padding: '10px 14px', borderRadius: 6,
+              background: 'rgba(142,68,173,0.06)', border: '1px solid rgba(142,68,173,0.15)',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}
+          >
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#8e44ad' }}>
+              ✦ AI Staffing Recommendations Available
+            </span>
+            <span style={{ fontSize: 12, color: '#8e44ad' }}>{showRec ? '▲' : '▼'}</span>
+          </button>
+
+          {showRec && (
+            <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {recommendations.map(rec => (
+                <div key={rec.role} style={{
+                  padding: '10px 14px', borderRadius: 6,
+                  background: rec.capacity_status === 'red' ? 'rgba(192,57,43,0.04)' : rec.capacity_status === 'amber' ? 'rgba(178,125,46,0.04)' : 'rgba(39,174,96,0.04)',
+                  border: `1px solid ${rec.capacity_status === 'red' ? 'rgba(192,57,43,0.15)' : rec.capacity_status === 'amber' ? 'rgba(178,125,46,0.15)' : 'rgba(39,174,96,0.15)'}`,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: ROLE_COLORS_MAP[rec.role] || C.slate }}>
+                      {rec.role}
+                    </span>
+                    {rec.recommended && (
+                      <button
+                        onClick={() => applyRecommendation(rec)}
+                        style={{
+                          padding: '3px 10px', borderRadius: 4, fontSize: 11, fontWeight: 600,
+                          background: C.teal, color: C.white, border: 'none', cursor: 'pointer',
+                        }}
+                      >
+                        Assign {rec.recommended.name.split(' ')[0]}
+                      </button>
+                    )}
+                  </div>
+                  <p style={{ fontSize: 11, color: C.slate, lineHeight: 1.4 }}>{rec.reason}</p>
+                  {rec.recommended && rec.alternatives.length > 0 && (
+                    <p style={{ fontSize: 10, color: C.slate, marginTop: 4 }}>
+                      Alternatives: {rec.alternatives.map(a => a.name).join(', ')}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Assignment dropdowns */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+        {ASSIGNMENT_ROLES.map(role => {
+          const currentMemberId = getAssignedMemberId(role);
+          const roleMembers = allMembers.filter(m => m.role === role);
+          const warning = capacityWarnings[role];
+          const roleColor = ROLE_COLORS_MAP[role] || C.slate;
+          const currentAssignment = assignments.find(a => a.role === role);
+
+          return (
+            <div key={role} style={{
+              padding: '12px 14px', borderRadius: 8,
+              background: currentMemberId ? `${roleColor}08` : C.cardBg,
+              border: `1px solid ${currentMemberId ? `${roleColor}25` : C.border}`,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: roleColor, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    {role}
+                  </span>
+                  <p style={{ fontSize: 10, color: C.slate }}>{ROLE_LABELS[role]}</p>
+                </div>
+                {currentMemberId && (
+                  <button
+                    onClick={() => handleRemove(role)}
+                    style={{ fontSize: 10, color: C.red, background: 'none', border: 'none', cursor: 'pointer' }}
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+
+              <select
+                value={currentMemberId ?? ''}
+                onChange={e => {
+                  const val = e.target.value ? parseInt(e.target.value) : null;
+                  if (val) handleAssign(role, val);
+                }}
+                disabled={saving === role}
+                style={{
+                  width: '100%', padding: '7px 10px', borderRadius: 5,
+                  border: `1px solid ${C.border}`, background: C.white,
+                  fontSize: 13, color: C.dark, cursor: 'pointer',
+                }}
+              >
+                <option value="">— Select {role} —</option>
+                {roleMembers.map(m => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
+
+              {/* Assigned member contact info */}
+              {currentAssignment && (
+                <div style={{ marginTop: 6, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {currentAssignment.member_email && (
+                    <a href={`mailto:${currentAssignment.member_email}`} style={{ fontSize: 10, color: C.teal, textDecoration: 'none' }}>
+                      ✉ Email
+                    </a>
+                  )}
+                  {currentAssignment.member_phone && (
+                    <a href={`tel:${currentAssignment.member_phone}`} style={{ fontSize: 10, color: C.teal, textDecoration: 'none' }}>
+                      ☎ {currentAssignment.member_phone}
+                    </a>
+                  )}
+                  {currentAssignment.member_calendar && (
+                    <a href={currentAssignment.member_calendar} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: C.teal, textDecoration: 'none' }}>
+                      📅 Calendar
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {/* Capacity warning */}
+              {warning?.projected && (warning.projected.over_capacity || warning.projected.would_exceed_red) && (
+                <div style={{
+                  marginTop: 8, padding: '6px 10px', borderRadius: 4,
+                  background: warning.projected.over_capacity ? C.redBg : C.amberBg,
+                  border: `1px solid ${warning.projected.over_capacity ? C.redBorder : C.amberBorder}`,
+                }}>
+                  <p style={{ fontSize: 10, fontWeight: 600, color: warning.projected.over_capacity ? C.red : C.amber }}>
+                    ⚠ {warning.warning || `${warning.member_name} at ${warning.projected.capacity_pct}% capacity`}
+                  </p>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </Section>
+  );
+}
+
 export default function AdvisorReportCard() {
   const params = useParams();
   const id = params.id as string;
@@ -350,6 +635,9 @@ export default function AdvisorReportCard() {
 
       {/* Complexity Score */}
       <ComplexityPanel dealId={id} />
+
+      {/* Team Assignments */}
+      <TeamAssignmentPanel dealId={id} complexityScore={0} />
 
       {/* STAGE 1+: Basic Info */}
       <Section title="Advisor Overview">

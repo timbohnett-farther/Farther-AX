@@ -16,7 +16,7 @@ const C = {
   green: '#27ae60', greenBg: 'rgba(39,174,96,0.10)',
 };
 
-const ROLES = ['AXM', 'AXA', 'CTM', 'CTA', 'CX Manager', 'Compliance', 'RIA Leadership'] as const;
+const ROLES = ['AXM', 'AXA', 'CTM', 'CTA', 'CX Manager', 'Compliance', 'RIA Leadership', 'Director'] as const;
 
 const ROLE_COLORS: Record<string, { bg: string; color: string }> = {
   'AXM':            { bg: 'rgba(29,118,130,0.12)', color: C.teal },
@@ -26,6 +26,7 @@ const ROLE_COLORS: Record<string, { bg: string; color: string }> = {
   'CX Manager':     { bg: C.greenBg, color: C.green },
   'Compliance':     { bg: C.amberBg, color: C.amber },
   'RIA Leadership': { bg: 'rgba(91,106,113,0.1)', color: C.slate },
+  'Director':       { bg: 'rgba(142,68,173,0.12)', color: '#8e44ad' },
 };
 
 const ROLE_DESCRIPTIONS: Record<string, string> = {
@@ -36,6 +37,7 @@ const ROLE_DESCRIPTIONS: Record<string, string> = {
   'CX Manager':     'Customer Experience Manager – Post-launch advisor support',
   'Compliance':     'Compliance Officer – Regulatory and compliance oversight',
   'RIA Leadership': 'RIA Manager/Leader – Senior RIA oversight',
+  'Director':       'AX Director – Team leadership and staffing oversight',
 };
 
 interface TeamMember {

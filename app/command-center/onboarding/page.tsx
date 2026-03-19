@@ -2,6 +2,7 @@
 
 import useSWR from 'swr';
 import { useState } from 'react';
+import Link from 'next/link';
 import { ONBOARDING_STAGE_IDS, STAGE_LABELS } from '@/lib/onboarding-tasks';
 import type { OnboardingTask, Phase } from '@/lib/onboarding-tasks';
 
@@ -10,6 +11,9 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 const C = {
   dark: '#333333', white: '#ffffff', slate: '#5b6a71',
   teal: '#1d7682', bg: '#FAF7F2', cardBg: '#ffffff', border: '#e8e2d9',
+  red: '#c0392b', redBg: 'rgba(192,57,43,0.08)',
+  amber: '#b27d2e', amberBg: 'rgba(178,125,46,0.08)',
+  green: '#27ae60', greenBg: 'rgba(39,174,96,0.10)',
 };
 
 const PHASE_LABELS: Record<Phase, string> = {
@@ -24,6 +28,195 @@ interface TaskRow extends OnboardingTask {
   completed_at: string | null;
 }
 
+interface WorkloadEntry {
+  member_id: number;
+  member_name: string;
+  member_email: string;
+  role: string;
+  active_deals: number;
+  total_complexity: number;
+  capacity_used_pct: number;
+  capacity_status: 'green' | 'amber' | 'red';
+  deals: Array<{
+    deal_id: string;
+    deal_name: string;
+    dealstage: string;
+    complexity_score: number;
+    complexity_tier: string;
+  }>;
+}
+
+const STATUS_COLORS: Record<string, { bg: string; color: string; border: string }> = {
+  green: { bg: C.greenBg, color: C.green, border: 'rgba(39,174,96,0.2)' },
+  amber: { bg: C.amberBg, color: C.amber, border: 'rgba(178,125,46,0.2)' },
+  red: { bg: C.redBg, color: C.red, border: 'rgba(192,57,43,0.2)' },
+};
+
+// ── AXM Workload Dashboard ──────────────────────────────────────────────────
+function WorkloadDashboard() {
+  const { data, isLoading } = useSWR('/api/command-center/workload?role=AXM', fetcher, { refreshInterval: 43_200_000 });
+  const [expandedMember, setExpandedMember] = useState<number | null>(null);
+
+  if (isLoading) return <div style={{ padding: 20, color: C.slate, fontSize: 13 }}>Loading workload data...</div>;
+
+  const workload: WorkloadEntry[] = data?.workload ?? [];
+  const maxCapacity: number = data?.maxCapacity ?? 250;
+
+  if (workload.length === 0) {
+    return (
+      <div style={{
+        padding: '24px 20px', background: C.cardBg, border: `1px solid ${C.border}`,
+        borderRadius: 10, marginBottom: 28, textAlign: 'center', color: C.slate, fontSize: 13,
+      }}>
+        No active AXMs found. Add team members in the Team page to see workload balancing.
+      </div>
+    );
+  }
+
+  const totalAdvisors = workload.reduce((sum, w) => sum + w.active_deals, 0);
+  const avgComplexity = workload.length > 0
+    ? Math.round(workload.reduce((sum, w) => sum + w.total_complexity, 0) / workload.length)
+    : 0;
+  const overloaded = workload.filter(w => w.capacity_status === 'red').length;
+
+  return (
+    <div style={{ marginBottom: 28 }}>
+      {/* Summary row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
+        <div style={{ padding: '14px 16px', background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
+          <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Active AXMs</p>
+          <p style={{ fontSize: 22, fontWeight: 700, color: C.teal, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{workload.length}</p>
+        </div>
+        <div style={{ padding: '14px 16px', background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
+          <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Total Advisors</p>
+          <p style={{ fontSize: 22, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{totalAdvisors}</p>
+        </div>
+        <div style={{ padding: '14px 16px', background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8 }}>
+          <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Avg Complexity Load</p>
+          <p style={{ fontSize: 22, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{avgComplexity}/{maxCapacity}</p>
+        </div>
+        <div style={{ padding: '14px 16px', background: overloaded > 0 ? C.redBg : C.greenBg, border: `1px solid ${overloaded > 0 ? 'rgba(192,57,43,0.15)' : 'rgba(39,174,96,0.15)'}`, borderRadius: 8 }}>
+          <p style={{ fontSize: 11, color: overloaded > 0 ? C.red : C.green, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
+            {overloaded > 0 ? 'Overloaded' : 'Team Status'}
+          </p>
+          <p style={{ fontSize: 22, fontWeight: 700, color: overloaded > 0 ? C.red : C.green, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+            {overloaded > 0 ? `${overloaded} AXM${overloaded > 1 ? 's' : ''}` : 'Balanced'}
+          </p>
+        </div>
+      </div>
+
+      {/* AXM Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+        {workload.map(w => {
+          const sc = STATUS_COLORS[w.capacity_status];
+          const isExpanded = expandedMember === w.member_id;
+
+          return (
+            <div key={w.member_id} style={{
+              background: C.cardBg, border: `1px solid ${sc.border}`,
+              borderRadius: 10, overflow: 'hidden',
+            }}>
+              {/* Header */}
+              <div
+                onClick={() => setExpandedMember(isExpanded ? null : w.member_id)}
+                style={{
+                  padding: '14px 16px', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}
+              >
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: C.dark, marginBottom: 2 }}>{w.member_name}</p>
+                  <p style={{ fontSize: 11, color: C.slate }}>
+                    {w.active_deals} advisor{w.active_deals !== 1 ? 's' : ''} · {w.total_complexity} pts
+                  </p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{
+                    display: 'inline-block', padding: '2px 8px', borderRadius: 4,
+                    fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+                    background: sc.bg, color: sc.color,
+                  }}>
+                    {w.capacity_status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Capacity bar */}
+              <div style={{ padding: '0 16px 12px' }}>
+                <div style={{ height: 8, background: '#e8e2d9', borderRadius: 4, overflow: 'hidden', position: 'relative' }}>
+                  {/* Amber threshold marker */}
+                  <div style={{
+                    position: 'absolute', left: '60%', top: 0, bottom: 0,
+                    width: 1, background: C.amber, opacity: 0.4,
+                  }} />
+                  {/* Red threshold marker */}
+                  <div style={{
+                    position: 'absolute', left: '88%', top: 0, bottom: 0,
+                    width: 1, background: C.red, opacity: 0.4,
+                  }} />
+                  {/* Fill */}
+                  <div style={{
+                    height: '100%', borderRadius: 4, transition: 'width 0.3s',
+                    width: `${Math.min(w.capacity_used_pct, 100)}%`,
+                    background: sc.color,
+                  }} />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                  <span style={{ fontSize: 10, color: C.slate }}>{w.capacity_used_pct}% capacity</span>
+                  <span style={{ fontSize: 10, color: C.slate }}>{w.total_complexity}/{maxCapacity} pts</span>
+                </div>
+              </div>
+
+              {/* Expanded: deal list */}
+              {isExpanded && w.deals.length > 0 && (
+                <div style={{ borderTop: `1px solid ${C.border}`, padding: '10px 16px' }}>
+                  <p style={{ fontSize: 10, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
+                    Assigned Advisors
+                  </p>
+                  {w.deals.map(d => {
+                    const tierColor = d.complexity_tier === 'Critical' ? '#8e44ad'
+                      : d.complexity_tier === 'High' ? C.red
+                      : d.complexity_tier === 'Moderate' ? C.amber
+                      : C.green;
+                    return (
+                      <div key={d.deal_id} style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: '6px 0', borderBottom: `1px solid ${C.border}`,
+                      }}>
+                        <Link
+                          href={`/command-center/advisor/${d.deal_id}`}
+                          style={{ fontSize: 12, color: C.teal, textDecoration: 'none', fontWeight: 500 }}
+                        >
+                          {d.deal_name}
+                        </Link>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: tierColor }}>{d.complexity_score}</span>
+                          <span style={{
+                            fontSize: 9, padding: '1px 5px', borderRadius: 3,
+                            background: `${tierColor}15`, color: tierColor, fontWeight: 600,
+                          }}>
+                            {d.complexity_tier}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {isExpanded && w.deals.length === 0 && (
+                <div style={{ borderTop: `1px solid ${C.border}`, padding: '12px 16px', color: C.slate, fontSize: 12 }}>
+                  No advisors currently assigned.
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Progress Bar ─────────────────────────────────────────────────────────────
 function ProgressBar({ completed, total }: { completed: number; total: number }) {
   const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
   return (
@@ -124,9 +317,14 @@ function AdvisorChecklist({ deal }: { deal: { id: string; dealname: string; deal
     <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 10, marginBottom: 24, overflow: 'hidden' }}>
       <div style={{ padding: '18px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 4 }}>
-            {deal.dealname}
-          </h3>
+          <Link
+            href={`/command-center/advisor/${deal.id}`}
+            style={{ textDecoration: 'none' }}
+          >
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 4, cursor: 'pointer' }}>
+              {deal.dealname}
+            </h3>
+          </Link>
           <span style={{ fontSize: 11, color: C.teal, fontWeight: 500 }}>{STAGE_LABELS[deal.dealstage] ?? deal.dealstage}</span>
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -150,6 +348,7 @@ function AdvisorChecklist({ deal }: { deal: { id: string; dealname: string; deal
 
 export default function OnboardingTracker() {
   const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, { refreshInterval: 43_200_000 });
+  const [activeTab, setActiveTab] = useState<'workload' | 'checklists'>('workload');
 
   if (isLoading) return <div style={{ padding: '60px 40px', color: C.slate }}>Loading…</div>;
   if (error) return <div style={{ padding: '60px 40px', color: '#c0392b' }}>Failed to load data.</div>;
@@ -160,23 +359,54 @@ export default function OnboardingTracker() {
 
   return (
     <div style={{ padding: '40px 40px', minHeight: '100vh', background: C.bg, fontFamily: "'Fakt', system-ui, sans-serif" }}>
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 6 }}>
-          Active Onboarding
-        </h1>
-        <p style={{ color: C.slate, fontSize: 14 }}>
-          {onboardingDeals.length} advisor{onboardingDeals.length !== 1 ? 's' : ''} in onboarding · 43-task checklist · real-time sync
-        </p>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
+        <div>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 6 }}>
+            Active Onboarding
+          </h1>
+          <p style={{ color: C.slate, fontSize: 14 }}>
+            {onboardingDeals.length} advisor{onboardingDeals.length !== 1 ? 's' : ''} in onboarding · Team capacity tracking · 43-task checklist
+          </p>
+        </div>
+
+        {/* Tab switcher */}
+        <div style={{ display: 'flex', gap: 4, background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 6, padding: 3 }}>
+          {[
+            { key: 'workload' as const, label: 'AXM Workload' },
+            { key: 'checklists' as const, label: 'Checklists' },
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              style={{
+                padding: '6px 14px', borderRadius: 4, fontSize: 12, fontWeight: 500,
+                background: activeTab === tab.key ? C.teal : 'transparent',
+                color: activeTab === tab.key ? C.white : C.slate,
+                border: 'none', cursor: 'pointer', transition: 'all 150ms',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {onboardingDeals.length === 0 ? (
-        <div style={{ padding: '60px 40px', textAlign: 'center', color: C.slate, background: C.cardBg, borderRadius: 8, border: `1px solid ${C.border}` }}>
-          No advisors currently in onboarding (Offer Accepted or Launched stages).
-        </div>
-      ) : (
-        onboardingDeals.map((deal: { id: string; dealname: string; dealstage: string }) => (
-          <AdvisorChecklist key={deal.id} deal={deal} />
-        ))
+      {/* AXM Workload Tab */}
+      {activeTab === 'workload' && <WorkloadDashboard />}
+
+      {/* Checklists Tab */}
+      {activeTab === 'checklists' && (
+        <>
+          {onboardingDeals.length === 0 ? (
+            <div style={{ padding: '60px 40px', textAlign: 'center', color: C.slate, background: C.cardBg, borderRadius: 8, border: `1px solid ${C.border}` }}>
+              No advisors currently in onboarding (Offer Accepted or Launched stages).
+            </div>
+          ) : (
+            onboardingDeals.map((deal: { id: string; dealname: string; dealstage: string }) => (
+              <AdvisorChecklist key={deal.id} deal={deal} />
+            ))
+          )}
+        </>
       )}
     </div>
   );
