@@ -6,6 +6,8 @@ const PIPELINE_ID = '751770';
 
 // ── Stage definitions ─────────────────────────────────────────────────────────
 // Active stages: deals currently progressing through the funnel
+// NOTE: Holding Pattern and terminal stages are excluded from the dashboard entirely.
+// Launched advisors (Step 7) are included but filtered to 90 days past start date.
 const ACTIVE_STAGE_IDS = [
   '2496931',   // Step 1 – First Meeting
   '2496932',   // Step 2 – Financial Model
@@ -14,14 +16,9 @@ const ACTIVE_STAGE_IDS = [
   '2496935',   // Step 5 – Offer Review
   '2496936',   // Step 6 – Offer Accepted
   '100411705', // Step 7 – Launched
-  '31214941',  // Holding Pattern
 ];
 
-// Terminal stages: only included if modified within the last 90 days
-const TERMINAL_STAGE_IDS = [
-  '2496937',   // Prospect Passed
-  '26572965',  // Farther Passed
-];
+const LAUNCHED_STAGE_ID = '100411705';
 
 const DEAL_PROPERTIES = [
   // Identity
@@ -102,21 +99,21 @@ async function fetchActiveDeals(): Promise<DealResult[]> {
   ]);
 }
 
-// ── Fetch recently closed deals (terminal stages, last 90 days) ───────────────
-async function fetchRecentlyClosedDeals(): Promise<DealResult[]> {
-  const ninetyDaysAgo = new Date();
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-  const cutoffMs = ninetyDaysAgo.getTime().toString();
+// ── Filter launched deals: only keep those within 90 days of start date ──────
+function filterLaunchedDeals(deals: DealResult[]): DealResult[] {
+  const now = new Date();
+  const ninetyDaysAgoMs = now.getTime() - (90 * 24 * 60 * 60 * 1000);
 
-  return paginatedSearch([
-    {
-      filters: [
-        { propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID },
-        { propertyName: 'dealstage', operator: 'IN', values: TERMINAL_STAGE_IDS },
-        { propertyName: 'hs_lastmodifieddate', operator: 'GTE', value: cutoffMs },
-      ],
-    },
-  ]);
+  return deals.filter(deal => {
+    if (deal.properties.dealstage !== LAUNCHED_STAGE_ID) return true;
+
+    // Use actual_launch_date first, fall back to desired_start_date
+    const startStr = deal.properties.actual_launch_date || deal.properties.desired_start_date;
+    if (!startStr) return true; // No date → keep (can't determine age)
+
+    const startMs = new Date(startStr).getTime();
+    return startMs >= ninetyDaysAgoMs; // Keep if launched within last 90 days
+  });
 }
 
 // ── Fetch owners ──────────────────────────────────────────────────────────────
@@ -134,35 +131,23 @@ async function fetchOwners(): Promise<Record<string, string>> {
 // ── GET handler ───────────────────────────────────────────────────────────────
 export async function GET() {
   try {
-    const [activeDeals, recentlyClosedDeals, owners] = await Promise.all([
+    const [rawDeals, owners] = await Promise.all([
       fetchActiveDeals(),
-      fetchRecentlyClosedDeals(),
       fetchOwners(),
     ]);
 
-    // De-duplicate (a deal could theoretically appear in both if stage changed)
-    const seen = new Set<string>();
-    const allDeals: DealResult[] = [];
-    for (const deal of [...activeDeals, ...recentlyClosedDeals]) {
-      if (!seen.has(deal.id)) {
-        seen.add(deal.id);
-        allDeals.push(deal);
-      }
-    }
+    // Filter out launched advisors who are 90+ days past their start date
+    const deals = filterLaunchedDeals(rawDeals);
 
-    const enriched = allDeals.map(deal => ({
+    const enriched = deals.map(deal => ({
       id: deal.id,
       ...deal.properties,
       ownerName: owners[deal.properties.hubspot_owner_id ?? ''] ?? null,
-      // Flag terminal deals so the frontend can style them differently
-      isTerminal: TERMINAL_STAGE_IDS.includes(deal.properties.dealstage ?? ''),
     }));
 
     return NextResponse.json({
       deals: enriched,
       total: enriched.length,
-      activeCount: activeDeals.length,
-      recentlyClosedCount: recentlyClosedDeals.length,
     });
   } catch (err) {
     console.error('[pipeline]', err);

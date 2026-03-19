@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import useSWR from 'swr';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -172,6 +173,124 @@ function AdvisorIntelSection({ deal }: { deal: Record<string, any> }) {
   );
 }
 
+// ── Complexity Score Panel ────────────────────────────────────────────────────
+interface ComplexityFactor {
+  category: string;
+  factor: string;
+  points: number;
+  maxPoints: number;
+  detail: string;
+}
+
+interface ComplexityData {
+  score: number;
+  tier: string;
+  tierColor: string;
+  factors: ComplexityFactor[];
+  staffingRec: string;
+  estimatedDays: number;
+}
+
+function ComplexityPanel({ dealId }: { dealId: string }) {
+  const { data, isLoading } = useSWR<ComplexityData>(
+    dealId ? `/api/command-center/complexity?dealId=${dealId}` : null,
+    fetcher
+  );
+  const [expanded, setExpanded] = useState(false);
+
+  if (isLoading || !data || !data.score) return null;
+
+  const { score, tier, tierColor, factors, staffingRec, estimatedDays } = data;
+
+  return (
+    <div style={{
+      background: C.cardBg, border: `1px solid ${tierColor}40`,
+      borderRadius: 10, marginBottom: 20, overflow: 'hidden',
+    }}>
+      {/* Header bar */}
+      <div
+        onClick={() => setExpanded(!expanded)}
+        style={{
+          padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          background: `${tierColor}0a`, cursor: 'pointer',
+          borderBottom: expanded ? `1px solid ${tierColor}20` : 'none',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: tierColor, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            Transition Complexity
+          </div>
+          {/* Score badge */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '4px 12px', borderRadius: 20,
+            background: `${tierColor}18`, border: `1px solid ${tierColor}30`,
+          }}>
+            <span style={{ fontSize: 18, fontWeight: 700, color: tierColor, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+              {score}
+            </span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: tierColor }}>
+              {tier}
+            </span>
+          </div>
+          {/* Mini progress bar */}
+          <div style={{ width: 80, height: 6, background: 'rgba(91,106,113,0.08)', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${Math.min((score / 105) * 100, 100)}%`, background: tierColor, borderRadius: 3 }} />
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <span style={{ fontSize: 12, color: C.slate }}>Est. {estimatedDays} days</span>
+          <span style={{ fontSize: 14, color: C.slate }}>{expanded ? '▲' : '▼'}</span>
+        </div>
+      </div>
+
+      {/* Expanded detail */}
+      {expanded && (
+        <div style={{ padding: '16px 20px' }}>
+          {/* Staffing recommendation */}
+          <div style={{
+            padding: '10px 14px', borderRadius: 6, marginBottom: 16,
+            background: `${tierColor}08`, border: `1px solid ${tierColor}15`,
+          }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: tierColor, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
+              Staffing Recommendation
+            </p>
+            <p style={{ fontSize: 13, color: C.dark, lineHeight: 1.5 }}>{staffingRec}</p>
+          </div>
+
+          {/* Factor breakdown */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {factors.map((f, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0', borderBottom: i < factors.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                <div style={{ width: 90, fontSize: 10, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  {f.category}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: C.dark }}>{f.factor}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: f.points > 0 ? tierColor : C.slate }}>
+                      {f.points}/{f.maxPoints}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 11, color: C.slate, lineHeight: 1.4 }}>{f.detail}</p>
+                </div>
+                {/* Factor bar */}
+                <div style={{ width: 50, height: 4, background: 'rgba(91,106,113,0.08)', borderRadius: 2, overflow: 'hidden', flexShrink: 0 }}>
+                  <div style={{
+                    height: '100%', borderRadius: 2,
+                    width: f.maxPoints > 0 ? `${(f.points / f.maxPoints) * 100}%` : '0%',
+                    background: f.points > 0 ? tierColor : 'transparent',
+                  }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdvisorReportCard() {
   const params = useParams();
   const id = params.id as string;
@@ -228,6 +347,9 @@ export default function AdvisorReportCard() {
           />
         ))}
       </div>
+
+      {/* Complexity Score */}
+      <ComplexityPanel dealId={id} />
 
       {/* STAGE 1+: Basic Info */}
       <Section title="Advisor Overview">

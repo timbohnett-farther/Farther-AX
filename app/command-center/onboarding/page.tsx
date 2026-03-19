@@ -103,7 +103,7 @@ function PhaseSection({ phase, tasks, onToggle }: {
 }
 
 function AdvisorChecklist({ deal }: { deal: { id: string; dealname: string; dealstage: string } }) {
-  const { data, mutate } = useSWR(`/api/command-center/checklist/${deal.id}`, fetcher, { refreshInterval: 30_000 });
+  const { data, mutate } = useSWR(`/api/command-center/checklist/${deal.id}`, fetcher, { refreshInterval: 43_200_000 });
   const tasks: TaskRow[] = data?.tasks ?? [];
   const completedCount = tasks.filter(t => t.completed).length;
 
@@ -149,7 +149,7 @@ function AdvisorChecklist({ deal }: { deal: { id: string; dealname: string; deal
 }
 
 export default function OnboardingTracker() {
-  const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, { refreshInterval: 30_000 });
+  const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, { refreshInterval: 43_200_000 });
 
   if (isLoading) return <div style={{ padding: '60px 40px', color: C.slate }}>Loading…</div>;
   if (error) return <div style={{ padding: '60px 40px', color: '#c0392b' }}>Failed to load data.</div>;

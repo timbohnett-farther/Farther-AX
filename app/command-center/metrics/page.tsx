@@ -58,7 +58,7 @@ function BarRow({ label, count, total, color }: { label: string; count: number; 
 }
 
 export default function MetricsDashboard() {
-  const { data, error, isLoading } = useSWR('/api/command-center/metrics', fetcher, { refreshInterval: 30_000 });
+  const { data, error, isLoading } = useSWR('/api/command-center/metrics', fetcher, { refreshInterval: 43_200_000 });
 
   if (isLoading) return <div style={{ padding: '60px 40px', color: C.slate }}>Loading metrics…</div>;
   if (error || data?.error) return <div style={{ padding: '60px 40px', color: '#c0392b' }}>Failed to load metrics.</div>;

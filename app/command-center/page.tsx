@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import useSWR from 'swr';
 import Link from 'next/link';
 
@@ -26,24 +26,16 @@ const STAGE_LABELS: Record<string, string> = {
   '2496935':   'Step 5 – Offer Review',
   '2496936':   'Step 6 – Offer Accepted',
   '100411705': 'Step 7 – Launched',
-  '31214941':  'Holding Pattern',
-  '2496937':   'Prospect Passed',
-  '26572965':  'Farther Passed',
 };
 
 const STAGE_DESCRIPTIONS: Record<string, string> = {
   '2496936':   'AX Team Introduced',
   '100411705': 'Official Start at Farther',
-  '31214941':  'Deal Stale',
-  '2496937':   'Deal Lost',
-  '26572965':  'No Further Marketing',
 };
 
 const ACTIVE_STAGE_IDS = ['2496931', '2496932', '2496934', '100409509', '2496935', '2496936', '100411705'];
 const FUNNEL_STAGE_ORDER = ['2496931', '2496932', '2496934', '100409509', '2496935', '2496936', '100411705'];
-const HOLDING_STAGE_ID = '31214941';
-const TERMINAL_STAGE_IDS = ['2496937', '26572965'];
-const ALL_STAGE_ORDER = [...FUNNEL_STAGE_ORDER, HOLDING_STAGE_ID];
+const ALL_STAGE_ORDER = [...FUNNEL_STAGE_ORDER];
 
 // ── Stage colors ─────────────────────────────────────────────────────────────
 const STAGE_COLORS: Record<string, string> = {
@@ -54,7 +46,6 @@ const STAGE_COLORS: Record<string, string> = {
   '2496935':   '#2f73a8',
   '2496936':   C.gold,
   '100411705': C.teal,
-  '31214941':  C.amber,
 };
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -92,12 +83,12 @@ interface Deal {
   actual_launch_date: string | null;
   client_households: string | null;
   ownerName: string | null;
-  isTerminal?: boolean;
 }
 
 interface AcquisitionsDeal extends Deal {
   stageLabel: string;
   stageOrder: number;
+  isTerminal?: boolean;
 }
 
 interface AcquisitionsStage {
@@ -127,7 +118,6 @@ function SummaryCard({ label, value, sub, accent, icon }: { label: string; value
 
 function StageBadge({ stageId, label, isTerminal }: { stageId: string; label: string; isTerminal?: boolean }) {
   const isLaunched = stageId === '100411705';
-  const isHolding = stageId === HOLDING_STAGE_ID;
   const isOfferAccepted = stageId === '2496936';
   const description = STAGE_DESCRIPTIONS[stageId];
 
@@ -135,14 +125,12 @@ function StageBadge({ stageId, label, isTerminal }: { stageId: string; label: st
   let color = C.slate;
   let borderColor = 'transparent';
 
-  if (isLaunched) {
+  if (isTerminal) {
+    bg = C.redBg; color = C.red; borderColor = C.redBorder;
+  } else if (isLaunched) {
     bg = 'rgba(29,118,130,0.1)'; color = C.teal;
   } else if (isOfferAccepted) {
     bg = C.goldBg; color = C.gold; borderColor = 'rgba(200,169,81,0.25)';
-  } else if (isHolding) {
-    bg = C.amberBg; color = C.amber; borderColor = C.amberBorder;
-  } else if (isTerminal) {
-    bg = C.redBg; color = C.red; borderColor = C.redBorder;
   }
 
   return (
@@ -158,11 +146,130 @@ function StageBadge({ stageId, label, isTerminal }: { stageId: string; label: st
   );
 }
 
+// ── Launch timer component ───────────────────────────────────────────────────
+// Step 6: countdown to launch. Step 7: days since launch + graduation progress.
+function LaunchTimer({ deal }: { deal: Deal }) {
+  const isOfferAccepted = deal.dealstage === '2496936';
+  const isLaunched = deal.dealstage === '100411705';
+
+  if (!isOfferAccepted && !isLaunched) return <span style={{ color: C.slate }}>—</span>;
+
+  const launchDateStr = deal.actual_launch_date || deal.desired_start_date;
+  if (!launchDateStr) return <span style={{ color: C.slate, fontSize: 12 }}>No date set</span>;
+
+  const launchDate = new Date(launchDateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - launchDate.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  // ── Step 6: Countdown to launch ──
+  if (isOfferAccepted) {
+    const daysUntilLaunch = -diffDays;
+    if (daysUntilLaunch < 0) {
+      // Past target date but still in Step 6
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: C.red }}>
+            {Math.abs(daysUntilLaunch)}d overdue
+          </span>
+          <span style={{ fontSize: 10, color: C.slate }}>
+            Target: {launchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+          </span>
+        </div>
+      );
+    }
+    const urgencyColor = daysUntilLaunch <= 7 ? C.red : daysUntilLaunch <= 30 ? C.amber : C.teal;
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: urgencyColor }}>
+          T-{daysUntilLaunch}d
+        </span>
+        <span style={{ fontSize: 10, color: C.slate }}>
+          {launchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+        </span>
+      </div>
+    );
+  }
+
+  // ── Step 7: Days since launch + graduation tracker ──
+  const daysSinceLaunch = diffDays;
+
+  // Graduation milestones
+  let milestone = '';
+  let milestoneColor = C.slate;
+  let progressPct = 0;
+
+  if (daysSinceLaunch >= 45) {
+    milestone = 'Graduated';
+    milestoneColor = C.green;
+    progressPct = 100;
+  } else if (daysSinceLaunch >= 30) {
+    milestone = '90% assets target';
+    milestoneColor = C.teal;
+    progressPct = Math.round((daysSinceLaunch / 45) * 100);
+  } else if (daysSinceLaunch >= 0) {
+    milestone = '70% assets by Day 30';
+    milestoneColor = C.amber;
+    progressPct = Math.round((daysSinceLaunch / 45) * 100);
+  } else {
+    // Future launch date
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: C.teal }}>T-{Math.abs(daysSinceLaunch)}d</span>
+        <span style={{ fontSize: 10, color: C.slate }}>Pre-launch</span>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 120 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: milestoneColor }}>
+          Day {daysSinceLaunch}
+        </span>
+        <span style={{ fontSize: 10, color: C.slate }}>/ 45</span>
+      </div>
+      {/* Progress bar */}
+      <div style={{ width: '100%', height: 4, background: 'rgba(91,106,113,0.1)', borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
+        {/* Day 30 marker */}
+        <div style={{ position: 'absolute', left: `${(30/45)*100}%`, top: 0, width: 1, height: '100%', background: 'rgba(91,106,113,0.3)' }} />
+        <div style={{
+          height: '100%', borderRadius: 2,
+          width: `${Math.min(progressPct, 100)}%`,
+          background: milestoneColor, transition: 'width 0.3s ease',
+        }} />
+      </div>
+      <span style={{ fontSize: 10, fontWeight: 500, color: milestoneColor }}>{milestone}</span>
+    </div>
+  );
+}
+
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div style={{ marginBottom: 16 }}>
       <h3 style={{ fontSize: 15, fontWeight: 600, color: C.dark, fontFamily: "'Fakt', system-ui, sans-serif", marginBottom: subtitle ? 4 : 0 }}>{title}</h3>
       {subtitle && <p style={{ fontSize: 12, color: C.slate }}>{subtitle}</p>}
+    </div>
+  );
+}
+
+// ── Complexity score badge ───────────────────────────────────────────────────
+function ComplexityBadge({ score, tier, tierColor }: { score: number; tier: string; tierColor: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }} title={`${tier} complexity — Score: ${score}/105`}>
+      <span style={{
+        fontSize: 12, fontWeight: 700, color: tierColor,
+        fontFamily: "'ABC Arizona Text', Georgia, serif",
+      }}>
+        {score}
+      </span>
+      <div style={{ width: 32, height: 4, background: 'rgba(91,106,113,0.08)', borderRadius: 2, overflow: 'hidden' }}>
+        <div style={{
+          height: '100%', borderRadius: 2,
+          width: `${Math.min((score / 105) * 100, 100)}%`,
+          background: tierColor,
+        }} />
+      </div>
     </div>
   );
 }
@@ -219,8 +326,6 @@ function DistributionList({ items, total }: { items: { label: string; count: num
 function CommandDashboard({ deals }: { deals: Deal[] }) {
   const analytics = useMemo(() => {
     const activeDeals = deals.filter(d => ACTIVE_STAGE_IDS.includes(d.dealstage));
-    const holdingDeals = deals.filter(d => d.dealstage === HOLDING_STAGE_ID);
-    const terminalDeals = deals.filter(d => TERMINAL_STAGE_IDS.includes(d.dealstage));
     const funnelDeals = deals.filter(d => FUNNEL_STAGE_ORDER.includes(d.dealstage));
     const launchedDeals = deals.filter(d => d.dealstage === '100411705');
     const preLaunchDeals = activeDeals.filter(d => d.dealstage !== '100411705');
@@ -234,9 +339,6 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
       return { id: sid, label: STAGE_LABELS[sid], count: stageDeals.length, aum, color: STAGE_COLORS[sid] };
     });
 
-    // ── Holding pattern ──
-    const holdingAUM = holdingDeals.reduce((acc, d) => acc + getAUM(d), 0);
-
     // ── Total active AUM ──
     const totalActiveAUM = activeDeals.reduce((acc, d) => acc + getAUM(d), 0);
     const preLaunchAUM = preLaunchDeals.reduce((acc, d) => acc + getAUM(d), 0);
@@ -247,7 +349,6 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
       const cutoff = new Date();
       cutoff.setDate(cutoff.getDate() + days);
       return preLaunchDeals
-        .concat(holdingDeals)
         .filter(d => {
           if (!d.desired_start_date) return false;
           const dt = new Date(d.desired_start_date);
@@ -266,7 +367,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 
     // ── Firm type distribution ──
     const firmTypeCounts: Record<string, number> = {};
-    for (const d of activeDeals.concat(holdingDeals)) {
+    for (const d of activeDeals) {
       const ft = d.firm_type || 'Not Set';
       firmTypeCounts[ft] = (firmTypeCounts[ft] ?? 0) + 1;
     }
@@ -276,7 +377,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 
     // ── Transition type distribution ──
     const transTypeCounts: Record<string, number> = {};
-    for (const d of activeDeals.concat(holdingDeals)) {
+    for (const d of activeDeals) {
       const tt = d.transition_type || 'Not Set';
       transTypeCounts[tt] = (transTypeCounts[tt] ?? 0) + 1;
     }
@@ -286,7 +387,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 
     // ── Custodian distribution ──
     const custCounts: Record<string, number> = {};
-    for (const d of activeDeals.concat(holdingDeals)) {
+    for (const d of activeDeals) {
       let cust = (d.custodian__cloned_ ?? '').trim();
       if (!cust) cust = 'Not Set';
       // Normalize Schwab variants
@@ -300,11 +401,11 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
       .map(([label, count]) => ({ label, count }));
 
     // ── AUM by stage ──
-    const maxStageAUM = Math.max(...stageFunnel.map(s => s.aum), holdingAUM);
+    const maxStageAUM = Math.max(...stageFunnel.map(s => s.aum));
 
     return {
-      activeDeals, holdingDeals, terminalDeals, launchedDeals, preLaunchDeals,
-      stageFunnel, holdingAUM, totalActiveAUM, preLaunchAUM,
+      activeDeals, launchedDeals, preLaunchDeals,
+      stageFunnel, totalActiveAUM, preLaunchAUM,
       launches30, launches60, launches90, launches30AUM, launches60AUM, launches90AUM,
       firmTypes, transTypes, custodians,
       maxStageAUM,
@@ -312,12 +413,12 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
   }, [deals]);
 
   const a = analytics;
-  const totalFunnelDeals = a.activeDeals.length + a.holdingDeals.length;
+  const totalFunnelDeals = a.activeDeals.length;
 
   return (
     <div style={{ marginBottom: 40 }}>
       {/* ── Hero Stats ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 32 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 32 }}>
         <SummaryCard
           label="Total Pipeline AUM"
           value={formatAUM(a.totalActiveAUM)}
@@ -327,7 +428,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
         <SummaryCard
           label="Pre-Launch AUM"
           value={formatAUM(a.preLaunchAUM)}
-          sub={`${a.preLaunchDeals.length} in funnel · ${a.holdingDeals.length} holding`}
+          sub={`${a.preLaunchDeals.length} in funnel`}
           icon="▸"
         />
         <SummaryCard
@@ -339,14 +440,8 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
         <SummaryCard
           label="Launched Advisors"
           value={String(a.launchedDeals.length)}
-          sub="Step 7 – Active at Farther"
+          sub="Step 7 – Within 90 days"
           icon="✓"
-        />
-        <SummaryCard
-          label="Recently Closed"
-          value={String(a.terminalDeals.length)}
-          sub="Last 90 days"
-          icon="✕"
         />
       </div>
 
@@ -358,20 +453,12 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           <SectionHeader title="Pipeline Funnel" subtitle="Advisors & projected AUM by stage" />
           <HorizontalBar
             maxValue={a.maxStageAUM}
-            items={[
-              ...a.stageFunnel.map(s => ({
-                label: STAGE_LABELS[s.id].replace('Step ', 'S'),
-                value: s.count,
-                color: s.color,
-                sub: formatAUM(s.aum),
-              })),
-              {
-                label: 'Holding',
-                value: a.holdingDeals.length,
-                color: C.amber,
-                sub: formatAUM(a.holdingAUM),
-              },
-            ]}
+            items={a.stageFunnel.map(s => ({
+              label: STAGE_LABELS[s.id].replace('Step ', 'S'),
+              value: s.count,
+              color: s.color,
+              sub: formatAUM(s.aum),
+            }))}
           />
         </div>
 
@@ -444,17 +531,6 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
               </div>
             );
           })}
-          {/* Holding bar */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: C.dark }}>{formatAUM(a.holdingAUM)}</div>
-            <div style={{
-              width: '100%', borderRadius: '4px 4px 0 0',
-              height: `${Math.max((a.holdingAUM / (a.maxStageAUM || 1)) * 100, 4)}%`, minHeight: 4,
-              background: C.amber, transition: 'height 0.4s ease',
-            }} />
-            <div style={{ fontSize: 10, color: C.slate, textAlign: 'center', lineHeight: 1.2 }}>Holding</div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: C.amber }}>{a.holdingDeals.length}</div>
-          </div>
         </div>
       </div>
 
@@ -486,23 +562,33 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 // ADVISOR RECRUITING TAB
 // ══════════════════════════════════════════════════════════════════════════════
 function RecruitingTab() {
-  const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, { refreshInterval: 30_000 });
+  const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, { refreshInterval: 43_200_000 });
   const [showDashboard, setShowDashboard] = useState(true);
+  const [complexityScores, setComplexityScores] = useState<Record<string, { score: number; tier: string; tierColor: string }>>({});
+
+  const deals: Deal[] = data?.deals ?? [];
+
+  // Fetch complexity scores after deals load
+  useEffect(() => {
+    if (deals.length === 0) return;
+    const dealIds = deals.map(d => d.id);
+    fetch('/api/command-center/complexity/batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dealIds }),
+    })
+      .then(r => r.json())
+      .then(d => { if (d.scores) setComplexityScores(d.scores); })
+      .catch(() => {}); // Silent fail — scores are supplementary
+  }, [deals]);
 
   if (isLoading) return <div style={{ padding: '60px 0', color: C.slate }}>Loading pipeline…</div>;
   if (error || data?.error) return <div style={{ padding: '60px 0', color: C.red }}>Failed to load pipeline data.</div>;
 
-  const deals: Deal[] = data?.deals ?? [];
-  const activeDeals = deals.filter(d => ACTIVE_STAGE_IDS.includes(d.dealstage));
-  const holdingDeals = deals.filter(d => d.dealstage === HOLDING_STAGE_ID);
-  const terminalDeals = deals.filter(d => TERMINAL_STAGE_IDS.includes(d.dealstage));
-
-  // All deals in a single unified table: active first, then holding, then terminal
-  const sortedDeals = [
-    ...activeDeals.sort((a, b) => FUNNEL_STAGE_ORDER.indexOf(a.dealstage) - FUNNEL_STAGE_ORDER.indexOf(b.dealstage)),
-    ...holdingDeals,
-    ...terminalDeals,
-  ];
+  // All deals sorted by funnel stage order
+  const sortedDeals = [...deals]
+    .filter(d => ACTIVE_STAGE_IDS.includes(d.dealstage))
+    .sort((a, b) => FUNNEL_STAGE_ORDER.indexOf(a.dealstage) - FUNNEL_STAGE_ORDER.indexOf(b.dealstage));
 
   return (
     <>
@@ -528,29 +614,20 @@ function RecruitingTab() {
       {/* Stage Funnel Pills */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
         {ALL_STAGE_ORDER.map(stageId => {
-          const count = deals.filter(d => d.dealstage === stageId).length;
+          const count = sortedDeals.filter(d => d.dealstage === stageId).length;
           if (!count) return null;
           const isLaunched = stageId === '100411705';
-          const isHolding = stageId === HOLDING_STAGE_ID;
           const isOfferAccepted = stageId === '2496936';
           return (
             <div key={stageId} style={{
               padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500,
-              background: isLaunched ? 'rgba(29,118,130,0.15)' : isOfferAccepted ? C.goldBg : isHolding ? C.amberBg : 'rgba(91,106,113,0.08)',
-              color: isLaunched ? C.teal : isOfferAccepted ? C.gold : isHolding ? C.amber : C.slate,
+              background: isLaunched ? 'rgba(29,118,130,0.15)' : isOfferAccepted ? C.goldBg : 'rgba(91,106,113,0.08)',
+              color: isLaunched ? C.teal : isOfferAccepted ? C.gold : C.slate,
             }}>
               {STAGE_LABELS[stageId]} · {count}
             </div>
           );
         })}
-        {terminalDeals.length > 0 && (
-          <div style={{
-            padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500,
-            background: C.redBg, color: C.red,
-          }}>
-            Passed / Closed · {terminalDeals.length}
-          </div>
-        )}
       </div>
 
       {/* Deals Table */}
@@ -559,7 +636,7 @@ function RecruitingTab() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr style={{ borderBottom: `1px solid ${C.border}`, background: '#f7f4ef' }}>
-                {['Advisor / Deal', 'Prior Firm', 'Type', 'Custodian', 'Stage', 'Exp. AUM', 'Target Launch', 'Owner'].map(h => (
+                {['Advisor / Deal', 'Prior Firm', 'Type', 'Stage', 'Exp. AUM', 'Complexity', 'Launch Status', 'Owner'].map(h => (
                   <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: C.slate, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
                     {h}
                   </th>
@@ -568,33 +645,33 @@ function RecruitingTab() {
             </thead>
             <tbody>
               {sortedDeals.map((deal, i) => {
-                const isTerminal = TERMINAL_STAGE_IDS.includes(deal.dealstage);
-                const rowOpacity = isTerminal ? 0.6 : 1;
+                const cx = complexityScores[deal.id];
                 return (
                   <tr key={deal.id} style={{
                     borderBottom: `1px solid ${C.border}`,
-                    background: isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? C.cardBg : '#faf7f2',
-                    opacity: rowOpacity,
+                    background: i % 2 === 0 ? C.cardBg : '#faf7f2',
                   }}>
                     <td style={{ padding: '10px 14px' }}>
                       <Link
                         href={`/command-center/advisor/${deal.id}`}
-                        style={{ fontWeight: 600, color: isTerminal ? C.slate : C.teal, textDecoration: isTerminal ? 'line-through' : 'none' }}
+                        style={{ fontWeight: 600, color: C.teal, textDecoration: 'none' }}
                       >
                         {deal.dealname}
                       </Link>
                     </td>
                     <td style={{ padding: '10px 14px', color: C.slate }}>{deal.current_firm__cloned_ ?? '—'}</td>
                     <td style={{ padding: '10px 14px', color: C.slate }}>{deal.firm_type ?? '—'}</td>
-                    <td style={{ padding: '10px 14px', color: C.slate }}>{deal.custodian__cloned_ || '—'}</td>
                     <td style={{ padding: '10px 14px' }}>
-                      <StageBadge stageId={deal.dealstage} label={STAGE_LABELS[deal.dealstage] ?? deal.dealstage} isTerminal={isTerminal} />
+                      <StageBadge stageId={deal.dealstage} label={STAGE_LABELS[deal.dealstage] ?? deal.dealstage} />
                     </td>
-                    <td style={{ padding: '10px 14px', color: isTerminal ? C.slate : C.teal, fontWeight: 600 }}>
+                    <td style={{ padding: '10px 14px', color: C.teal, fontWeight: 600 }}>
                       {formatAUM(parseFloat(deal.transferable_aum ?? '0'))}
                     </td>
-                    <td style={{ padding: '10px 14px', color: C.slate }}>
-                      {formatDate(deal.desired_start_date)}
+                    <td style={{ padding: '10px 14px' }}>
+                      {cx ? <ComplexityBadge score={cx.score} tier={cx.tier} tierColor={cx.tierColor} /> : <span style={{ color: C.slate, fontSize: 11 }}>…</span>}
+                    </td>
+                    <td style={{ padding: '10px 14px' }}>
+                      <LaunchTimer deal={deal} />
                     </td>
                     <td style={{ padding: '10px 14px', color: C.slate }}>{deal.ownerName ?? '—'}</td>
                   </tr>
@@ -612,7 +689,7 @@ function RecruitingTab() {
 // ACQUISITIONS TAB
 // ══════════════════════════════════════════════════════════════════════════════
 function AcquisitionsTab() {
-  const { data, error, isLoading } = useSWR('/api/command-center/acquisitions', fetcher, { refreshInterval: 30_000 });
+  const { data, error, isLoading } = useSWR('/api/command-center/acquisitions', fetcher, { refreshInterval: 43_200_000 });
 
   if (isLoading) return <div style={{ padding: '60px 0', color: C.slate }}>Loading acquisitions…</div>;
   if (error || data?.error) return <div style={{ padding: '60px 0', color: C.red }}>Failed to load acquisitions data.</div>;

@@ -24,7 +24,9 @@ const navItems = [
 const commandCenterItems = [
   { label: 'Pipeline', href: '/command-center', icon: '◈' },
   { label: 'Onboarding', href: '/command-center/onboarding', icon: '✓' },
+  { label: 'Team', href: '/command-center/team', icon: '●' },
   { label: 'Metrics', href: '/command-center/metrics', icon: '▲' },
+  { label: 'Complexity', href: '/command-center/complexity', icon: '◉' },
   { label: 'AI Assistant', href: '/command-center/ai', icon: '✦' },
 ];
 
