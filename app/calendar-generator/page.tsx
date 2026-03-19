@@ -71,17 +71,17 @@ export default function CalendarGeneratorPage() {
         {/* Form */}
         <div
           className="rounded-xl border p-6 mb-6"
-          style={{ borderColor: "#D8CFC4", backgroundColor: "rgba(255,255,255,0.5)" }}
+          style={{ borderColor: "#dde8f0", backgroundColor: "rgba(255,255,255,0.5)" }}
         >
           <h2
             className="text-xl font-bold mb-5"
-            style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#2D2D2D" }}
+            style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#333333" }}
           >
             Advisor Details
           </h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "#6B6B6B" }}>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "#5b6a71" }}>
                 Advisor Name
               </label>
               <input
@@ -90,18 +90,18 @@ export default function CalendarGeneratorPage() {
                 onChange={(e) => setAdvisorName(e.target.value)}
                 placeholder="e.g. Jane Smith"
                 className="w-full px-3 py-2 rounded-md border text-sm outline-none"
-                style={{ borderColor: "#D8CFC4", backgroundColor: "#F5F0EB", color: "#2D2D2D" }}
+                style={{ borderColor: "#dde8f0", backgroundColor: "#ffffff", color: "#333333" }}
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "#6B6B6B" }}>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "#5b6a71" }}>
                 Pathway
               </label>
               <select
                 value={pathway}
                 onChange={(e) => setPathway(e.target.value)}
                 className="w-full px-3 py-2 rounded-md border text-sm outline-none"
-                style={{ borderColor: "#D8CFC4", backgroundColor: "#F5F0EB", color: "#2D2D2D" }}
+                style={{ borderColor: "#dde8f0", backgroundColor: "#ffffff", color: "#333333" }}
               >
                 <option value="breakaway">Breakaway</option>
                 <option value="independent_ria">Independent RIA</option>
@@ -110,7 +110,7 @@ export default function CalendarGeneratorPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "#6B6B6B" }}>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "#5b6a71" }}>
                 Launch / Go Live Date
               </label>
               <input
@@ -118,11 +118,11 @@ export default function CalendarGeneratorPage() {
                 value={launchDate}
                 onChange={(e) => setLaunchDate(e.target.value)}
                 className="w-full px-3 py-2 rounded-md border text-sm outline-none"
-                style={{ borderColor: "#D8CFC4", backgroundColor: "#F5F0EB", color: "#2D2D2D" }}
+                style={{ borderColor: "#dde8f0", backgroundColor: "#ffffff", color: "#333333" }}
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "#6B6B6B" }}>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "#5b6a71" }}>
                 Advisor Email (for invites)
               </label>
               <input
@@ -131,11 +131,11 @@ export default function CalendarGeneratorPage() {
                 onChange={(e) => setAdvisorEmail(e.target.value)}
                 placeholder="advisor@example.com"
                 className="w-full px-3 py-2 rounded-md border text-sm outline-none"
-                style={{ borderColor: "#D8CFC4", backgroundColor: "#F5F0EB", color: "#2D2D2D" }}
+                style={{ borderColor: "#dde8f0", backgroundColor: "#ffffff", color: "#333333" }}
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "#6B6B6B" }}>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "#5b6a71" }}>
                 AXM Email
               </label>
               <input
@@ -144,7 +144,7 @@ export default function CalendarGeneratorPage() {
                 onChange={(e) => setAxmEmail(e.target.value)}
                 placeholder="axm@farther.com"
                 className="w-full px-3 py-2 rounded-md border text-sm outline-none"
-                style={{ borderColor: "#D8CFC4", backgroundColor: "#F5F0EB", color: "#2D2D2D" }}
+                style={{ borderColor: "#dde8f0", backgroundColor: "#ffffff", color: "#333333" }}
               />
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function CalendarGeneratorPage() {
             disabled={!launchDate}
             className="mt-5 px-6 py-2.5 rounded-md text-sm font-semibold text-white transition-opacity"
             style={{
-              backgroundColor: launchDate ? "#B8977E" : "#D8CFC4",
+              backgroundColor: launchDate ? "#1d7682" : "#dde8f0",
               cursor: launchDate ? "pointer" : "not-allowed",
             }}
           >
@@ -166,24 +166,24 @@ export default function CalendarGeneratorPage() {
         {generated && launch && (
           <div
             className="rounded-xl border overflow-hidden"
-            style={{ borderColor: "#D8CFC4" }}
+            style={{ borderColor: "#dde8f0" }}
           >
             <div
               className="px-6 py-4 flex items-center justify-between"
-              style={{ backgroundColor: "#EDE7DF" }}
+              style={{ backgroundColor: "#f0f5f9" }}
             >
               <h2
                 className="text-xl font-bold"
-                style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#2D2D2D" }}
+                style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#333333" }}
               >
                 {advisorName ? `${advisorName} — Meeting Schedule` : "Meeting Schedule"}
               </h2>
-              <span className="text-sm" style={{ color: "#6B6B6B" }}>
+              <span className="text-sm" style={{ color: "#5b6a71" }}>
                 Launch: {formatDate(launch)}
               </span>
             </div>
 
-            <div className="divide-y" style={{ borderColor: "#D8CFC4" }}>
+            <div className="divide-y" style={{ borderColor: "#dde8f0" }}>
               {MEETINGS.map((m) => {
                 const date = addDays(launch, m.daysFromLaunch);
                 const isGoLive = m.id === "go_live";
@@ -192,7 +192,7 @@ export default function CalendarGeneratorPage() {
                     key={m.id}
                     className="flex items-center gap-4 px-6 py-3"
                     style={{
-                      backgroundColor: isGoLive ? "rgba(184,151,126,0.1)" : "transparent",
+                      backgroundColor: isGoLive ? "rgba(29,118,130,0.1)" : "transparent",
                       opacity: included[m.id] ? 1 : 0.4,
                     }}
                   >
@@ -204,19 +204,19 @@ export default function CalendarGeneratorPage() {
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium" style={{ color: "#2D2D2D" }}>
+                        <span className="text-sm font-medium" style={{ color: "#333333" }}>
                           {m.label}
                         </span>
                         {isGoLive && (
                           <span
                             className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                            style={{ backgroundColor: "#B8977E", color: "white" }}
+                            style={{ backgroundColor: "#1d7682", color: "white" }}
                           >
                             Go Live
                           </span>
                         )}
                       </div>
-                      <div className="text-xs mt-0.5" style={{ color: "#6B6B6B" }}>
+                      <div className="text-xs mt-0.5" style={{ color: "#5b6a71" }}>
                         {formatDate(date)} · Owner: {m.owner}
                       </div>
                     </div>
@@ -226,7 +226,7 @@ export default function CalendarGeneratorPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="shrink-0 px-3 py-1 rounded text-xs font-medium border transition-colors"
-                        style={{ borderColor: "#B8977E", color: "#9A7A62" }}
+                        style={{ borderColor: "#1d7682", color: "#155961" }}
                       >
                         Add to Calendar ↗
                       </a>

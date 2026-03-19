@@ -62,10 +62,10 @@ export default function NoToLowAUMPage() {
         {/* Section: When This Pathway Applies */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#B8977E" }} />
+            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#2D2D2D", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
             >
               When This Pathway Applies
             </h2>
@@ -100,10 +100,10 @@ export default function NoToLowAUMPage() {
         {/* Section: Key Characteristics */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#B8977E" }} />
+            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#2D2D2D", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
             >
               Key Characteristics
             </h2>
@@ -114,23 +114,23 @@ export default function NoToLowAUMPage() {
               <div
                 key={idx}
                 className="rounded-xl p-6 border"
-                style={{ backgroundColor: "#EDE7DF", borderColor: "#D8CFC4" }}
+                style={{ backgroundColor: "#f0f5f9", borderColor: "#dde8f0" }}
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0"
-                    style={{ backgroundColor: "#B8977E", color: "#F5F0EB" }}
+                    style={{ backgroundColor: "#1d7682", color: "#ffffff" }}
                   >
                     {item.icon}
                   </div>
                   <h3
                     className="font-serif text-lg leading-tight"
-                    style={{ color: "#2D2D2D", fontFamily: "'Playfair Display', Georgia, serif" }}
+                    style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
                   >
                     {item.title}
                   </h3>
                 </div>
-                <p className="text-sm leading-relaxed" style={{ color: "#6B6B6B" }}>
+                <p className="text-sm leading-relaxed" style={{ color: "#5b6a71" }}>
                   {item.body}
                 </p>
               </div>
@@ -141,10 +141,10 @@ export default function NoToLowAUMPage() {
         {/* Section: The Focus Team Review */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#B8977E" }} />
+            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#2D2D2D", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
             >
               The Focus Team Review
             </h2>
@@ -152,24 +152,24 @@ export default function NoToLowAUMPage() {
 
           <div
             className="rounded-xl overflow-hidden border"
-            style={{ borderColor: "#D8CFC4" }}
+            style={{ borderColor: "#dde8f0" }}
           >
             <div
               className="px-7 py-5 border-b"
-              style={{ backgroundColor: "#EDE7DF", borderColor: "#D8CFC4" }}
+              style={{ backgroundColor: "#f0f5f9", borderColor: "#dde8f0" }}
             >
-              <p className="text-sm leading-relaxed" style={{ color: "#2D2D2D" }}>
+              <p className="text-sm leading-relaxed" style={{ color: "#333333" }}>
                 The Focus Team is an internal Farther committee that reviews borderline advisor
                 candidates. Their assessment covers the following areas. The AXM must present the
                 advisor&apos;s profile to the Focus Team before initiating any onboarding steps.
               </p>
             </div>
-            <div className="px-7 py-6" style={{ backgroundColor: "#F5F0EB" }}>
+            <div className="px-7 py-6" style={{ backgroundColor: "#ffffff" }}>
               <ul className="space-y-3">
                 {focusTeamItems.map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <span className="shrink-0 mt-0.5" style={{ color: "#B8977E" }}>◆</span>
-                    <span className="text-sm leading-relaxed" style={{ color: "#2D2D2D" }}>
+                    <span className="shrink-0 mt-0.5" style={{ color: "#1d7682" }}>◆</span>
+                    <span className="text-sm leading-relaxed" style={{ color: "#333333" }}>
                       {item}
                     </span>
                   </li>
@@ -182,10 +182,10 @@ export default function NoToLowAUMPage() {
         {/* Section: Training Curriculum Priority */}
         <section className="mb-4">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#B8977E" }} />
+            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#2D2D2D", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
             >
               Training Curriculum Priority
             </h2>
@@ -193,33 +193,33 @@ export default function NoToLowAUMPage() {
 
           <div
             className="rounded-xl border overflow-hidden"
-            style={{ borderColor: "#D8CFC4" }}
+            style={{ borderColor: "#dde8f0" }}
           >
             <div
               className="px-2 py-1 border-b"
-              style={{ backgroundColor: "#2D2D2D", borderColor: "#D8CFC4" }}
+              style={{ backgroundColor: "#333333", borderColor: "#dde8f0" }}
             >
               <span
                 className="text-xs uppercase tracking-widest font-medium px-5 py-3 inline-block"
-                style={{ color: "#B8977E" }}
+                style={{ color: "#1d7682" }}
               >
                 Required Training Modules — In Order
               </span>
             </div>
-            <div style={{ backgroundColor: "#F5F0EB" }}>
+            <div style={{ backgroundColor: "#ffffff" }}>
               {trainingItems.map((item, idx) => (
                 <div
                   key={idx}
                   className="flex items-center gap-5 px-6 py-4 border-b last:border-b-0"
-                  style={{ borderColor: "#D8CFC4" }}
+                  style={{ borderColor: "#dde8f0" }}
                 >
                   <span
                     className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold font-sans"
-                    style={{ backgroundColor: "#EDE7DF", color: "#B8977E", border: "1px solid #D8CFC4" }}
+                    style={{ backgroundColor: "#f0f5f9", color: "#1d7682", border: "1px solid #dde8f0" }}
                   >
                     {String(idx + 1).padStart(2, "0")}
                   </span>
-                  <span className="text-sm leading-relaxed" style={{ color: "#2D2D2D" }}>
+                  <span className="text-sm leading-relaxed" style={{ color: "#333333" }}>
                     {item}
                   </span>
                 </div>

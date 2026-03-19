@@ -1,12 +1,12 @@
 import PageLayout from "@/components/PageLayout";
 
 const COLORS = {
-  charcoal: "#2D2D2D",
-  charcoalMuted: "#6B6B6B",
-  gold: "#B8977E",
-  cream: "#F5F0EB",
-  creamDark: "#EDE7DF",
-  creamBorder: "#D8CFC4",
+  charcoal: "#333333",
+  charcoalMuted: "#5b6a71",
+  gold: "#1d7682",
+  cream: "#ffffff",
+  creamDark: "#f0f5f9",
+  creamBorder: "#dde8f0",
   amberBg: "#FEF3C7",
   amberBorder: "#F59E0B",
   amberText: "#92400E",
@@ -22,7 +22,7 @@ const characteristics = [
   {
     label: "U4 Timing",
     badge: "Hold Until Resignation",
-    badgeColor: "#B8977E",
+    badgeColor: "#1d7682",
     body: "The U4 registration form must NOT be submitted until after the advisor has formally resigned. Submitting early creates a trackable FINRA event that can alert the prior firm prematurely.",
   },
   {
@@ -34,7 +34,7 @@ const characteristics = [
   {
     label: "Resignation Required",
     badge: "Mandatory First Step",
-    badgeColor: "#6B6B6B",
+    badgeColor: "#5b6a71",
     body: "The advisor must formally resign before the Farther onboarding can fully proceed. The AXM coordinates timing with the advisor and Legal to minimize exposure and ensure the transition is clean.",
   },
 ];

@@ -66,10 +66,10 @@ export default function LPOAPage() {
         {/* Section: At a Glance */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#B8977E" }} />
+            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#2D2D2D", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
             >
               At a Glance
             </h2>
@@ -80,17 +80,17 @@ export default function LPOAPage() {
               <div
                 key={idx}
                 className="rounded-xl border text-center px-6 py-7"
-                style={{ backgroundColor: "#EDE7DF", borderColor: "#D8CFC4" }}
+                style={{ backgroundColor: "#f0f5f9", borderColor: "#dde8f0" }}
               >
                 <p
                   className="text-xs uppercase tracking-widest font-medium mb-3"
-                  style={{ color: "#6B6B6B" }}
+                  style={{ color: "#5b6a71" }}
                 >
                   {card.label}
                 </p>
                 <p
                   className="font-serif text-xl leading-snug"
-                  style={{ color: "#B8977E", fontFamily: "'Playfair Display', Georgia, serif" }}
+                  style={{ color: "#1d7682", fontFamily: "'Playfair Display', Georgia, serif" }}
                 >
                   {card.value}
                 </p>
@@ -102,10 +102,10 @@ export default function LPOAPage() {
         {/* Section: How LPOA Works */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#B8977E" }} />
+            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#2D2D2D", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
             >
               How LPOA Works
             </h2>
@@ -113,7 +113,7 @@ export default function LPOAPage() {
 
           <div
             className="rounded-xl border overflow-hidden"
-            style={{ borderColor: "#D8CFC4" }}
+            style={{ borderColor: "#dde8f0" }}
           >
             {processSteps.map((step, idx) => {
               const isLast = idx === processSteps.length - 1;
@@ -122,8 +122,8 @@ export default function LPOAPage() {
                   key={idx}
                   className="flex items-start gap-5 px-6 py-5 border-b last:border-b-0 relative"
                   style={{
-                    backgroundColor: idx % 2 === 0 ? "#F5F0EB" : "#EDE7DF",
-                    borderColor: "#D8CFC4",
+                    backgroundColor: idx % 2 === 0 ? "#ffffff" : "#f0f5f9",
+                    borderColor: "#dde8f0",
                   }}
                 >
                   {/* Step number */}
@@ -131,8 +131,8 @@ export default function LPOAPage() {
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold font-sans shrink-0"
                       style={{
-                        backgroundColor: isLast ? "#B8977E" : "#2D2D2D",
-                        color: "#F5F0EB",
+                        backgroundColor: isLast ? "#1d7682" : "#333333",
+                        color: "#ffffff",
                       }}
                     >
                       {idx + 1}
@@ -142,14 +142,14 @@ export default function LPOAPage() {
                         className="w-px mt-1"
                         style={{
                           height: "20px",
-                          backgroundColor: "#D8CFC4",
+                          backgroundColor: "#dde8f0",
                         }}
                       />
                     )}
                   </div>
                   <p
                     className="text-sm leading-relaxed pt-1.5"
-                    style={{ color: "#2D2D2D" }}
+                    style={{ color: "#333333" }}
                   >
                     {step}
                   </p>
@@ -162,10 +162,10 @@ export default function LPOAPage() {
         {/* Section: Custodian Availability */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#B8977E" }} />
+            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#2D2D2D", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
             >
               Custodian Availability
             </h2>
@@ -176,23 +176,23 @@ export default function LPOAPage() {
               <div
                 key={idx}
                 className="rounded-xl border p-6"
-                style={{ backgroundColor: "#EDE7DF", borderColor: "#D8CFC4" }}
+                style={{ backgroundColor: "#f0f5f9", borderColor: "#dde8f0" }}
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center font-serif font-bold text-lg shrink-0"
-                    style={{ backgroundColor: "#2D2D2D", color: "#F5F0EB" }}
+                    style={{ backgroundColor: "#333333", color: "#ffffff" }}
                   >
                     {c.icon}
                   </div>
                   <h3
                     className="font-serif text-lg"
-                    style={{ color: "#2D2D2D", fontFamily: "'Playfair Display', Georgia, serif" }}
+                    style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
                   >
                     {c.name}
                   </h3>
                 </div>
-                <p className="text-sm leading-relaxed" style={{ color: "#6B6B6B" }}>
+                <p className="text-sm leading-relaxed" style={{ color: "#5b6a71" }}>
                   {c.body}
                 </p>
               </div>
@@ -203,10 +203,10 @@ export default function LPOAPage() {
         {/* Section: Key Considerations */}
         <section className="mb-4">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#B8977E" }} />
+            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#2D2D2D", fontFamily: "'Playfair Display', Georgia, serif" }}
+              style={{ color: "#333333", fontFamily: "'Playfair Display', Georgia, serif" }}
             >
               Key Considerations
             </h2>
@@ -214,35 +214,35 @@ export default function LPOAPage() {
 
           <div
             className="rounded-xl border overflow-hidden"
-            style={{ backgroundColor: "#F5F0EB", borderColor: "#D8CFC4" }}
+            style={{ backgroundColor: "#ffffff", borderColor: "#dde8f0" }}
           >
             {/* Dark header bar */}
             <div
               className="px-6 py-3 border-b"
-              style={{ backgroundColor: "#2D2D2D", borderColor: "#D8CFC4" }}
+              style={{ backgroundColor: "#333333", borderColor: "#dde8f0" }}
             >
               <span
                 className="text-xs uppercase tracking-widest font-medium"
-                style={{ color: "#B8977E" }}
+                style={{ color: "#1d7682" }}
               >
                 Important Notes
               </span>
             </div>
 
-            <ul className="divide-y" style={{ borderColor: "#D8CFC4" }}>
+            <ul className="divide-y" style={{ borderColor: "#dde8f0" }}>
               {considerations.map((item, idx) => (
                 <li
                   key={idx}
                   className="flex items-start gap-4 px-6 py-4"
-                  style={{ borderColor: "#D8CFC4" }}
+                  style={{ borderColor: "#dde8f0" }}
                 >
                   <span
                     className="shrink-0 mt-0.5 text-base"
-                    style={{ color: "#B8977E" }}
+                    style={{ color: "#1d7682" }}
                   >
                     ▸
                   </span>
-                  <span className="text-sm leading-relaxed" style={{ color: "#2D2D2D" }}>
+                  <span className="text-sm leading-relaxed" style={{ color: "#333333" }}>
                     {item}
                   </span>
                 </li>

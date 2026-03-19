@@ -61,7 +61,7 @@ export default function BreakawayProcessPage() {
       nextHref="/calendar-generator"
     >
       <div className="max-w-4xl">
-        <p className="text-base leading-relaxed mb-8" style={{ color: "#4A4A4A" }}>
+        <p className="text-base leading-relaxed mb-8" style={{ color: "#444444" }}>
           The following workflow maps every phase of a Breakaway advisor onboarding — from the
           moment the deal is signed through graduation. Each phase shows the key meetings,
           required attendees, agenda items, and follow-up actions with assigned owners.
@@ -74,7 +74,7 @@ export default function BreakawayProcessPage() {
               <div className="flex items-center gap-4 mb-3">
                 <div
                   className="px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase"
-                  style={{ backgroundColor: "#B8977E", color: "white" }}
+                  style={{ backgroundColor: "#1d7682", color: "white" }}
                 >
                   {phase.phase}
                 </div>
@@ -82,14 +82,14 @@ export default function BreakawayProcessPage() {
                   className="text-xl font-bold"
                   style={{
                     fontFamily: "'Playfair Display', Georgia, serif",
-                    color: "#2D2D2D",
+                    color: "#333333",
                   }}
                 >
                   {phase.title}
                 </h3>
                 <span
                   className="text-sm px-2 py-0.5 rounded border"
-                  style={{ color: "#6B6B6B", borderColor: "#D8CFC4" }}
+                  style={{ color: "#5b6a71", borderColor: "#dde8f0" }}
                 >
                   {phase.duration}
                 </span>
@@ -98,16 +98,16 @@ export default function BreakawayProcessPage() {
               {/* Meetings table */}
               <div
                 className="rounded-lg border overflow-hidden"
-                style={{ borderColor: "#D8CFC4" }}
+                style={{ borderColor: "#dde8f0" }}
               >
                 <table className="w-full text-sm">
                   <thead>
-                    <tr style={{ backgroundColor: "#EDE7DF" }}>
-                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "#6B6B6B", width: "22%" }}>Meeting</th>
-                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "#6B6B6B", width: "20%" }}>Attendees</th>
-                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "#6B6B6B", width: "28%" }}>Agenda</th>
-                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "#6B6B6B", width: "22%" }}>Follow-Up</th>
-                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "#6B6B6B", width: "8%" }}>Owner</th>
+                    <tr style={{ backgroundColor: "#f0f5f9" }}>
+                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "#5b6a71", width: "22%" }}>Meeting</th>
+                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "#5b6a71", width: "20%" }}>Attendees</th>
+                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "#5b6a71", width: "28%" }}>Agenda</th>
+                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "#5b6a71", width: "22%" }}>Follow-Up</th>
+                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "#5b6a71", width: "8%" }}>Owner</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -115,18 +115,18 @@ export default function BreakawayProcessPage() {
                       <tr
                         key={itemIdx}
                         style={{
-                          backgroundColor: itemIdx % 2 === 0 ? "rgba(255,255,255,0.6)" : "#F5F0EB",
-                          borderTop: "1px solid #D8CFC4",
+                          backgroundColor: itemIdx % 2 === 0 ? "rgba(255,255,255,0.6)" : "#ffffff",
+                          borderTop: "1px solid #dde8f0",
                         }}
                       >
-                        <td className="px-4 py-3 font-medium" style={{ color: "#2D2D2D" }}>{item.meeting}</td>
-                        <td className="px-4 py-3" style={{ color: "#4A4A4A" }}>{item.attendees}</td>
-                        <td className="px-4 py-3" style={{ color: "#4A4A4A" }}>{item.agenda}</td>
-                        <td className="px-4 py-3" style={{ color: "#4A4A4A" }}>{item.followUp}</td>
+                        <td className="px-4 py-3 font-medium" style={{ color: "#333333" }}>{item.meeting}</td>
+                        <td className="px-4 py-3" style={{ color: "#444444" }}>{item.attendees}</td>
+                        <td className="px-4 py-3" style={{ color: "#444444" }}>{item.agenda}</td>
+                        <td className="px-4 py-3" style={{ color: "#444444" }}>{item.followUp}</td>
                         <td className="px-4 py-3">
                           <span
                             className="px-2 py-0.5 rounded text-xs font-semibold"
-                            style={{ backgroundColor: "#EDE7DF", color: "#9A7A62" }}
+                            style={{ backgroundColor: "#f0f5f9", color: "#155961" }}
                           >
                             {item.owner}
                           </span>

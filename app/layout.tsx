@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 
@@ -9,9 +9,9 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-dm-sans",
   display: "swap",
 });
 
@@ -26,13 +26,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
+    <html lang="en" className={`${playfair.variable} ${dmSans.variable}`}>
       <body
         className="antialiased"
         style={{
-          fontFamily: "var(--font-inter), system-ui, sans-serif",
-          backgroundColor: "#F5F0EB",
-          color: "#2D2D2D",
+          fontFamily: "var(--font-dm-sans), system-ui, sans-serif",
+          backgroundColor: "#ffffff",
+          color: "#333333",
         }}
       >
         <div className="flex min-h-screen">

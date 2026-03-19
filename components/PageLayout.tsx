@@ -27,13 +27,13 @@ export default function PageLayout({
   const totalStr = String(totalSteps).padStart(2, "0");
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#F5F0EB" }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#ffffff" }}>
       {/* Top bar */}
       <header
         className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b"
         style={{
-          backgroundColor: "#F5F0EB",
-          borderColor: "#D8CFC4",
+          backgroundColor: "#ffffff",
+          borderColor: "#dde8f0",
         }}
       >
         <div>
@@ -41,13 +41,13 @@ export default function PageLayout({
             className="text-2xl font-bold leading-tight"
             style={{
               fontFamily: "'Playfair Display', Georgia, serif",
-              color: "#2D2D2D",
+              color: "#333333",
             }}
           >
             {title}
           </h1>
           {subtitle && (
-            <p className="text-sm mt-0.5" style={{ color: "#6B6B6B" }}>
+            <p className="text-sm mt-0.5" style={{ color: "#5b6a71" }}>
               {subtitle}
             </p>
           )}
@@ -57,13 +57,13 @@ export default function PageLayout({
             className="text-2xl font-bold"
             style={{
               fontFamily: "'Playfair Display', Georgia, serif",
-              color: "#B8977E",
+              color: "#1d7682",
             }}
           >
             {stepStr}
           </span>
-          <span className="text-lg" style={{ color: "#D8CFC4" }}>/</span>
-          <span className="text-lg font-medium" style={{ color: "#9A9A9A" }}>
+          <span className="text-lg" style={{ color: "#dde8f0" }}>/</span>
+          <span className="text-lg font-medium" style={{ color: "#5b6a71" }}>
             {totalStr}
           </span>
         </div>
@@ -75,7 +75,7 @@ export default function PageLayout({
       {/* Bottom navigation */}
       <footer
         className="px-10 py-6 border-t flex items-center justify-between"
-        style={{ borderColor: "#D8CFC4", backgroundColor: "#EDE7DF" }}
+        style={{ borderColor: "#dde8f0", backgroundColor: "#f0f5f9" }}
       >
         <div>
           {backHref ? (
@@ -83,8 +83,8 @@ export default function PageLayout({
               href={backHref}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-all duration-150 border"
               style={{
-                borderColor: "#D8CFC4",
-                color: "#4A4A4A",
+                borderColor: "#dde8f0",
+                color: "#5b6a71",
                 backgroundColor: "transparent",
               }}
             >
@@ -104,7 +104,7 @@ export default function PageLayout({
               style={{
                 width: i + 1 === step ? "20px" : "6px",
                 height: "6px",
-                backgroundColor: i + 1 === step ? "#B8977E" : "#D8CFC4",
+                backgroundColor: i + 1 === step ? "#1d7682" : "#b6d0ed",
               }}
             />
           ))}
@@ -115,7 +115,7 @@ export default function PageLayout({
             <Link
               href={nextHref}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-all duration-150 text-white"
-              style={{ backgroundColor: "#B8977E" }}
+              style={{ backgroundColor: "#1d7682" }}
             >
               {nextLabel} →
             </Link>

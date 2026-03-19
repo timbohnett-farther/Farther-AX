@@ -32,7 +32,7 @@ export default function Sidebar() {
   return (
     <aside
       className="fixed top-0 left-0 h-full w-64 flex flex-col z-40"
-      style={{ background: "#1E1A17" }}
+      style={{ background: "#333333" }}
     >
       {/* Logo / Brand */}
       <div className="px-6 pt-8 pb-6 border-b border-white/10">
@@ -41,13 +41,13 @@ export default function Sidebar() {
             className="text-2xl font-bold tracking-tight"
             style={{
               fontFamily: "'Playfair Display', Georgia, serif",
-              color: "#D4B896",
+              color: "#ffffff",
             }}
           >
             Farther
           </span>
         </div>
-        <p className="text-xs tracking-widest uppercase" style={{ color: "#7A6A5E" }}>
+        <p className="text-xs tracking-widest uppercase" style={{ color: "#5b6a71" }}>
           AX Playbook
         </p>
       </div>
@@ -56,7 +56,7 @@ export default function Sidebar() {
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <p
           className="px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
-          style={{ color: "#5A4A40" }}
+          style={{ color: "#4a5a62" }}
         >
           Sections
         </p>
@@ -74,13 +74,13 @@ export default function Sidebar() {
                   }`}
                   style={
                     isActive
-                      ? { background: "rgba(184,151,126,0.2)", borderLeft: "2px solid #B8977E" }
+                      ? { background: "rgba(29,118,130,0.2)", borderLeft: "2px solid #1d7682" }
                       : {}
                   }
                 >
                   <span
                     className="text-xs font-mono w-5 shrink-0 text-right"
-                    style={{ color: isActive ? "#B8977E" : "#5A4A40" }}
+                    style={{ color: isActive ? "#1d7682" : "#4a5a62" }}
                   >
                     {String(item.step).padStart(2, "0")}
                   </span>
@@ -97,7 +97,7 @@ export default function Sidebar() {
         {/* External Links */}
         <p
           className="px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
-          style={{ color: "#5A4A40" }}
+          style={{ color: "#4a5a62" }}
         >
           Resources
         </p>
@@ -110,7 +110,7 @@ export default function Sidebar() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/40 hover:text-white/70 transition-colors"
               >
-                <span className="text-xs" style={{ color: "#5A4A40" }}>↗</span>
+                <span className="text-xs" style={{ color: "#4a5a62" }}>↗</span>
                 {link.label}
               </a>
             </li>
@@ -120,10 +120,10 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="px-6 py-4 border-t border-white/10">
-        <p className="text-xs" style={{ color: "#3A2E28" }}>
+        <p className="text-xs" style={{ color: "#4a5a62" }}>
           Farther Wealth Management
         </p>
-        <p className="text-xs mt-0.5" style={{ color: "#3A2E28" }}>
+        <p className="text-xs mt-0.5" style={{ color: "#4a5a62" }}>
           Internal Use Only
         </p>
       </div>

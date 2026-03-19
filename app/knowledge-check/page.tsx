@@ -160,14 +160,14 @@ export default function KnowledgeCheckPage() {
           <div
             className="rounded-xl border p-10 text-center"
             style={{
-              backgroundColor: "#EDE7DF",
-              borderColor: "#D8CFC4",
+              backgroundColor: "#f0f5f9",
+              borderColor: "#dde8f0",
             }}
           >
             {/* Trophy / score badge */}
             <div
               className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
-              style={{ backgroundColor: "#B8977E" }}
+              style={{ backgroundColor: "#1d7682" }}
             >
               <span
                 className="text-white text-3xl font-bold"
@@ -181,7 +181,7 @@ export default function KnowledgeCheckPage() {
               className="text-3xl font-bold mb-3"
               style={{
                 fontFamily: "'Playfair Display', Georgia, serif",
-                color: "#2D2D2D",
+                color: "#333333",
               }}
             >
               You scored {score} / 7
@@ -189,7 +189,7 @@ export default function KnowledgeCheckPage() {
 
             <p
               className="text-base mb-8 max-w-md mx-auto leading-relaxed"
-              style={{ color: "#4A4A4A" }}
+              style={{ color: "#444444" }}
             >
               {getScoreMessage(score)}
             </p>
@@ -219,12 +219,12 @@ export default function KnowledgeCheckPage() {
                     <div>
                       <p
                         className="text-sm font-medium"
-                        style={{ color: "#2D2D2D" }}
+                        style={{ color: "#333333" }}
                       >
                         Q{q.id}: {q.question}
                       </p>
                       {!correct && userAns !== null && (
-                        <p className="text-xs mt-0.5" style={{ color: "#6B6B6B" }}>
+                        <p className="text-xs mt-0.5" style={{ color: "#5b6a71" }}>
                           Correct answer: {q.options[q.correctIndex]}
                         </p>
                       )}
@@ -237,7 +237,7 @@ export default function KnowledgeCheckPage() {
             <button
               onClick={handleRetake}
               className="inline-flex items-center gap-2 px-7 py-3 rounded-md text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "#B8977E" }}
+              style={{ backgroundColor: "#1d7682" }}
             >
               ↺ Retake Quiz
             </button>
@@ -250,13 +250,13 @@ export default function KnowledgeCheckPage() {
               <div className="flex items-center justify-between mb-2">
                 <span
                   className="text-sm font-medium"
-                  style={{ color: "#6B6B6B" }}
+                  style={{ color: "#5b6a71" }}
                 >
                   Question {currentIndex + 1} of {QUESTIONS.length}
                 </span>
                 <span
                   className="text-sm font-medium"
-                  style={{ color: "#B8977E" }}
+                  style={{ color: "#1d7682" }}
                 >
                   {Math.round(progressPercent)}% complete
                 </span>
@@ -264,13 +264,13 @@ export default function KnowledgeCheckPage() {
               {/* Progress bar */}
               <div
                 className="w-full rounded-full h-2"
-                style={{ backgroundColor: "#D8CFC4" }}
+                style={{ backgroundColor: "#dde8f0" }}
               >
                 <div
                   className="h-2 rounded-full transition-all duration-500"
                   style={{
                     width: `${progressPercent}%`,
-                    backgroundColor: "#B8977E",
+                    backgroundColor: "#1d7682",
                   }}
                 />
               </div>
@@ -280,15 +280,15 @@ export default function KnowledgeCheckPage() {
             <div
               className="rounded-xl border p-8"
               style={{
-                backgroundColor: "#EDE7DF",
-                borderColor: "#D8CFC4",
+                backgroundColor: "#f0f5f9",
+                borderColor: "#dde8f0",
               }}
             >
               <h2
                 className="text-xl font-bold mb-6 leading-snug"
                 style={{
                   fontFamily: "'Playfair Display', Georgia, serif",
-                  color: "#2D2D2D",
+                  color: "#333333",
                 }}
               >
                 {currentQuestion.question}
@@ -300,9 +300,9 @@ export default function KnowledgeCheckPage() {
                   const isSelected = selectedAnswer === i;
                   const isCorrect = i === currentQuestion.correctIndex;
 
-                  let borderColor = "#D8CFC4";
-                  let bgColor = "#F5F0EB";
-                  let textColor = "#2D2D2D";
+                  let borderColor = "#dde8f0";
+                  let bgColor = "#ffffff";
+                  let textColor = "#333333";
 
                   if (isAnswered) {
                     if (isCorrect) {
@@ -314,9 +314,9 @@ export default function KnowledgeCheckPage() {
                       bgColor = "rgba(252,165,165,0.18)";
                       textColor = "#7F1D1D";
                     } else {
-                      bgColor = "#F5F0EB";
-                      borderColor = "#D8CFC4";
-                      textColor = "#9A9A9A";
+                      bgColor = "#ffffff";
+                      borderColor = "#dde8f0";
+                      textColor = "#8a9aa1";
                     }
                   }
 
@@ -342,12 +342,12 @@ export default function KnowledgeCheckPage() {
                               ? "#16A34A"
                               : isSelected
                               ? "#DC2626"
-                              : "#D8CFC4"
-                            : "#B8977E",
+                              : "#dde8f0"
+                            : "#1d7682",
                           color: isAnswered
                             ? isCorrect || isSelected
                               ? "#fff"
-                              : "#9A9A9A"
+                              : "#8a9aa1"
                             : "#fff",
                         }}
                       >
@@ -408,7 +408,7 @@ export default function KnowledgeCheckPage() {
                       ? "Correct"
                       : "Incorrect"}
                   </p>
-                  <p className="text-sm leading-relaxed" style={{ color: "#2D2D2D" }}>
+                  <p className="text-sm leading-relaxed" style={{ color: "#333333" }}>
                     {currentQuestion.explanation}
                   </p>
                 </div>
@@ -420,7 +420,7 @@ export default function KnowledgeCheckPage() {
                   <button
                     onClick={handleNext}
                     className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                    style={{ backgroundColor: "#B8977E" }}
+                    style={{ backgroundColor: "#1d7682" }}
                   >
                     {isLastQuestion ? "See Results" : "Next Question"} →
                   </button>

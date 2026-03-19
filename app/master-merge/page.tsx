@@ -20,16 +20,16 @@ export default function MasterMergePage() {
             <div
               key={stat.label}
               className="rounded-lg p-5 border text-center"
-              style={{ borderColor: "#D8CFC4", backgroundColor: "rgba(255,255,255,0.5)" }}
+              style={{ borderColor: "#dde8f0", backgroundColor: "rgba(255,255,255,0.5)" }}
             >
-              <p className="text-xs tracking-widest uppercase mb-1" style={{ color: "#9A7A62" }}>
+              <p className="text-xs tracking-widest uppercase mb-1" style={{ color: "#155961" }}>
                 {stat.label}
               </p>
               <p
                 className="text-xl font-bold"
                 style={{
                   fontFamily: "'Playfair Display', Georgia, serif",
-                  color: "#2D2D2D",
+                  color: "#333333",
                 }}
               >
                 {stat.value}
@@ -41,19 +41,19 @@ export default function MasterMergePage() {
         {/* Coming Soon Banner */}
         <div
           className="rounded-xl p-8 border mb-8 text-center"
-          style={{ backgroundColor: "#EDE7DF", borderColor: "#D8CFC4" }}
+          style={{ backgroundColor: "#f0f5f9", borderColor: "#dde8f0" }}
         >
-          <div className="text-5xl mb-4" style={{ color: "#B8977E" }}>◆</div>
+          <div className="text-5xl mb-4" style={{ color: "#1d7682" }}>◆</div>
           <h2
             className="text-2xl font-bold mb-3"
             style={{
               fontFamily: "'Playfair Display', Georgia, serif",
-              color: "#2D2D2D",
+              color: "#333333",
             }}
           >
             Detailed Content Coming Soon
           </h2>
-          <p className="text-base leading-relaxed" style={{ color: "#6B6B6B" }}>
+          <p className="text-base leading-relaxed" style={{ color: "#5b6a71" }}>
             The Master Merge section will provide a complete step-by-step guide to
             executing the fastest available transition method, including custodian
             requirements, eligibility criteria, and the full workflow.
@@ -63,13 +63,13 @@ export default function MasterMergePage() {
         {/* Preview */}
         <div
           className="rounded-lg p-6 border"
-          style={{ borderColor: "#D8CFC4", backgroundColor: "rgba(255,255,255,0.5)" }}
+          style={{ borderColor: "#dde8f0", backgroundColor: "rgba(255,255,255,0.5)" }}
         >
           <h3
             className="text-lg font-semibold mb-4"
             style={{
               fontFamily: "'Playfair Display', Georgia, serif",
-              color: "#2D2D2D",
+              color: "#333333",
             }}
           >
             What This Section Will Cover
@@ -84,8 +84,8 @@ export default function MasterMergePage() {
               "Post-merge verification and reconciliation",
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3">
-                <span style={{ color: "#B8977E", marginTop: "2px" }}>▸</span>
-                <span className="text-sm" style={{ color: "#4A4A4A" }}>{item}</span>
+                <span style={{ color: "#1d7682", marginTop: "2px" }}>▸</span>
+                <span className="text-sm" style={{ color: "#444444" }}>{item}</span>
               </li>
             ))}
           </ul>

@@ -1,12 +1,12 @@
 import PageLayout from "@/components/PageLayout";
 
 const COLORS = {
-  charcoal: "#2D2D2D",
-  charcoalMuted: "#6B6B6B",
-  gold: "#B8977E",
-  cream: "#F5F0EB",
-  creamDark: "#EDE7DF",
-  creamBorder: "#D8CFC4",
+  charcoal: "#333333",
+  charcoalMuted: "#5b6a71",
+  gold: "#1d7682",
+  cream: "#ffffff",
+  creamDark: "#f0f5f9",
+  creamBorder: "#dde8f0",
   blueBg: "#EFF6FF",
   blueBorder: "#3B82F6",
   blueText: "#1E40AF",
@@ -22,7 +22,7 @@ const characteristics = [
   {
     label: "ADV-W Required",
     badge: "Within 90 Days",
-    badgeColor: "#B8977E",
+    badgeColor: "#1d7682",
     body: "The advisor must file Form ADV-W (withdrawal of investment adviser registration) within 90 days of joining Farther. This formally dissolves their independent RIA registration with the SEC or state regulator.",
   },
   {
