@@ -2,12 +2,36 @@ import { NextResponse } from 'next/server';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_PAT!;
 const PIPELINE_ID = '751770';
+
 const DEAL_PROPERTIES = [
-  'dealname', 'transferable_aum', 'aum', 'dealstage', 'desired_start_date',
-  'actual_launch_date', 'transition_type', 'onboarder', 'transition_owner',
-  'custodian__cloned_', 'current_firm__cloned_', 'client_households',
-  'transferable_households', 'firm_type', 'hubspot_owner_id',
-  'createdate', 'hs_lastmodifieddate',
+  // Identity
+  'dealname', 'dealstage', 'pipeline', 'hubspot_owner_id', 'createdate', 'hs_lastmodifieddate',
+  // AUM & Revenue
+  'aum', 'transferable_aum', 'transferable_aum__', 't12_revenue', 'fee_based_revenue',
+  'projected_revenue', 'expected_revenue', 'insurance_annuity_revenue', 'broker_dealer_revenue',
+  'n401k_aum', 'n401k_revenue', 'book_assets', 'book_acquired___inherited__',
+  'initial_aum', 'initial_aum_date', 'new_aum_projected_amount',
+  'average_household_assets',
+  // Clients
+  'client_households', 'transferable_households', 'of_client_households__cloned_',
+  // Transition
+  'transition_type', 'transition_owner', 'transition_notes', 'prior_transitions', 'prior_transitions_notes',
+  // Dates
+  'desired_start_date', 'actual_launch_date', 'closedate',
+  // Firm
+  'current_firm__cloned_', 'custodian__cloned_', 'onboarding_custodian__select_all_that_apply_',
+  'firm_type', 'ibd',
+  // Advisor intel
+  'advisor', 'advisor_goals', 'advisor_top_care_abouts', 'advisor_pain_points',
+  'advisor_go_to_market_strategy', 'advisor_debt',
+  // Tech stack
+  'crm_platform__cloned_', 'financial_planning_platform__cloned_', 'performance_platform__cloned_',
+  'technology_platforms_being_used__cloned_',
+  // Recruiting
+  'advisor_recruiting_lead_source', 'referred_by__cloned_',
+  'onboarder', 'transition_owner',
+  // Staff
+  'people',
 ];
 
 async function fetchAllDeals() {
@@ -25,10 +49,7 @@ async function fetchAllDeals() {
 
     const res = await fetch('https://api.hubapi.com/crm/v3/objects/deals/search', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${HUBSPOT_PAT}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
 
@@ -48,9 +69,7 @@ async function fetchOwners() {
   if (!res.ok) return {};
   const data = await res.json();
   const map: Record<string, string> = {};
-  for (const o of data.results) {
-    map[o.id] = `${o.firstName} ${o.lastName}`.trim();
-  }
+  for (const o of data.results) map[o.id] = `${o.firstName} ${o.lastName}`.trim();
   return map;
 }
 
