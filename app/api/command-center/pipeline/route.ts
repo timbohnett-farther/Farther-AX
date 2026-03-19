@@ -4,6 +4,25 @@ import { NextResponse } from 'next/server';
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
 
+// ── Stage definitions ─────────────────────────────────────────────────────────
+// Active stages: deals currently progressing through the funnel
+const ACTIVE_STAGE_IDS = [
+  '2496931',   // Step 1 – First Meeting
+  '2496932',   // Step 2 – Financial Model
+  '2496934',   // Step 3 – Advisor Demo
+  '100409509', // Step 4 – Discovery Day
+  '2496935',   // Step 5 – Offer Review
+  '2496936',   // Step 6 – Offer Accepted
+  '100411705', // Step 7 – Launched
+  '31214941',  // Holding Pattern
+];
+
+// Terminal stages: only included if modified within the last 90 days
+const TERMINAL_STAGE_IDS = [
+  '2496937',   // Prospect Passed
+  '26572965',  // Farther Passed
+];
+
 const DEAL_PROPERTIES = [
   // Identity
   'dealname', 'dealstage', 'pipeline', 'hubspot_owner_id', 'createdate', 'hs_lastmodifieddate',
@@ -35,13 +54,16 @@ const DEAL_PROPERTIES = [
   'people',
 ];
 
-async function fetchAllDeals() {
-  const deals: unknown[] = [];
+// ── HubSpot pagination helper ─────────────────────────────────────────────────
+type DealResult = { id: string; properties: Record<string, string | null> };
+
+async function paginatedSearch(filterGroups: unknown[]): Promise<DealResult[]> {
+  const deals: DealResult[] = [];
   let after: string | undefined;
 
   do {
     const body: Record<string, unknown> = {
-      filterGroups: [{ filters: [{ propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID }] }],
+      filterGroups,
       properties: DEAL_PROPERTIES,
       sorts: [{ propertyName: 'hs_lastmodifieddate', direction: 'DESCENDING' }],
       limit: 100,
@@ -66,7 +88,39 @@ async function fetchAllDeals() {
   return deals;
 }
 
-async function fetchOwners() {
+// ── Fetch active deals (in-progress stages) ───────────────────────────────────
+async function fetchActiveDeals(): Promise<DealResult[]> {
+  // HubSpot allows max 5 filterGroups. We use one group per active stage
+  // with AND logic: pipeline = X AND dealstage IN active stages.
+  return paginatedSearch([
+    {
+      filters: [
+        { propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID },
+        { propertyName: 'dealstage', operator: 'IN', values: ACTIVE_STAGE_IDS },
+      ],
+    },
+  ]);
+}
+
+// ── Fetch recently closed deals (terminal stages, last 90 days) ───────────────
+async function fetchRecentlyClosedDeals(): Promise<DealResult[]> {
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+  const cutoffMs = ninetyDaysAgo.getTime().toString();
+
+  return paginatedSearch([
+    {
+      filters: [
+        { propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID },
+        { propertyName: 'dealstage', operator: 'IN', values: TERMINAL_STAGE_IDS },
+        { propertyName: 'hs_lastmodifieddate', operator: 'GTE', value: cutoffMs },
+      ],
+    },
+  ]);
+}
+
+// ── Fetch owners ──────────────────────────────────────────────────────────────
+async function fetchOwners(): Promise<Record<string, string>> {
   const res = await fetch('https://api.hubapi.com/crm/v3/owners?limit=100', {
     headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` },
   });
@@ -77,17 +131,39 @@ async function fetchOwners() {
   return map;
 }
 
+// ── GET handler ───────────────────────────────────────────────────────────────
 export async function GET() {
   try {
-    const [deals, owners] = await Promise.all([fetchAllDeals(), fetchOwners()]);
+    const [activeDeals, recentlyClosedDeals, owners] = await Promise.all([
+      fetchActiveDeals(),
+      fetchRecentlyClosedDeals(),
+      fetchOwners(),
+    ]);
 
-    const enriched = (deals as Array<{ id: string; properties: Record<string, string | null> }>).map(deal => ({
+    // De-duplicate (a deal could theoretically appear in both if stage changed)
+    const seen = new Set<string>();
+    const allDeals: DealResult[] = [];
+    for (const deal of [...activeDeals, ...recentlyClosedDeals]) {
+      if (!seen.has(deal.id)) {
+        seen.add(deal.id);
+        allDeals.push(deal);
+      }
+    }
+
+    const enriched = allDeals.map(deal => ({
       id: deal.id,
       ...deal.properties,
       ownerName: owners[deal.properties.hubspot_owner_id ?? ''] ?? null,
+      // Flag terminal deals so the frontend can style them differently
+      isTerminal: TERMINAL_STAGE_IDS.includes(deal.properties.dealstage ?? ''),
     }));
 
-    return NextResponse.json({ deals: enriched, total: enriched.length });
+    return NextResponse.json({
+      deals: enriched,
+      total: enriched.length,
+      activeCount: activeDeals.length,
+      recentlyClosedCount: recentlyClosedDeals.length,
+    });
   } catch (err) {
     console.error('[pipeline]', err);
     const message = err instanceof Error ? err.message : String(err);
