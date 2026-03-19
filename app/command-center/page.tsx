@@ -129,6 +129,7 @@ function StageBadge({ stageId, label, isTerminal }: { stageId: string; label: st
   const isLaunched = stageId === '100411705';
   const isHolding = stageId === HOLDING_STAGE_ID;
   const isOfferAccepted = stageId === '2496936';
+  const description = STAGE_DESCRIPTIONS[stageId];
 
   let bg = 'rgba(91,106,113,0.1)';
   let color = C.slate;
@@ -145,10 +146,13 @@ function StageBadge({ stageId, label, isTerminal }: { stageId: string; label: st
   }
 
   return (
-    <span style={{
-      display: 'inline-block', padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 500,
-      background: bg, color, border: `1px solid ${borderColor}`,
-    }}>
+    <span
+      title={description}
+      style={{
+        display: 'inline-block', padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 500,
+        background: bg, color, border: `1px solid ${borderColor}`, cursor: description ? 'help' : 'default',
+      }}
+    >
       {label}
     </span>
   );
