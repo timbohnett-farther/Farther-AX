@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-const HUBSPOT_PAT = process.env.HUBSPOT_PAT!;
+const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN!;
 const PIPELINE_ID = '751770';
 
 const STAGE_LABELS: Record<string, string> = {

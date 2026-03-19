@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const HUBSPOT_PAT = process.env.HUBSPOT_PAT!;
+const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN!;
 const PIPELINE_ID = '751770';
 const LAUNCHED_STAGE = '100411705';
 

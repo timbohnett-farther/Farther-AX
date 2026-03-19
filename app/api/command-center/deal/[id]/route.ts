@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const HUBSPOT_PAT = process.env.HUBSPOT_PAT!;
+const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN!;
 const TEAMS_OBJECT_TYPE = '2-43222882';
 
 const DEAL_PROPS = [
