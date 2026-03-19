@@ -50,13 +50,13 @@ function SignInContent() {
           className="text-center mb-2"
           style={{
             fontFamily: "'ABC Arizona Text', Georgia, serif",
-            fontSize: "1.75rem",
+            fontSize: "1.35rem",
             fontWeight: 300,
             color: "#333333",
-            lineHeight: 1.3,
+            lineHeight: 1.45,
           }}
         >
-          AX Playbook
+          Advisor Experience &amp; Transition Command Center
         </h1>
         <p
           className="text-center mb-8"
