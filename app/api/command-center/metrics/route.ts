@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN!;
+const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
 const LAUNCHED_STAGE = '100411705';
 
@@ -15,7 +15,7 @@ export async function GET() {
         limit: 200,
       }),
     });
-    if (!res.ok) throw new Error('HubSpot error');
+    if (!res.ok) { const e = await res.text(); throw new Error(`HubSpot ${res.status}: ${e}`); }
     const data = await res.json();
     const deals = data.results as Array<{ properties: Record<string, string | null> }>;
 
@@ -77,7 +77,7 @@ export async function GET() {
     });
   } catch (err) {
     console.error('[metrics]', err);
-    return NextResponse.json({ error: 'Failed to fetch metrics' }, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err); return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

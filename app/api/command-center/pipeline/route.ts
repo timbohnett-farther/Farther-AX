@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
-const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN!;
+// Support both env var names so Railway config doesn't need to change
+const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
 
 const DEAL_PROPERTIES = [
@@ -29,7 +30,7 @@ const DEAL_PROPERTIES = [
   'technology_platforms_being_used__cloned_',
   // Recruiting
   'advisor_recruiting_lead_source', 'referred_by__cloned_',
-  'onboarder', 'transition_owner',
+  'onboarder',
   // Staff
   'people',
 ];
@@ -53,7 +54,10 @@ async function fetchAllDeals() {
       body: JSON.stringify(body),
     });
 
-    if (!res.ok) throw new Error(`HubSpot error: ${res.status}`);
+    if (!res.ok) {
+      const errBody = await res.text();
+      throw new Error(`HubSpot ${res.status}: ${errBody}`);
+    }
     const data = await res.json();
     deals.push(...data.results);
     after = data.paging?.next?.after;
@@ -86,7 +90,8 @@ export async function GET() {
     return NextResponse.json({ deals: enriched, total: enriched.length });
   } catch (err) {
     console.error('[pipeline]', err);
-    return NextResponse.json({ error: 'Failed to fetch pipeline' }, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
