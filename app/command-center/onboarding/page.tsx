@@ -2,7 +2,7 @@
 
 import useSWR from 'swr';
 import { useState } from 'react';
-import { ONBOARDING_TASKS, ONBOARDING_STAGE_IDS, STAGE_LABELS } from '@/lib/onboarding-tasks';
+import { ONBOARDING_STAGE_IDS, STAGE_LABELS } from '@/lib/onboarding-tasks';
 import type { OnboardingTask, Phase } from '@/lib/onboarding-tasks';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
@@ -64,7 +64,7 @@ function PhaseSection({ phase, tasks, onToggle }: {
       </button>
       {open && (
         <div>
-          {phaseTasks.map((task, i) => (
+          {phaseTasks.map((task) => (
             <div
               key={task.key}
               style={{
