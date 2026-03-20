@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import useSWR from 'swr';
 import Link from 'next/link';
 
@@ -35,8 +35,6 @@ const STAGE_DESCRIPTIONS: Record<string, string> = {
 
 const ACTIVE_STAGE_IDS = ['2496931', '2496932', '2496934', '100409509', '2496935', '2496936', '100411705'];
 const FUNNEL_STAGE_ORDER = ['2496931', '2496932', '2496934', '100409509', '2496935', '2496936', '100411705'];
-const ALL_STAGE_ORDER = [...FUNNEL_STAGE_ORDER];
-
 // ── Stage colors ─────────────────────────────────────────────────────────────
 const STAGE_COLORS: Record<string, string> = {
   '2496931':   '#7fb3d8',
@@ -83,7 +81,12 @@ interface Deal {
   actual_launch_date: string | null;
   client_households: string | null;
   ownerName: string | null;
+  daysSinceLaunch: number | null;
 }
+
+// Stage groupings for tabs
+const EARLY_STAGE_IDS = ['2496931', '2496932', '2496934', '100409509']; // Steps 1-4
+const LAUNCH_STAGE_IDS = ['2496935', '2496936', '100411705']; // Steps 5-7
 
 interface AcquisitionsDeal extends Deal {
   stageLabel: string;
@@ -275,44 +278,26 @@ function ComplexityBadge({ score, tier, tierColor }: { score: number; tier: stri
 }
 
 // ── Horizontal bar component ─────────────────────────────────────────────────
-function HorizontalBar({ items, maxValue }: { items: { label: string; value: number; color: string; sub?: string }[]; maxValue: number }) {
+function HorizontalBar({ items, maxValue, perItemMax }: { items: { label: string; value: number; color: string; sub?: string; display?: string }[]; maxValue: number; perItemMax?: number[] }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {items.map((item, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 130, fontSize: 12, color: C.slate, textAlign: 'right', flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {item.label}
-          </div>
-          <div style={{ flex: 1, height: 22, background: 'rgba(91,106,113,0.06)', borderRadius: 4, overflow: 'hidden', position: 'relative' }}>
-            <div style={{
-              height: '100%', borderRadius: 4,
-              width: `${maxValue > 0 ? Math.max((item.value / maxValue) * 100, 2) : 0}%`,
-              background: item.color, transition: 'width 0.4s ease',
-            }} />
-            <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 11, fontWeight: 600, color: C.dark }}>
-              {item.value}{item.sub ? ` · ${item.sub}` : ''}
-            </span>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ── Distribution pill list ───────────────────────────────────────────────────
-function DistributionList({ items, total }: { items: { label: string; count: number }[]; total: number }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       {items.map((item, i) => {
-        const pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
+        const cap = perItemMax?.[i] ?? maxValue;
         return (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ flex: 1, fontSize: 13, color: C.dark }}>{item.label}</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: C.teal, minWidth: 30, textAlign: 'right' }}>{item.count}</div>
-            <div style={{ width: 60, height: 6, background: 'rgba(91,106,113,0.08)', borderRadius: 3, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${pct}%`, background: C.teal, borderRadius: 3 }} />
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 130, fontSize: 12, color: C.slate, textAlign: 'right', flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {item.label}
             </div>
-            <div style={{ fontSize: 11, color: C.slate, minWidth: 32, textAlign: 'right' }}>{pct}%</div>
+            <div style={{ flex: 1, height: 22, background: 'rgba(91,106,113,0.06)', borderRadius: 4, overflow: 'hidden', position: 'relative' }}>
+              <div style={{
+                height: '100%', borderRadius: 4,
+                width: `${cap > 0 ? Math.max((item.value / cap) * 100, 2) : 0}%`,
+                background: item.color, transition: 'width 0.4s ease',
+              }} />
+              <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 11, fontWeight: 600, color: C.dark }}>
+                {item.display ?? item.value}{item.sub ? ` · ${item.sub}` : ''}
+              </span>
+            </div>
           </div>
         );
       })}
@@ -365,41 +350,6 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
     const launches60AUM = launches60.reduce((acc, d) => acc + getAUM(d), 0);
     const launches90AUM = launches90.reduce((acc, d) => acc + getAUM(d), 0);
 
-    // ── Firm type distribution ──
-    const firmTypeCounts: Record<string, number> = {};
-    for (const d of activeDeals) {
-      const ft = d.firm_type || 'Not Set';
-      firmTypeCounts[ft] = (firmTypeCounts[ft] ?? 0) + 1;
-    }
-    const firmTypes = Object.entries(firmTypeCounts)
-      .sort(([, a], [, b]) => b - a)
-      .map(([label, count]) => ({ label: label.replace(/_/g, ' '), count }));
-
-    // ── Transition type distribution ──
-    const transTypeCounts: Record<string, number> = {};
-    for (const d of activeDeals) {
-      const tt = d.transition_type || 'Not Set';
-      transTypeCounts[tt] = (transTypeCounts[tt] ?? 0) + 1;
-    }
-    const transTypes = Object.entries(transTypeCounts)
-      .sort(([, a], [, b]) => b - a)
-      .map(([label, count]) => ({ label, count }));
-
-    // ── Custodian distribution ──
-    const custCounts: Record<string, number> = {};
-    for (const d of activeDeals) {
-      let cust = (d.custodian__cloned_ ?? '').trim();
-      if (!cust) cust = 'Not Set';
-      // Normalize Schwab variants
-      if (cust.toLowerCase().includes('schwab') || cust.toLowerCase().includes('charles schwab')) {
-        if (!cust.includes(',') && !cust.includes('&')) cust = 'Schwab';
-      }
-      custCounts[cust] = (custCounts[cust] ?? 0) + 1;
-    }
-    const custodians = Object.entries(custCounts)
-      .sort(([, a], [, b]) => b - a)
-      .map(([label, count]) => ({ label, count }));
-
     // ── AUM by stage ──
     const maxStageAUM = Math.max(...stageFunnel.map(s => s.aum));
 
@@ -407,13 +357,11 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
       activeDeals, launchedDeals, preLaunchDeals,
       stageFunnel, totalActiveAUM, preLaunchAUM,
       launches30, launches60, launches90, launches30AUM, launches60AUM, launches90AUM,
-      firmTypes, transTypes, custodians,
       maxStageAUM,
     };
   }, [deals]);
 
   const a = analytics;
-  const totalFunnelDeals = a.activeDeals.length;
 
   return (
     <div style={{ marginBottom: 40 }}>
@@ -453,11 +401,13 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           <SectionHeader title="Pipeline Funnel" subtitle="Advisors & projected AUM by stage" />
           <HorizontalBar
             maxValue={a.maxStageAUM}
+            perItemMax={[20e9, 15e9, 10e9, 7e9, 5e9, 4e9, 4e9]}
             items={a.stageFunnel.map(s => ({
               label: STAGE_LABELS[s.id].replace('Step ', 'S'),
-              value: s.count,
+              value: s.aum,
+              display: formatAUM(s.aum),
               color: s.color,
-              sub: formatAUM(s.aum),
+              sub: `${s.count} deals`,
             }))}
           />
         </div>
@@ -487,73 +437,52 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           </div>
 
           {/* Upcoming launches list */}
-          <div style={{ maxHeight: 200, overflowY: 'auto' }}>
-            {a.launches30.length > 0 ? (
-              <div style={{ fontSize: 12 }}>
-                <div style={{ fontWeight: 600, color: C.dark, marginBottom: 8 }}>Next 30 Days</div>
-                {a.launches30.map(deal => (
-                  <div key={deal.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', borderBottom: `1px solid ${C.border}` }}>
-                    <Link href={`/command-center/advisor/${deal.id}`} style={{ color: C.teal, fontWeight: 500, textDecoration: 'none', flex: 1 }}>
-                      {deal.dealname}
-                    </Link>
-                    <StageBadge stageId={deal.dealstage} label={STAGE_LABELS[deal.dealstage] ?? deal.dealstage} />
-                    <span style={{ color: C.teal, fontWeight: 600, minWidth: 50, textAlign: 'right' }}>{formatAUM(parseFloat(deal.transferable_aum ?? '0'))}</span>
-                    <span style={{ color: C.slate, minWidth: 40, textAlign: 'right' }}>{daysUntil(deal.desired_start_date!)}d</span>
-                  </div>
-                ))}
-              </div>
+          <div style={{ maxHeight: 220, overflow: 'auto' }}>
+            {a.launches90.length > 0 ? (
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 420 }}>
+                <thead>
+                  <tr style={{ borderBottom: `1px solid ${C.border}`, position: 'sticky', top: 0, background: C.cardBg, zIndex: 1 }}>
+                    {['Advisor', 'Stage', 'Exp. AUM', 'Days'].map(h => (
+                      <th key={h} style={{ padding: '6px 8px', textAlign: h === 'Advisor' ? 'left' : 'right', color: C.slate, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {a.launches90
+                    .sort((x, y) => new Date(x.desired_start_date!).getTime() - new Date(y.desired_start_date!).getTime())
+                    .map(deal => {
+                      const days = daysUntil(deal.desired_start_date!);
+                      const urgencyColor = days <= 7 ? C.red : days <= 30 ? C.amber : C.teal;
+                      return (
+                        <tr key={deal.id} style={{ borderBottom: `1px solid ${C.border}` }}>
+                          <td style={{ padding: '5px 8px' }}>
+                            <Link href={`/command-center/advisor/${deal.id}`} style={{ color: C.teal, fontWeight: 500, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                              {deal.dealname}
+                            </Link>
+                          </td>
+                          <td style={{ padding: '5px 8px', textAlign: 'right' }}>
+                            <StageBadge stageId={deal.dealstage} label={STAGE_LABELS[deal.dealstage] ?? deal.dealstage} />
+                          </td>
+                          <td style={{ padding: '5px 8px', color: C.teal, fontWeight: 600, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                            {formatAUM(parseFloat(deal.transferable_aum ?? '0'))}
+                          </td>
+                          <td style={{ padding: '5px 8px', fontWeight: 600, textAlign: 'right', color: urgencyColor, whiteSpace: 'nowrap' }}>
+                            {days}d
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
             ) : (
-              <p style={{ fontSize: 13, color: C.slate, textAlign: 'center', padding: 20 }}>No launches scheduled in the next 30 days</p>
+              <p style={{ fontSize: 13, color: C.slate, textAlign: 'center', padding: 20 }}>No launches scheduled in the next 90 days</p>
             )}
           </div>
         </div>
       </div>
 
-      {/* ── Row 2: AUM by Stage bar chart ── */}
-      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24, marginBottom: 20 }}>
-        <SectionHeader title="Projected AUM by Stage" subtitle="Total transferable AUM at each funnel stage" />
-        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 140 }}>
-          {a.stageFunnel.map(stage => {
-            const maxAUM = a.maxStageAUM || 1;
-            const heightPct = Math.max((stage.aum / maxAUM) * 100, 4);
-            return (
-              <div key={stage.id} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: C.dark }}>{formatAUM(stage.aum)}</div>
-                <div style={{
-                  width: '100%', borderRadius: '4px 4px 0 0',
-                  height: `${heightPct}%`, minHeight: 4,
-                  background: stage.color, transition: 'height 0.4s ease',
-                }} />
-                <div style={{ fontSize: 10, color: C.slate, textAlign: 'center', lineHeight: 1.2 }}>
-                  {STAGE_LABELS[stage.id].replace('Step ', 'S').replace(' – ', '\n')}
-                </div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: stage.color }}>{stage.count}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── Row 3: Breakdown Charts ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginBottom: 20 }}>
-        {/* Firm Type */}
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24 }}>
-          <SectionHeader title="Firm Type" subtitle="Where advisors are coming from" />
-          <DistributionList items={a.firmTypes} total={totalFunnelDeals} />
-        </div>
-
-        {/* Transition Type */}
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24 }}>
-          <SectionHeader title="Transition Type" subtitle="How assets will move" />
-          <DistributionList items={a.transTypes} total={totalFunnelDeals} />
-        </div>
-
-        {/* Custodian */}
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24 }}>
-          <SectionHeader title="Custodian" subtitle="Current custodian relationships" />
-          <DistributionList items={a.custodians.slice(0, 8)} total={totalFunnelDeals} />
-        </div>
-      </div>
     </div>
   );
 }
@@ -565,8 +494,21 @@ function RecruitingTab() {
   const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, { refreshInterval: 43_200_000 });
   const [showDashboard, setShowDashboard] = useState(true);
   const [complexityScores, setComplexityScores] = useState<Record<string, { score: number; tier: string; tierColor: string }>>({});
+  const [advisorTab, setAdvisorTab] = useState<'launch_to_grad' | 'early' | 'completed'>('launch_to_grad');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [stageFilter, setStageFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [sortCol, setSortCol] = useState<string>('');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [showAI, setShowAI] = useState(false);
+  const [aiMessages, setAiMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
+    { role: 'assistant', content: "Ask me anything about the pipeline — stalled deals, upcoming launches, advisor details, or risk factors." },
+  ]);
+  const [aiInput, setAiInput] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const aiBottomRef = useRef<HTMLDivElement>(null);
 
-  const deals: Deal[] = data?.deals ?? [];
+  const deals: Deal[] = (data?.deals ?? []).filter((d: Deal) => !d.dealname?.toLowerCase().includes('test'));
 
   // Fetch complexity scores after deals load
   useEffect(() => {
@@ -582,18 +524,91 @@ function RecruitingTab() {
       .catch(() => {}); // Silent fail — scores are supplementary
   }, [deals]);
 
+  // Auto-scroll AI chat
+  useEffect(() => {
+    aiBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [aiMessages]);
+
   if (isLoading) return <div style={{ padding: '60px 0', color: C.slate }}>Loading pipeline…</div>;
   if (error || data?.error) return <div style={{ padding: '60px 0', color: C.red }}>Failed to load pipeline data.</div>;
 
   // All deals sorted by funnel stage order
-  const sortedDeals = [...deals]
+  const allActiveDeals = [...deals]
     .filter(d => ACTIVE_STAGE_IDS.includes(d.dealstage))
     .sort((a, b) => FUNNEL_STAGE_ORDER.indexOf(a.dealstage) - FUNNEL_STAGE_ORDER.indexOf(b.dealstage));
 
+  // Filter deals by sub-tab
+  const sortedDeals = allActiveDeals.filter(d => {
+    if (advisorTab === 'early') return EARLY_STAGE_IDS.includes(d.dealstage);
+    if (advisorTab === 'completed') return d.dealstage === '100411705' && (d.daysSinceLaunch ?? 0) >= 90;
+    // launch_to_grad: Stages 5-7, but launched advisors only if < 90 days
+    if (LAUNCH_STAGE_IDS.includes(d.dealstage)) {
+      if (d.dealstage === '100411705') return (d.daysSinceLaunch ?? 0) < 90;
+      return true;
+    }
+    return false;
+  });
+
+  // Stage IDs relevant to the active sub-tab (for filter dropdown)
+  const tabStageIds = advisorTab === 'early' ? EARLY_STAGE_IDS
+    : advisorTab === 'completed' ? ['100411705']
+    : LAUNCH_STAGE_IDS;
+
+  // Apply search & filters
+  const filteredDeals = sortedDeals.filter(d => {
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const match = [d.dealname, d.current_firm__cloned_, d.firm_type, d.ownerName, d.custodian__cloned_]
+        .some(f => f?.toLowerCase().includes(q));
+      if (!match) return false;
+    }
+    if (stageFilter !== 'all' && d.dealstage !== stageFilter) return false;
+    if (typeFilter !== 'all' && d.firm_type !== typeFilter) return false;
+    return true;
+  });
+
+  // Unique firm types for filter dropdown
+  const firmTypes = Array.from(new Set(sortedDeals.map(d => d.firm_type).filter(Boolean))) as string[];
+
+  // AI send function
+  async function sendAiMessage(text: string) {
+    if (!text.trim() || aiLoading) return;
+    const userMsg = { role: 'user' as const, content: text.trim() };
+    const updated = [...aiMessages, userMsg];
+    setAiMessages(updated);
+    setAiInput('');
+    setAiLoading(true);
+    try {
+      const res = await fetch('/api/command-center/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: updated }),
+      });
+      const d = await res.json();
+      setAiMessages(prev => [...prev, { role: 'assistant', content: d.reply ?? d.error ?? 'Error occurred.' }]);
+    } catch {
+      setAiMessages(prev => [...prev, { role: 'assistant', content: 'Connection error. Please try again.' }]);
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
   return (
     <>
-      {/* Toggle */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+      {/* Toolbar: Analytics toggle + AI toggle */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginBottom: 16 }}>
+        <button
+          onClick={() => setShowAI(!showAI)}
+          style={{
+            padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500,
+            background: showAI ? C.teal : C.cardBg,
+            color: showAI ? C.white : C.slate,
+            border: `1px solid ${showAI ? C.teal : C.border}`,
+            cursor: 'pointer', transition: 'all 150ms ease',
+          }}
+        >
+          {showAI ? '✦ Hide AI' : '✦ Ask AI'}
+        </button>
         <button
           onClick={() => setShowDashboard(!showDashboard)}
           style={{
@@ -611,21 +626,185 @@ function RecruitingTab() {
       {/* Command Dashboard */}
       {showDashboard && <CommandDashboard deals={deals} />}
 
+      {/* Inline AI Chat */}
+      {showAI && (
+        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, marginBottom: 20, overflow: 'hidden' }}>
+          <div style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 24, height: 24, borderRadius: '50%', background: C.teal, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: C.white }}>✦</div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: C.dark }}>AX AI Assistant</span>
+            <span style={{ fontSize: 11, color: C.slate }}>· Powered by Grok · Live pipeline data</span>
+          </div>
+          <div style={{ maxHeight: 280, overflowY: 'auto', padding: '12px 16px' }}>
+            {aiMessages.map((msg, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', marginBottom: 10 }}>
+                <div style={{
+                  maxWidth: '75%', padding: '8px 14px',
+                  borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
+                  background: msg.role === 'user' ? C.teal : '#f7f4ef',
+                  color: msg.role === 'user' ? C.white : C.dark,
+                  fontSize: 13, lineHeight: 1.5, whiteSpace: 'pre-wrap',
+                  border: msg.role === 'user' ? 'none' : `1px solid ${C.border}`,
+                }}>
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+            {aiLoading && (
+              <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+                <div style={{ padding: '8px 14px', borderRadius: '14px 14px 14px 4px', background: '#f7f4ef', border: `1px solid ${C.border}`, fontSize: 13, color: C.slate }}>
+                  Thinking…
+                </div>
+              </div>
+            )}
+            <div ref={aiBottomRef} />
+          </div>
+          <form
+            onSubmit={e => { e.preventDefault(); sendAiMessage(aiInput); }}
+            style={{ display: 'flex', gap: 8, padding: '10px 16px', borderTop: `1px solid ${C.border}`, background: '#faf7f2' }}
+          >
+            <input
+              value={aiInput}
+              onChange={e => setAiInput(e.target.value)}
+              placeholder="Ask about deals, advisors, risks, upcoming launches…"
+              style={{
+                flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
+                fontSize: 13, color: C.dark, background: C.white, outline: 'none',
+                fontFamily: "'Fakt', system-ui, sans-serif",
+              }}
+            />
+            <button
+              type="submit"
+              disabled={!aiInput.trim() || aiLoading}
+              style={{
+                padding: '8px 16px', borderRadius: 8, border: 'none',
+                background: aiInput.trim() && !aiLoading ? C.teal : C.border,
+                color: aiInput.trim() && !aiLoading ? C.white : C.slate,
+                fontSize: 13, fontWeight: 600, cursor: aiInput.trim() && !aiLoading ? 'pointer' : 'default',
+                fontFamily: "'Fakt', system-ui, sans-serif",
+              }}
+            >
+              Send
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Sub-tabs: Early Deals / Launch to Graduation / Completed Transitions */}
+      <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${C.border}`, marginBottom: 20 }}>
+        {([
+          { key: 'launch_to_grad' as const, label: 'Launch to Graduation', sub: 'Steps 5–7 (< 90 days)' },
+          { key: 'early' as const, label: 'Early Deals', sub: 'Steps 1–4' },
+          { key: 'completed' as const, label: 'Completed Transitions', sub: '90+ days post-launch' },
+        ]).map(tab => {
+          const isActive = advisorTab === tab.key;
+          // Count deals for badge
+          const count = allActiveDeals.filter(d => {
+            if (tab.key === 'early') return EARLY_STAGE_IDS.includes(d.dealstage);
+            if (tab.key === 'completed') return d.dealstage === '100411705' && (d.daysSinceLaunch ?? 0) >= 90;
+            if (LAUNCH_STAGE_IDS.includes(d.dealstage)) {
+              if (d.dealstage === '100411705') return (d.daysSinceLaunch ?? 0) < 90;
+              return true;
+            }
+            return false;
+          }).length;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => { setAdvisorTab(tab.key); setStageFilter('all'); }}
+              style={{
+                padding: '10px 20px', background: 'none', border: 'none',
+                borderBottom: `2px solid ${isActive ? C.teal : 'transparent'}`,
+                marginBottom: -2, cursor: 'pointer', transition: 'all 150ms ease',
+              }}
+            >
+              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? C.teal : C.slate, fontFamily: "'Fakt', system-ui, sans-serif" }}>
+                {tab.label}
+              </span>
+              <span style={{
+                marginLeft: 6, fontSize: 11, fontWeight: 600,
+                padding: '1px 6px', borderRadius: 10,
+                background: isActive ? 'rgba(29,118,130,0.12)' : 'rgba(91,106,113,0.08)',
+                color: isActive ? C.teal : C.slate,
+              }}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Search, Filters & Stage Pills */}
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
+        {/* Search */}
+        <div style={{ position: 'relative', flex: '1 1 240px', maxWidth: 320 }}>
+          <input
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Search advisors, firms, owners…"
+            style={{
+              width: '100%', padding: '8px 12px 8px 32px', borderRadius: 8,
+              border: `1px solid ${C.border}`, fontSize: 13, color: C.dark,
+              background: C.cardBg, outline: 'none', fontFamily: "'Fakt', system-ui, sans-serif",
+            }}
+          />
+          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: C.slate }}>⌕</span>
+        </div>
+
+        {/* Stage Filter */}
+        <select
+          value={stageFilter}
+          onChange={e => setStageFilter(e.target.value)}
+          style={{
+            padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
+            fontSize: 12, color: C.dark, background: C.cardBg, outline: 'none',
+            fontFamily: "'Fakt', system-ui, sans-serif", cursor: 'pointer',
+          }}
+        >
+          <option value="all">All Stages</option>
+          {tabStageIds.map(sid => (
+            <option key={sid} value={sid}>{STAGE_LABELS[sid]}</option>
+          ))}
+        </select>
+
+        {/* Firm Type Filter */}
+        <select
+          value={typeFilter}
+          onChange={e => setTypeFilter(e.target.value)}
+          style={{
+            padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
+            fontSize: 12, color: C.dark, background: C.cardBg, outline: 'none',
+            fontFamily: "'Fakt', system-ui, sans-serif", cursor: 'pointer',
+          }}
+        >
+          <option value="all">All Firm Types</option>
+          {firmTypes.map(ft => (
+            <option key={ft} value={ft}>{ft.replace(/_/g, ' ')}</option>
+          ))}
+        </select>
+
+        {/* Result count */}
+        <span style={{ fontSize: 12, color: C.slate }}>
+          {filteredDeals.length} of {sortedDeals.length} deals
+        </span>
+      </div>
+
       {/* Stage Funnel Pills */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
-        {ALL_STAGE_ORDER.map(stageId => {
+        {tabStageIds.map(stageId => {
           const count = sortedDeals.filter(d => d.dealstage === stageId).length;
           if (!count) return null;
           const isLaunched = stageId === '100411705';
           const isOfferAccepted = stageId === '2496936';
+          const isSelected = stageFilter === stageId;
           return (
-            <div key={stageId} style={{
-              padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500,
-              background: isLaunched ? 'rgba(29,118,130,0.15)' : isOfferAccepted ? C.goldBg : 'rgba(91,106,113,0.08)',
-              color: isLaunched ? C.teal : isOfferAccepted ? C.gold : C.slate,
+            <button key={stageId} onClick={() => setStageFilter(isSelected ? 'all' : stageId)} style={{
+              padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer',
+              background: isSelected ? C.teal : isLaunched ? 'rgba(29,118,130,0.15)' : isOfferAccepted ? C.goldBg : 'rgba(91,106,113,0.08)',
+              color: isSelected ? C.white : isLaunched ? C.teal : isOfferAccepted ? C.gold : C.slate,
+              fontFamily: "'Fakt', system-ui, sans-serif",
             }}>
               {STAGE_LABELS[stageId]} · {count}
-            </div>
+            </button>
           );
         })}
       </div>
@@ -636,47 +815,100 @@ function RecruitingTab() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr style={{ borderBottom: `1px solid ${C.border}`, background: '#f7f4ef' }}>
-                {['Advisor / Deal', 'Prior Firm', 'Type', 'Stage', 'Exp. AUM', 'Complexity', 'Launch Status', 'Owner'].map(h => (
-                  <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: C.slate, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
-                    {h}
+                {[
+                  { key: 'dealname', label: 'Advisor / Deal' },
+                  { key: 'current_firm__cloned_', label: 'Prior Firm' },
+                  { key: 'firm_type', label: 'Type' },
+                  { key: 'dealstage', label: 'Stage' },
+                  { key: 'transferable_aum', label: 'Exp. AUM' },
+                  { key: 'complexity', label: 'Complexity' },
+                  { key: 'launch_date', label: 'Launch Date' },
+                  { key: 'launch_status', label: 'Launch Status' },
+                  { key: 'onboarder', label: 'AXM' },
+                  { key: 'transition_owner', label: 'AXA' },
+                  { key: 'ownerName', label: 'Recruiter' },
+                ].map(col => (
+                  <th
+                    key={col.key}
+                    onClick={() => {
+                      if (sortCol === col.key) {
+                        setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+                      } else {
+                        setSortCol(col.key);
+                        setSortDir('asc');
+                      }
+                    }}
+                    style={{
+                      padding: '10px 14px', textAlign: 'left', color: C.slate, fontSize: 11,
+                      fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em',
+                      whiteSpace: 'nowrap', cursor: 'pointer', userSelect: 'none',
+                    }}
+                  >
+                    {col.label} {sortCol === col.key ? (sortDir === 'asc' ? '▲' : '▼') : ''}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {sortedDeals.map((deal, i) => {
-                const cx = complexityScores[deal.id];
-                return (
-                  <tr key={deal.id} style={{
-                    borderBottom: `1px solid ${C.border}`,
-                    background: i % 2 === 0 ? C.cardBg : '#faf7f2',
-                  }}>
-                    <td style={{ padding: '10px 14px' }}>
-                      <Link
-                        href={`/command-center/advisor/${deal.id}`}
-                        style={{ fontWeight: 600, color: C.teal, textDecoration: 'none' }}
-                      >
-                        {deal.dealname}
-                      </Link>
-                    </td>
-                    <td style={{ padding: '10px 14px', color: C.slate }}>{deal.current_firm__cloned_ ?? '—'}</td>
-                    <td style={{ padding: '10px 14px', color: C.slate }}>{deal.firm_type ?? '—'}</td>
-                    <td style={{ padding: '10px 14px' }}>
-                      <StageBadge stageId={deal.dealstage} label={STAGE_LABELS[deal.dealstage] ?? deal.dealstage} />
-                    </td>
-                    <td style={{ padding: '10px 14px', color: C.teal, fontWeight: 600 }}>
-                      {formatAUM(parseFloat(deal.transferable_aum ?? '0'))}
-                    </td>
-                    <td style={{ padding: '10px 14px' }}>
-                      {cx ? <ComplexityBadge score={cx.score} tier={cx.tier} tierColor={cx.tierColor} /> : <span style={{ color: C.slate, fontSize: 11 }}>…</span>}
-                    </td>
-                    <td style={{ padding: '10px 14px' }}>
-                      <LaunchTimer deal={deal} />
-                    </td>
-                    <td style={{ padding: '10px 14px', color: C.slate }}>{deal.ownerName ?? '—'}</td>
-                  </tr>
-                );
-              })}
+              {(() => {
+                const displayed = [...filteredDeals].sort((a, b) => {
+                  if (!sortCol) return 0;
+                  const dir = sortDir === 'asc' ? 1 : -1;
+                  if (sortCol === 'transferable_aum') {
+                    return ((parseFloat(a.transferable_aum ?? '0') || 0) - (parseFloat(b.transferable_aum ?? '0') || 0)) * dir;
+                  }
+                  if (sortCol === 'complexity') {
+                    return ((complexityScores[a.id]?.score ?? 0) - (complexityScores[b.id]?.score ?? 0)) * dir;
+                  }
+                  if (sortCol === 'launch_date') {
+                    const da = a.desired_start_date ?? a.actual_launch_date ?? '';
+                    const db = b.desired_start_date ?? b.actual_launch_date ?? '';
+                    return da.localeCompare(db) * dir;
+                  }
+                  if (sortCol === 'dealstage') {
+                    return (FUNNEL_STAGE_ORDER.indexOf(a.dealstage) - FUNNEL_STAGE_ORDER.indexOf(b.dealstage)) * dir;
+                  }
+                  const va = ((a as unknown as Record<string, unknown>)[sortCol] as string) ?? '';
+                  const vb = ((b as unknown as Record<string, unknown>)[sortCol] as string) ?? '';
+                  return va.localeCompare(vb) * dir;
+                });
+                return displayed.map((deal, i) => {
+                  const cx = complexityScores[deal.id];
+                  const launchDate = deal.desired_start_date ?? deal.actual_launch_date;
+                  return (
+                    <tr key={deal.id} style={{
+                      borderBottom: `1px solid ${C.border}`,
+                      background: i % 2 === 0 ? C.cardBg : '#faf7f2',
+                    }}>
+                      <td style={{ padding: '10px 14px' }}>
+                        <Link href={`/command-center/advisor/${deal.id}`} style={{ fontWeight: 600, color: C.teal, textDecoration: 'none' }}>
+                          {deal.dealname}
+                        </Link>
+                      </td>
+                      <td style={{ padding: '10px 14px', color: C.slate }}>{deal.current_firm__cloned_ ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: C.slate }}>{deal.firm_type ?? '—'}</td>
+                      <td style={{ padding: '10px 14px' }}>
+                        <StageBadge stageId={deal.dealstage} label={STAGE_LABELS[deal.dealstage] ?? deal.dealstage} />
+                      </td>
+                      <td style={{ padding: '10px 14px', color: C.teal, fontWeight: 600 }}>
+                        {formatAUM(parseFloat(deal.transferable_aum ?? '0'))}
+                      </td>
+                      <td style={{ padding: '10px 14px' }}>
+                        {cx ? <ComplexityBadge score={cx.score} tier={cx.tier} tierColor={cx.tierColor} /> : <span style={{ color: C.slate, fontSize: 11 }}>…</span>}
+                      </td>
+                      <td style={{ padding: '10px 14px', color: C.slate, whiteSpace: 'nowrap' }}>
+                        {launchDate ? formatDate(launchDate) : '—'}
+                      </td>
+                      <td style={{ padding: '10px 14px' }}>
+                        <LaunchTimer deal={deal} />
+                      </td>
+                      <td style={{ padding: '10px 14px', color: C.slate }}>{deal.onboarder ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: C.slate }}>{deal.transition_owner ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: C.slate }}>{deal.ownerName ?? '—'}</td>
+                    </tr>
+                  );
+                });
+              })()}
             </tbody>
           </table>
         </div>

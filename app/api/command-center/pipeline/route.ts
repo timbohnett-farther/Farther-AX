@@ -99,20 +99,15 @@ async function fetchActiveDeals(): Promise<DealResult[]> {
   ]);
 }
 
-// ── Filter launched deals: only keep those within 90 days of start date ──────
-function filterLaunchedDeals(deals: DealResult[]): DealResult[] {
-  const now = new Date();
-  const ninetyDaysAgoMs = now.getTime() - (90 * 24 * 60 * 60 * 1000);
-
-  return deals.filter(deal => {
-    if (deal.properties.dealstage !== LAUNCHED_STAGE_ID) return true;
-
-    // Use actual_launch_date first, fall back to desired_start_date
+// ── Compute days since launch for graduated status ──────────────────────────
+function enrichLaunchStatus(deals: DealResult[]): (DealResult & { daysSinceLaunch?: number })[] {
+  const now = Date.now();
+  return deals.map(deal => {
+    if (deal.properties.dealstage !== LAUNCHED_STAGE_ID) return deal;
     const startStr = deal.properties.actual_launch_date || deal.properties.desired_start_date;
-    if (!startStr) return true; // No date → keep (can't determine age)
-
-    const startMs = new Date(startStr).getTime();
-    return startMs >= ninetyDaysAgoMs; // Keep if launched within last 90 days
+    if (!startStr) return deal;
+    const daysSinceLaunch = Math.floor((now - new Date(startStr).getTime()) / (1000 * 60 * 60 * 24));
+    return { ...deal, daysSinceLaunch };
   });
 }
 
@@ -136,13 +131,13 @@ export async function GET() {
       fetchOwners(),
     ]);
 
-    // Filter out launched advisors who are 90+ days past their start date
-    const deals = filterLaunchedDeals(rawDeals);
+    const deals = enrichLaunchStatus(rawDeals);
 
     const enriched = deals.map(deal => ({
       id: deal.id,
       ...deal.properties,
       ownerName: owners[deal.properties.hubspot_owner_id ?? ''] ?? null,
+      daysSinceLaunch: (deal as { daysSinceLaunch?: number }).daysSinceLaunch ?? null,
     }));
 
     return NextResponse.json({
