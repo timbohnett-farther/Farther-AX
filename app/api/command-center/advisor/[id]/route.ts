@@ -43,6 +43,18 @@ const TEAM_PROPS = [
   'ye_aum', 'ye_revenue', 'book_assets', 'alternative_assets__',
 ].join(',');
 
+const CONTACT_PROPS = [
+  'firstname', 'lastname', 'email', 'phone', 'mobilephone',
+  'city', 'state', 'zip', 'company',
+  'hs_linkedin_url', 'linkedin_url',
+  'assets', 'client_type',
+  'notes_last_contacted', 'notes_last_updated',
+  'num_notes', 'num_contacted_notes',
+  'hs_pinned_engagement_id',
+  'hs_object_id',
+].join(',');
+
+// ── Fetch deal ────────────────────────────────────────────────────────────────
 async function fetchDeal(id: string) {
   const res = await fetch(
     `https://api.hubapi.com/crm/v3/objects/deals/${id}?properties=${DEAL_PROPS}&associations=contacts,notes`,
@@ -52,6 +64,7 @@ async function fetchDeal(id: string) {
   return res.json();
 }
 
+// ── Fetch notes associated with deal ──────────────────────────────────────────
 async function fetchNotes(dealId: string) {
   const res = await fetch('https://api.hubapi.com/crm/v3/objects/notes/search', {
     method: 'POST',
@@ -68,6 +81,7 @@ async function fetchNotes(dealId: string) {
   return data.results ?? [];
 }
 
+// ── Fetch teams custom object ─────────────────────────────────────────────────
 async function fetchTeamsRecord(dealId: string) {
   const res = await fetch(
     `https://api.hubapi.com/crm/v4/objects/deals/${dealId}/associations/${TEAMS_OBJECT_TYPE}`,
@@ -87,14 +101,143 @@ async function fetchTeamsRecord(dealId: string) {
   return { id: teamData.id, ...teamData.properties };
 }
 
+// ── Fetch associated contact + pinned note ────────────────────────────────────
+async function fetchAssociatedContact(dealId: string) {
+  // Step 1: Get contact IDs associated with this deal
+  const assocRes = await fetch(
+    `https://api.hubapi.com/crm/v4/objects/deals/${dealId}/associations/contacts`,
+    { headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` } }
+  );
+  if (!assocRes.ok) return { contact: null, pinnedNote: null, allContacts: [] };
+  const assocData = await assocRes.json();
+  const contactAssocs = assocData.results ?? [];
+  if (contactAssocs.length === 0) return { contact: null, pinnedNote: null, allContacts: [] };
+
+  // Step 2: Fetch primary contact properties
+  const primaryContactId = contactAssocs[0].toObjectId;
+  const contactRes = await fetch(
+    `https://api.hubapi.com/crm/v3/objects/contacts/${primaryContactId}?properties=${CONTACT_PROPS}`,
+    { headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` } }
+  );
+  if (!contactRes.ok) return { contact: null, pinnedNote: null, allContacts: [] };
+  const contactData = await contactRes.json();
+  const contact = { id: contactData.id, ...contactData.properties };
+
+  // Step 3: Fetch pinned note if exists
+  let pinnedNote = null;
+  const pinnedId = contact.hs_pinned_engagement_id;
+  if (pinnedId) {
+    const noteRes = await fetch(
+      `https://api.hubapi.com/crm/v3/objects/notes/${pinnedId}?properties=hs_note_body,hs_timestamp,hubspot_owner_id,hs_attachment_ids`,
+      { headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` } }
+    );
+    if (noteRes.ok) {
+      const noteData = await noteRes.json();
+      pinnedNote = {
+        id: noteData.id,
+        body: noteData.properties?.hs_note_body ?? '',
+        timestamp: noteData.properties?.hs_timestamp ?? null,
+        ownerId: noteData.properties?.hubspot_owner_id ?? null,
+      };
+    }
+  }
+
+  // Step 4: Fetch additional associated contacts (for Team & Contacts tab)
+  const allContacts = [];
+  for (const assoc of contactAssocs) {
+    if (assoc.toObjectId === primaryContactId) {
+      allContacts.push(contact);
+      continue;
+    }
+    try {
+      const otherRes = await fetch(
+        `https://api.hubapi.com/crm/v3/objects/contacts/${assoc.toObjectId}?properties=firstname,lastname,email,phone,company,city,state`,
+        { headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` } }
+      );
+      if (otherRes.ok) {
+        const otherData = await otherRes.json();
+        allContacts.push({ id: otherData.id, ...otherData.properties });
+      }
+    } catch {
+      // Skip failed contact fetches
+    }
+  }
+
+  return { contact, pinnedNote, allContacts };
+}
+
+// ── Fetch engagements for contact ─────────────────────────────────────────────
+async function fetchEngagements(contactId: string) {
+  const engagementTypes = [
+    { type: 'emails', props: 'hs_email_subject,hs_email_direction,hs_email_status,hs_timestamp,hs_email_text' },
+    { type: 'calls', props: 'hs_call_title,hs_call_direction,hs_call_status,hs_call_duration,hs_timestamp,hs_call_body' },
+    { type: 'meetings', props: 'hs_meeting_title,hs_meeting_outcome,hs_timestamp,hs_meeting_start_time,hs_meeting_end_time,hs_meeting_body' },
+  ];
+
+  const results: { type: string; id: string; timestamp: string; properties: Record<string, string> }[] = [];
+
+  await Promise.all(engagementTypes.map(async ({ type, props }) => {
+    try {
+      const res = await fetch(`https://api.hubapi.com/crm/v3/objects/${type}/search`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filterGroups: [{ filters: [{ propertyName: 'associations.contact', operator: 'EQ', value: contactId }] }],
+          properties: props.split(','),
+          sorts: [{ propertyName: 'hs_timestamp', direction: 'DESCENDING' }],
+          limit: 10,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        for (const item of (data.results ?? [])) {
+          results.push({
+            type: type.replace(/s$/, ''), // emails→email, calls→call, meetings→meeting
+            id: item.id,
+            timestamp: item.properties?.hs_timestamp ?? '',
+            properties: item.properties ?? {},
+          });
+        }
+      }
+    } catch {
+      // Silent — engagement fetch is supplementary
+    }
+  }));
+
+  // Sort all engagements by timestamp descending
+  results.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+  return results.slice(0, 20);
+}
+
+// ── Main GET handler ──────────────────────────────────────────────────────────
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
+    // Fetch deal + existing data in parallel
     const [deal, notes, team] = await Promise.all([
       fetchDeal(params.id),
       fetchNotes(params.id),
       fetchTeamsRecord(params.id),
     ]);
-    return NextResponse.json({ deal, notes, team });
+
+    // Get associated contacts from deal
+    const { contact, pinnedNote, allContacts } = await fetchAssociatedContact(params.id);
+
+    // Fetch engagements if we have a contact
+    let engagements: Awaited<ReturnType<typeof fetchEngagements>> = [];
+    if (contact?.hs_object_id) {
+      engagements = await fetchEngagements(contact.hs_object_id);
+    }
+
+    return NextResponse.json({
+      deal,
+      notes,
+      team,
+      contact,
+      pinnedNote,
+      allContacts,
+      engagements,
+    });
   } catch (err) {
     console.error('[advisor detail]', err);
     const message = err instanceof Error ? err.message : String(err);
