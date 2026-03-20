@@ -34,6 +34,7 @@ export const TabGroup: React.FC<TabGroupProps> = ({
     >
       <TabList variant="solid" className="mb-6">
         {tabs.map((tab, idx) => (
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <Tab key={idx} icon={tab.icon as any}>
             <div className="flex items-center gap-2">
               <span>{tab.label}</span>

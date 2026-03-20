@@ -17,9 +17,9 @@ import {
   CurrencyDollarIcon,
   UserGroupIcon,
   ChartBarIcon,
-  TrendingUpIcon,
+  ArrowArrowTrendingUpIcon,
 } from '@heroicons/react/24/outline';
-import { colors, formatCurrency, formatCompactCurrency } from '@/lib/design-tokens';
+import { formatCompactCurrency } from '@/lib/design-tokens';
 
 /**
  * UI Showcase - Component Library Reference
@@ -102,7 +102,7 @@ export default function UIShowcasePage() {
               value={formatCompactCurrency(345000000)}
               delta="Stable"
               deltaType="unchanged"
-              icon={<TrendingUpIcon className="h-6 w-6 text-teal" />}
+              icon={<ArrowTrendingUpIcon className="h-6 w-6 text-teal" />}
             />
           </div>
         </section>

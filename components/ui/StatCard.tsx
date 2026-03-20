@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, Metric, Text, Flex, BadgeDelta, DeltaType } from '@tremor/react';
-import { colors } from '@/lib/design-tokens';
 
 export interface StatCardProps {
   title: string;

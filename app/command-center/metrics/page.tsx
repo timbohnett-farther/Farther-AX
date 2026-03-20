@@ -1,7 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
-import { StatCard, MetricBar, DataCard } from '@/components/ui';
+import { StatCard, MetricBar } from '@/components/ui';
 import { formatCompactCurrency } from '@/lib/design-tokens';
 import {
   UserGroupIcon,
@@ -57,9 +57,6 @@ export default function MetricsDashboard() {
   const m = data ?? {};
   const cap = m.capacity ?? {};
   const avgAUMPerStaff = cap.totalAUM && cap.axmCount ? cap.totalAUM / cap.axmCount : 0;
-
-  const transitionTotal = Object.values((m.transitionBreakdown ?? {}) as Record<string, number>).reduce((a, b) => a + b, 0);
-  const stageTotal = Object.values((m.stageBreakdown ?? {}) as Record<string, number>).reduce((a, b) => a + b, 0);
 
   // Prepare transition data for MetricBar
   const transitionData = Object.entries(m.transitionBreakdown as Record<string, number> ?? {})

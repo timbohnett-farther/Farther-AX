@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { ONBOARDING_STAGE_IDS, STAGE_LABELS } from '@/lib/onboarding-tasks';
 import type { OnboardingTask, Phase } from '@/lib/onboarding-tasks';
 import { StatCard, ProgressIndicator, DataCard, ScoreBadge } from '@/components/ui';
-import { colors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
