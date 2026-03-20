@@ -29,12 +29,13 @@ const commandCenterItems = [
   { label: 'Team', href: '/command-center/team', icon: '●' },
   { label: 'Metrics', href: '/command-center/metrics', icon: '▲' },
   { label: 'Complexity', href: '/command-center/complexity', icon: '◉' },
+  { label: 'Transitions', href: '/command-center/transitions', icon: '⇄' },
   { label: 'AI Assistant', href: '/command-center/ai', icon: '✦' },
 ];
 
 const externalLinks = [
   { label: "Farther Portal", href: "https://app.farther.com/Login" },
-  { label: "Transition Tracker", href: "#" },
+  { label: "Transition Tracker", href: "/command-center/transitions" },
   { label: "AX — Notion", href: "#" },
   { label: "AX Email Templates", href: "#" },
 ];
