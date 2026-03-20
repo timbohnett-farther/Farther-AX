@@ -315,7 +315,10 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
   const analytics = useMemo(() => {
     const activeDeals = deals.filter(d => ACTIVE_STAGE_IDS.includes(d.dealstage));
     const funnelDeals = deals.filter(d => FUNNEL_STAGE_ORDER.includes(d.dealstage));
-    const launchedDeals = deals.filter(d => d.dealstage === '100411705');
+    const allLaunchedDeals = deals.filter(d => d.dealstage === '100411705');
+    const launchedDeals = allLaunchedDeals.filter(d =>
+      d.daysSinceLaunch === null || d.daysSinceLaunch <= 90
+    );
     const preLaunchDeals = activeDeals.filter(d => d.dealstage !== '100411705');
 
     const getAUM = (d: Deal) => parseFloat(d.transferable_aum ?? '0') || 0;
@@ -374,7 +377,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 
     const getLaunchDate = (d: Deal) => d.actual_launch_date || d.desired_start_date;
 
-    const ytdLaunched = launchedDeals.filter(d => {
+    const ytdLaunched = allLaunchedDeals.filter(d => {
       const ls = getLaunchDate(d);
       return ls && new Date(ls) >= ytdStart;
     });

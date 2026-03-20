@@ -534,7 +534,7 @@ export default function AdvisorHubPage() {
 
   const { launchDeals, earlyDeals, completedDeals } = useMemo(() => {
     if (!data?.deals) return { launchDeals: [], earlyDeals: [], completedDeals: [] };
-    const deals = data.deals as Deal[];
+    const deals = (data.deals as Deal[]).filter(d => !d.dealname?.toLowerCase().includes('test'));
 
     const early = deals.filter(d => EARLY_STAGE_IDS.includes(d.dealstage));
 
@@ -574,7 +574,7 @@ export default function AdvisorHubPage() {
   // Filtered AUM advisors
   const filteredAumAdvisors = useMemo(() => {
     if (!aumData?.advisors) return [];
-    const advisors = aumData.advisors as AumAdvisor[];
+    const advisors = (aumData.advisors as AumAdvisor[]).filter(a => !a.advisor_name?.toLowerCase().includes('test'));
     if (!search.trim()) return advisors;
     const q = search.toLowerCase();
     return advisors.filter(a =>

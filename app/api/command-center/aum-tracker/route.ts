@@ -197,7 +197,9 @@ export async function GET() {
       const contactId = dealContactMap[deal.id];
       const teamId = dealTeamMap[deal.id];
       const contactData = contactId ? contactAumMap[contactId] : null;
-      const feeRateBps = teamId ? teamFeeMap[teamId] : null;
+      // average_fee_rate is stored as a percentage (e.g. 1.0 = 1% = 100 bps)
+      const feeRatePct = teamId ? teamFeeMap[teamId] : null;
+      const feeRateBps = feeRatePct != null ? Math.round(feeRatePct * 100) : null;
       const expectedAum = parseFloat(deal.properties.transferable_aum ?? '0') || null;
       const actualAum = contactData?.aum ?? null;
       const launchDate = deal.properties.actual_launch_date || deal.properties.desired_start_date;
@@ -208,10 +210,10 @@ export async function GET() {
         transferPct = Math.round((actualAum / expectedAum) * 100);
       }
 
-      // Calculate current revenue: AUM × (fee rate BPS / 10000)
+      // Calculate current revenue: AUM × (fee rate % / 100)
       let currentRevenue: number | null = null;
-      if (actualAum && feeRateBps && feeRateBps > 0) {
-        currentRevenue = Math.round(actualAum * (feeRateBps / 10000));
+      if (actualAum && feeRatePct && feeRatePct > 0) {
+        currentRevenue = Math.round(actualAum * (feeRatePct / 100));
       }
 
       // Days since launch
@@ -237,23 +239,30 @@ export async function GET() {
       };
     });
 
+    // Filter to Launch-to-Graduation only (≤90 days since launch) and exclude test advisors
+    const GRADUATION_DAYS = 90;
+    const filtered = advisors.filter(a =>
+      !a.advisor_name.toLowerCase().includes('test') &&
+      (a.days_since_launch === null || a.days_since_launch <= GRADUATION_DAYS)
+    );
+
     // Sort by advisor name (last name)
-    advisors.sort((a, b) => {
+    filtered.sort((a, b) => {
       const lastA = (a.advisor_name.split(/\s+/).pop() ?? '').toLowerCase();
       const lastB = (b.advisor_name.split(/\s+/).pop() ?? '').toLowerCase();
       return lastA.localeCompare(lastB);
     });
 
     // Summary stats
-    const withExpected = advisors.filter(a => a.expected_aum);
-    const withActual = advisors.filter(a => a.actual_aum);
+    const withExpected = filtered.filter(a => a.expected_aum);
+    const withActual = filtered.filter(a => a.actual_aum);
     const totalExpected = withExpected.reduce((sum, a) => sum + (a.expected_aum ?? 0), 0);
     const totalActual = withActual.reduce((sum, a) => sum + (a.actual_aum ?? 0), 0);
-    const totalRevenue = advisors.reduce((sum, a) => sum + (a.current_revenue ?? 0), 0);
+    const totalRevenue = filtered.reduce((sum, a) => sum + (a.current_revenue ?? 0), 0);
 
     return NextResponse.json({
-      advisors,
-      total: advisors.length,
+      advisors: filtered,
+      total: filtered.length,
       summary: {
         total_expected_aum: totalExpected,
         total_actual_aum: totalActual,
