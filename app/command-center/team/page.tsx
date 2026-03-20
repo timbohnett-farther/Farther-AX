@@ -2,31 +2,21 @@
 
 import { useState, useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
+import { DataCard, StatusBadge } from '@/components/ui';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
-// ── Design tokens ────────────────────────────────────────────────────────────
-const C = {
-  dark: '#333333', white: '#ffffff', slate: '#5b6a71',
-  teal: '#1d7682', bg: '#FAF7F2',
-  cardBg: '#ffffff', border: '#e8e2d9',
-  red: '#c0392b', redBg: 'rgba(192,57,43,0.08)',
-  amber: '#b27d2e', amberBg: 'rgba(178,125,46,0.08)',
-  gold: '#c8a951', goldBg: 'rgba(200,169,81,0.10)',
-  green: '#27ae60', greenBg: 'rgba(39,174,96,0.10)',
-};
-
 const ROLES = ['AXM', 'AXA', 'CTM', 'CTA', 'CX Manager', 'Compliance', 'RIA Leadership', 'Director'] as const;
 
-const ROLE_COLORS: Record<string, { bg: string; color: string }> = {
-  'AXM':            { bg: 'rgba(29,118,130,0.12)', color: C.teal },
-  'AXA':            { bg: 'rgba(29,118,130,0.08)', color: C.teal },
-  'CTM':            { bg: 'rgba(200,169,81,0.12)', color: C.gold },
-  'CTA':            { bg: 'rgba(200,169,81,0.08)', color: C.gold },
-  'CX Manager':     { bg: C.greenBg, color: C.green },
-  'Compliance':     { bg: C.amberBg, color: C.amber },
-  'RIA Leadership': { bg: 'rgba(91,106,113,0.1)', color: C.slate },
-  'Director':       { bg: 'rgba(142,68,173,0.12)', color: '#8e44ad' },
+const ROLE_COLORS: Record<string, { bg: string; color: string; border: string }> = {
+  'AXM':            { bg: 'bg-teal/10', color: 'text-teal', border: 'border-teal' },
+  'AXA':            { bg: 'bg-teal/10', color: 'text-teal', border: 'border-teal' },
+  'CTM':            { bg: 'bg-amber/10', color: 'text-amber-700', border: 'border-amber-700' },
+  'CTA':            { bg: 'bg-amber/10', color: 'text-amber-700', border: 'border-amber-700' },
+  'CX Manager':     { bg: 'bg-emerald/10', color: 'text-emerald-700', border: 'border-emerald-700' },
+  'Compliance':     { bg: 'bg-orange/10', color: 'text-orange-700', border: 'border-orange-700' },
+  'RIA Leadership': { bg: 'bg-slate/10', color: 'text-slate', border: 'border-slate' },
+  'Director':       { bg: 'bg-purple/10', color: 'text-purple-700', border: 'border-purple-700' },
 };
 
 const ROLE_DESCRIPTIONS: Record<string, string> = {
@@ -52,7 +42,7 @@ interface TeamMember {
   updated_at: string;
 }
 
-// ── Add/Edit Form ────────────────────────────────────────────────────────────
+// Add/Edit Form Component
 function MemberForm({
   initial,
   onSave,
@@ -94,84 +84,112 @@ function MemberForm({
     }
   };
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '8px 12px', borderRadius: 6,
-    border: `1px solid ${C.border}`, fontSize: 13,
-    fontFamily: "'Fakt', system-ui, sans-serif",
-    background: C.white, color: C.dark,
-  };
-
-  const labelStyle: React.CSSProperties = {
-    fontSize: 11, fontWeight: 600, color: C.slate,
-    textTransform: 'uppercase', letterSpacing: '0.06em',
-    marginBottom: 4, display: 'block',
-  };
-
   return (
-    <form onSubmit={handleSubmit} style={{
-      background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
-      padding: 24, marginBottom: 24,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 600, color: C.dark, fontFamily: "'Fakt', system-ui, sans-serif" }}>
-          {initial ? 'Edit Team Member' : 'Add Team Member'}
-        </h3>
-        <button type="button" onClick={onCancel} style={{
-          background: 'none', border: 'none', fontSize: 18, color: C.slate, cursor: 'pointer',
-        }}>×</button>
-      </div>
+    <DataCard className="mb-6">
+      <form onSubmit={handleSubmit}>
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-base font-semibold text-charcoal">
+            {initial ? 'Edit Team Member' : 'Add Team Member'}
+          </h3>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="bg-transparent border-none text-lg text-slate cursor-pointer hover:text-charcoal"
+          >
+            ×
+          </button>
+        </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-        <div>
-          <label style={labelStyle}>Full Name *</label>
-          <input style={inputStyle} value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-[11px] font-semibold text-slate uppercase tracking-wider mb-1">
+              Full Name *
+            </label>
+            <input
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-none"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Jane Smith"
+            />
+          </div>
+          <div>
+            <label className="block text-[11px] font-semibold text-slate uppercase tracking-wider mb-1">
+              Email *
+            </label>
+            <input
+              type="email"
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-none"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="jane@farther.com"
+            />
+          </div>
+          <div>
+            <label className="block text-[11px] font-semibold text-slate uppercase tracking-wider mb-1">
+              Role *
+            </label>
+            <select
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-none"
+              value={role}
+              onChange={e => setRole(e.target.value)}
+            >
+              {ROLES.map(r => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-[11px] font-semibold text-slate uppercase tracking-wider mb-1">
+              Phone
+            </label>
+            <input
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-none"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              placeholder="(555) 123-4567"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-[11px] font-semibold text-slate uppercase tracking-wider mb-1">
+              Calendar Link
+            </label>
+            <input
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-none"
+              value={calendarLink}
+              onChange={e => setCalendarLink(e.target.value)}
+              placeholder="https://calendar.google.com/..."
+            />
+          </div>
         </div>
-        <div>
-          <label style={labelStyle}>Email *</label>
-          <input style={inputStyle} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jane@farther.com" />
-        </div>
-        <div>
-          <label style={labelStyle}>Role *</label>
-          <select style={inputStyle} value={role} onChange={e => setRole(e.target.value)}>
-            {ROLES.map(r => (
-              <option key={r} value={r}>{r}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label style={labelStyle}>Phone</label>
-          <input style={inputStyle} value={phone} onChange={e => setPhone(e.target.value)} placeholder="(555) 123-4567" />
-        </div>
-        <div style={{ gridColumn: '1 / -1' }}>
-          <label style={labelStyle}>Calendar Link</label>
-          <input style={inputStyle} value={calendarLink} onChange={e => setCalendarLink(e.target.value)} placeholder="https://calendar.google.com/..." />
-        </div>
-      </div>
 
-      {error && <p style={{ color: C.red, fontSize: 12, marginBottom: 12 }}>{error}</p>}
+        {error && <p className="text-red-600 text-xs mb-3">{error}</p>}
 
-      <div style={{ display: 'flex', gap: 10 }}>
-        <button type="submit" disabled={saving} style={{
-          padding: '8px 20px', borderRadius: 6, fontSize: 13, fontWeight: 600,
-          background: C.teal, color: C.white, border: 'none', cursor: saving ? 'wait' : 'pointer',
-          opacity: saving ? 0.7 : 1,
-        }}>
-          {saving ? 'Saving…' : initial ? 'Update' : 'Add Member'}
-        </button>
-        <button type="button" onClick={onCancel} style={{
-          padding: '8px 20px', borderRadius: 6, fontSize: 13, fontWeight: 500,
-          background: C.cardBg, color: C.slate, border: `1px solid ${C.border}`, cursor: 'pointer',
-        }}>
-          Cancel
-        </button>
-      </div>
-    </form>
+        <div className="flex gap-2.5">
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-5 py-2 rounded-md text-sm font-semibold bg-teal text-white border-none cursor-pointer hover:bg-teal-dark transition-smooth disabled:opacity-70 disabled:cursor-wait"
+          >
+            {saving ? 'Saving…' : initial ? 'Update' : 'Add Member'}
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-5 py-2 rounded-md text-sm font-medium bg-white text-slate border border-cream-border cursor-pointer hover:bg-cream transition-smooth"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </DataCard>
   );
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// MAIN PAGE
-// ══════════════════════════════════════════════════════════════════════════════
+/**
+ * Team Management Page - Team member directory
+ *
+ * Migrated to Tremor components and Tailwind utilities
+ */
 export default function TeamPage() {
   const { data, error, isLoading } = useSWR('/api/command-center/team', fetcher, { refreshInterval: 43_200_000 });
 
@@ -228,28 +246,25 @@ export default function TeamPage() {
     mutate('/api/command-center/team');
   };
 
-  if (isLoading) return <div style={{ padding: '60px 40px', color: C.slate }}>Loading team…</div>;
-  if (error) return <div style={{ padding: '60px 40px', color: C.red }}>Failed to load team data.</div>;
+  if (isLoading) return <div className="px-10 py-16 text-slate">Loading team…</div>;
+  if (error) return <div className="px-10 py-16 text-red-600">Failed to load team data.</div>;
 
   return (
-    <div style={{ padding: '40px 40px', minHeight: '100vh', background: C.bg, fontFamily: "'Fakt', system-ui, sans-serif" }}>
+    <div className="px-10 py-10 min-h-screen bg-cream font-sans">
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+      <div className="flex justify-between items-start mb-6">
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 6 }}>
+          <h1 className="text-3xl font-bold text-charcoal font-serif mb-2">
             Team Management
           </h1>
-          <p style={{ color: C.slate, fontSize: 14 }}>
+          <p className="text-slate text-sm">
             Manage AX team members · Assign to advisors
           </p>
         </div>
         {!showForm && !editMember && (
           <button
             onClick={() => { setShowForm(true); setEditMember(null); }}
-            style={{
-              padding: '10px 20px', borderRadius: 6, fontSize: 13, fontWeight: 600,
-              background: C.teal, color: C.white, border: 'none', cursor: 'pointer',
-            }}
+            className="px-5 py-2.5 rounded-md text-sm font-semibold bg-teal text-white border-none cursor-pointer hover:bg-teal-dark transition-smooth"
           >
             + Add Team Member
           </button>
@@ -266,7 +281,7 @@ export default function TeamPage() {
       )}
 
       {/* Role Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${ROLES.length}, 1fr)`, gap: 10, marginBottom: 24 }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2.5 mb-6">
         {ROLES.map(role => {
           const style = ROLE_COLORS[role];
           const isActive = filterRole === role;
@@ -274,16 +289,16 @@ export default function TeamPage() {
             <button
               key={role}
               onClick={() => setFilterRole(isActive ? 'all' : role)}
-              style={{
-                padding: '14px 12px', borderRadius: 8, border: `1px solid ${isActive ? style.color : C.border}`,
-                background: isActive ? style.bg : C.cardBg, cursor: 'pointer', textAlign: 'center',
-                transition: 'all 150ms ease',
-              }}
+              className={`px-3 py-3.5 rounded-lg border text-center cursor-pointer transition-smooth ${
+                isActive
+                  ? `${style.bg} ${style.border}`
+                  : 'bg-white border-cream-border hover:bg-cream'
+              }`}
             >
-              <div style={{ fontSize: 22, fontWeight: 700, color: style.color, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+              <div className={`text-2xl font-bold font-serif ${style.color}`}>
                 {roleCounts[role]}
               </div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: isActive ? style.color : C.slate, marginTop: 2 }}>
+              <div className={`text-[11px] font-semibold mt-0.5 ${isActive ? style.color : 'text-slate'}`}>
                 {role}
               </div>
             </button>
@@ -292,34 +307,33 @@ export default function TeamPage() {
       </div>
 
       {/* Filters */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <div style={{ fontSize: 13, color: C.slate }}>
+      <div className="flex justify-between items-center mb-4">
+        <div className="text-sm text-slate">
           {filteredMembers.length} member{filteredMembers.length !== 1 ? 's' : ''}
           {filterRole !== 'all' && ` · filtered by ${filterRole}`}
         </div>
-        <label style={{ fontSize: 12, color: C.slate, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <label className="text-xs text-slate cursor-pointer flex items-center gap-1.5">
           <input
             type="checkbox"
             checked={showInactive}
             onChange={e => setShowInactive(e.target.checked)}
-            style={{ accentColor: C.teal }}
+            className="accent-teal"
           />
           Show inactive
         </label>
       </div>
 
-      {/* Team Members — Grouped by Role */}
+      {/* Team Members */}
       {filteredMembers.length === 0 ? (
-        <div style={{
-          background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
-          padding: '40px 14px', textAlign: 'center', color: C.slate, fontSize: 13,
-        }}>
-          {members.length === 0 ? 'No team members yet. Click "Add Team Member" to get started.' : 'No members match the current filter.'}
-        </div>
+        <DataCard className="text-center py-10">
+          <p className="text-slate text-sm">
+            {members.length === 0 ? 'No team members yet. Click "Add Team Member" to get started.' : 'No members match the current filter.'}
+          </p>
+        </DataCard>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div className="flex flex-col gap-5">
           {(() => {
-            // Group filtered members by role, preserving ROLES order
+            // Group filtered members by role
             const grouped: { role: string; members: TeamMember[] }[] = [];
             for (const role of ROLES) {
               const roleMembers = filteredMembers.filter(m => m.role === role);
@@ -327,130 +341,103 @@ export default function TeamPage() {
                 grouped.push({ role, members: roleMembers });
               }
             }
-            // Catch any members with roles not in ROLES
-            const knownRoles = new Set(ROLES as readonly string[]);
-            const otherMembers = filteredMembers.filter(m => !knownRoles.has(m.role));
-            if (otherMembers.length > 0) {
-              grouped.push({ role: 'Other', members: otherMembers });
-            }
 
             return grouped.map(group => {
-              const roleStyle = ROLE_COLORS[group.role] ?? { bg: 'rgba(91,106,113,0.1)', color: C.slate };
+              const roleStyle = ROLE_COLORS[group.role] ?? { bg: 'bg-slate/10', color: 'text-slate', border: 'border-slate' };
               const roleDesc = ROLE_DESCRIPTIONS[group.role] ?? '';
               return (
-                <div key={group.role} style={{
-                  background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, overflow: 'hidden',
-                }}>
+                <DataCard key={group.role} className="p-0 overflow-hidden">
                   {/* Role group header */}
-                  <div style={{
-                    padding: '14px 20px', background: roleStyle.bg,
-                    borderBottom: `1px solid ${C.border}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span style={{ fontSize: 15, fontWeight: 700, color: roleStyle.color, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+                  <div className={`px-5 py-3.5 ${roleStyle.bg} border-b border-cream-border flex items-center justify-between`}>
+                    <div className="flex items-center gap-2.5">
+                      <span className={`text-base font-bold font-serif ${roleStyle.color}`}>
                         {group.role}
                       </span>
-                      <span style={{ fontSize: 12, color: C.slate }}>
+                      <span className="text-xs text-slate">
                         {roleDesc}
                       </span>
                     </div>
-                    <span style={{
-                      fontSize: 12, fontWeight: 600, padding: '2px 10px', borderRadius: 10,
-                      background: C.cardBg, color: roleStyle.color,
-                    }}>
+                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full bg-white ${roleStyle.color}`}>
                       {group.members.length}
                     </span>
                   </div>
                   {/* Members table */}
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                    <thead>
-                      <tr style={{ borderBottom: `1px solid ${C.border}` }}>
-                        {['Name', 'Email', 'Phone', 'Calendar', 'Status', ''].map(h => (
-                          <th key={h} style={{
-                            padding: '8px 14px', textAlign: 'left', color: C.slate,
-                            fontSize: 10, fontWeight: 600, textTransform: 'uppercase',
-                            letterSpacing: '0.06em', whiteSpace: 'nowrap',
-                          }}>
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {group.members.map((member, i) => (
-                        <tr key={member.id} style={{
-                          borderBottom: `1px solid ${C.border}`,
-                          background: i % 2 === 0 ? C.cardBg : '#faf7f2',
-                          opacity: member.active ? 1 : 0.5,
-                        }}>
-                          <td style={{ padding: '10px 14px', fontWeight: 600, color: C.dark }}>
-                            {member.name}
-                          </td>
-                          <td style={{ padding: '10px 14px' }}>
-                            <a href={`mailto:${member.email}`} style={{ color: C.teal, textDecoration: 'none' }}>
-                              {member.email}
-                            </a>
-                          </td>
-                          <td style={{ padding: '10px 14px', color: C.slate }}>
-                            {member.phone || '—'}
-                          </td>
-                          <td style={{ padding: '10px 14px' }}>
-                            {member.calendar_link ? (
-                              <a href={member.calendar_link} target="_blank" rel="noopener noreferrer"
-                                style={{ color: C.teal, textDecoration: 'none', fontSize: 12 }}>
-                                View Calendar
-                              </a>
-                            ) : (
-                              <span style={{ color: C.slate }}>—</span>
-                            )}
-                          </td>
-                          <td style={{ padding: '10px 14px' }}>
-                            <span style={{
-                              fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 4,
-                              background: member.active ? C.greenBg : C.redBg,
-                              color: member.active ? C.green : C.red,
-                            }}>
-                              {member.active ? 'Active' : 'Inactive'}
-                            </span>
-                          </td>
-                          <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
-                            <button
-                              onClick={() => { setEditMember(member); setShowForm(false); }}
-                              style={{
-                                background: 'none', border: 'none', color: C.teal,
-                                fontSize: 12, fontWeight: 500, cursor: 'pointer', marginRight: 12,
-                              }}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-cream-border">
+                          {['Name', 'Email', 'Phone', 'Calendar', 'Status', ''].map(h => (
+                            <th
+                              key={h}
+                              className="px-3.5 py-2 text-left text-slate text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap"
                             >
-                              Edit
-                            </button>
-                            {member.active ? (
-                              <button
-                                onClick={() => handleDeactivate(member)}
-                                style={{
-                                  background: 'none', border: 'none', color: C.red,
-                                  fontSize: 12, fontWeight: 500, cursor: 'pointer',
-                                }}
-                              >
-                                Deactivate
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => handleReactivate(member)}
-                                style={{
-                                  background: 'none', border: 'none', color: C.green,
-                                  fontSize: 12, fontWeight: 500, cursor: 'pointer',
-                                }}
-                              >
-                                Reactivate
-                              </button>
-                            )}
-                          </td>
+                              {h}
+                            </th>
+                          ))}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {group.members.map((member, i) => (
+                          <tr
+                            key={member.id}
+                            className={`border-b border-cream-border ${i % 2 === 0 ? 'bg-white' : 'bg-cream'} ${!member.active ? 'opacity-50' : ''}`}
+                          >
+                            <td className="px-3.5 py-2.5 font-semibold text-charcoal">
+                              {member.name}
+                            </td>
+                            <td className="px-3.5 py-2.5">
+                              <a href={`mailto:${member.email}`} className="text-teal no-underline hover:underline">
+                                {member.email}
+                              </a>
+                            </td>
+                            <td className="px-3.5 py-2.5 text-slate">
+                              {member.phone || '—'}
+                            </td>
+                            <td className="px-3.5 py-2.5">
+                              {member.calendar_link ? (
+                                <a href={member.calendar_link} target="_blank" rel="noopener noreferrer"
+                                  className="text-teal no-underline text-xs hover:underline">
+                                  View Calendar
+                                </a>
+                              ) : (
+                                <span className="text-slate">—</span>
+                              )}
+                            </td>
+                            <td className="px-3.5 py-2.5">
+                              <StatusBadge
+                                status={member.active ? 'active' : 'inactive'}
+                                size="sm"
+                              />
+                            </td>
+                            <td className="px-3.5 py-2.5 whitespace-nowrap">
+                              <button
+                                onClick={() => { setEditMember(member); setShowForm(false); }}
+                                className="bg-transparent border-none text-teal text-xs font-medium cursor-pointer mr-3 hover:underline"
+                              >
+                                Edit
+                              </button>
+                              {member.active ? (
+                                <button
+                                  onClick={() => handleDeactivate(member)}
+                                  className="bg-transparent border-none text-red-600 text-xs font-medium cursor-pointer hover:underline"
+                                >
+                                  Deactivate
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleReactivate(member)}
+                                  className="bg-transparent border-none text-emerald-600 text-xs font-medium cursor-pointer hover:underline"
+                                >
+                                  Reactivate
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </DataCard>
               );
             });
           })()}
