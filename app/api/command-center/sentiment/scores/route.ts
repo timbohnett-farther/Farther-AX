@@ -1,0 +1,62 @@
+/**
+ * app/api/command-center/sentiment/scores/route.ts
+ *
+ * GET /api/command-center/sentiment/scores
+ *
+ * Returns all stored sentiment scores from the advisor_sentiment table,
+ * ordered by deal_name. Used by the Advisor Hub to display scores
+ * without re-computing.
+ */
+
+import { NextResponse } from 'next/server';
+import pool from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
+
+interface AdvisorSentimentRow {
+  deal_id: string;
+  deal_name: string;
+  contact_id: string | null;
+  composite_score: number;
+  activity_score: number;
+  tone_score: number;
+  milestone_score: number;
+  recency_score: number;
+  tier: string;
+  deal_stage: string;
+  engagements_analyzed: number;
+  signals: Record<string, unknown>;
+  updated_at: string;
+}
+
+export async function GET() {
+  try {
+    const result = await pool.query<AdvisorSentimentRow>(
+      `SELECT
+         deal_id,
+         deal_name,
+         contact_id,
+         composite_score,
+         activity_score,
+         tone_score,
+         milestone_score,
+         recency_score,
+         tier,
+         deal_stage,
+         engagements_analyzed,
+         signals,
+         updated_at
+       FROM advisor_sentiment
+       ORDER BY deal_name ASC`
+    );
+
+    return NextResponse.json({
+      scores: result.rows,
+      count: result.rowCount ?? result.rows.length,
+    });
+  } catch (err) {
+    console.error('[sentiment/scores]', err);
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}

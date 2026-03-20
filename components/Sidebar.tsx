@@ -24,6 +24,7 @@ const navItems = [
 
 const commandCenterItems = [
   { label: 'Pipeline', href: '/command-center', icon: '◈' },
+  { label: 'Advisor Hub', href: '/command-center/advisor-hub', icon: '◇' },
   { label: 'Onboarding', href: '/command-center/onboarding', icon: '✓' },
   { label: 'Team', href: '/command-center/team', icon: '●' },
   { label: 'Metrics', href: '/command-center/metrics', icon: '▲' },
@@ -45,6 +46,7 @@ export default function Sidebar() {
   const firstName = session?.user?.name?.split(" ")[0] ?? "";
 
   const [trainingOpen, setTrainingOpen] = useState(true);
+  const [resourcesOpen, setResourcesOpen] = useState(true);
 
   return (
     <aside
@@ -151,28 +153,34 @@ export default function Sidebar() {
         {/* Divider */}
         <div className="my-4 border-t border-white/10" />
 
-        {/* External Links */}
-        <p
-          className="px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
-          style={{ color: "#4a5a62" }}
+        {/* External Links — collapsible */}
+        <button
+          onClick={() => setResourcesOpen(!resourcesOpen)}
+          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
+          style={{ color: "#4a5a62", background: "none", border: "none", cursor: "pointer" }}
         >
-          Resources
-        </p>
-        <ul className="space-y-0.5">
-          {externalLinks.map((link) => (
-            <li key={link.label}>
-              <a
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/40 hover:text-white/70 transition-colors"
-              >
-                <span className="text-xs" style={{ color: "#4a5a62" }}>↗</span>
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+          <span>Resources</span>
+          <span style={{ fontSize: 10, transition: "transform 150ms ease", transform: resourcesOpen ? "rotate(0deg)" : "rotate(-90deg)" }}>
+            ▼
+          </span>
+        </button>
+        {resourcesOpen && (
+          <ul className="space-y-0.5">
+            {externalLinks.map((link) => (
+              <li key={link.label}>
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/40 hover:text-white/70 transition-colors"
+                >
+                  <span className="text-xs" style={{ color: "#4a5a62" }}>↗</span>
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
       </nav>
 
       {/* User / Sign Out */}

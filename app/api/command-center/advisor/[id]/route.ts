@@ -47,7 +47,7 @@ const CONTACT_PROPS = [
   'firstname', 'lastname', 'email', 'phone', 'mobilephone',
   'city', 'state', 'zip', 'company',
   'hs_linkedin_url', 'linkedin_url',
-  'assets', 'client_type',
+  'assets', 'client_type', 'advisor_current_aum',
   'notes_last_contacted', 'notes_last_updated',
   'num_notes', 'num_contacted_notes',
   'hs_pinned_engagement_id',

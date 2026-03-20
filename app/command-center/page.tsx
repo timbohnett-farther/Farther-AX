@@ -309,6 +309,9 @@ function HorizontalBar({ items, maxValue, perItemMax }: { items: { label: string
 // COMMAND DASHBOARD (Analytics overlay for Recruiting tab)
 // ══════════════════════════════════════════════════════════════════════════════
 function CommandDashboard({ deals }: { deals: Deal[] }) {
+  const { data: aumData } = useSWR('/api/command-center/aum-tracker', fetcher);
+  const { data: sentimentData } = useSWR('/api/command-center/sentiment/scores', fetcher);
+
   const analytics = useMemo(() => {
     const activeDeals = deals.filter(d => ACTIVE_STAGE_IDS.includes(d.dealstage));
     const funnelDeals = deals.filter(d => FUNNEL_STAGE_ORDER.includes(d.dealstage));
@@ -590,6 +593,98 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
         />
       </div>
 
+      {/* ── Insight Cards: Sentiment · AUM · Revenue ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 32 }}>
+        {/* Sentiment Tracking */}
+        {(() => {
+          const scores = sentimentData?.scores ?? [];
+          const tierCounts: Record<string, number> = {};
+          for (const s of scores) tierCounts[s.tier] = (tierCounts[s.tier] ?? 0) + 1;
+          const atRisk = (tierCounts['At Risk'] ?? 0) + (tierCounts['High Risk'] ?? 0);
+          const positive = (tierCounts['Advocate'] ?? 0) + (tierCounts['Positive'] ?? 0);
+          return (
+            <div style={{
+              background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+              padding: '20px 24px', position: 'relative',
+            }}>
+              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.25, color: '#1d7682' }}>✦</span>
+              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Sentiment Tracking</p>
+              <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+                {scores.length > 0 ? `${scores.length}` : '—'}
+              </p>
+              <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
+                {scores.length > 0
+                  ? `${positive} positive · ${atRisk > 0 ? `${atRisk} at risk` : 'none at risk'}`
+                  : 'No scores yet'}
+              </p>
+            </div>
+          );
+        })()}
+
+        {/* Current AUM vs Expected */}
+        <div style={{
+          background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+          padding: '20px 24px', position: 'relative',
+        }}>
+          <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.25, color: C.teal }}>◎</span>
+          <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Current vs Expected AUM</p>
+          <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+            {aumData?.summary?.overall_transfer_pct != null ? `${aumData.summary.overall_transfer_pct}%` : '—'}
+          </p>
+          <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
+            {aumData?.summary
+              ? `${formatAUM(aumData.summary.total_actual_aum)} of ${formatAUM(aumData.summary.total_expected_aum)}`
+              : 'Loading...'}
+          </p>
+        </div>
+
+        {/* On Book Revenue */}
+        <div style={{
+          background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+          padding: '20px 24px', position: 'relative',
+        }}>
+          <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.25, color: C.green }}>$</span>
+          <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>On Book Revenue</p>
+          <p style={{ fontSize: 28, fontWeight: 700, color: C.green, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+            {aumData?.summary?.total_current_revenue ? formatAUM(aumData.summary.total_current_revenue) : '—'}
+          </p>
+          <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
+            {aumData?.summary?.advisors_with_actual
+              ? `${aumData.summary.advisors_with_actual} advisors with AUM on book`
+              : 'Based on current AUM × fee rate'}
+          </p>
+        </div>
+
+        {/* Expected Revenue */}
+        {(() => {
+          // Expected revenue = total expected AUM × weighted avg fee rate
+          const advisors = aumData?.advisors ?? [];
+          let totalExpectedRevenue = 0;
+          for (const adv of advisors) {
+            if (adv.expected_aum && adv.fee_rate_bps && adv.fee_rate_bps > 0) {
+              totalExpectedRevenue += adv.expected_aum * (adv.fee_rate_bps / 10000);
+            }
+          }
+          return (
+            <div style={{
+              background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+              padding: '20px 24px', position: 'relative',
+            }}>
+              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.25, color: C.gold }}>★</span>
+              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Expected Revenue</p>
+              <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+                {totalExpectedRevenue > 0 ? formatAUM(Math.round(totalExpectedRevenue)) : '—'}
+              </p>
+              <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
+                {totalExpectedRevenue > 0 && aumData?.summary?.total_current_revenue
+                  ? `${Math.round((aumData.summary.total_current_revenue / totalExpectedRevenue) * 100)}% realized`
+                  : 'At full AUM transfer'}
+              </p>
+            </div>
+          );
+        })()}
+      </div>
+
       {/* ── Row 1: Stage Funnel + Launch Countdown ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
 
@@ -711,6 +806,7 @@ function RecruitingTab() {
   const [aiInput, setAiInput] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const aiBottomRef = useRef<HTMLDivElement>(null);
+  const [teamAssignments, setTeamAssignments] = useState<Record<string, Record<string, string>>>({});
 
   const deals: Deal[] = useMemo(
     () => (data?.deals ?? []).filter((d: Deal) => !d.dealname?.toLowerCase().includes('test')),
@@ -730,6 +826,24 @@ function RecruitingTab() {
       .then(r => r.json())
       .then(d => { if (d.scores) setComplexityScores(d.scores); })
       .catch(() => {}); // Silent fail — scores are supplementary
+  }, [dealIdKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch team assignments from database after deals load
+  useEffect(() => {
+    if (deals.length === 0) return;
+    fetch('/api/command-center/assignments')
+      .then(r => r.json())
+      .then(d => {
+        if (d.assignments) {
+          const map: Record<string, Record<string, string>> = {};
+          for (const a of d.assignments) {
+            if (!map[a.deal_id]) map[a.deal_id] = {};
+            map[a.deal_id][a.role] = a.member_name;
+          }
+          setTeamAssignments(map);
+        }
+      })
+      .catch(() => {});
   }, [dealIdKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-scroll AI chat
@@ -1032,8 +1146,10 @@ function RecruitingTab() {
                   { key: 'complexity', label: 'Complexity' },
                   { key: 'launch_date', label: 'Launch Date' },
                   { key: 'launch_status', label: 'Launch Status' },
-                  { key: 'onboarder', label: 'AXM' },
-                  { key: 'transition_owner', label: 'AXA' },
+                  { key: 'axm', label: 'AXM' },
+                  { key: 'axa', label: 'AXA' },
+                  { key: 'ctm', label: 'CTM' },
+                  { key: 'cta', label: 'CTA' },
                   { key: 'ownerName', label: 'Recruiter' },
                 ].map(col => (
                   <th
@@ -1076,6 +1192,12 @@ function RecruitingTab() {
                   if (sortCol === 'dealstage') {
                     return (FUNNEL_STAGE_ORDER.indexOf(a.dealstage) - FUNNEL_STAGE_ORDER.indexOf(b.dealstage)) * dir;
                   }
+                  if (['axm', 'axa', 'ctm', 'cta'].includes(sortCol)) {
+                    const roleKey = sortCol.toUpperCase();
+                    const va = teamAssignments[a.id]?.[roleKey] ?? '';
+                    const vb = teamAssignments[b.id]?.[roleKey] ?? '';
+                    return va.localeCompare(vb) * dir;
+                  }
                   const va = ((a as unknown as Record<string, unknown>)[sortCol] as string) ?? '';
                   const vb = ((b as unknown as Record<string, unknown>)[sortCol] as string) ?? '';
                   return va.localeCompare(vb) * dir;
@@ -1110,8 +1232,10 @@ function RecruitingTab() {
                       <td style={{ padding: '10px 14px' }}>
                         <LaunchTimer deal={deal} />
                       </td>
-                      <td style={{ padding: '10px 14px', color: C.slate }}>{deal.onboarder ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: C.slate }}>{deal.transition_owner ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXM ? C.dark : C.slate, fontWeight: teamAssignments[deal.id]?.AXM ? 500 : 400 }}>{teamAssignments[deal.id]?.AXM ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXA ? C.dark : C.slate, fontWeight: teamAssignments[deal.id]?.AXA ? 500 : 400 }}>{teamAssignments[deal.id]?.AXA ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTM ? C.dark : C.slate, fontWeight: teamAssignments[deal.id]?.CTM ? 500 : 400 }}>{teamAssignments[deal.id]?.CTM ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTA ? C.dark : C.slate, fontWeight: teamAssignments[deal.id]?.CTA ? 500 : 400 }}>{teamAssignments[deal.id]?.CTA ?? '—'}</td>
                       <td style={{ padding: '10px 14px', color: C.slate }}>{deal.ownerName ?? '—'}</td>
                     </tr>
                   );
