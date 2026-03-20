@@ -362,19 +362,207 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
     // ── AUM by stage ──
     const maxStageAUM = Math.max(...stageFunnel.map(s => s.aum));
 
+    // ── Launch pace tracking ──
+    const ANNUAL_GOAL = 25e9;
+    const year = now.getFullYear();
+    const monthStart = new Date(year, now.getMonth(), 1);
+    const quarterMonth = Math.floor(now.getMonth() / 3) * 3;
+    const quarterStart = new Date(year, quarterMonth, 1);
+
+    const getLaunchDate = (d: Deal) => d.actual_launch_date || d.desired_start_date;
+
+    const ytdLaunched = launchedDeals.filter(d => {
+      const ls = getLaunchDate(d);
+      return ls && new Date(ls) >= ytdStart;
+    });
+    const mtdLaunched = ytdLaunched.filter(d => {
+      const ls = getLaunchDate(d);
+      return ls && new Date(ls) >= monthStart;
+    });
+    const qtdLaunched = ytdLaunched.filter(d => {
+      const ls = getLaunchDate(d);
+      return ls && new Date(ls) >= quarterStart;
+    });
+
+    const ytdAUM = ytdLaunched.reduce((acc, d) => acc + getAUM(d), 0);
+    const mtdAUM = mtdLaunched.reduce((acc, d) => acc + getAUM(d), 0);
+    const qtdAUM = qtdLaunched.reduce((acc, d) => acc + getAUM(d), 0);
+
+    // Pace calculations
+    const dayOfYear = Math.floor((now.getTime() - ytdStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const totalDaysInYear = (new Date(year, 11, 31).getTime() - ytdStart.getTime()) / (1000 * 60 * 60 * 24) + 1;
+    const ytdPacePct = (ytdAUM / ANNUAL_GOAL) * 100;
+    const expectedYtdPct = (dayOfYear / totalDaysInYear) * 100;
+    const ytdOnTrack = ytdPacePct >= expectedYtdPct;
+
+    // Monthly pace: goal / 12 per month
+    const monthlyGoal = ANNUAL_GOAL / 12;
+    const dayOfMonth = now.getDate();
+    const daysInMonth = new Date(year, now.getMonth() + 1, 0).getDate();
+    const expectedMtdPct = (dayOfMonth / daysInMonth) * 100;
+    const mtdPacePct = (mtdAUM / monthlyGoal) * 100;
+    const mtdOnTrack = mtdPacePct >= expectedMtdPct;
+    const mtdDeficit = mtdOnTrack ? 0 : (monthlyGoal * (expectedMtdPct / 100)) - mtdAUM;
+
+    // Quarterly pace: goal / 4 per quarter
+    const quarterlyGoal = ANNUAL_GOAL / 4;
+    const dayOfQuarter = Math.floor((now.getTime() - quarterStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const quarterEnd = new Date(year, quarterMonth + 3, 0);
+    const daysInQuarter = Math.floor((quarterEnd.getTime() - quarterStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const expectedQtdPct = (dayOfQuarter / daysInQuarter) * 100;
+    const qtdPacePct = (qtdAUM / quarterlyGoal) * 100;
+    const qtdOnTrack = qtdPacePct >= expectedQtdPct;
+    const qtdDeficit = qtdOnTrack ? 0 : (quarterlyGoal * (expectedQtdPct / 100)) - qtdAUM;
+
+    const quarterLabel = `Q${Math.floor(now.getMonth() / 3) + 1}`;
+    const monthLabel = now.toLocaleString('en-US', { month: 'long' });
+
     return {
       activeDeals, launchedDeals, preLaunchDeals,
       stageFunnel, totalActiveAUM, preLaunchAUM,
       launches30, launches60, launches90, launches30AUM, launches60AUM, launches90AUM,
       maxStageAUM,
+      // Pace tracking
+      ANNUAL_GOAL, ytdAUM, mtdAUM, qtdAUM,
+      ytdLaunched, mtdLaunched, qtdLaunched,
+      ytdPacePct, mtdPacePct, qtdPacePct,
+      expectedYtdPct, expectedMtdPct, expectedQtdPct,
+      ytdOnTrack, mtdOnTrack, qtdOnTrack,
+      mtdDeficit, qtdDeficit,
+      monthlyGoal, quarterlyGoal,
+      quarterLabel, monthLabel,
     };
   }, [deals]);
 
   const a = analytics;
 
+  // Pace indicator helper
+  function PaceIndicator({ label, aum, goal, pacePct, expectedPct, onTrack, deficit, count }: {
+    label: string; aum: number; goal: number; pacePct: number; expectedPct: number; onTrack: boolean; deficit: number; count: number;
+  }) {
+    const paceColor = onTrack ? C.green : C.red;
+    const cappedPct = Math.min(pacePct, 100);
+    return (
+      <div style={{ flex: 1, padding: '16px 20px', borderRadius: 8, background: 'rgba(91,106,113,0.04)', border: `1px solid ${C.border}` }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
+          <span style={{ fontSize: 11, color: C.slate }}>{count} launched</span>
+        </div>
+        <div style={{ fontSize: 24, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 2 }}>
+          {formatAUM(aum)}
+        </div>
+        <div style={{ fontSize: 11, color: C.slate, marginBottom: 10 }}>
+          of {formatAUM(goal)} goal
+        </div>
+        {/* Progress bar with expected pace marker */}
+        <div style={{ position: 'relative', height: 8, background: 'rgba(91,106,113,0.08)', borderRadius: 4, overflow: 'visible', marginBottom: 8 }}>
+          <div style={{
+            height: '100%', borderRadius: 4, width: `${cappedPct}%`,
+            background: paceColor, transition: 'width 0.4s ease',
+          }} />
+          {/* Expected pace marker */}
+          <div style={{
+            position: 'absolute', top: -3, left: `${Math.min(expectedPct, 100)}%`,
+            width: 2, height: 14, background: C.dark, borderRadius: 1, opacity: 0.4,
+          }} title={`Expected pace: ${expectedPct.toFixed(0)}%`} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: paceColor }}>
+            {onTrack ? 'On Track' : 'Behind Pace'}
+          </span>
+          {!onTrack && deficit > 0 && (
+            <span style={{ fontSize: 11, fontWeight: 600, color: C.red }}>
+              {formatAUM(deficit)} deficit
+            </span>
+          )}
+          {onTrack && (
+            <span style={{ fontSize: 11, color: C.green }}>
+              +{formatAUM(aum - (goal * expectedPct / 100))} ahead
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ marginBottom: 40 }}>
-      {/* ── Hero Stats ── */}
+      {/* ── 2026 Launch Goal Tracker ── */}
+      <div style={{
+        background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 10,
+        padding: '28px 32px', marginBottom: 20,
+      }}>
+        {/* Header row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+          <div>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 4 }}>
+              2026 Launch Goal Tracker
+            </h3>
+            <p style={{ fontSize: 12, color: C.slate }}>
+              {formatAUM(a.ANNUAL_GOAL)} annual target · {a.ytdLaunched.length} advisors launched YTD
+            </p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 32, fontWeight: 700, color: a.ytdOnTrack ? C.teal : C.red, fontFamily: "'ABC Arizona Text', Georgia, serif", lineHeight: 1 }}>
+              {formatAUM(a.ytdAUM)}
+            </div>
+            <div style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
+              {a.ytdPacePct.toFixed(1)}% of goal · {a.expectedYtdPct.toFixed(0)}% expected
+            </div>
+          </div>
+        </div>
+
+        {/* YTD progress bar */}
+        <div style={{ position: 'relative', height: 12, background: 'rgba(91,106,113,0.08)', borderRadius: 6, overflow: 'visible', marginBottom: 24 }}>
+          <div style={{
+            height: '100%', borderRadius: 6,
+            width: `${Math.min(a.ytdPacePct, 100)}%`,
+            background: a.ytdOnTrack ? C.teal : C.red,
+            transition: 'width 0.4s ease',
+          }} />
+          {/* Expected pace marker */}
+          <div style={{
+            position: 'absolute', top: -4, left: `${Math.min(a.expectedYtdPct, 100)}%`,
+            width: 2, height: 20, background: C.dark, borderRadius: 1, opacity: 0.5,
+          }} title={`Expected YTD pace: ${a.expectedYtdPct.toFixed(0)}%`} />
+          {/* Goal markers */}
+          {[25, 50, 75].map(pct => (
+            <div key={pct} style={{
+              position: 'absolute', top: 16, left: `${pct}%`, transform: 'translateX(-50%)',
+              fontSize: 9, color: C.slate, opacity: 0.6,
+            }}>
+              {formatAUM(a.ANNUAL_GOAL * pct / 100)}
+            </div>
+          ))}
+        </div>
+
+        {/* MTD / QTD / YTD pace cards */}
+        <div style={{ display: 'flex', gap: 16 }}>
+          <PaceIndicator
+            label={a.monthLabel}
+            aum={a.mtdAUM} goal={a.monthlyGoal}
+            pacePct={a.mtdPacePct} expectedPct={a.expectedMtdPct}
+            onTrack={a.mtdOnTrack} deficit={a.mtdDeficit}
+            count={a.mtdLaunched.length}
+          />
+          <PaceIndicator
+            label={a.quarterLabel}
+            aum={a.qtdAUM} goal={a.quarterlyGoal}
+            pacePct={a.qtdPacePct} expectedPct={a.expectedQtdPct}
+            onTrack={a.qtdOnTrack} deficit={a.qtdDeficit}
+            count={a.qtdLaunched.length}
+          />
+          <PaceIndicator
+            label="YTD"
+            aum={a.ytdAUM} goal={a.ANNUAL_GOAL}
+            pacePct={a.ytdPacePct} expectedPct={a.expectedYtdPct}
+            onTrack={a.ytdOnTrack} deficit={a.ytdOnTrack ? 0 : (a.ANNUAL_GOAL * a.expectedYtdPct / 100) - a.ytdAUM}
+            count={a.ytdLaunched.length}
+          />
+        </div>
+      </div>
+
+      {/* ── Pipeline Stats ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 32 }}>
         <SummaryCard
           label="Total Pipeline AUM"
