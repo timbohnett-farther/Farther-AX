@@ -32,7 +32,7 @@ const commandCenterItems = [
 ];
 
 const externalLinks = [
-  { label: "Farther Portal", href: "#" },
+  { label: "Farther Portal", href: "https://app.farther.com/Login" },
   { label: "Transition Tracker", href: "#" },
   { label: "AX — Notion", href: "#" },
   { label: "AX Email Templates", href: "#" },
