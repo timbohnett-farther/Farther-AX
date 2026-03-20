@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { colors } from '@/lib/design-tokens';
 
 interface Message {
   role: 'user' | 'assistant';

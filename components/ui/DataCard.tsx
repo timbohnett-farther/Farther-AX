@@ -29,7 +29,7 @@ export const DataCard: React.FC<DataCardProps> = ({
     <Card
       className={`glass-card ${className}`}
       decoration={decoration}
-      decorationColor={decorationColor as any}
+      decorationColor={decorationColor as "teal" | "blue" | "red" | "green" | "gray" | undefined}
     >
       {(title || action) && (
         <div className="flex items-center justify-between mb-4">

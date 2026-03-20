@@ -56,6 +56,18 @@ async function migrate() {
         ON advisor_assignments(deal_id);
       CREATE INDEX IF NOT EXISTS idx_advisor_assignments_member_id
         ON advisor_assignments(member_id);
+
+      CREATE TABLE IF NOT EXISTS advisor_drive_links (
+        id          SERIAL PRIMARY KEY,
+        deal_id     VARCHAR(64) NOT NULL UNIQUE,
+        folder_url  TEXT NOT NULL,
+        folder_name VARCHAR(255) DEFAULT 'Advisor Folder',
+        updated_by  VARCHAR(255),
+        updated_at  TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_advisor_drive_links_deal_id
+        ON advisor_drive_links(deal_id);
     `);
     console.log('Migration complete.');
   } finally {

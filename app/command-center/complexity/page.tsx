@@ -1,6 +1,6 @@
 "use client";
 
-import { DataCard, ScoreBadge } from '@/components/ui';
+import { DataCard } from '@/components/ui';
 
 /**
  * Complexity Education Page - Transition complexity scoring guide
