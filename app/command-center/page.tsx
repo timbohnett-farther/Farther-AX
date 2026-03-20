@@ -810,6 +810,7 @@ function RecruitingTab() {
   const [aiLoading, setAiLoading] = useState(false);
   const aiBottomRef = useRef<HTMLDivElement>(null);
   const [teamAssignments, setTeamAssignments] = useState<Record<string, Record<string, string>>>({});
+  const { data: aumData } = useSWR('/api/command-center/aum-tracker', fetcher);
 
   const deals: Deal[] = useMemo(
     () => (data?.deals ?? []).filter((d: Deal) => !d.dealname?.toLowerCase().includes('test')),
@@ -848,6 +849,17 @@ function RecruitingTab() {
       })
       .catch(() => {});
   }, [dealIdKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Build map of deal_id → { actual_aum, current_revenue } from AUM tracker data
+  const aumMap = useMemo(() => {
+    const map: Record<string, { actual_aum: number | null; current_revenue: number | null }> = {};
+    if (aumData?.advisors) {
+      for (const a of aumData.advisors) {
+        map[a.deal_id] = { actual_aum: a.actual_aum, current_revenue: a.current_revenue };
+      }
+    }
+    return map;
+  }, [aumData]);
 
   // Auto-scroll AI chat
   useEffect(() => {
@@ -1146,15 +1158,17 @@ function RecruitingTab() {
                   { key: 'firm_type', label: 'Type' },
                   { key: 'dealstage', label: 'Stage' },
                   { key: 'transferable_aum', label: 'Exp. AUM' },
+                  { key: 'actual_aum', label: 'Tran AUM' },
+                  { key: 'current_revenue', label: 'Revenue' },
                   { key: 'complexity', label: 'Complexity' },
                   { key: 'launch_date', label: 'Launch Date' },
                   { key: 'launch_status', label: 'Launch Status' },
-                  { key: 'axm', label: 'AXM' },
+                  { key: 'axm', label: 'AXM', color: C.teal },
                   { key: 'axa', label: 'AXA' },
-                  { key: 'ctm', label: 'CTM' },
+                  { key: 'ctm', label: 'CTM', color: '#2f73a8' },
                   { key: 'cta', label: 'CTA' },
                   { key: 'ownerName', label: 'Recruiter' },
-                ].map(col => (
+                ].map((col: { key: string; label: string; color?: string }) => (
                   <th
                     key={col.key}
                     onClick={() => {
@@ -1166,7 +1180,7 @@ function RecruitingTab() {
                       }
                     }}
                     style={{
-                      padding: '10px 14px', textAlign: 'left', color: C.slate, fontSize: 11,
+                      padding: '10px 14px', textAlign: 'left', color: col.color || C.slate, fontSize: 11,
                       fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em',
                       whiteSpace: 'nowrap', cursor: 'pointer', userSelect: 'none',
                     }}
@@ -1183,6 +1197,12 @@ function RecruitingTab() {
                   const dir = sortDir === 'asc' ? 1 : -1;
                   if (sortCol === 'transferable_aum') {
                     return ((parseFloat(a.transferable_aum ?? '0') || 0) - (parseFloat(b.transferable_aum ?? '0') || 0)) * dir;
+                  }
+                  if (sortCol === 'actual_aum') {
+                    return ((aumMap[a.id]?.actual_aum ?? 0) - (aumMap[b.id]?.actual_aum ?? 0)) * dir;
+                  }
+                  if (sortCol === 'current_revenue') {
+                    return ((aumMap[a.id]?.current_revenue ?? 0) - (aumMap[b.id]?.current_revenue ?? 0)) * dir;
                   }
                   if (sortCol === 'complexity') {
                     return ((complexityScores[a.id]?.score ?? 0) - (complexityScores[b.id]?.score ?? 0)) * dir;
@@ -1226,6 +1246,12 @@ function RecruitingTab() {
                       <td style={{ padding: '10px 14px', color: C.teal, fontWeight: 600 }}>
                         {formatAUM(parseFloat(deal.transferable_aum ?? '0'))}
                       </td>
+                      <td style={{ padding: '10px 14px', color: aumMap[deal.id]?.actual_aum ? C.dark : C.slate, fontWeight: aumMap[deal.id]?.actual_aum ? 600 : 400 }}>
+                        {aumMap[deal.id]?.actual_aum ? formatAUM(aumMap[deal.id].actual_aum) : '—'}
+                      </td>
+                      <td style={{ padding: '10px 14px', color: aumMap[deal.id]?.current_revenue ? C.green : C.slate, fontWeight: aumMap[deal.id]?.current_revenue ? 600 : 400 }}>
+                        {aumMap[deal.id]?.current_revenue ? formatAUM(aumMap[deal.id].current_revenue) : '—'}
+                      </td>
                       <td style={{ padding: '10px 14px' }}>
                         {cx ? <ComplexityBadge score={cx.score} tier={cx.tier} tierColor={cx.tierColor} /> : <span style={{ color: C.slate, fontSize: 11 }}>…</span>}
                       </td>
@@ -1235,9 +1261,9 @@ function RecruitingTab() {
                       <td style={{ padding: '10px 14px' }}>
                         <LaunchTimer deal={deal} />
                       </td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXM ? C.dark : C.slate, fontWeight: teamAssignments[deal.id]?.AXM ? 500 : 400 }}>{teamAssignments[deal.id]?.AXM ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXM ? C.teal : C.slate, fontWeight: teamAssignments[deal.id]?.AXM ? 600 : 400 }}>{teamAssignments[deal.id]?.AXM ?? '—'}</td>
                       <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXA ? C.dark : C.slate, fontWeight: teamAssignments[deal.id]?.AXA ? 500 : 400 }}>{teamAssignments[deal.id]?.AXA ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTM ? C.dark : C.slate, fontWeight: teamAssignments[deal.id]?.CTM ? 500 : 400 }}>{teamAssignments[deal.id]?.CTM ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTM ? '#2f73a8' : C.slate, fontWeight: teamAssignments[deal.id]?.CTM ? 600 : 400 }}>{teamAssignments[deal.id]?.CTM ?? '—'}</td>
                       <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTA ? C.dark : C.slate, fontWeight: teamAssignments[deal.id]?.CTA ? 500 : 400 }}>{teamAssignments[deal.id]?.CTA ?? '—'}</td>
                       <td style={{ padding: '10px 14px', color: C.slate }}>{deal.ownerName ?? '—'}</td>
                     </tr>

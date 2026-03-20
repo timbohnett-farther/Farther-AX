@@ -354,7 +354,15 @@ export default function OnboardingTracker() {
   if (error) return <div style={{ padding: '60px 40px', color: '#c0392b' }}>Failed to load data.</div>;
 
   const onboardingDeals = (data?.deals ?? []).filter(
-    (d: { dealstage: string }) => ONBOARDING_STAGE_IDS.includes(d.dealstage)
+    (d: { dealstage: string; dealname?: string; daysSinceLaunch?: number | null }) => {
+      if (!ONBOARDING_STAGE_IDS.includes(d.dealstage)) return false;
+      if (d.dealname?.toLowerCase().includes('test')) return false;
+      // For launched advisors, only include those within 90-day graduation window
+      if (d.dealstage === '100411705') {
+        return d.daysSinceLaunch == null || d.daysSinceLaunch <= 90;
+      }
+      return true;
+    }
   );
 
   return (

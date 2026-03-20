@@ -52,23 +52,6 @@ interface TeamMember {
   updated_at: string;
 }
 
-// ── Role Badge ───────────────────────────────────────────────────────────────
-function RoleBadge({ role }: { role: string }) {
-  const style = ROLE_COLORS[role] ?? { bg: 'rgba(91,106,113,0.1)', color: C.slate };
-  return (
-    <span
-      title={ROLE_DESCRIPTIONS[role]}
-      style={{
-        display: 'inline-block', padding: '2px 10px', borderRadius: 4,
-        fontSize: 11, fontWeight: 600, background: style.bg, color: style.color,
-        cursor: 'help',
-      }}
-    >
-      {role}
-    </span>
-  );
-}
-
 // ── Add/Edit Form ────────────────────────────────────────────────────────────
 function MemberForm({
   initial,
@@ -325,109 +308,154 @@ export default function TeamPage() {
         </label>
       </div>
 
-      {/* Team Table */}
-      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, overflow: 'hidden' }}>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-            <thead>
-              <tr style={{ borderBottom: `1px solid ${C.border}`, background: '#f7f4ef' }}>
-                {['Name', 'Role', 'Email', 'Phone', 'Calendar', 'Status', ''].map(h => (
-                  <th key={h} style={{
-                    padding: '10px 14px', textAlign: 'left', color: C.slate,
-                    fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
-                    letterSpacing: '0.06em', whiteSpace: 'nowrap',
-                  }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredMembers.length === 0 ? (
-                <tr>
-                  <td colSpan={7} style={{ padding: '40px 14px', textAlign: 'center', color: C.slate }}>
-                    {members.length === 0 ? 'No team members yet. Click "Add Team Member" to get started.' : 'No members match the current filter.'}
-                  </td>
-                </tr>
-              ) : (
-                filteredMembers.map((member, i) => (
-                  <tr key={member.id} style={{
-                    borderBottom: `1px solid ${C.border}`,
-                    background: i % 2 === 0 ? C.cardBg : '#faf7f2',
-                    opacity: member.active ? 1 : 0.5,
-                  }}>
-                    <td style={{ padding: '10px 14px', fontWeight: 600, color: C.dark }}>
-                      {member.name}
-                    </td>
-                    <td style={{ padding: '10px 14px' }}>
-                      <RoleBadge role={member.role} />
-                    </td>
-                    <td style={{ padding: '10px 14px' }}>
-                      <a href={`mailto:${member.email}`} style={{ color: C.teal, textDecoration: 'none' }}>
-                        {member.email}
-                      </a>
-                    </td>
-                    <td style={{ padding: '10px 14px', color: C.slate }}>
-                      {member.phone || '—'}
-                    </td>
-                    <td style={{ padding: '10px 14px' }}>
-                      {member.calendar_link ? (
-                        <a href={member.calendar_link} target="_blank" rel="noopener noreferrer"
-                          style={{ color: C.teal, textDecoration: 'none', fontSize: 12 }}>
-                          View Calendar
-                        </a>
-                      ) : (
-                        <span style={{ color: C.slate }}>—</span>
-                      )}
-                    </td>
-                    <td style={{ padding: '10px 14px' }}>
-                      <span style={{
-                        fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 4,
-                        background: member.active ? C.greenBg : C.redBg,
-                        color: member.active ? C.green : C.red,
-                      }}>
-                        {member.active ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
-                      <button
-                        onClick={() => { setEditMember(member); setShowForm(false); }}
-                        style={{
-                          background: 'none', border: 'none', color: C.teal,
-                          fontSize: 12, fontWeight: 500, cursor: 'pointer', marginRight: 12,
-                        }}
-                      >
-                        Edit
-                      </button>
-                      {member.active ? (
-                        <button
-                          onClick={() => handleDeactivate(member)}
-                          style={{
-                            background: 'none', border: 'none', color: C.red,
-                            fontSize: 12, fontWeight: 500, cursor: 'pointer',
-                          }}
-                        >
-                          Deactivate
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleReactivate(member)}
-                          style={{
-                            background: 'none', border: 'none', color: C.green,
-                            fontSize: 12, fontWeight: 500, cursor: 'pointer',
-                          }}
-                        >
-                          Reactivate
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      {/* Team Members — Grouped by Role */}
+      {filteredMembers.length === 0 ? (
+        <div style={{
+          background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+          padding: '40px 14px', textAlign: 'center', color: C.slate, fontSize: 13,
+        }}>
+          {members.length === 0 ? 'No team members yet. Click "Add Team Member" to get started.' : 'No members match the current filter.'}
         </div>
-      </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {(() => {
+            // Group filtered members by role, preserving ROLES order
+            const grouped: { role: string; members: TeamMember[] }[] = [];
+            for (const role of ROLES) {
+              const roleMembers = filteredMembers.filter(m => m.role === role);
+              if (roleMembers.length > 0) {
+                grouped.push({ role, members: roleMembers });
+              }
+            }
+            // Catch any members with roles not in ROLES
+            const knownRoles = new Set(ROLES as readonly string[]);
+            const otherMembers = filteredMembers.filter(m => !knownRoles.has(m.role));
+            if (otherMembers.length > 0) {
+              grouped.push({ role: 'Other', members: otherMembers });
+            }
+
+            return grouped.map(group => {
+              const roleStyle = ROLE_COLORS[group.role] ?? { bg: 'rgba(91,106,113,0.1)', color: C.slate };
+              const roleDesc = ROLE_DESCRIPTIONS[group.role] ?? '';
+              return (
+                <div key={group.role} style={{
+                  background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, overflow: 'hidden',
+                }}>
+                  {/* Role group header */}
+                  <div style={{
+                    padding: '14px 20px', background: roleStyle.bg,
+                    borderBottom: `1px solid ${C.border}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ fontSize: 15, fontWeight: 700, color: roleStyle.color, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+                        {group.role}
+                      </span>
+                      <span style={{ fontSize: 12, color: C.slate }}>
+                        {roleDesc}
+                      </span>
+                    </div>
+                    <span style={{
+                      fontSize: 12, fontWeight: 600, padding: '2px 10px', borderRadius: 10,
+                      background: C.cardBg, color: roleStyle.color,
+                    }}>
+                      {group.members.length}
+                    </span>
+                  </div>
+                  {/* Members table */}
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                    <thead>
+                      <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                        {['Name', 'Email', 'Phone', 'Calendar', 'Status', ''].map(h => (
+                          <th key={h} style={{
+                            padding: '8px 14px', textAlign: 'left', color: C.slate,
+                            fontSize: 10, fontWeight: 600, textTransform: 'uppercase',
+                            letterSpacing: '0.06em', whiteSpace: 'nowrap',
+                          }}>
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {group.members.map((member, i) => (
+                        <tr key={member.id} style={{
+                          borderBottom: `1px solid ${C.border}`,
+                          background: i % 2 === 0 ? C.cardBg : '#faf7f2',
+                          opacity: member.active ? 1 : 0.5,
+                        }}>
+                          <td style={{ padding: '10px 14px', fontWeight: 600, color: C.dark }}>
+                            {member.name}
+                          </td>
+                          <td style={{ padding: '10px 14px' }}>
+                            <a href={`mailto:${member.email}`} style={{ color: C.teal, textDecoration: 'none' }}>
+                              {member.email}
+                            </a>
+                          </td>
+                          <td style={{ padding: '10px 14px', color: C.slate }}>
+                            {member.phone || '—'}
+                          </td>
+                          <td style={{ padding: '10px 14px' }}>
+                            {member.calendar_link ? (
+                              <a href={member.calendar_link} target="_blank" rel="noopener noreferrer"
+                                style={{ color: C.teal, textDecoration: 'none', fontSize: 12 }}>
+                                View Calendar
+                              </a>
+                            ) : (
+                              <span style={{ color: C.slate }}>—</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '10px 14px' }}>
+                            <span style={{
+                              fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 4,
+                              background: member.active ? C.greenBg : C.redBg,
+                              color: member.active ? C.green : C.red,
+                            }}>
+                              {member.active ? 'Active' : 'Inactive'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
+                            <button
+                              onClick={() => { setEditMember(member); setShowForm(false); }}
+                              style={{
+                                background: 'none', border: 'none', color: C.teal,
+                                fontSize: 12, fontWeight: 500, cursor: 'pointer', marginRight: 12,
+                              }}
+                            >
+                              Edit
+                            </button>
+                            {member.active ? (
+                              <button
+                                onClick={() => handleDeactivate(member)}
+                                style={{
+                                  background: 'none', border: 'none', color: C.red,
+                                  fontSize: 12, fontWeight: 500, cursor: 'pointer',
+                                }}
+                              >
+                                Deactivate
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleReactivate(member)}
+                                style={{
+                                  background: 'none', border: 'none', color: C.green,
+                                  fontSize: 12, fontWeight: 500, cursor: 'pointer',
+                                }}
+                              >
+                                Reactivate
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            });
+          })()}
+        </div>
+      )}
     </div>
   );
 }
