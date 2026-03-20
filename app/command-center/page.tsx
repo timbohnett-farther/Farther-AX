@@ -712,9 +712,13 @@ function RecruitingTab() {
   const [aiLoading, setAiLoading] = useState(false);
   const aiBottomRef = useRef<HTMLDivElement>(null);
 
-  const deals: Deal[] = (data?.deals ?? []).filter((d: Deal) => !d.dealname?.toLowerCase().includes('test'));
+  const deals: Deal[] = useMemo(
+    () => (data?.deals ?? []).filter((d: Deal) => !d.dealname?.toLowerCase().includes('test')),
+    [data]
+  );
 
   // Fetch complexity scores after deals load
+  const dealIdKey = useMemo(() => deals.map(d => d.id).join(','), [deals]);
   useEffect(() => {
     if (deals.length === 0) return;
     const dealIds = deals.map(d => d.id);
@@ -726,7 +730,7 @@ function RecruitingTab() {
       .then(r => r.json())
       .then(d => { if (d.scores) setComplexityScores(d.scores); })
       .catch(() => {}); // Silent fail — scores are supplementary
-  }, [deals]);
+  }, [dealIdKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-scroll AI chat
   useEffect(() => {
