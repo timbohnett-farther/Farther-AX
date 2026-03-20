@@ -76,11 +76,11 @@ export const TIER_CONFIG: Record<
   SentimentTier,
   { min: number; max: number; color: string; bgColor: string; icon: string }
 > = {
-  'Advocate':  { min: 82, max: 100, color: '#27ae60', bgColor: 'rgba(39,174,96,0.10)',   icon: '★' },
-  'Positive':  { min: 65, max: 81,  color: '#1d7682', bgColor: 'rgba(29,118,130,0.10)',  icon: '▲' },
-  'Neutral':   { min: 45, max: 64,  color: '#b27d2e', bgColor: 'rgba(178,125,46,0.08)', icon: '●' },
-  'At Risk':   { min: 28, max: 44,  color: '#e67e22', bgColor: 'rgba(230,126,34,0.10)', icon: '◈' },
-  'High Risk': { min: 0,  max: 27,  color: '#c0392b', bgColor: 'rgba(192,57,43,0.08)',  icon: '▼' },
+  'Advocate':  { min: 80, max: 100, color: '#27ae60', bgColor: 'rgba(39,174,96,0.10)',   icon: '★' },
+  'Positive':  { min: 58, max: 79,  color: '#1d7682', bgColor: 'rgba(29,118,130,0.10)',  icon: '▲' },
+  'Neutral':   { min: 38, max: 57,  color: '#b27d2e', bgColor: 'rgba(178,125,46,0.08)', icon: '●' },
+  'At Risk':   { min: 20, max: 37,  color: '#e67e22', bgColor: 'rgba(230,126,34,0.10)', icon: '◈' },
+  'High Risk': { min: 0,  max: 19,  color: '#c0392b', bgColor: 'rgba(192,57,43,0.08)',  icon: '▼' },
 };
 
 // ── Milestone Stage Map ────────────────────────────────────────────────────────
@@ -90,17 +90,26 @@ export const TIER_CONFIG: Record<
  * Each maps to a human-readable label and a numeric position (step).
  */
 const STAGE_MAP: Record<string, { label: string; step: number }> = {
-  '2496935':  { label: 'Step 5 – Offer Review',    step: 5 },
-  '2496936':  { label: 'Step 6 – Offer Accepted',  step: 6 },
-  '100411705':{ label: 'Step 7 – Launched',         step: 7 },
+  '2496931':  { label: 'Step 1 – Initial Conversation', step: 1 },
+  '2496932':  { label: 'Step 2 – Discovery Meeting',    step: 2 },
+  '2496933':  { label: 'Step 3 – Office Visit',         step: 3 },
+  '2496934':  { label: 'Step 4 – Due Diligence',        step: 4 },
+  '2496935':  { label: 'Step 5 – Offer Review',         step: 5 },
+  '2496936':  { label: 'Step 6 – Offer Accepted',       step: 6 },
+  '100411705':{ label: 'Step 7 – Launched',              step: 7 },
 };
 
 /**
  * Base milestone scores for each pipeline step.
- * Steps below 5 are not in the tracked stage map; treat as early-stage (score 20).
+ * Early-stage advisors now get fair baseline scores instead of defaulting to 20.
+ * Progression is rewarded but early stages aren't punished.
  */
 const STAGE_BASE_SCORES: Record<number, number> = {
-  5: 50,
+  1: 35,
+  2: 40,
+  3: 45,
+  4: 48,
+  5: 55,
   6: 70,
   7: 85,
 };
@@ -160,9 +169,10 @@ export function getTier(score: number): SentimentTier {
  *
  * Scores activity volume over a rolling time window on a 0–100 scale.
  *
- * Baseline expectation: ~8–12 engagements per 30-day window represents a
- * healthy relationship (score = 100). The curve is linear up to the ceiling
- * so that advisors with fewer touchpoints are scored proportionally.
+ * Baseline expectation: ~5 engagements per 30-day window represents a
+ * healthy relationship (score = 100). This reflects realistic recruiting
+ * cadence — a weekly check-in plus occasional extras. The curve is linear
+ * up to the ceiling so advisors with fewer touchpoints score proportionally.
  *
  * @param engagements  Full engagement array (any period).
  * @param dayWindow    Rolling window in days (default 30).
@@ -175,9 +185,10 @@ export function computeActivityScore(
   const windowed = filterToWindow(engagements, dayWindow);
   const count = windowed.length;
 
-  // Healthy baseline: 10 engagements / 30 days → 100
+  // Healthy baseline: 5 engagements / 30 days → 100
+  // Realistic for advisor recruiting — weekly check-in + a few extras is healthy
   // Scale linearly; anything at or above baseline = 100
-  const BASELINE = 10 * (dayWindow / 30);
+  const BASELINE = 5 * (dayWindow / 30);
   const raw = (count / BASELINE) * 100;
 
   return clamp(raw);
@@ -190,10 +201,11 @@ export function computeActivityScore(
  *
  * Reference points (interpolated linearly between breakpoints):
  *   0 days  → 100
- *   3 days  →  85
- *   7 days  →  60
- *   14 days →  30
- *   30+ days→   0
+ *   3 days  →  90
+ *   7 days  →  75
+ *   14 days →  55
+ *   21 days →  30
+ *   45+ days→   0
  *
  * @param engagements  Full engagement array; sorted order is not assumed.
  * @returns            Score 0–100.
@@ -214,16 +226,18 @@ export function computeRecencyScore(engagements: Engagement[]): number {
   const days = (Date.now() - mostRecentMs) / (1000 * 60 * 60 * 24);
 
   // Piecewise linear interpolation across defined breakpoints
+  // Softened curve — advisors aren't penalized as harshly for 1-2 week gaps
   const breakpoints: [number, number][] = [
     [0,  100],
-    [3,   85],
-    [7,   60],
-    [14,  30],
-    [30,   0],
+    [3,   90],
+    [7,   75],
+    [14,  55],
+    [21,  30],
+    [45,   0],
   ];
 
   if (days <= 0) return 100;
-  if (days >= 30) return 0;
+  if (days >= 45) return 0;
 
   for (let i = 0; i < breakpoints.length - 1; i++) {
     const [d0, s0] = breakpoints[i];

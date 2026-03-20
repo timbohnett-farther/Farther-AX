@@ -172,7 +172,9 @@ async function fetchTeamFeeRates(teamIds: string[]): Promise<Record<string, numb
 }
 
 // ── GET handler ──────────────────────────────────────────────────────────────
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const includeAll = searchParams.get('all') === 'true';
   try {
     // Step 1: Get all launched deals
     const deals = await fetchLaunchedDeals();
@@ -197,9 +199,9 @@ export async function GET() {
       const contactId = dealContactMap[deal.id];
       const teamId = dealTeamMap[deal.id];
       const contactData = contactId ? contactAumMap[contactId] : null;
-      // average_fee_rate is stored as a percentage (e.g. 1.0 = 1% = 100 bps)
-      const feeRatePct = teamId ? teamFeeMap[teamId] : null;
-      const feeRateBps = feeRatePct != null ? Math.round(feeRatePct * 100) : null;
+      // average_fee_rate is stored as basis points (e.g. 100 = 100 bps = 1%)
+      // Pass through the raw value — no conversion needed
+      const feeRateRaw = teamId ? teamFeeMap[teamId] : null;
       const expectedAum = parseFloat(deal.properties.transferable_aum ?? '0') || null;
       const actualAum = contactData?.aum ?? null;
       const launchDate = deal.properties.actual_launch_date || deal.properties.desired_start_date;
@@ -210,10 +212,11 @@ export async function GET() {
         transferPct = Math.round((actualAum / expectedAum) * 100);
       }
 
-      // Calculate current revenue: AUM × (fee rate % / 100)
+      // Calculate current revenue: AUM × (BPS / 10,000)
+      // e.g. $50M × (100 bps / 10000) = $500K
       let currentRevenue: number | null = null;
-      if (actualAum && feeRatePct && feeRatePct > 0) {
-        currentRevenue = Math.round(actualAum * (feeRatePct / 100));
+      if (actualAum && feeRateRaw && feeRateRaw > 0) {
+        currentRevenue = Math.round(actualAum * (feeRateRaw / 10000));
       }
 
       // Days since launch
@@ -229,7 +232,7 @@ export async function GET() {
         expected_aum: expectedAum,
         actual_aum: actualAum,
         transfer_pct: transferPct,
-        fee_rate_bps: feeRateBps,
+        fee_rate_bps: feeRateRaw,
         current_revenue: currentRevenue,
         launch_date: launchDate ?? null,
         days_since_launch: daysSinceLaunch,
@@ -239,12 +242,15 @@ export async function GET() {
       };
     });
 
-    // Filter to Launch-to-Graduation only (≤90 days since launch) and exclude test advisors
+    // Filter: always exclude test advisors; optionally limit to graduation window
     const GRADUATION_DAYS = 90;
-    const filtered = advisors.filter(a =>
-      !a.advisor_name.toLowerCase().includes('test') &&
-      (a.days_since_launch === null || a.days_since_launch <= GRADUATION_DAYS)
-    );
+    const filtered = advisors.filter(a => {
+      if (a.advisor_name.toLowerCase().includes('test')) return false;
+      // When ?all=true, include all launched advisors (for pipeline table)
+      if (includeAll) return true;
+      // Default: only include advisors within 90-day graduation window
+      return a.days_since_launch === null || a.days_since_launch <= GRADUATION_DAYS;
+    });
 
     // Sort by advisor name (last name)
     filtered.sort((a, b) => {

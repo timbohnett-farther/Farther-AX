@@ -810,7 +810,7 @@ function RecruitingTab() {
   const [aiLoading, setAiLoading] = useState(false);
   const aiBottomRef = useRef<HTMLDivElement>(null);
   const [teamAssignments, setTeamAssignments] = useState<Record<string, Record<string, string>>>({});
-  const { data: aumData } = useSWR('/api/command-center/aum-tracker', fetcher);
+  const { data: aumData } = useSWR('/api/command-center/aum-tracker?all=true', fetcher);
 
   const deals: Deal[] = useMemo(
     () => (data?.deals ?? []).filter((d: Deal) => !d.dealname?.toLowerCase().includes('test')),
