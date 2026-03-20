@@ -318,8 +318,17 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
     const getAUM = (d: Deal) => parseFloat(d.transferable_aum ?? '0') || 0;
 
     // ── Stage funnel ──
+    const ytdStart = new Date(new Date().getFullYear(), 0, 1); // Jan 1 of current year
     const stageFunnel = FUNNEL_STAGE_ORDER.map(sid => {
-      const stageDeals = funnelDeals.filter(d => d.dealstage === sid);
+      let stageDeals = funnelDeals.filter(d => d.dealstage === sid);
+      // Step 7 (Launched): only show YTD launches toward the $25B goal
+      if (sid === '100411705') {
+        stageDeals = stageDeals.filter(d => {
+          const launchStr = d.actual_launch_date || d.desired_start_date;
+          if (!launchStr) return false;
+          return new Date(launchStr) >= ytdStart;
+        });
+      }
       const aum = stageDeals.reduce((acc, d) => acc + getAUM(d), 0);
       return { id: sid, label: STAGE_LABELS[sid], count: stageDeals.length, aum, color: STAGE_COLORS[sid] };
     });
@@ -398,10 +407,10 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 
         {/* Stage Funnel with AUM */}
         <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24 }}>
-          <SectionHeader title="Pipeline Funnel" subtitle="Advisors & projected AUM by stage" />
+          <SectionHeader title="Pipeline Funnel" subtitle="Advisors & projected AUM by stage · Launched = YTD toward $25B goal" />
           <HorizontalBar
             maxValue={a.maxStageAUM}
-            perItemMax={[20e9, 15e9, 10e9, 7e9, 5e9, 4e9, 4e9]}
+            perItemMax={[20e9, 15e9, 10e9, 7e9, 5e9, 4e9, 25e9]}
             items={a.stageFunnel.map(s => ({
               label: STAGE_LABELS[s.id].replace('Step ', 'S'),
               value: s.aum,
