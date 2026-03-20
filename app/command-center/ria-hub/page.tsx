@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import useSWR from 'swr';
-import { Card, Title, Text, Metric, Flex, Badge } from '@tremor/react';
+import { Card, Text, Badge } from '@tremor/react';
 import { StatCard, DataCard, StatusBadge, TabGroup, FilterBar } from '@/components/ui';
 import { formatCompactCurrency } from '@/lib/design-tokens';
 import {

@@ -17,7 +17,7 @@ import {
   CurrencyDollarIcon,
   UserGroupIcon,
   ChartBarIcon,
-  ArrowArrowTrendingUpIcon,
+  ArrowTrendingUpIcon,
 } from '@heroicons/react/24/outline';
 import { formatCompactCurrency } from '@/lib/design-tokens';
 
