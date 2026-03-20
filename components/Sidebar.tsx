@@ -31,6 +31,7 @@ const commandCenterItems = [
   { label: 'Complexity', href: '/command-center/complexity', icon: '◉' },
   { label: 'Transitions', href: '/command-center/transitions', icon: '⇄' },
   { label: 'AI Assistant', href: '/command-center/ai', icon: '✦' },
+  { label: 'RIA Hub', href: '/command-center/ria-hub', icon: '◇' },
 ];
 
 const externalLinks = [
