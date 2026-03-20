@@ -1,14 +1,16 @@
 'use client';
 
 import useSWR from 'swr';
+import { StatCard, MetricBar, DataCard } from '@/components/ui';
+import { formatCompactCurrency } from '@/lib/design-tokens';
+import {
+  UserGroupIcon,
+  CurrencyDollarIcon,
+  ChartBarIcon,
+  ArrowTrendingUpIcon,
+} from '@heroicons/react/24/outline';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
-
-const C = {
-  dark: '#333333', white: '#ffffff', slate: '#5b6a71',
-  lightBlue: '#b6d0ed', teal: '#1d7682', bg: '#FAF7F2',
-  cardBg: '#ffffff', border: '#e8e2d9',
-};
 
 const STAGE_LABELS: Record<string, string> = {
   '2496931': 'Step 1 – First Meeting',
@@ -25,43 +27,32 @@ const STAGE_LABELS: Record<string, string> = {
 
 function formatAUM(n: number): string {
   if (!n || isNaN(n)) return '$0';
-  if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1)}B`;
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(0)}M`;
-  return `$${n.toLocaleString()}`;
+  return formatCompactCurrency(n);
 }
 
-function MetricCard({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: boolean }) {
-  return (
-    <div style={{
-      background: accent ? C.teal : C.cardBg,
-      border: `1px solid ${accent ? C.teal : C.border}`,
-      borderRadius: 8, padding: '20px 24px',
-    }}>
-      <p style={{ fontSize: 11, color: accent ? 'rgba(255,255,255,0.7)' : C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{label}</p>
-      <p style={{ fontSize: 26, fontWeight: 700, color: accent ? C.white : C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{value}</p>
-      {sub && <p style={{ fontSize: 11, color: accent ? 'rgba(255,255,255,0.6)' : C.slate, marginTop: 4 }}>{sub}</p>}
-    </div>
-  );
-}
-
-function BarRow({ label, count, total, color }: { label: string; count: number; total: number; color: string }) {
-  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-      <span style={{ width: 200, fontSize: 13, color: C.dark, flexShrink: 0 }}>{label}</span>
-      <div style={{ flex: 1, height: 8, background: '#e8e2d9', borderRadius: 4, overflow: 'hidden' }}>
-        <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 4 }} />
-      </div>
-      <span style={{ fontSize: 12, color: C.slate, minWidth: 50, textAlign: 'right' }}>{count} ({pct}%)</span>
-    </div>
-  );
-}
-
+/**
+ * Metrics Dashboard - KPI tracking with StatCards
+ *
+ * Migrated to Tremor components (removed all inline styles)
+ */
 export default function MetricsDashboard() {
   const { data, error, isLoading } = useSWR('/api/command-center/metrics', fetcher, { refreshInterval: 43_200_000 });
 
-  if (isLoading) return <div style={{ padding: '60px 40px', color: C.slate }}>Loading metrics…</div>;
-  if (error || data?.error) return <div style={{ padding: '60px 40px', color: '#c0392b' }}>Failed to load metrics.</div>;
+  if (isLoading) {
+    return (
+      <div className="px-10 py-16 text-slate">
+        Loading metrics…
+      </div>
+    );
+  }
+
+  if (error || data?.error) {
+    return (
+      <div className="px-10 py-16 text-red-600">
+        Failed to load metrics.
+      </div>
+    );
+  }
 
   const m = data ?? {};
   const cap = m.capacity ?? {};
@@ -70,72 +61,130 @@ export default function MetricsDashboard() {
   const transitionTotal = Object.values((m.transitionBreakdown ?? {}) as Record<string, number>).reduce((a, b) => a + b, 0);
   const stageTotal = Object.values((m.stageBreakdown ?? {}) as Record<string, number>).reduce((a, b) => a + b, 0);
 
+  // Prepare transition data for MetricBar
+  const transitionData = Object.entries(m.transitionBreakdown as Record<string, number> ?? {})
+    .sort((a, b) => b[1] - a[1])
+    .map(([type, count]) => ({
+      name: type || 'Not set',
+      value: count,
+      color: 'teal' as const,
+    }));
+
+  // Prepare stage data for MetricBar
+  const stageData = Object.entries(m.stageBreakdown as Record<string, number> ?? {})
+    .sort((a, b) => {
+      const order = ['2496931','2496932','2496934','100409509','2496935','2496936','100411705','31214941','2496937','26572965'];
+      return order.indexOf(a[0]) - order.indexOf(b[0]);
+    })
+    .map(([stageId, count]) => ({
+      name: STAGE_LABELS[stageId] ?? stageId,
+      value: count,
+      color: (stageId === '100411705' ? 'teal' : 'blue') as const,
+    }));
+
   return (
-    <div style={{ padding: '40px 40px', minHeight: '100vh', background: C.bg, fontFamily: "'Fakt', system-ui, sans-serif" }}>
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 6 }}>
+    <div className="px-10 py-10 min-h-screen bg-cream font-sans">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-charcoal font-serif mb-2">
           AX Metrics
         </h1>
-        <p style={{ color: C.slate, fontSize: 14 }}>Live pipeline metrics · refreshes every 30s</p>
+        <p className="text-slate text-sm">
+          Live pipeline metrics · refreshes every 30s
+        </p>
       </div>
 
       {/* Team Capacity */}
-      <h2 style={{ fontSize: 12, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Team Capacity</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
-        <MetricCard label="AXM/AXA Staff" value={String(cap.axmCount ?? 9)} sub="managing onboarding" />
-        <MetricCard label="Total AUM" value={formatAUM(cap.totalAUM ?? 15e9)} sub="under management" accent />
-        <MetricCard label="Advisors" value={String(cap.advisorCount ?? 240)} sub="Farther platform" />
-        <MetricCard label="AUM per Staff" value={formatAUM(avgAUMPerStaff)} sub="avg load" />
+      <h2 className="text-xs font-semibold text-slate uppercase tracking-wider mb-4">
+        Team Capacity
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCard
+          title="AXM/AXA Staff"
+          value={String(cap.axmCount ?? 9)}
+          subtitle="managing onboarding"
+          icon={<UserGroupIcon className="h-6 w-6 text-teal" />}
+        />
+        <StatCard
+          title="Total AUM"
+          value={formatAUM(cap.totalAUM ?? 15e9)}
+          subtitle="under management"
+          icon={<CurrencyDollarIcon className="h-6 w-6 text-white" />}
+          className="bg-teal text-white"
+        />
+        <StatCard
+          title="Advisors"
+          value={String(cap.advisorCount ?? 240)}
+          subtitle="Farther platform"
+          icon={<ChartBarIcon className="h-6 w-6 text-teal" />}
+        />
+        <StatCard
+          title="AUM per Staff"
+          value={formatAUM(avgAUMPerStaff)}
+          subtitle="avg load"
+          icon={<ArrowTrendingUpIcon className="h-6 w-6 text-teal" />}
+        />
       </div>
 
       {/* Onboarded AUM */}
-      <h2 style={{ fontSize: 12, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Onboarded AUM</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
-        <MetricCard label="This Month" value={formatAUM(m.onboardedThisMonth?.aum ?? 0)} sub={`${m.onboardedThisMonth?.count ?? 0} advisors`} />
-        <MetricCard label="This Quarter" value={formatAUM(m.onboardedThisQuarter?.aum ?? 0)} sub={`${m.onboardedThisQuarter?.count ?? 0} advisors`} />
-        <MetricCard label="This Year" value={formatAUM(m.onboardedThisYear?.aum ?? 0)} sub={`${m.onboardedThisYear?.count ?? 0} advisors`} accent />
+      <h2 className="text-xs font-semibold text-slate uppercase tracking-wider mb-4">
+        Onboarded AUM
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <StatCard
+          title="This Month"
+          value={formatAUM(m.onboardedThisMonth?.aum ?? 0)}
+          subtitle={`${m.onboardedThisMonth?.count ?? 0} advisors`}
+        />
+        <StatCard
+          title="This Quarter"
+          value={formatAUM(m.onboardedThisQuarter?.aum ?? 0)}
+          subtitle={`${m.onboardedThisQuarter?.count ?? 0} advisors`}
+        />
+        <StatCard
+          title="This Year"
+          value={formatAUM(m.onboardedThisYear?.aum ?? 0)}
+          subtitle={`${m.onboardedThisYear?.count ?? 0} advisors`}
+          className="bg-teal text-white"
+        />
       </div>
 
       {/* Pipeline AUM */}
-      <h2 style={{ fontSize: 12, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Upcoming Pipeline AUM</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
-        <MetricCard label="Next 30 Days" value={formatAUM(m.pipeline30?.aum ?? 0)} sub={`${m.pipeline30?.count ?? 0} expected`} />
-        <MetricCard label="Next 60 Days" value={formatAUM(m.pipeline60?.aum ?? 0)} sub={`${m.pipeline60?.count ?? 0} expected`} />
-        <MetricCard label="Next 90 Days" value={formatAUM(m.pipeline90?.aum ?? 0)} sub={`${m.pipeline90?.count ?? 0} expected`} />
+      <h2 className="text-xs font-semibold text-slate uppercase tracking-wider mb-4">
+        Upcoming Pipeline AUM
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <StatCard
+          title="Next 30 Days"
+          value={formatAUM(m.pipeline30?.aum ?? 0)}
+          subtitle={`${m.pipeline30?.count ?? 0} expected`}
+        />
+        <StatCard
+          title="Next 60 Days"
+          value={formatAUM(m.pipeline60?.aum ?? 0)}
+          subtitle={`${m.pipeline60?.count ?? 0} expected`}
+        />
+        <StatCard
+          title="Next 90 Days"
+          value={formatAUM(m.pipeline90?.aum ?? 0)}
+          subtitle={`${m.pipeline90?.count ?? 0} expected`}
+        />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Transition Type Breakdown */}
-        {m.transitionBreakdown && Object.keys(m.transitionBreakdown).length > 0 && (
-          <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: '20px 24px' }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, color: C.dark, marginBottom: 16 }}>Transition Type Breakdown</h3>
-            {Object.entries(m.transitionBreakdown as Record<string, number>)
-              .sort((a, b) => b[1] - a[1])
-              .map(([type, count]) => (
-                <BarRow key={type} label={type || 'Not set'} count={count} total={transitionTotal} color={C.teal} />
-              ))}
-          </div>
+        {transitionData.length > 0 && (
+          <MetricBar
+            title="Transition Type Breakdown"
+            data={transitionData}
+          />
         )}
 
         {/* Stage Breakdown */}
-        {m.stageBreakdown && (
-          <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: '20px 24px' }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, color: C.dark, marginBottom: 16 }}>Pipeline by Stage</h3>
-            {Object.entries(m.stageBreakdown as Record<string, number>)
-              .sort((a, b) => {
-                const order = ['2496931','2496932','2496934','100409509','2496935','2496936','100411705','31214941','2496937','26572965'];
-                return order.indexOf(a[0]) - order.indexOf(b[0]);
-              })
-              .map(([stageId, count]) => (
-                <BarRow
-                  key={stageId}
-                  label={STAGE_LABELS[stageId] ?? stageId}
-                  count={count}
-                  total={stageTotal}
-                  color={stageId === '100411705' ? C.teal : C.lightBlue}
-                />
-              ))}
-          </div>
+        {stageData.length > 0 && (
+          <MetricBar
+            title="Pipeline by Stage"
+            data={stageData}
+          />
         )}
       </div>
     </div>

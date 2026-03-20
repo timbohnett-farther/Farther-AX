@@ -12,6 +12,11 @@ interface PageLayoutProps {
   children: React.ReactNode;
 }
 
+/**
+ * PageLayout - Multi-step form layout with progress indicator
+ *
+ * Migrated to Tailwind utilities (removed all inline styles)
+ */
 export default function PageLayout({
   step,
   totalSteps = 13,
@@ -27,43 +32,25 @@ export default function PageLayout({
   const totalStr = String(totalSteps).padStart(2, "0");
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#FAF7F2" }}>
+    <div className="min-h-screen flex flex-col bg-cream">
       {/* Top bar */}
-      <header
-        className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b"
-        style={{
-          backgroundColor: "#FAF7F2",
-          borderColor: "#dde8f0",
-        }}
-      >
+      <header className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b border-cream-border bg-cream">
         <div>
-          <h1
-            className="text-2xl font-bold leading-tight"
-            style={{
-              fontFamily: "'ABC Arizona Text', Georgia, serif",
-              color: "#333333",
-            }}
-          >
+          <h1 className="text-2xl font-bold font-serif text-charcoal leading-tight">
             {title}
           </h1>
           {subtitle && (
-            <p className="text-sm mt-0.5" style={{ color: "#5b6a71" }}>
+            <p className="text-sm mt-0.5 text-slate">
               {subtitle}
             </p>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span
-            className="text-2xl font-bold"
-            style={{
-              fontFamily: "'ABC Arizona Text', Georgia, serif",
-              color: "#1d7682",
-            }}
-          >
+          <span className="text-2xl font-bold font-serif text-teal">
             {stepStr}
           </span>
-          <span className="text-lg" style={{ color: "#dde8f0" }}>/</span>
-          <span className="text-lg font-medium" style={{ color: "#5b6a71" }}>
+          <span className="text-lg text-cream-border">/</span>
+          <span className="text-lg font-medium text-slate">
             {totalStr}
           </span>
         </div>
@@ -73,20 +60,12 @@ export default function PageLayout({
       <div className="flex-1 px-10 py-8">{children}</div>
 
       {/* Bottom navigation */}
-      <footer
-        className="px-10 py-6 border-t flex items-center justify-between"
-        style={{ borderColor: "#dde8f0", backgroundColor: "#f0f5f9" }}
-      >
+      <footer className="px-10 py-6 border-t border-cream-border bg-cream-dark flex items-center justify-between">
         <div>
           {backHref ? (
             <Link
               href={backHref}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-all duration-150 border"
-              style={{
-                borderColor: "#dde8f0",
-                color: "#5b6a71",
-                backgroundColor: "transparent",
-              }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-smooth border border-cream-border text-slate bg-transparent hover:bg-white hover:border-teal"
             >
               ← {backLabel}
             </Link>
@@ -100,10 +79,9 @@ export default function PageLayout({
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div
               key={i}
-              className="rounded-full transition-all"
+              className="rounded-full transition-all h-1.5 bg-teal-light"
               style={{
                 width: i + 1 === step ? "20px" : "6px",
-                height: "6px",
                 backgroundColor: i + 1 === step ? "#1d7682" : "#b6d0ed",
               }}
             />
@@ -114,8 +92,7 @@ export default function PageLayout({
           {nextHref ? (
             <Link
               href={nextHref}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-all duration-150 text-white"
-              style={{ backgroundColor: "#1d7682" }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-smooth text-white bg-teal hover:bg-teal-dark"
             >
               {nextLabel} →
             </Link>
