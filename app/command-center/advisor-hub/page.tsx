@@ -650,24 +650,62 @@ export default function AdvisorHubPage() {
       </div>
 
       {/* Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16, marginBottom: 32 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
         {[
           { label: 'Launch to Graduation', value: String(launchDeals.length), sub: undefined, color: C.teal, icon: '▲' },
           { label: 'Early Deals', value: String(earlyDeals.length), sub: undefined, color: '#4383b4', icon: '◈' },
           { label: 'Completed Transitions', value: String(completedDeals.length), sub: undefined, color: C.green, icon: '✓' },
-          {
-            label: 'AUM Transfer Rate',
-            value: aumData?.summary?.overall_transfer_pct != null ? `${aumData.summary.overall_transfer_pct}%` : '—',
-            sub: aumData?.summary ? `${formatAUM(aumData.summary.total_actual_aum)} of ${formatAUM(aumData.summary.total_expected_aum)}` : undefined,
-            color: C.gold, icon: '◎',
-          },
-          {
-            label: 'On Book Revenue',
-            value: aumData?.summary?.total_current_revenue ? formatAUM(aumData.summary.total_current_revenue) : '—',
-            sub: aumData?.summary?.advisors_with_actual ? `${aumData.summary.advisors_with_actual} advisor${aumData.summary.advisors_with_actual > 1 ? 's' : ''} reporting` : undefined,
-            color: C.green, icon: '$',
-          },
         ].map(card => (
+          <div key={card.label} style={{
+            background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+            padding: '20px 24px', position: 'relative',
+          }}>
+            <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.25, color: card.color }}>
+              {card.icon}
+            </span>
+            <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+              {card.label}
+            </p>
+            <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+              {card.value}
+            </p>
+            {card.sub && <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>{card.sub}</p>}
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
+        {(() => {
+          const advisors = (aumData?.advisors ?? []) as AumAdvisor[];
+          let totalExpectedRevenue = 0;
+          for (const adv of advisors) {
+            if (adv.expected_aum && adv.fee_rate_bps && adv.fee_rate_bps > 0) {
+              totalExpectedRevenue += adv.expected_aum * (adv.fee_rate_bps / 10000);
+            }
+          }
+          const realizedPct = totalExpectedRevenue > 0 && aumData?.summary?.total_current_revenue
+            ? Math.round((aumData.summary.total_current_revenue / totalExpectedRevenue) * 100)
+            : null;
+          return [
+            {
+              label: 'AUM Transfer Rate',
+              value: aumData?.summary?.overall_transfer_pct != null ? `${aumData.summary.overall_transfer_pct}%` : '—',
+              sub: aumData?.summary ? `${formatAUM(aumData.summary.total_actual_aum)} of ${formatAUM(aumData.summary.total_expected_aum)}` : undefined,
+              color: C.gold, icon: '◎',
+            },
+            {
+              label: 'On Book Revenue',
+              value: aumData?.summary?.total_current_revenue ? formatAUM(aumData.summary.total_current_revenue) : '—',
+              sub: aumData?.summary?.advisors_with_actual ? `${aumData.summary.advisors_with_actual} advisor${aumData.summary.advisors_with_actual > 1 ? 's' : ''} reporting` : undefined,
+              color: C.green, icon: '$',
+            },
+            {
+              label: 'Expected Revenue',
+              value: totalExpectedRevenue > 0 ? formatAUM(Math.round(totalExpectedRevenue)) : '—',
+              sub: realizedPct != null ? `${realizedPct}% realized` : 'At full AUM transfer',
+              color: C.gold, icon: '★',
+            },
+          ];
+        })().map(card => (
           <div key={card.label} style={{
             background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
             padding: '20px 24px', position: 'relative',
