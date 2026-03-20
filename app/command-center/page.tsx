@@ -427,9 +427,9 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           {/* 30/60/90 tabs */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 16 }}>
             {[
-              { label: '30 Days', count: a.launches30.length, aum: a.launches30AUM, color: C.red },
-              { label: '60 Days', count: a.launches60.length, aum: a.launches60AUM, color: C.amber },
               { label: '90 Days', count: a.launches90.length, aum: a.launches90AUM, color: C.teal },
+              { label: '60 Days', count: a.launches60.length, aum: a.launches60AUM, color: C.amber },
+              { label: '30 Days', count: a.launches30.length, aum: a.launches30AUM, color: C.red },
             ].map(item => (
               <div key={item.label} style={{
                 padding: '12px 14px', borderRadius: 6,
@@ -440,7 +440,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                   {item.count}
                 </div>
                 <div style={{ fontSize: 11, color: C.slate, marginTop: 2 }}>{item.label}</div>
-                <div style={{ fontSize: 11, color: item.color, fontWeight: 600, marginTop: 2 }}>{formatAUM(item.aum)}</div>
+                <div style={{ fontSize: 13, color: item.color, fontWeight: 700, marginTop: 2 }}>{formatAUM(item.aum)}</div>
               </div>
             ))}
           </div>
@@ -460,7 +460,14 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                 </thead>
                 <tbody>
                   {a.launches90
-                    .sort((x, y) => new Date(x.desired_start_date!).getTime() - new Date(y.desired_start_date!).getTime())
+                    .sort((x, y) => {
+                      const dx = daysUntil(x.desired_start_date!);
+                      const dy = daysUntil(y.desired_start_date!);
+                      const x30 = dx <= 30 ? 0 : 1;
+                      const y30 = dy <= 30 ? 0 : 1;
+                      if (x30 !== y30) return x30 - y30;
+                      return dx - dy;
+                    })
                     .map(deal => {
                       const days = daysUntil(deal.desired_start_date!);
                       const urgencyColor = days <= 7 ? C.red : days <= 30 ? C.amber : C.teal;
