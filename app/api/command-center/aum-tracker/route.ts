@@ -5,10 +5,12 @@
  *
  * For each launched advisor (Step 7), fetches:
  *   - Expected AUM from the deal record (transferable_aum)
- *   - Actual current AUM from the associated contact (advisor_current_aum)
+ *   - Actual AUM (BD Market Value) from the Farther Managed Accounts custom object
+ *   - Fee Rate BPS from the same managed accounts
+ *   - Revenue = BD Market Value × Fee Rate BPS / 10,000
  *
- * Returns a list of advisors with expected vs actual AUM for tracking
- * transfer progress.
+ * Managed Accounts are aggregated per advisor by matching advisor_name
+ * on the custom object to dealname on the deal.
  */
 
 import { NextResponse } from 'next/server';
@@ -18,11 +20,18 @@ export const dynamic = 'force-dynamic';
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
 const LAUNCHED_STAGE_ID = '100411705';
-const TEAMS_OBJECT_TYPE = '2-43222882';
+const MANAGED_ACCOUNTS_OBJECT_TYPE = '2-13676628';
 
 interface DealResult {
   id: string;
   properties: Record<string, string | null>;
+}
+
+interface ManagedAccountAgg {
+  total_bd_market_value: number;
+  // Weighted average fee rate: sum(mv * bps) / sum(mv)
+  weighted_fee_bps: number;
+  account_count: number;
 }
 
 // ── Step 1: Fetch all launched deals ─────────────────────────────────────────
@@ -62,113 +71,67 @@ async function fetchLaunchedDeals(): Promise<DealResult[]> {
   return deals;
 }
 
-// ── Step 2: Batch fetch contact IDs for deals ────────────────────────────────
-async function fetchDealContactAssociations(dealIds: string[]): Promise<Record<string, string>> {
-  const map: Record<string, string> = {};
+// ── Step 2: Fetch ALL Farther Managed Accounts and aggregate by advisor ─────
+async function fetchManagedAccountsByAdvisor(): Promise<Record<string, ManagedAccountAgg>> {
+  const map: Record<string, { totalMv: number; weightedBpsSum: number; count: number }> = {};
+  let after: string | undefined;
 
-  // HubSpot batch associations: max 100 per request
-  for (let i = 0; i < dealIds.length; i += 100) {
-    const batch = dealIds.slice(i, i + 100);
+  do {
+    const body: Record<string, unknown> = {
+      filterGroups: [{
+        filters: [
+          { propertyName: 'bd_market_value', operator: 'HAS_PROPERTY' },
+        ],
+      }],
+      properties: ['advisor_name', 'bd_market_value', 'fee_rate_bps'],
+      limit: 100,
+    };
+    if (after) body.after = after;
+
     const res = await fetch(
-      'https://api.hubapi.com/crm/v4/associations/deals/contacts/batch/read',
+      `https://api.hubapi.com/crm/v3/objects/${MANAGED_ACCOUNTS_OBJECT_TYPE}/search`,
       {
         method: 'POST',
         headers: { Authorization: `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputs: batch.map(id => ({ id })) }),
+        body: JSON.stringify(body),
       }
     );
-    if (!res.ok) continue;
+    if (!res.ok) {
+      console.error('[aum-tracker] Failed to fetch managed accounts:', res.status, await res.text().catch(() => ''));
+      break;
+    }
     const data = await res.json();
-    for (const result of data.results ?? []) {
-      const dealId = result.from?.id;
-      const contactId = result.to?.[0]?.toObjectId;
-      if (dealId && contactId) {
-        map[dealId] = String(contactId);
+
+    for (const acct of data.results ?? []) {
+      const advisorName = (acct.properties?.advisor_name ?? '').trim();
+      const mv = parseFloat(acct.properties?.bd_market_value ?? '0') || 0;
+      const bps = parseFloat(acct.properties?.fee_rate_bps ?? '0') || 0;
+
+      if (!advisorName || mv <= 0) continue;
+
+      if (!map[advisorName]) {
+        map[advisorName] = { totalMv: 0, weightedBpsSum: 0, count: 0 };
       }
+      map[advisorName].totalMv += mv;
+      map[advisorName].weightedBpsSum += mv * bps; // for weighted average
+      map[advisorName].count += 1;
     }
+
+    after = data.paging?.next?.after;
+  } while (after);
+
+  // Convert to final aggregation
+  const result: Record<string, ManagedAccountAgg> = {};
+  for (const [name, agg] of Object.entries(map)) {
+    result[name] = {
+      total_bd_market_value: agg.totalMv,
+      weighted_fee_bps: agg.totalMv > 0
+        ? Math.round((agg.weightedBpsSum / agg.totalMv) * 100) / 100
+        : 0,
+      account_count: agg.count,
+    };
   }
-
-  return map;
-}
-
-// ── Step 3: Batch fetch contact AUM properties ───────────────────────────────
-async function fetchContactAUM(contactIds: string[]): Promise<Record<string, { aum: number | null; name: string }>> {
-  const map: Record<string, { aum: number | null; name: string }> = {};
-  const uniqueIds = Array.from(new Set(contactIds));
-
-  // HubSpot batch read: max 100 per request
-  for (let i = 0; i < uniqueIds.length; i += 100) {
-    const batch = uniqueIds.slice(i, i + 100);
-    const res = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/batch/read', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        inputs: batch.map(id => ({ id })),
-        properties: ['advisor_current_aum', 'firstname', 'lastname'],
-      }),
-    });
-    if (!res.ok) continue;
-    const data = await res.json();
-    for (const contact of data.results ?? []) {
-      const rawAum = contact.properties?.advisor_current_aum;
-      map[contact.id] = {
-        aum: rawAum ? parseFloat(rawAum) : null,
-        name: [contact.properties?.firstname, contact.properties?.lastname].filter(Boolean).join(' '),
-      };
-    }
-  }
-
-  return map;
-}
-
-// ── Step 4: Batch fetch Teams associations + fee rate ────────────────────────
-async function fetchDealTeamAssociations(dealIds: string[]): Promise<Record<string, string>> {
-  const map: Record<string, string> = {};
-  for (let i = 0; i < dealIds.length; i += 100) {
-    const batch = dealIds.slice(i, i + 100);
-    const res = await fetch(
-      `https://api.hubapi.com/crm/v4/associations/deals/${TEAMS_OBJECT_TYPE}/batch/read`,
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputs: batch.map(id => ({ id })) }),
-      }
-    );
-    if (!res.ok) continue;
-    const data = await res.json();
-    for (const result of data.results ?? []) {
-      const dealId = result.from?.id;
-      const teamId = result.to?.[0]?.toObjectId;
-      if (dealId && teamId) {
-        map[dealId] = String(teamId);
-      }
-    }
-  }
-  return map;
-}
-
-async function fetchTeamFeeRates(teamIds: string[]): Promise<Record<string, number | null>> {
-  const map: Record<string, number | null> = {};
-  const uniqueIds = Array.from(new Set(teamIds));
-
-  for (let i = 0; i < uniqueIds.length; i += 100) {
-    const batch = uniqueIds.slice(i, i + 100);
-    const res = await fetch(`https://api.hubapi.com/crm/v3/objects/${TEAMS_OBJECT_TYPE}/batch/read`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        inputs: batch.map(id => ({ id })),
-        properties: ['average_fee_rate'],
-      }),
-    });
-    if (!res.ok) continue;
-    const data = await res.json();
-    for (const team of data.results ?? []) {
-      const raw = team.properties?.average_fee_rate;
-      map[team.id] = raw ? parseFloat(raw) : null;
-    }
-  }
-  return map;
+  return result;
 }
 
 // ── GET handler ──────────────────────────────────────────────────────────────
@@ -176,47 +139,33 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const includeAll = searchParams.get('all') === 'true';
   try {
-    // Step 1: Get all launched deals
-    const deals = await fetchLaunchedDeals();
-    const dealIds = deals.map(d => d.id);
-
-    // Step 2: Get contact and team associations in parallel
-    const [dealContactMap, dealTeamMap] = await Promise.all([
-      fetchDealContactAssociations(dealIds),
-      fetchDealTeamAssociations(dealIds),
+    // Step 1: Fetch deals + managed accounts in parallel
+    const [deals, managedAccounts] = await Promise.all([
+      fetchLaunchedDeals(),
+      fetchManagedAccountsByAdvisor(),
     ]);
 
-    // Step 3: Get actual AUM from contacts and fee rates from teams in parallel
-    const contactIds = Object.values(dealContactMap).filter(Boolean);
-    const teamIds = Object.values(dealTeamMap).filter(Boolean);
-    const [contactAumMap, teamFeeMap] = await Promise.all([
-      fetchContactAUM(contactIds),
-      fetchTeamFeeRates(teamIds),
-    ]);
-
-    // Step 5: Build the response
+    // Step 2: Build advisor response by matching deal name to managed account advisor_name
     const advisors = deals.map(deal => {
-      const contactId = dealContactMap[deal.id];
-      const teamId = dealTeamMap[deal.id];
-      const contactData = contactId ? contactAumMap[contactId] : null;
-      // average_fee_rate is stored as basis points (e.g. 100 = 100 bps = 1%)
-      // Pass through the raw value — no conversion needed
-      const feeRateRaw = teamId ? teamFeeMap[teamId] : null;
+      const dealName = deal.properties.dealname ?? '—';
+      const managed = managedAccounts[dealName] ?? null;
+
       const expectedAum = parseFloat(deal.properties.transferable_aum ?? '0') || null;
-      const actualAum = contactData?.aum ?? null;
+      const actualAum = managed?.total_bd_market_value ?? null;
+      const feeRateBps = managed?.weighted_fee_bps ?? null;
       const launchDate = deal.properties.actual_launch_date || deal.properties.desired_start_date;
 
-      // Calculate transfer percentage
+      // Transfer percentage: actual / expected
       let transferPct: number | null = null;
       if (expectedAum && actualAum && expectedAum > 0) {
         transferPct = Math.round((actualAum / expectedAum) * 100);
       }
 
-      // Calculate current revenue: AUM × (BPS / 10,000)
-      // e.g. $50M × (100 bps / 10000) = $500K
+      // Revenue = BD Market Value × Fee Rate BPS / 10,000
+      // e.g. $286,222,952 × 63.1 / 10000 = $1,806,067
       let currentRevenue: number | null = null;
-      if (actualAum && feeRateRaw && feeRateRaw > 0) {
-        currentRevenue = Math.round(actualAum * (feeRateRaw / 10000));
+      if (actualAum && feeRateBps && feeRateBps > 0) {
+        currentRevenue = Math.round((actualAum * feeRateBps) / 10000 * 100) / 100;
       }
 
       // Days since launch
@@ -227,18 +176,18 @@ export async function GET(request: Request) {
 
       return {
         deal_id: deal.id,
-        advisor_name: deal.properties.dealname ?? '—',
-        contact_id: contactId ?? null,
+        advisor_name: dealName,
         expected_aum: expectedAum,
         actual_aum: actualAum,
         transfer_pct: transferPct,
-        fee_rate_bps: feeRateRaw,
+        fee_rate_bps: feeRateBps,
         current_revenue: currentRevenue,
         launch_date: launchDate ?? null,
         days_since_launch: daysSinceLaunch,
         prior_firm: deal.properties.current_firm__cloned_ ?? null,
         households: deal.properties.client_households ? parseInt(deal.properties.client_households) : null,
         transition_type: deal.properties.transition_type ?? null,
+        managed_account_count: managed?.account_count ?? 0,
       };
     });
 
