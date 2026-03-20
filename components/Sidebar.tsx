@@ -40,6 +40,11 @@ const externalLinks = [
   { label: "AX Email Templates", href: "#" },
 ];
 
+/**
+ * Sidebar - Main navigation component
+ *
+ * Migrated to Tailwind utilities (removed all inline styles)
+ */
 export default function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -50,10 +55,7 @@ export default function Sidebar() {
   const [resourcesOpen, setResourcesOpen] = useState(true);
 
   return (
-    <aside
-      className="fixed top-0 left-0 h-full w-64 flex flex-col z-40"
-      style={{ background: "#333333" }}
-    >
+    <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-charcoal">
       {/* Logo / Brand */}
       <div className="px-6 pt-8 pb-6 border-b border-white/10">
         <Image
@@ -61,10 +63,9 @@ export default function Sidebar() {
           alt="Farther"
           width={120}
           height={28}
-          className="mb-2"
-          style={{ objectFit: "contain", objectPosition: "left" }}
+          className="mb-2 object-contain object-left"
         />
-        <p className="text-xs tracking-widest uppercase" style={{ color: "#5b6a71" }}>
+        <p className="text-xs tracking-widest uppercase text-slate">
           AX Playbook
         </p>
       </div>
@@ -72,10 +73,7 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         {/* Command Center — first */}
-        <p
-          className="px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
-          style={{ color: '#1d7682' }}
-        >
+        <p className="px-3 mb-2 text-xs font-semibold tracking-widest uppercase text-teal">
           Command Center
         </p>
         <ul className="space-y-0.5">
@@ -85,16 +83,13 @@ export default function Sidebar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all duration-150 ${
-                    isActive ? 'text-white' : 'text-white/50 hover:text-white/80'
-                  }`}
-                  style={
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-smooth ${
                     isActive
-                      ? { background: 'rgba(29,118,130,0.25)', borderLeft: '2px solid #1d7682' }
-                      : {}
-                  }
+                      ? 'text-white bg-teal/25 border-l-2 border-teal'
+                      : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+                  }`}
                 >
-                  <span className="text-xs w-5 shrink-0 text-center" style={{ color: '#1d7682' }}>
+                  <span className="text-xs w-5 shrink-0 text-center text-teal">
                     {item.icon}
                   </span>
                   <span className="leading-snug">{item.label}</span>
@@ -110,11 +105,10 @@ export default function Sidebar() {
         {/* AX Training & Information — collapsible */}
         <button
           onClick={() => setTrainingOpen(!trainingOpen)}
-          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
-          style={{ color: "#4a5a62", background: "none", border: "none", cursor: "pointer" }}
+          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase text-charcoal-muted bg-transparent border-none cursor-pointer hover:text-slate transition-smooth"
         >
           <span>AX Training &amp; Information</span>
-          <span style={{ fontSize: 10, transition: "transform 150ms ease", transform: trainingOpen ? "rotate(0deg)" : "rotate(-90deg)" }}>
+          <span className={`text-[10px] transition-transform ${trainingOpen ? 'rotate-0' : '-rotate-90'}`}>
             ▼
           </span>
         </button>
@@ -126,21 +120,15 @@ export default function Sidebar() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all duration-150 group ${
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-smooth group ${
                       isActive
-                        ? "text-white"
-                        : "text-white/50 hover:text-white/80"
+                        ? "text-white bg-teal/20 border-l-2 border-teal"
+                        : "text-white/50 hover:text-white/80 hover:bg-white/5"
                     }`}
-                    style={
-                      isActive
-                        ? { background: "rgba(29,118,130,0.2)", borderLeft: "2px solid #1d7682" }
-                        : {}
-                    }
                   >
-                    <span
-                      className="text-xs font-mono w-5 shrink-0 text-right"
-                      style={{ color: isActive ? "#1d7682" : "#4a5a62" }}
-                    >
+                    <span className={`text-xs font-mono w-5 shrink-0 text-right ${
+                      isActive ? 'text-teal' : 'text-charcoal-muted'
+                    }`}>
                       {String(item.step).padStart(2, "0")}
                     </span>
                     <span className="leading-snug">{item.label}</span>
@@ -157,11 +145,10 @@ export default function Sidebar() {
         {/* External Links — collapsible */}
         <button
           onClick={() => setResourcesOpen(!resourcesOpen)}
-          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
-          style={{ color: "#4a5a62", background: "none", border: "none", cursor: "pointer" }}
+          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase text-charcoal-muted bg-transparent border-none cursor-pointer hover:text-slate transition-smooth"
         >
           <span>Resources</span>
-          <span style={{ fontSize: 10, transition: "transform 150ms ease", transform: resourcesOpen ? "rotate(0deg)" : "rotate(-90deg)" }}>
+          <span className={`text-[10px] transition-transform ${resourcesOpen ? 'rotate-0' : '-rotate-90'}`}>
             ▼
           </span>
         </button>
@@ -173,9 +160,9 @@ export default function Sidebar() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/40 hover:text-white/70 transition-colors"
+                  className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/40 hover:text-white/70 hover:bg-white/5 transition-smooth"
                 >
-                  <span className="text-xs" style={{ color: "#4a5a62" }}>↗</span>
+                  <span className="text-xs text-charcoal-muted">↗</span>
                   {link.label}
                 </a>
               </li>
@@ -197,10 +184,7 @@ export default function Sidebar() {
                 className="rounded-full"
               />
             ) : (
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shrink-0"
-                style={{ backgroundColor: "#1d7682" }}
-              >
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shrink-0 bg-teal">
                 {firstName.charAt(0).toUpperCase()}
               </div>
             )}
@@ -208,15 +192,14 @@ export default function Sidebar() {
               <p className="text-xs font-medium text-white truncate">
                 {session.user.name}
               </p>
-              <p className="text-xs truncate" style={{ color: "#5b6a71" }}>
+              <p className="text-xs truncate text-slate">
                 {session.user.email}
               </p>
             </div>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-            className="w-full text-left px-3 py-2 rounded-md text-xs transition-colors text-white/40 hover:text-white/70 hover:bg-white/5"
-            style={{ fontFamily: "'Fakt', system-ui, sans-serif" }}
+            className="w-full text-left px-3 py-2 rounded-md text-xs transition-smooth text-white/40 hover:text-white/70 hover:bg-white/5"
           >
             ← Sign out
           </button>
@@ -226,7 +209,7 @@ export default function Sidebar() {
       {/* Footer (shown when not signed in) */}
       {!session?.user && (
         <div className="px-6 py-4 border-t border-white/10">
-          <p className="text-xs" style={{ color: "#4a5a62" }}>
+          <p className="text-xs text-charcoal-muted">
             Farther Wealth Management
           </p>
         </div>

@@ -1,12 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-
-const C = {
-  dark: '#333333', white: '#ffffff', slate: '#5b6a71',
-  teal: '#1d7682', bg: '#FAF7F2', cardBg: '#ffffff', border: '#e8e2d9',
-  lightBlue: '#b6d0ed',
-};
+import { colors } from '@/lib/design-tokens';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -25,31 +20,30 @@ const SUGGESTED_PROMPTS = [
 function MessageBubble({ message }: { message: Message }) {
   const isUser = message.role === 'user';
   return (
-    <div style={{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start', marginBottom: 16 }}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
       {!isUser && (
-        <div style={{
-          width: 32, height: 32, borderRadius: '50%', background: C.teal,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 14, color: C.white, flexShrink: 0, marginRight: 10, marginTop: 2,
-        }}>✦</div>
+        <div className="w-8 h-8 rounded-full bg-teal flex items-center justify-center text-sm text-white flex-shrink-0 mr-2.5 mt-0.5">
+          ✦
+        </div>
       )}
-      <div style={{
-        maxWidth: '72%',
-        padding: '12px 16px',
-        borderRadius: isUser ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-        background: isUser ? C.teal : C.white,
-        color: isUser ? C.white : C.dark,
-        fontSize: 14,
-        lineHeight: 1.6,
-        border: isUser ? 'none' : `1px solid ${C.border}`,
-        whiteSpace: 'pre-wrap',
-      }}>
+      <div
+        className={`max-w-[72%] px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+          isUser
+            ? 'rounded-[18px_18px_4px_18px] bg-teal text-white'
+            : 'rounded-[18px_18px_18px_4px] bg-white text-charcoal border border-cream-border'
+        }`}
+      >
         {message.content}
       </div>
     </div>
   );
 }
 
+/**
+ * AI Assistant Page - Chat interface with Grok
+ *
+ * Migrated to Tailwind utilities (removed all inline styles)
+ */
 export default function AIAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -89,34 +83,36 @@ export default function AIAssistant() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: C.bg, fontFamily: "'Fakt', system-ui, sans-serif" }}>
+    <div className="flex flex-col h-screen bg-cream font-sans">
       {/* Header */}
-      <div style={{ padding: '24px 40px 16px', borderBottom: `1px solid ${C.border}`, background: C.white }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.teal, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: C.white }}>✦</div>
+      <div className="px-10 pt-6 pb-4 border-b border-cream-border bg-white">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-teal flex items-center justify-center text-base text-white">
+            ✦
+          </div>
           <div>
-            <h1 style={{ fontSize: 18, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>AX AI Assistant</h1>
-            <p style={{ fontSize: 12, color: C.slate }}>Powered by Grok · Live HubSpot pipeline access</p>
+            <h1 className="text-lg font-bold text-charcoal font-serif">
+              AX AI Assistant
+            </h1>
+            <p className="text-xs text-slate">
+              Powered by Grok · Live HubSpot pipeline access
+            </p>
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 40px' }}>
+      <div className="flex-1 overflow-y-auto px-10 py-6">
         {/* Suggested prompts (shown only at start) */}
         {messages.length === 1 && (
-          <div style={{ marginBottom: 24 }}>
-            <p style={{ fontSize: 12, color: C.slate, marginBottom: 10 }}>Try asking:</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          <div className="mb-6">
+            <p className="text-xs text-slate mb-2.5">Try asking:</p>
+            <div className="flex flex-wrap gap-2">
               {SUGGESTED_PROMPTS.map(prompt => (
                 <button
                   key={prompt}
                   onClick={() => sendMessage(prompt)}
-                  style={{
-                    padding: '6px 14px', borderRadius: 20, border: `1px solid ${C.border}`,
-                    background: C.white, color: C.slate, fontSize: 12, cursor: 'pointer',
-                    fontFamily: "'Fakt', system-ui, sans-serif",
-                  }}
+                  className="px-3.5 py-1.5 rounded-full border border-cream-border bg-white text-slate text-xs cursor-pointer hover:bg-cream hover:border-teal transition-smooth"
                 >
                   {prompt}
                 </button>
@@ -128,10 +124,12 @@ export default function AIAssistant() {
         {messages.map((msg, i) => <MessageBubble key={i} message={msg} />)}
 
         {loading && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: C.teal, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: C.white }}>✦</div>
-            <div style={{ padding: '12px 16px', borderRadius: '18px 18px 18px 4px', background: C.white, border: `1px solid ${C.border}` }}>
-              <span style={{ color: C.slate, fontSize: 13 }}>Thinking…</span>
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="w-8 h-8 rounded-full bg-teal flex items-center justify-center text-sm text-white">
+              ✦
+            </div>
+            <div className="px-4 py-3 rounded-[18px_18px_18px_4px] bg-white border border-cream-border">
+              <span className="text-slate text-xs">Thinking…</span>
             </div>
           </div>
         )}
@@ -139,10 +137,10 @@ export default function AIAssistant() {
       </div>
 
       {/* Input */}
-      <div style={{ padding: '16px 40px 24px', background: C.white, borderTop: `1px solid ${C.border}` }}>
+      <div className="px-10 py-4 pb-6 bg-white border-t border-cream-border">
         <form
           onSubmit={e => { e.preventDefault(); sendMessage(input); }}
-          style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}
+          className="flex gap-3 items-end"
         >
           <textarea
             value={input}
@@ -150,22 +148,16 @@ export default function AIAssistant() {
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input); } }}
             placeholder="Ask about pipeline, advisors, onboarding status, risks…"
             rows={2}
-            style={{
-              flex: 1, padding: '12px 16px', borderRadius: 12, border: `1px solid ${C.border}`,
-              fontSize: 14, fontFamily: "'Fakt', system-ui, sans-serif", resize: 'none',
-              color: C.dark, background: C.bg, outline: 'none',
-            }}
+            className="flex-1 px-4 py-3 rounded-xl border border-cream-border text-sm resize-none text-charcoal bg-cream outline-none focus:border-teal focus:ring-1 focus:ring-teal transition-smooth"
           />
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            style={{
-              padding: '12px 24px', borderRadius: 12, border: 'none',
-              background: input.trim() && !loading ? C.teal : C.border,
-              color: input.trim() && !loading ? C.white : C.slate,
-              fontSize: 14, fontWeight: 600, cursor: input.trim() && !loading ? 'pointer' : 'default',
-              fontFamily: "'Fakt', system-ui, sans-serif", transition: 'all 0.15s',
-            }}
+            className={`px-6 py-3 rounded-xl border-none text-sm font-semibold transition-smooth ${
+              input.trim() && !loading
+                ? 'bg-teal text-white cursor-pointer hover:bg-teal-dark'
+                : 'bg-cream-border text-slate cursor-default'
+            }`}
           >
             Send
           </button>
