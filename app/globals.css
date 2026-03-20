@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   FARTHER BRAND FONTS
+   ============================================ */
+
 /* ABC Arizona Text — headers */
 @font-face {
   font-family: 'ABC Arizona Text';
@@ -54,26 +58,403 @@
   font-display: swap;
 }
 
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
 :root {
   --font-arizona: 'ABC Arizona Text', Georgia, serif;
   --font-fakt: 'Fakt', system-ui, sans-serif;
 }
 
-html, body {
-  background-color: #FAF7F2;
+body {
+  font-family: 'Fakt', system-ui, sans-serif;
+  background: linear-gradient(135deg, #FAF7F2 0%, #F0EBE3 100%);
+  background-attachment: fixed;
   color: #333333;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'ABC Arizona Text', Georgia, serif;
+}
+
+/* ============================================
+   GLASSMORPHISM COMPONENTS
+   ============================================ */
+
+/* Glass Card - Premium look with blur effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.12);
+}
+
+/* Glass Card Dark - For contrast sections */
+.glass-card-dark {
+  background: rgba(29, 118, 130, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(29, 118, 130, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(29, 118, 130, 0.1);
+  border-radius: 12px;
+}
+
+/* Stat Card - For KPI metrics */
+.stat-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 8px 32px 0 rgba(31, 38, 135, 0.07),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #1d7682 0%, #a3d4d9 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow:
+    0 16px 48px 0 rgba(31, 38, 135, 0.12),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  border-color: rgba(29, 118, 130, 0.3);
+}
+
+/* Chart Card - For data visualizations */
+.chart-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 10px 40px 0 rgba(31, 38, 135, 0.08),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 28px;
+  transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+  box-shadow:
+    0 14px 56px 0 rgba(31, 38, 135, 0.12),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+}
+
+/* ============================================
+   GRADIENT OVERLAYS
+   ============================================ */
+
+/* Teal Gradient - For primary actions/highlights */
+.gradient-teal {
+  background: linear-gradient(135deg, #1d7682 0%, #155a63 100%);
+  box-shadow: 0 4px 20px 0 rgba(29, 118, 130, 0.3);
+}
+
+.gradient-teal:hover {
+  box-shadow: 0 6px 28px 0 rgba(29, 118, 130, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Success Gradient */
+.gradient-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 20px 0 rgba(16, 185, 129, 0.3);
+}
+
+/* Warning Gradient */
+.gradient-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 4px 20px 0 rgba(245, 158, 11, 0.3);
+}
+
+/* Danger Gradient */
+.gradient-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 4px 20px 0 rgba(239, 68, 68, 0.3);
+}
+
+/* ============================================
+   CHART ENHANCEMENTS
+   ============================================ */
+
+/* Chart Container - Adds glow effect to charts */
+.chart-glow {
+  position: relative;
+}
+
+.chart-glow::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg,
+    rgba(29, 118, 130, 0.3) 0%,
+    rgba(163, 212, 217, 0.3) 50%,
+    rgba(29, 118, 130, 0.3) 100%);
+  border-radius: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+  filter: blur(15px);
+}
+
+.chart-glow:hover::before {
+  opacity: 1;
+}
+
+/* ============================================
+   METRIC DISPLAYS
+   ============================================ */
+
+/* Large Metric Number */
+.metric-display {
+  font-family: 'Fakt', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 2.5rem;
+  line-height: 1.2;
+  background: linear-gradient(135deg, #1d7682 0%, #333333 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+/* Metric with trend indicator */
+.metric-trend-up {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.metric-trend-down {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* ============================================
+   PREMIUM EFFECTS
+   ============================================ */
+
+/* Shimmer effect for loading states */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.5) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+/* Pulse glow for important alerts */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(29, 118, 130, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(29, 118, 130, 0.8);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Frosted glass effect for overlays */
+.frosted-glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================
+   TABLE ENHANCEMENTS
+   ============================================ */
+
+/* Premium table styling */
+.premium-table {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.premium-table thead {
+  background: rgba(29, 118, 130, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.premium-table tbody tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.premium-table tbody tr:hover {
+  background: rgba(29, 118, 130, 0.05);
+  transform: scale(1.01);
+}
+
+/* ============================================
+   BADGES & INDICATORS
+   ============================================ */
+
+/* Status badge with glass effect */
+.badge-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.badge-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.badge-warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.badge-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+/* Custom scrollbar for premium feel */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 10px;
+  height: 10px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #f0f4f0;
+  background: rgba(240, 235, 227, 0.5);
+  border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #1d7682;
-  border-radius: 3px;
+  background: linear-gradient(135deg, #1d7682 0%, #a3d4d9 100%);
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #155a63 0%, #1d7682 100%);
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .stat-card {
+    padding: 20px;
+  }
+
+  .chart-card {
+    padding: 20px;
+  }
+
+  .metric-display {
+    font-size: 2rem;
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Depth layers */
+.depth-1 {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.depth-2 {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.depth-3 {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.depth-4 {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+}
+
+/* Smooth transitions */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Text gradients */
+.text-gradient-teal {
+  background: linear-gradient(135deg, #1d7682 0%, #a3d4d9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 @layer utilities {
