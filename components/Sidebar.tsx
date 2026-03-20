@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -43,6 +44,8 @@ export default function Sidebar() {
 
   const firstName = session?.user?.name?.split(" ")[0] ?? "";
 
+  const [trainingOpen, setTrainingOpen] = useState(true);
+
   return (
     <aside
       className="fixed top-0 left-0 h-full w-64 flex flex-col z-40"
@@ -65,45 +68,7 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
-        <p
-          className="px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
-          style={{ color: "#4a5a62" }}
-        >
-          Sections
-        </p>
-        <ul className="space-y-0.5">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all duration-150 group ${
-                    isActive
-                      ? "text-white"
-                      : "text-white/50 hover:text-white/80"
-                  }`}
-                  style={
-                    isActive
-                      ? { background: "rgba(29,118,130,0.2)", borderLeft: "2px solid #1d7682" }
-                      : {}
-                  }
-                >
-                  <span
-                    className="text-xs font-mono w-5 shrink-0 text-right"
-                    style={{ color: isActive ? "#1d7682" : "#4a5a62" }}
-                  >
-                    {String(item.step).padStart(2, "0")}
-                  </span>
-                  <span className="leading-snug">{item.label}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-
-        {/* Command Center */}
-        <div className="my-4 border-t border-white/10" />
+        {/* Command Center — first */}
         <p
           className="px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
           style={{ color: '#1d7682' }}
@@ -135,6 +100,53 @@ export default function Sidebar() {
             );
           })}
         </ul>
+
+        {/* Divider */}
+        <div className="my-4 border-t border-white/10" />
+
+        {/* AX Training & Information — collapsible */}
+        <button
+          onClick={() => setTrainingOpen(!trainingOpen)}
+          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase"
+          style={{ color: "#4a5a62", background: "none", border: "none", cursor: "pointer" }}
+        >
+          <span>AX Training &amp; Information</span>
+          <span style={{ fontSize: 10, transition: "transform 150ms ease", transform: trainingOpen ? "rotate(0deg)" : "rotate(-90deg)" }}>
+            ▼
+          </span>
+        </button>
+        {trainingOpen && (
+          <ul className="space-y-0.5">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all duration-150 group ${
+                      isActive
+                        ? "text-white"
+                        : "text-white/50 hover:text-white/80"
+                    }`}
+                    style={
+                      isActive
+                        ? { background: "rgba(29,118,130,0.2)", borderLeft: "2px solid #1d7682" }
+                        : {}
+                    }
+                  >
+                    <span
+                      className="text-xs font-mono w-5 shrink-0 text-right"
+                      style={{ color: isActive ? "#1d7682" : "#4a5a62" }}
+                    >
+                      {String(item.step).padStart(2, "0")}
+                    </span>
+                    <span className="leading-snug">{item.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
 
         {/* Divider */}
         <div className="my-4 border-t border-white/10" />
