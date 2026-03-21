@@ -226,7 +226,7 @@ export default function ContentLibraryPage() {
                   </h3>
                   <div className="flex items-center justify-between mb-3">
                     <span
-                      className="px-2 py-1 rounded text-xs"
+                      className="px-2 py-1 rounded-sm text-xs"
                       style={{
                         fontFamily: "'Fakt', system-ui, sans-serif",
                         backgroundColor: C.blueBg,
@@ -520,7 +520,7 @@ export default function ContentLibraryPage() {
                     <td style={{ padding: '1rem', fontSize: '0.875rem', color: C.slate }}>{template.usage}</td>
                     <td style={{ padding: '1rem' }}>
                       <span
-                        className="px-2 py-1 rounded text-xs"
+                        className="px-2 py-1 rounded-sm text-xs"
                         style={{
                           backgroundColor: statusStyle.bg,
                           color: statusStyle.text,

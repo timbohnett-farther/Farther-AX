@@ -106,7 +106,7 @@ function MemberForm({
               Full Name *
             </label>
             <input
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-none"
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="Jane Smith"
@@ -118,7 +118,7 @@ function MemberForm({
             </label>
             <input
               type="email"
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-none"
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="jane@farther.com"
@@ -129,7 +129,7 @@ function MemberForm({
               Role *
             </label>
             <select
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-none"
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               value={role}
               onChange={e => setRole(e.target.value)}
             >
@@ -143,7 +143,7 @@ function MemberForm({
               Phone
             </label>
             <input
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-none"
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               value={phone}
               onChange={e => setPhone(e.target.value)}
               placeholder="(555) 123-4567"
@@ -154,7 +154,7 @@ function MemberForm({
               Calendar Link
             </label>
             <input
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-none"
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               value={calendarLink}
               onChange={e => setCalendarLink(e.target.value)}
               placeholder="https://calendar.google.com/..."

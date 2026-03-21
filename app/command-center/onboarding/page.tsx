@@ -119,7 +119,7 @@ function WorkloadDashboard() {
                   </p>
                 </div>
                 <div>
-                  <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-${statusColor}-100 text-${statusColor}-700`}>
+                  <span className={`inline-block px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase bg-${statusColor}-100 text-${statusColor}-700`}>
                     {w.capacity_status}
                   </span>
                 </div>
@@ -223,7 +223,7 @@ function PhaseSection({ phase, tasks, onToggle }: {
                 type="checkbox"
                 checked={task.completed}
                 onChange={e => onToggle(task.key, e.target.checked)}
-                className="mt-0.5 accent-teal w-4 h-4 cursor-pointer flex-shrink-0"
+                className="mt-0.5 accent-teal w-4 h-4 cursor-pointer shrink-0"
               />
               <div className="flex-1">
                 <span className={`text-sm ${task.completed ? 'text-slate line-through' : 'text-charcoal'}`}>

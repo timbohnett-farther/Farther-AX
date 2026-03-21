@@ -250,7 +250,7 @@ export default function KeyDocumentsPage() {
           </h2>
 
           {/* Responsive table wrapper */}
-          <div className="overflow-x-auto rounded-lg border border-cream-border shadow-sm">
+          <div className="overflow-x-auto rounded-lg border border-cream-border shadow-xs">
             <table className="min-w-full text-sm border-collapse">
               <thead>
                 <tr className="bg-cream-dark">
@@ -331,7 +331,7 @@ export default function KeyDocumentsPage() {
               >
                 {/* Card header */}
                 <div className="flex items-start gap-4 mb-3">
-                  <span className="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-cream-dark text-gold-dark text-xs font-bold font-sans">
+                  <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-cream-dark text-gold-dark text-xs font-bold font-sans">
                     {String(idx + 1).padStart(2, "0")}
                   </span>
                   <div>
@@ -386,7 +386,7 @@ export default function KeyDocumentsPage() {
 
             <Link
               href="/breakaway"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gold text-white hover:bg-gold-dark transition-colors text-sm font-medium shadow-sm"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gold text-white hover:bg-gold-dark transition-colors text-sm font-medium shadow-xs"
             >
               Next
               <span aria-hidden="true">→</span>

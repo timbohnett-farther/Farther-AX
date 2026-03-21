@@ -76,7 +76,7 @@ export default function MetricsDashboard() {
     .map(([stageId, count]) => ({
       name: STAGE_LABELS[stageId] ?? stageId,
       value: count,
-      color: (stageId === '100411705' ? 'teal' : 'blue') as const,
+      color: stageId === '100411705' ? ('teal' as const) : ('blue' as const),
     }));
 
   return (

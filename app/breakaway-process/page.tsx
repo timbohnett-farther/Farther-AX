@@ -88,7 +88,7 @@ export default function BreakawayProcessPage() {
                   {phase.title}
                 </h3>
                 <span
-                  className="text-sm px-2 py-0.5 rounded border"
+                  className="text-sm px-2 py-0.5 rounded-sm border"
                   style={{ color: "#5b6a71", borderColor: "#dde8f0" }}
                 >
                   {phase.duration}
@@ -125,7 +125,7 @@ export default function BreakawayProcessPage() {
                         <td className="px-4 py-3" style={{ color: "#444444" }}>{item.followUp}</td>
                         <td className="px-4 py-3">
                           <span
-                            className="px-2 py-0.5 rounded text-xs font-semibold"
+                            className="px-2 py-0.5 rounded-sm text-xs font-semibold"
                             style={{ backgroundColor: "#f0f5f9", color: "#155961" }}
                           >
                             {item.owner}

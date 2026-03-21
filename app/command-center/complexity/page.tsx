@@ -192,7 +192,7 @@ export default function ComplexityEducationPage() {
                   <span className="text-sm font-semibold text-charcoal">
                     {factor.name}
                   </span>
-                  <span className="text-xs px-2 py-0.5 rounded bg-cream-dark text-gray-600">
+                  <span className="text-xs px-2 py-0.5 rounded-sm bg-cream-dark text-gray-600">
                     {factor.category}
                   </span>
                   <span className="text-xs ml-auto font-mono text-teal">
@@ -257,7 +257,7 @@ export default function ComplexityEducationPage() {
               {keywords.map((kw) => (
                 <span
                   key={kw}
-                  className="text-xs px-2 py-1 rounded font-mono bg-cream-dark text-gray-600 border border-cream-border"
+                  className="text-xs px-2 py-1 rounded-sm font-mono bg-cream-dark text-gray-600 border border-cream-border"
                 >
                   {kw}
                 </span>

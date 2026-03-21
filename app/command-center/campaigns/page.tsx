@@ -260,7 +260,7 @@ export default function CampaignsPage() {
                       <td className="py-3 px-2 text-sm" style={{ color: C.dark }}>{campaign.name}</td>
                       <td className="py-3 px-2">
                         <span
-                          className="inline-block px-2 py-1 rounded text-xs font-semibold"
+                          className="inline-block px-2 py-1 rounded-sm text-xs font-semibold"
                           style={{ backgroundColor: statusStyle.bg, color: statusStyle.text }}
                         >
                           {campaign.status}

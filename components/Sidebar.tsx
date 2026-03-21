@@ -147,7 +147,7 @@ export default function Sidebar() {
           labelClassName="text-teal"
         />
 
-        <div className="my-2 border-t border-white/[0.06]" />
+        <div className="my-2 border-t border-white/6" />
 
         <NavGroup
           label="Content & Campaigns"
@@ -155,7 +155,7 @@ export default function Sidebar() {
           pathname={pathname}
         />
 
-        <div className="my-2 border-t border-white/[0.06]" />
+        <div className="my-2 border-t border-white/6" />
 
         <NavGroup
           label="Insights & Governance"

@@ -5,7 +5,7 @@ export default function IntroductionPage() {
     <div className="min-h-screen bg-cream text-charcoal">
       {/* Step Indicator */}
       <div className="fixed top-6 right-8 z-50">
-        <span className="font-sans text-xs tracking-[0.2em] uppercase text-charcoal-muted bg-white/70 backdrop-blur border border-cream-border px-4 py-2 rounded-full shadow-sm">
+        <span className="font-sans text-xs tracking-[0.2em] uppercase text-charcoal-muted bg-white/70 backdrop-blur-sm border border-cream-border px-4 py-2 rounded-full shadow-xs">
           01 / 13
         </span>
       </div>
@@ -32,7 +32,7 @@ export default function IntroductionPage() {
 
         {/* Overview */}
         <section className="mb-20">
-          <div className="bg-white/50 backdrop-blur border border-cream-border rounded-2xl px-10 py-10 shadow-sm">
+          <div className="bg-white/50 backdrop-blur-sm border border-cream-border rounded-2xl px-10 py-10 shadow-xs">
             <p className="font-sans text-base leading-8 text-charcoal">
               This playbook is the definitive reference for Farther&rsquo;s Advisor Experience (AX) team. It
               guides <strong className="text-charcoal font-semibold">AX Managers (AXMs)</strong> and{" "}
@@ -60,7 +60,7 @@ export default function IntroductionPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
             {/* Card 1: Breakaway */}
-            <div className="bg-white/50 backdrop-blur border border-cream-border rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300 group">
+            <div className="bg-white/50 backdrop-blur-sm border border-cream-border rounded-2xl p-8 shadow-xs hover:shadow-md transition-shadow duration-300 group">
               <div className="flex items-start justify-between mb-6">
                 <span className="font-serif text-5xl text-gold opacity-25 leading-none select-none">01</span>
                 <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-3 py-1 rounded-full">
@@ -79,7 +79,7 @@ export default function IntroductionPage() {
             </div>
 
             {/* Card 2: Independent RIA */}
-            <div className="bg-white/50 backdrop-blur border border-cream-border rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300 group">
+            <div className="bg-white/50 backdrop-blur-sm border border-cream-border rounded-2xl p-8 shadow-xs hover:shadow-md transition-shadow duration-300 group">
               <div className="flex items-start justify-between mb-6">
                 <span className="font-serif text-5xl text-gold opacity-25 leading-none select-none">02</span>
                 <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full">
@@ -97,7 +97,7 @@ export default function IntroductionPage() {
             </div>
 
             {/* Card 3: M&A */}
-            <div className="bg-white/50 backdrop-blur border border-cream-border rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300 group">
+            <div className="bg-white/50 backdrop-blur-sm border border-cream-border rounded-2xl p-8 shadow-xs hover:shadow-md transition-shadow duration-300 group">
               <div className="flex items-start justify-between mb-6">
                 <span className="font-serif text-5xl text-gold opacity-25 leading-none select-none">03</span>
                 <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1 rounded-full">
@@ -115,7 +115,7 @@ export default function IntroductionPage() {
             </div>
 
             {/* Card 4: No to Low AUM */}
-            <div className="bg-white/50 backdrop-blur border border-cream-border rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300 group">
+            <div className="bg-white/50 backdrop-blur-sm border border-cream-border rounded-2xl p-8 shadow-xs hover:shadow-md transition-shadow duration-300 group">
               <div className="flex items-start justify-between mb-6">
                 <span className="font-serif text-5xl text-gold opacity-25 leading-none select-none">04</span>
                 <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full">
@@ -150,7 +150,7 @@ export default function IntroductionPage() {
           <div className="flex flex-col gap-5">
 
             {/* Method 1: Master Merge */}
-            <div className="bg-white/50 backdrop-blur border border-cream-border rounded-2xl px-8 py-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div className="bg-white/50 backdrop-blur-sm border border-cream-border rounded-2xl px-8 py-7 shadow-xs hover:shadow-md transition-shadow duration-300">
               <div className="flex flex-col sm:flex-row sm:items-start gap-6">
                 <div className="shrink-0">
                   <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-4 py-2 rounded-full whitespace-nowrap">
@@ -175,7 +175,7 @@ export default function IntroductionPage() {
             </div>
 
             {/* Method 2: LPOA */}
-            <div className="bg-white/50 backdrop-blur border border-cream-border rounded-2xl px-8 py-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div className="bg-white/50 backdrop-blur-sm border border-cream-border rounded-2xl px-8 py-7 shadow-xs hover:shadow-md transition-shadow duration-300">
               <div className="flex flex-col sm:flex-row sm:items-start gap-6">
                 <div className="shrink-0">
                   <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-4 py-2 rounded-full whitespace-nowrap">
@@ -200,7 +200,7 @@ export default function IntroductionPage() {
             </div>
 
             {/* Method 3: Repaper / ACAT */}
-            <div className="bg-white/50 backdrop-blur border border-cream-border rounded-2xl px-8 py-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div className="bg-white/50 backdrop-blur-sm border border-cream-border rounded-2xl px-8 py-7 shadow-xs hover:shadow-md transition-shadow duration-300">
               <div className="flex flex-col sm:flex-row sm:items-start gap-6">
                 <div className="shrink-0">
                   <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-4 py-2 rounded-full whitespace-nowrap">
@@ -256,7 +256,7 @@ export default function IntroductionPage() {
           </span>
           <Link
             href="/onboarding-vs-transitions"
-            className="group inline-flex items-center gap-3 font-sans text-sm tracking-wide bg-gold text-white px-8 py-4 rounded-full shadow-sm hover:bg-gold-dark transition-colors duration-200"
+            className="group inline-flex items-center gap-3 font-sans text-sm tracking-wide bg-gold text-white px-8 py-4 rounded-full shadow-xs hover:bg-gold-dark transition-colors duration-200"
           >
             <span>Next</span>
             <span className="transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>

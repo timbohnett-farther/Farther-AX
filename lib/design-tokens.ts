@@ -55,7 +55,7 @@ export const colors = {
 // Tailwind utility class helpers
 export const tw = {
   // Card styles
-  card: 'bg-white rounded-xl border border-gray-200 shadow-sm',
+  card: 'bg-white rounded-xl border border-gray-200 shadow-xs',
   cardGlass: 'glass-card',
   cardStat: 'stat-card',
   cardChart: 'chart-card',

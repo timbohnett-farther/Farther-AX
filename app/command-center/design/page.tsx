@@ -67,18 +67,18 @@ const kanbanData = {
 };
 
 const assets = [
-  { id: 1, filename: 'logo-primary.svg', type: 'SVG', size: '24 KB', color: 'bg-gradient-to-br from-teal-500 to-teal-600' },
-  { id: 2, filename: 'logo-white.png', type: 'PNG', size: '48 KB', color: 'bg-gradient-to-br from-slate-700 to-slate-800' },
-  { id: 3, filename: 'icon-wealth.svg', type: 'SVG', size: '12 KB', color: 'bg-gradient-to-br from-amber-500 to-orange-600' },
-  { id: 4, filename: 'hero-office.jpg', type: 'JPG', size: '1.2 MB', color: 'bg-gradient-to-br from-blue-400 to-blue-600' },
-  { id: 5, filename: 'pattern-gold.png', type: 'PNG', size: '156 KB', color: 'bg-gradient-to-br from-yellow-400 to-amber-500' },
-  { id: 6, filename: 'advisor-headshot-template.ai', type: 'AI', size: '2.4 MB', color: 'bg-gradient-to-br from-purple-500 to-purple-600' },
-  { id: 7, filename: 'social-template-1.png', type: 'PNG', size: '384 KB', color: 'bg-gradient-to-br from-pink-500 to-rose-600' },
-  { id: 8, filename: 'email-header.png', type: 'PNG', size: '256 KB', color: 'bg-gradient-to-br from-green-500 to-emerald-600' },
-  { id: 9, filename: 'presentation-bg.jpg', type: 'JPG', size: '892 KB', color: 'bg-gradient-to-br from-indigo-500 to-indigo-600' },
-  { id: 10, filename: 'brand-colors.pdf', type: 'PDF', size: '64 KB', color: 'bg-gradient-to-br from-red-500 to-rose-600' },
-  { id: 11, filename: 'icon-set.svg', type: 'SVG', size: '36 KB', color: 'bg-gradient-to-br from-cyan-500 to-blue-600' },
-  { id: 12, filename: 'event-banner.psd', type: 'PSD', size: '3.1 MB', color: 'bg-gradient-to-br from-violet-500 to-purple-600' },
+  { id: 1, filename: 'logo-primary.svg', type: 'SVG', size: '24 KB', color: 'bg-linear-to-br from-teal-500 to-teal-600' },
+  { id: 2, filename: 'logo-white.png', type: 'PNG', size: '48 KB', color: 'bg-linear-to-br from-slate-700 to-slate-800' },
+  { id: 3, filename: 'icon-wealth.svg', type: 'SVG', size: '12 KB', color: 'bg-linear-to-br from-amber-500 to-orange-600' },
+  { id: 4, filename: 'hero-office.jpg', type: 'JPG', size: '1.2 MB', color: 'bg-linear-to-br from-blue-400 to-blue-600' },
+  { id: 5, filename: 'pattern-gold.png', type: 'PNG', size: '156 KB', color: 'bg-linear-to-br from-yellow-400 to-amber-500' },
+  { id: 6, filename: 'advisor-headshot-template.ai', type: 'AI', size: '2.4 MB', color: 'bg-linear-to-br from-purple-500 to-purple-600' },
+  { id: 7, filename: 'social-template-1.png', type: 'PNG', size: '384 KB', color: 'bg-linear-to-br from-pink-500 to-rose-600' },
+  { id: 8, filename: 'email-header.png', type: 'PNG', size: '256 KB', color: 'bg-linear-to-br from-green-500 to-emerald-600' },
+  { id: 9, filename: 'presentation-bg.jpg', type: 'JPG', size: '892 KB', color: 'bg-linear-to-br from-indigo-500 to-indigo-600' },
+  { id: 10, filename: 'brand-colors.pdf', type: 'PDF', size: '64 KB', color: 'bg-linear-to-br from-red-500 to-rose-600' },
+  { id: 11, filename: 'icon-set.svg', type: 'SVG', size: '36 KB', color: 'bg-linear-to-br from-cyan-500 to-blue-600' },
+  { id: 12, filename: 'event-banner.psd', type: 'PSD', size: '3.1 MB', color: 'bg-linear-to-br from-violet-500 to-purple-600' },
 ];
 
 export default function DesignPage() {
@@ -156,7 +156,7 @@ export default function DesignPage() {
             }}
             className="border rounded-xl p-5 hover:shadow-md transition-shadow cursor-pointer"
           >
-            <div className={`h-1 w-full mb-4 rounded-full bg-gradient-to-r ${item.gradient}`}></div>
+            <div className={`h-1 w-full mb-4 rounded-full bg-linear-to-r ${item.gradient}`}></div>
             <div className="text-3xl mb-3">{item.icon}</div>
             <h3 style={{ color: C.dark }} className="font-semibold text-lg mb-2">
               {item.title}
@@ -211,7 +211,7 @@ export default function DesignPage() {
               }}
               className="border rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
             >
-              <div className={`h-40 bg-gradient-to-br ${template.gradient}`}></div>
+              <div className={`h-40 bg-linear-to-br ${template.gradient}`}></div>
               <div className="p-4">
                 <h3 style={{ color: C.dark }} className="font-semibold mb-2">
                   {template.name}
@@ -220,7 +220,7 @@ export default function DesignPage() {
                   <span style={{
                     backgroundColor: C.blueBg,
                     color: C.blue,
-                  }} className="text-xs px-2 py-1 rounded">
+                  }} className="text-xs px-2 py-1 rounded-sm">
                     {template.category}
                   </span>
                   <span style={{ color: C.slate }} className="text-xs">
@@ -271,12 +271,12 @@ export default function DesignPage() {
                   <td style={{ color: C.slate }} className="px-6 py-4">{project.designer}</td>
                   <td style={{ color: C.slate }} className="px-6 py-4">{project.type}</td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
+                    <span className={`px-2 py-1 rounded-sm text-xs font-medium ${getStatusColor(project.status)}`}>
                       {project.status}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(project.priority)}`}>
+                    <span className={`px-2 py-1 rounded-sm text-xs font-medium ${getPriorityColor(project.priority)}`}>
                       {project.priority}
                     </span>
                   </td>
@@ -343,13 +343,13 @@ export default function DesignPage() {
                       backgroundColor: C.cardBg,
                       borderColor: C.border,
                     }}
-                    className="border rounded-lg p-3 hover:shadow-sm transition-shadow cursor-move"
+                    className="border rounded-lg p-3 hover:shadow-xs transition-shadow cursor-move"
                   >
                     <p style={{ color: C.dark }} className="text-sm font-medium mb-2">
                       {item.title}
                     </p>
                     <div className="flex items-center">
-                      <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${getAvatarColor(item.assignee)} flex items-center justify-center text-white text-xs font-semibold`}>
+                      <div className={`w-6 h-6 rounded-full bg-linear-to-br ${getAvatarColor(item.assignee)} flex items-center justify-center text-white text-xs font-semibold`}>
                         {item.assignee}
                       </div>
                     </div>
@@ -408,7 +408,7 @@ export default function DesignPage() {
                 backgroundColor: C.white,
                 borderColor: C.border,
               }}
-              className="border rounded-lg overflow-hidden hover:shadow-sm transition-shadow cursor-pointer"
+              className="border rounded-lg overflow-hidden hover:shadow-xs transition-shadow cursor-pointer"
             >
               <div className={`h-24 ${asset.color}`}></div>
               <div className="p-3">
@@ -419,7 +419,7 @@ export default function DesignPage() {
                   <span style={{
                     backgroundColor: C.amberBg,
                     color: C.amber,
-                  }} className="text-xs px-2 py-1 rounded">
+                  }} className="text-xs px-2 py-1 rounded-sm">
                     {asset.type}
                   </span>
                   <span style={{ color: C.slate }} className="text-xs">

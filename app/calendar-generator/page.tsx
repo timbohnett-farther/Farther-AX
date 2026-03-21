@@ -266,7 +266,7 @@ export default function CalendarGeneratorPage() {
                 value={advisorName}
                 onChange={(e) => setAdvisorName(e.target.value)}
                 placeholder="e.g. Jane Smith"
-                className="w-full px-3 py-2 rounded-md border text-sm outline-none"
+                className="w-full px-3 py-2 rounded-md border text-sm outline-hidden"
                 style={{ borderColor: "#dde8f0", backgroundColor: "#FAF7F2", color: "#333333" }}
               />
             </div>
@@ -277,7 +277,7 @@ export default function CalendarGeneratorPage() {
               <select
                 value={pathway}
                 onChange={(e) => setPathway(e.target.value)}
-                className="w-full px-3 py-2 rounded-md border text-sm outline-none"
+                className="w-full px-3 py-2 rounded-md border text-sm outline-hidden"
                 style={{ borderColor: "#dde8f0", backgroundColor: "#FAF7F2", color: "#333333" }}
               >
                 <option value="breakaway">Breakaway</option>
@@ -294,7 +294,7 @@ export default function CalendarGeneratorPage() {
                 type="date"
                 value={launchDate}
                 onChange={(e) => setLaunchDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-md border text-sm outline-none"
+                className="w-full px-3 py-2 rounded-md border text-sm outline-hidden"
                 style={{ borderColor: "#dde8f0", backgroundColor: "#FAF7F2", color: "#333333" }}
               />
             </div>
@@ -486,7 +486,7 @@ export default function CalendarGeneratorPage() {
                         href={gCalLink(m)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="shrink-0 px-3 py-1 rounded text-xs font-medium border transition-colors"
+                        className="shrink-0 px-3 py-1 rounded-sm text-xs font-medium border transition-colors"
                         style={{ borderColor: "#1d7682", color: "#155961" }}
                       >
                         Add to Calendar ↗

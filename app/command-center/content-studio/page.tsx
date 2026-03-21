@@ -428,19 +428,19 @@ export default function ContentStudioPage() {
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <button
-                          className="p-1.5 rounded hover:bg-opacity-10 transition-colors"
+                          className="p-1.5 rounded-sm hover:bg-opacity-10 transition-colors"
                           style={{ color: C.slate }}
                         >
                           <EyeIcon className="w-4 h-4" />
                         </button>
                         <button
-                          className="p-1.5 rounded hover:bg-opacity-10 transition-colors"
+                          className="p-1.5 rounded-sm hover:bg-opacity-10 transition-colors"
                           style={{ color: C.slate }}
                         >
                           <PencilIcon className="w-4 h-4" />
                         </button>
                         <button
-                          className="p-1.5 rounded hover:bg-opacity-10 transition-colors"
+                          className="p-1.5 rounded-sm hover:bg-opacity-10 transition-colors"
                           style={{ color: C.slate }}
                         >
                           <EllipsisVerticalIcon className="w-4 h-4" />
@@ -503,7 +503,7 @@ export default function ContentStudioPage() {
                   {template.name}
                 </h3>
                 <span
-                  className="inline-block px-2 py-1 rounded text-xs font-medium mb-3"
+                  className="inline-block px-2 py-1 rounded-sm text-xs font-medium mb-3"
                   style={{
                     backgroundColor: C.bg,
                     color: C.slate,

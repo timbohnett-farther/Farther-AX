@@ -206,7 +206,7 @@ export default function SuperTeamPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border p-6 shadow-sm hover:shadow-md transition-shadow" style={{ borderColor: C.border }}>
+        <div className="bg-white rounded-xl border p-6 shadow-xs hover:shadow-md transition-shadow" style={{ borderColor: C.border }}>
           <div className="flex items-center gap-2 mb-2">
             <div
               className="w-2 h-2 rounded-full"
@@ -222,7 +222,7 @@ export default function SuperTeamPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border p-6 shadow-sm hover:shadow-md transition-shadow" style={{ borderColor: C.border }}>
+        <div className="bg-white rounded-xl border p-6 shadow-xs hover:shadow-md transition-shadow" style={{ borderColor: C.border }}>
           <div className="mb-2">
             <span style={{ color: C.slate, fontSize: '14px' }}>Active Workflows</span>
           </div>
@@ -234,7 +234,7 @@ export default function SuperTeamPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border p-6 shadow-sm hover:shadow-md transition-shadow" style={{ borderColor: C.border }}>
+        <div className="bg-white rounded-xl border p-6 shadow-xs hover:shadow-md transition-shadow" style={{ borderColor: C.border }}>
           <div className="mb-2">
             <span style={{ color: C.slate, fontSize: '14px' }}>Avg Response Time</span>
           </div>
@@ -266,13 +266,13 @@ export default function SuperTeamPage() {
             return (
               <div
                 key={member.name}
-                className="bg-white rounded-xl border p-5 shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white rounded-xl border p-5 shadow-xs hover:shadow-md transition-shadow"
                 style={{ borderColor: C.border }}
               >
                 {/* Avatar */}
                 <div className="flex flex-col items-center mb-4">
                   <div
-                    className={`w-16 h-16 rounded-full bg-gradient-to-br ${member.gradient} flex items-center justify-center text-white font-bold text-lg mb-3`}
+                    className={`w-16 h-16 rounded-full bg-linear-to-br ${member.gradient} flex items-center justify-center text-white font-bold text-lg mb-3`}
                   >
                     {member.initials}
                   </div>
@@ -341,7 +341,7 @@ export default function SuperTeamPage() {
         >
           Active Workflows
         </h2>
-        <div className="bg-white rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: C.border }}>
+        <div className="bg-white rounded-xl border shadow-xs overflow-hidden" style={{ borderColor: C.border }}>
           <table className="w-full">
             <thead>
               <tr style={{ backgroundColor: C.cardBg, borderBottom: `1px solid ${C.border}` }}>
@@ -374,7 +374,7 @@ export default function SuperTeamPage() {
                 return (
                   <tr
                     key={idx}
-                    className="hover:bg-black/[0.02] transition-colors"
+                    className="hover:bg-black/2 transition-colors"
                     style={{ borderBottom: `1px solid ${C.border}` }}
                   >
                     <td className="px-6 py-4" style={{ color: C.dark, fontWeight: '500' }}>
@@ -441,7 +441,7 @@ export default function SuperTeamPage() {
       {/* Performance Metrics */}
       <div className="grid grid-cols-2 gap-6">
         {/* Team Performance Chart */}
-        <div className="bg-white rounded-xl border p-6 shadow-sm" style={{ borderColor: C.border }}>
+        <div className="bg-white rounded-xl border p-6 shadow-xs" style={{ borderColor: C.border }}>
           <h3
             className="text-lg font-semibold mb-4"
             style={{
@@ -493,7 +493,7 @@ export default function SuperTeamPage() {
         </div>
 
         {/* Activation History Chart */}
-        <div className="bg-white rounded-xl border p-6 shadow-sm" style={{ borderColor: C.border }}>
+        <div className="bg-white rounded-xl border p-6 shadow-xs" style={{ borderColor: C.border }}>
           <h3
             className="text-lg font-semibold mb-4"
             style={{

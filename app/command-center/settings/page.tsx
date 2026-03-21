@@ -213,7 +213,7 @@ export default function SettingsPage() {
       </div>
 
       {/* API Connections */}
-      <div className="bg-white rounded-xl shadow-sm border" style={{ borderColor: C.border }}>
+      <div className="bg-white rounded-xl shadow-xs border" style={{ borderColor: C.border }}>
         <div className="p-6 border-b" style={{ borderColor: C.border }}>
           <h2
             className="text-xl font-semibold"
@@ -288,7 +288,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Notification Preferences */}
-      <div className="bg-white rounded-xl shadow-sm border" style={{ borderColor: C.border }}>
+      <div className="bg-white rounded-xl shadow-xs border" style={{ borderColor: C.border }}>
         <div className="p-6 border-b" style={{ borderColor: C.border }}>
           <h2
             className="text-xl font-semibold"
@@ -331,7 +331,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Team Configuration */}
-      <div className="bg-white rounded-xl shadow-sm border" style={{ borderColor: C.border }}>
+      <div className="bg-white rounded-xl shadow-xs border" style={{ borderColor: C.border }}>
         <div className="p-6 border-b" style={{ borderColor: C.border }}>
           <h2
             className="text-xl font-semibold"
@@ -422,7 +422,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Brand Guidelines & Assets */}
-      <div className="bg-white rounded-xl shadow-sm border" style={{ borderColor: C.border }}>
+      <div className="bg-white rounded-xl shadow-xs border" style={{ borderColor: C.border }}>
         <div className="p-6 border-b" style={{ borderColor: C.border }}>
           <h2
             className="text-xl font-semibold"

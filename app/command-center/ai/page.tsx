@@ -21,7 +21,7 @@ function MessageBubble({ message }: { message: Message }) {
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
       {!isUser && (
-        <div className="w-8 h-8 rounded-full bg-teal flex items-center justify-center text-sm text-white flex-shrink-0 mr-2.5 mt-0.5">
+        <div className="w-8 h-8 rounded-full bg-teal flex items-center justify-center text-sm text-white shrink-0 mr-2.5 mt-0.5">
           ✦
         </div>
       )}
@@ -147,7 +147,7 @@ export default function AIAssistant() {
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input); } }}
             placeholder="Ask about pipeline, advisors, onboarding status, risks…"
             rows={2}
-            className="flex-1 px-4 py-3 rounded-xl border border-cream-border text-sm resize-none text-charcoal bg-cream outline-none focus:border-teal focus:ring-1 focus:ring-teal transition-smooth"
+            className="flex-1 px-4 py-3 rounded-xl border border-cream-border text-sm resize-none text-charcoal bg-cream outline-hidden focus:border-teal focus:ring-1 focus:ring-teal transition-smooth"
           />
           <button
             type="submit"

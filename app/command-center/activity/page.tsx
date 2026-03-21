@@ -108,7 +108,7 @@ export default function TeamActivityPage() {
       {/* Live Activity Feed + Team Availability Grid */}
       <div className="grid grid-cols-5 gap-6">
         {/* Live Activity Feed */}
-        <div className="col-span-3 rounded-lg p-6 shadow-sm" style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
+        <div className="col-span-3 rounded-lg p-6 shadow-xs" style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
           <h2 className="text-2xl font-semibold mb-6" style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: C.dark }}>
             Live Activity Feed
           </h2>
@@ -118,7 +118,7 @@ export default function TeamActivityPage() {
               return (
                 <div key={idx} className="flex items-start gap-4 p-3 rounded-lg transition-all hover:bg-opacity-50" style={{ backgroundColor: 'rgba(253,250,245,0.5)' }}>
                   {/* Avatar */}
-                  <div className={`flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br ${activity.color} flex items-center justify-center text-white text-sm font-semibold shadow-sm`}>
+                  <div className={`shrink-0 w-10 h-10 rounded-full bg-linear-to-br ${activity.color} flex items-center justify-center text-white text-sm font-semibold shadow-xs`}>
                     {getInitials(activity.name)}
                   </div>
 
@@ -146,7 +146,7 @@ export default function TeamActivityPage() {
         </div>
 
         {/* Team Availability */}
-        <div className="col-span-2 rounded-lg p-6 shadow-sm" style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
+        <div className="col-span-2 rounded-lg p-6 shadow-xs" style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
           <h2 className="text-2xl font-semibold mb-6" style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: C.dark }}>
             Team Availability
           </h2>
@@ -154,7 +154,7 @@ export default function TeamActivityPage() {
             {teamAvailability.map((member, idx) => (
               <div key={idx} className="p-3 rounded-lg transition-all hover:shadow-md" style={{ backgroundColor: C.cardBg, border: `1px solid ${C.border}` }}>
                 {/* Avatar */}
-                <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${member.color} flex items-center justify-center text-white text-xs font-semibold mb-2 shadow-sm`}>
+                <div className={`w-8 h-8 rounded-full bg-linear-to-br ${member.color} flex items-center justify-center text-white text-xs font-semibold mb-2 shadow-xs`}>
                   {getInitials(member.name)}
                 </div>
 
@@ -182,7 +182,7 @@ export default function TeamActivityPage() {
       </div>
 
       {/* Active Collaborations */}
-      <div className="rounded-lg p-6 shadow-sm" style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
+      <div className="rounded-lg p-6 shadow-xs" style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
         <h2 className="text-2xl font-semibold mb-6" style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: C.dark }}>
           Active Collaborations
         </h2>
@@ -199,7 +199,7 @@ export default function TeamActivityPage() {
                 {collab.members.map((member, mIdx) => (
                   <div
                     key={mIdx}
-                    className={`w-8 h-8 rounded-full bg-gradient-to-br ${member.color} flex items-center justify-center text-white text-xs font-semibold border-2 shadow-sm`}
+                    className={`w-8 h-8 rounded-full bg-linear-to-br ${member.color} flex items-center justify-center text-white text-xs font-semibold border-2 shadow-xs`}
                     style={{
                       borderColor: C.white,
                       marginLeft: mIdx > 0 ? '-8px' : '0',
@@ -239,7 +239,7 @@ export default function TeamActivityPage() {
       </div>
 
       {/* Performance Chart */}
-      <div className="rounded-lg p-6 shadow-sm" style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
+      <div className="rounded-lg p-6 shadow-xs" style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
         <h2 className="text-2xl font-semibold mb-6" style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: C.dark }}>
           Team Output — Last 4 Weeks
         </h2>

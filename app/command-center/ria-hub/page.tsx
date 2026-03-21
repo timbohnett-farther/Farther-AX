@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import useSWR from 'swr';
-import { Card, Title, Text, Metric, Flex, Badge } from '@tremor/react';
+import { Card, Text, Badge } from '@tremor/react';
 import { StatCard, DataCard, StatusBadge, TabGroup, FilterBar } from '@/components/ui';
 import { formatCompactCurrency } from '@/lib/design-tokens';
 import {
@@ -460,7 +460,7 @@ export default function RiaHubPage() {
     return (
       <div className="px-10 py-16 text-slate">
         <div className="shimmer h-8 w-64 rounded-lg mb-4" />
-        <div className="shimmer h-4 w-96 rounded mb-8" />
+        <div className="shimmer h-4 w-96 rounded-sm mb-8" />
         <div className="grid grid-cols-4 gap-4 mb-8">
           {[1,2,3,4].map(i => <div key={i} className="shimmer h-24 rounded-xl" />)}
         </div>

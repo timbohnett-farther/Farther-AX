@@ -152,7 +152,7 @@ export default function AnalyticsPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
+        <div className="bg-white rounded-xl p-6 shadow-xs border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
           <div className="text-sm font-medium mb-2" style={{ color: C.slate }}>Marketing ROI</div>
           <div className="text-3xl font-bold mb-2" style={{ color: C.dark }}>4.2x</div>
           <div className="flex items-center gap-1 text-sm" style={{ color: C.green }}>
@@ -161,7 +161,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
+        <div className="bg-white rounded-xl p-6 shadow-xs border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
           <div className="text-sm font-medium mb-2" style={{ color: C.slate }}>Attribution Score</div>
           <div className="text-3xl font-bold mb-2" style={{ color: C.dark }}>78/100</div>
           <div className="flex items-center gap-1 text-sm" style={{ color: C.blue }}>
@@ -170,7 +170,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
+        <div className="bg-white rounded-xl p-6 shadow-xs border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
           <div className="text-sm font-medium mb-2" style={{ color: C.slate }}>Conversion Rate</div>
           <div className="text-3xl font-bold mb-2" style={{ color: C.dark }}>3.8%</div>
           <div className="flex items-center gap-1 text-sm" style={{ color: C.green }}>
@@ -179,7 +179,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
+        <div className="bg-white rounded-xl p-6 shadow-xs border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
           <div className="text-sm font-medium mb-2" style={{ color: C.slate }}>Customer Acquisition Cost</div>
           <div className="text-3xl font-bold mb-2" style={{ color: C.dark }}>$1,240</div>
           <div className="flex items-center gap-1 text-sm" style={{ color: C.green }}>
@@ -190,7 +190,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Campaign Performance */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
+      <div className="bg-white rounded-xl p-6 shadow-xs border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold" style={{ color: C.dark }}>Campaign Performance Over Time</h2>
           <div className="flex gap-2">
@@ -242,7 +242,7 @@ export default function AnalyticsPage() {
       {/* Traffic Sources + Attribution */}
       <div className="grid grid-cols-2 gap-6">
         {/* Traffic Sources */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
+        <div className="bg-white rounded-xl p-6 shadow-xs border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
           <h2 className="text-xl font-semibold mb-6" style={{ color: C.dark }}>Traffic Sources</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -276,7 +276,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Channel Attribution */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
+        <div className="bg-white rounded-xl p-6 shadow-xs border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold" style={{ color: C.dark }}>Channel Attribution</h2>
             <div className="flex gap-2">
@@ -324,7 +324,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* A/B Testing Dashboard */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
+      <div className="bg-white rounded-xl p-6 shadow-xs border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
         <h2 className="text-xl font-semibold mb-6" style={{ color: C.dark }}>Active A/B Tests</h2>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -348,7 +348,7 @@ export default function AnalyticsPage() {
                   <td className="py-3 text-sm text-right" style={{ color: C.dark }}>{test.sampleSize}</td>
                   <td className="py-3 text-sm">
                     {test.winner !== '—' ? (
-                      <span className="px-2 py-1 rounded text-xs font-medium" style={{ backgroundColor: C.greenBg, color: C.green }}>
+                      <span className="px-2 py-1 rounded-sm text-xs font-medium" style={{ backgroundColor: C.greenBg, color: C.green }}>
                         {test.winner}
                       </span>
                     ) : (
@@ -360,7 +360,7 @@ export default function AnalyticsPage() {
                   </td>
                   <td className="py-3 text-sm">
                     <span
-                      className="px-2 py-1 rounded text-xs font-medium"
+                      className="px-2 py-1 rounded-sm text-xs font-medium"
                       style={{
                         backgroundColor: test.status === 'Completed' ? C.blueBg : C.amberBg,
                         color: test.status === 'Completed' ? C.blue : C.amber
@@ -377,7 +377,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Competitive Intelligence */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
+      <div className="bg-white rounded-xl p-6 shadow-xs border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
         <h2 className="text-xl font-semibold mb-6" style={{ color: C.dark }}>Competitive Landscape</h2>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -429,7 +429,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* ROI Calculator */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
+      <div className="bg-white rounded-xl p-6 shadow-xs border" style={{ borderColor: C.border, backgroundColor: C.cardBg }}>
         <h2 className="text-xl font-semibold mb-6" style={{ color: C.dark }}>ROI Calculator</h2>
         <div className="grid grid-cols-2 gap-8">
           {/* Input Fields */}
@@ -442,7 +442,7 @@ export default function AnalyticsPage() {
                 type="number"
                 value={budget}
                 onChange={(e) => setBudget(Number(e.target.value))}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                className="w-full px-4 py-2 rounded-lg border focus:outline-hidden focus:ring-2"
                 style={{ borderColor: C.border, backgroundColor: C.white }}
               />
             </div>
@@ -454,7 +454,7 @@ export default function AnalyticsPage() {
                 type="number"
                 value={expectedLeads}
                 onChange={(e) => setExpectedLeads(Number(e.target.value))}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                className="w-full px-4 py-2 rounded-lg border focus:outline-hidden focus:ring-2"
                 style={{ borderColor: C.border, backgroundColor: C.white }}
               />
             </div>
@@ -466,7 +466,7 @@ export default function AnalyticsPage() {
                 type="number"
                 value={dealSize}
                 onChange={(e) => setDealSize(Number(e.target.value))}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                className="w-full px-4 py-2 rounded-lg border focus:outline-hidden focus:ring-2"
                 style={{ borderColor: C.border, backgroundColor: C.white }}
               />
             </div>
@@ -478,7 +478,7 @@ export default function AnalyticsPage() {
                 type="number"
                 value={closeRate}
                 onChange={(e) => setCloseRate(Number(e.target.value))}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                className="w-full px-4 py-2 rounded-lg border focus:outline-hidden focus:ring-2"
                 style={{ borderColor: C.border, backgroundColor: C.white }}
               />
             </div>

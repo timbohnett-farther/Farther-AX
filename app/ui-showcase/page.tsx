@@ -17,7 +17,7 @@ import {
   CurrencyDollarIcon,
   UserGroupIcon,
   ChartBarIcon,
-  ArrowArrowTrendingUpIcon,
+  ArrowTrendingUpIcon,
 } from '@heroicons/react/24/outline';
 import { formatCompactCurrency } from '@/lib/design-tokens';
 
@@ -56,7 +56,7 @@ export default function UIShowcasePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream to-cream-dark p-8">
+    <div className="min-h-screen bg-linear-to-br from-cream to-cream-dark p-8">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}

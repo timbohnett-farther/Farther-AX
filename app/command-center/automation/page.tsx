@@ -478,7 +478,7 @@ export default function IntegrationHubPage() {
                   </td>
                   <td className="px-5 py-3">
                     <span
-                      className="px-2 py-1 text-xs font-semibold rounded"
+                      className="px-2 py-1 text-xs font-semibold rounded-sm"
                       style={{ backgroundColor: C.blueBg, color: C.blue }}
                     >
                       {webhook.method}
@@ -573,7 +573,7 @@ export default function IntegrationHubPage() {
                   </td>
                   <td className="px-5 py-3">
                     <span
-                      className="px-2 py-1 text-xs font-semibold rounded"
+                      className="px-2 py-1 text-xs font-semibold rounded-sm"
                       style={{
                         backgroundColor:
                           log.status === 'Success' ? C.greenBg : log.status === 'Warning' ? C.amberBg : C.redBg,
