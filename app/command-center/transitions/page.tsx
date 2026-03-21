@@ -6,51 +6,35 @@ import Link from 'next/link';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
-// ── Design tokens ────────────────────────────────────────────────────────────
-const C = {
-  dark: '#333333', white: '#ffffff', slate: '#5b6a71',
-  teal: '#1d7682', bg: '#FAF7F2',
-  cardBg: '#ffffff', border: '#e8e2d9',
-  red: '#c0392b', redBg: 'rgba(192,57,43,0.08)', redBorder: 'rgba(192,57,43,0.18)',
-  amber: '#b27d2e', amberBg: 'rgba(178,125,46,0.08)', amberBorder: 'rgba(178,125,46,0.18)',
-  gold: '#c8a951', goldBg: 'rgba(200,169,81,0.10)',
-  green: '#27ae60', greenBg: 'rgba(39,174,96,0.10)', greenBorder: 'rgba(39,174,96,0.18)',
-  blue: '#2980b9', blueBg: 'rgba(41,128,185,0.10)', blueBorder: 'rgba(41,128,185,0.18)',
-};
-
-// ── Status color map ─────────────────────────────────────────────────────────
-function statusStyle(status: string | null): React.CSSProperties {
-  if (!status) return { color: C.slate, fontStyle: 'italic' };
+// ── Status class helper ─────────────────────────────────────────────────────
+function statusClass(status: string | null): string {
+  if (!status) return 'text-slate italic';
   const s = status.toLowerCase();
   if (s === 'completed' || s === 'signed' || s === 'done') {
-    return { color: C.green, fontWeight: 600 };
+    return 'text-market-bull font-semibold';
   }
   if (s === 'sent' || s === 'delivered' || s === 'in progress') {
-    return { color: C.amber, fontWeight: 500 };
+    return 'text-wealth-gold-dark font-medium';
   }
   if (s === 'not sent' || s === 'not ready' || s === 'declined' || s === 'voided') {
-    return { color: C.red, fontWeight: 500 };
+    return 'text-market-bear font-medium';
   }
   if (s === 'ready to send documents' || s === 'ready') {
-    return { color: C.blue, fontWeight: 500 };
+    return 'font-medium text-blue-600';
   }
-  return { color: C.dark };
+  return 'text-charcoal';
 }
 
 // ── DocuSign status pill ─────────────────────────────────────────────────────
 function DocuSignPill({ status }: { status: string | null }) {
-  if (!status) return <span style={{ color: C.slate, fontSize: 12 }}>—</span>;
+  if (!status) return <span className="text-slate text-xs">&mdash;</span>;
   const s = status.toLowerCase();
-  let bg = C.amberBg, border = C.amberBorder, color = C.amber;
-  if (s === 'completed' || s === 'signed') { bg = C.greenBg; border = C.greenBorder; color = C.green; }
-  if (s === 'sent' || s === 'delivered') { bg = C.blueBg; border = C.blueBorder; color = C.blue; }
-  if (s === 'voided' || s === 'declined') { bg = C.redBg; border = C.redBorder; color = C.red; }
+  let badgeClass = 'badge-glass badge-warning';
+  if (s === 'completed' || s === 'signed') badgeClass = 'badge-glass badge-success';
+  if (s === 'sent' || s === 'delivered') badgeClass = 'badge-glass text-blue-600 bg-blue-50 border-blue-200';
+  if (s === 'voided' || s === 'declined') badgeClass = 'badge-glass badge-danger';
   return (
-    <span style={{
-      display: 'inline-block', padding: '2px 8px', borderRadius: 12,
-      fontSize: 11, fontWeight: 600, background: bg, border: `1px solid ${border}`, color,
-      textTransform: 'capitalize',
-    }}>
+    <span className={`inline-block capitalize ${badgeClass}`}>
       {status}
     </span>
   );
@@ -209,37 +193,34 @@ export default function TransitionsPage() {
   const summary = data?.summary;
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 1400 }}>
+    <div className="py-8 px-10 max-w-[1400px]">
       {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <div style={{ marginBottom: 24 }}>
-        <Link href="/command-center" style={{ fontSize: 13, color: C.slate, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+      <div className="mb-6">
+        <Link href="/command-center" className="text-sm text-slate no-underline inline-flex items-center gap-1.5 mb-3 hover:text-teal transition-smooth">
           ← Back to Pipeline
         </Link>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, margin: '8px 0 4px' }}>
+        <h1 className="text-3xl font-bold text-charcoal font-serif mb-1">
           Client Transition Dashboard
         </h1>
-        <p style={{ fontSize: 14, color: C.slate, margin: 0 }}>
+        <p className="text-sm text-slate">
           Track client transitions, document statuses, and DocuSign progress by advisor
         </p>
       </div>
 
       {/* ── Summary Cards ───────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16, marginBottom: 24 }}>
+      <div className="grid grid-cols-5 gap-4 mb-6">
         {[
-          { label: 'Total Advisors', value: summary?.total_advisors ?? '—', color: C.teal },
-          { label: 'Total Accounts', value: summary?.total_accounts ?? '—', color: C.dark },
-          { label: 'IAA Signed', value: summary?.iaa_signed ?? '—', color: C.green },
-          { label: 'Paperwork Signed', value: summary?.paperwork_signed ?? '—', color: C.green },
-          { label: 'Pending Documents', value: summary?.pending_documents ?? '—', color: C.amber },
+          { label: 'Total Advisors', value: summary?.total_advisors ?? '—', colorClass: 'text-teal' },
+          { label: 'Total Accounts', value: summary?.total_accounts ?? '—', colorClass: 'text-charcoal' },
+          { label: 'IAA Signed', value: summary?.iaa_signed ?? '—', colorClass: 'text-market-bull' },
+          { label: 'Paperwork Signed', value: summary?.paperwork_signed ?? '—', colorClass: 'text-market-bull' },
+          { label: 'Pending Documents', value: summary?.pending_documents ?? '—', colorClass: 'text-wealth-gold-dark' },
         ].map(card => (
-          <div key={card.label} style={{
-            background: C.cardBg, borderRadius: 12, padding: '20px 20px 16px',
-            border: `1px solid ${C.border}`, boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-          }}>
-            <div style={{ fontSize: 12, color: C.slate, fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>
+          <div key={card.label} className="stat-card">
+            <div className="text-xs text-slate font-medium uppercase tracking-wide mb-1.5">
               {card.label}
             </div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: card.color }}>
+            <div className={`text-3xl font-bold ${card.colorClass}`}>
               {card.value}
             </div>
           </div>
@@ -247,28 +228,21 @@ export default function TransitionsPage() {
       </div>
 
       {/* ── Controls Row ────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20, alignItems: 'center', flexWrap: 'wrap' }}>
+      <div className="flex gap-3 mb-5 items-center flex-wrap">
         {/* Search */}
         <input
           type="text"
           placeholder="Search advisors, households, clients..."
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          style={{
-            flex: 1, minWidth: 250, padding: '10px 14px', borderRadius: 8,
-            border: `1px solid ${C.border}`, fontSize: 14, outline: 'none',
-            background: C.white, color: C.dark,
-          }}
+          className="flex-1 min-w-[250px] px-3.5 py-2.5 rounded-lg border border-cream-border text-sm text-charcoal bg-white outline-none focus:border-teal focus:ring-1 focus:ring-teal transition-smooth"
         />
 
         {/* Status Filter */}
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          style={{
-            padding: '10px 14px', borderRadius: 8, border: `1px solid ${C.border}`,
-            fontSize: 13, background: C.white, color: C.dark, cursor: 'pointer',
-          }}
+          className="px-3.5 py-2.5 rounded-lg border border-cream-border text-sm bg-white text-charcoal cursor-pointer focus:border-teal focus:ring-1 focus:ring-teal transition-smooth"
         >
           <option value="all">All Statuses</option>
           <option value="iaa_pending">IAA Pending</option>
@@ -280,11 +254,7 @@ export default function TransitionsPage() {
         {/* Sync Button */}
         <button
           onClick={() => setShowSyncPanel(!showSyncPanel)}
-          style={{
-            padding: '10px 18px', borderRadius: 8, border: 'none',
-            background: C.teal, color: C.white, fontSize: 13, fontWeight: 600,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-          }}
+          className="bg-teal hover:bg-teal-dark text-white px-4 py-2.5 rounded-lg text-sm font-semibold cursor-pointer flex items-center gap-1.5 transition-smooth"
         >
           ↻ Sync from Sheet
         </button>
@@ -292,11 +262,7 @@ export default function TransitionsPage() {
         {/* DocuSign Button */}
         <button
           onClick={handleDocuSignConnect}
-          style={{
-            padding: '10px 18px', borderRadius: 8, border: `1px solid ${C.border}`,
-            background: C.white, color: C.dark, fontSize: 13, fontWeight: 600,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-          }}
+          className="bg-white hover:bg-cream text-charcoal px-4 py-2.5 rounded-lg border border-cream-border text-sm font-semibold cursor-pointer flex items-center gap-1.5 transition-smooth"
         >
           ✎ DocuSign Status
         </button>
@@ -304,46 +270,38 @@ export default function TransitionsPage() {
 
       {/* ── Sync Panel ──────────────────────────────────────────────────────── */}
       {showSyncPanel && (
-        <div style={{
-          background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12,
-          padding: 20, marginBottom: 20,
-        }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: C.dark, marginBottom: 12 }}>
+        <div className="glass-card p-5 mb-5">
+          <div className="text-sm font-semibold text-charcoal mb-3">
             Sync Transition Data from Google Sheets
           </div>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div className="flex gap-3 items-center">
             <input
               type="text"
               placeholder="Google Sheet ID (from the URL)"
               value={sheetId}
               onChange={e => setSheetId(e.target.value)}
-              style={{
-                flex: 1, padding: '10px 14px', borderRadius: 8,
-                border: `1px solid ${C.border}`, fontSize: 13, outline: 'none',
-              }}
+              className="flex-1 px-3.5 py-2.5 rounded-lg border border-cream-border text-sm outline-none bg-white focus:border-teal focus:ring-1 focus:ring-teal transition-smooth"
             />
             <button
               onClick={handleSync}
               disabled={syncing}
-              style={{
-                padding: '10px 20px', borderRadius: 8, border: 'none',
-                background: syncing ? C.slate : C.teal, color: C.white,
-                fontSize: 13, fontWeight: 600, cursor: syncing ? 'not-allowed' : 'pointer',
-              }}
+              className={`px-5 py-2.5 rounded-lg border-none text-white text-sm font-semibold transition-smooth ${
+                syncing ? 'bg-slate cursor-not-allowed' : 'bg-teal hover:bg-teal-dark cursor-pointer'
+              }`}
             >
               {syncing ? 'Syncing...' : 'Start Sync'}
             </button>
           </div>
           {syncResult && (
-            <div style={{
-              marginTop: 10, fontSize: 13, padding: '8px 12px', borderRadius: 6,
-              background: syncResult.startsWith('Error') ? C.redBg : C.greenBg,
-              color: syncResult.startsWith('Error') ? C.red : C.green,
-            }}>
+            <div className={`mt-2.5 text-sm px-3 py-2 rounded-md ${
+              syncResult.startsWith('Error')
+                ? 'bg-market-bear-light text-market-bear-dark'
+                : 'bg-market-bull-light text-market-bull-dark'
+            }`}>
               {syncResult}
             </div>
           )}
-          <p style={{ fontSize: 12, color: C.slate, marginTop: 8 }}>
+          <p className="text-xs text-slate mt-2">
             The Sheet ID is the long string in the Google Sheets URL between /d/ and /edit.
             The sheet tab must be named &quot;Transition&quot;.
           </p>
@@ -352,42 +310,39 @@ export default function TransitionsPage() {
 
       {/* ── DocuSign Status ─────────────────────────────────────────────────── */}
       {docusignStatus && (
-        <div style={{
-          background: docusignStatus.includes('Error') || docusignStatus.includes('failed') ? C.redBg : C.greenBg,
-          border: `1px solid ${docusignStatus.includes('Error') || docusignStatus.includes('failed') ? C.redBorder : C.greenBorder}`,
-          borderRadius: 8, padding: '10px 16px', marginBottom: 16, fontSize: 13,
-          color: docusignStatus.includes('Error') || docusignStatus.includes('failed') ? C.red : C.green,
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        }}>
+        <div className={`rounded-lg px-4 py-2.5 mb-4 text-sm flex justify-between items-center border ${
+          docusignStatus.includes('Error') || docusignStatus.includes('failed')
+            ? 'bg-market-bear-light border-market-bear text-market-bear-dark'
+            : 'bg-market-bull-light border-market-bull text-market-bull-dark'
+        }`}>
           {docusignStatus}
-          <button onClick={() => setDocusignStatus(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'inherit' }}>×</button>
+          <button onClick={() => setDocusignStatus(null)} className="bg-transparent border-none cursor-pointer text-base text-inherit hover:opacity-70 transition-smooth">×</button>
         </div>
       )}
 
       {/* ── Loading / Error States ──────────────────────────────────────────── */}
       {isLoading && (
-        <div style={{ textAlign: 'center', padding: 60, color: C.slate }}>
-          Loading transition data...
+        <div className="space-y-4">
+          <div className="shimmer h-24 rounded-xl" />
+          <div className="shimmer h-24 rounded-xl" />
+          <div className="shimmer h-24 rounded-xl" />
         </div>
       )}
 
       {error && (
-        <div style={{ textAlign: 'center', padding: 60, color: C.red }}>
+        <div className="text-center py-16 text-market-bear">
           Failed to load transition data. {data?.advisors?.length === 0 ? 'Sync a Google Sheet to get started.' : ''}
         </div>
       )}
 
       {/* ── Empty State ─────────────────────────────────────────────────────── */}
       {data && data.advisors.length === 0 && !isLoading && !error && (
-        <div style={{
-          textAlign: 'center', padding: '80px 40px',
-          background: C.cardBg, borderRadius: 16, border: `1px solid ${C.border}`,
-        }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
-          <div style={{ fontSize: 18, fontWeight: 600, color: C.dark, marginBottom: 8 }}>
+        <div className="glass-card text-center py-20 px-10">
+          <div className="text-5xl mb-4">📋</div>
+          <div className="text-lg font-semibold text-charcoal mb-2">
             No Transition Data Yet
           </div>
-          <p style={{ fontSize: 14, color: C.slate, maxWidth: 400, margin: '0 auto 20px' }}>
+          <p className="text-sm text-slate max-w-[400px] mx-auto mb-5">
             Click &quot;Sync from Sheet&quot; above to import your transition spreadsheet from Google Sheets.
           </p>
         </div>
@@ -406,67 +361,41 @@ export default function TransitionsPage() {
         ).length;
 
         return (
-          <div key={advisor.advisor_name} style={{
-            background: C.cardBg, borderRadius: 12, border: `1px solid ${C.border}`,
-            marginBottom: 12, overflow: 'hidden',
-            boxShadow: isExpanded ? '0 2px 8px rgba(0,0,0,0.06)' : '0 1px 3px rgba(0,0,0,0.03)',
-          }}>
+          <div key={advisor.advisor_name} className={`glass-card mb-3 overflow-hidden ${isExpanded ? 'depth-3' : 'depth-1'}`}>
             {/* ── Advisor Header ────────────────────────────────────────────── */}
             <button
               onClick={() => setExpandedAdvisor(isExpanded ? null : advisor.advisor_name)}
-              style={{
-                width: '100%', padding: '16px 20px', border: 'none', cursor: 'pointer',
-                background: isExpanded ? 'rgba(29,118,130,0.04)' : 'transparent',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                textAlign: 'left',
-              }}
+              className={`w-full px-5 py-4 border-none cursor-pointer flex items-center justify-between text-left transition-smooth ${
+                isExpanded ? 'bg-glass-teal-light' : 'bg-transparent hover:bg-glass-teal-light'
+              }`}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: '50%', background: C.teal,
-                  color: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, fontWeight: 700, flexShrink: 0,
-                }}>
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-full bg-teal text-white flex items-center justify-center text-sm font-bold shrink-0">
                   {advisor.advisor_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                 </div>
                 <div>
-                  <div style={{ fontSize: 16, fontWeight: 600, color: C.dark }}>
+                  <div className="text-base font-semibold text-charcoal">
                     {advisor.advisor_name}
                   </div>
-                  <div style={{ fontSize: 12, color: C.slate }}>
+                  <div className="text-xs text-slate">
                     {advisor.farther_contact && `Contact: ${advisor.farther_contact} · `}
                     {advisor.total_accounts} account{advisor.total_accounts !== 1 ? 's' : ''}
                   </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div className="flex items-center gap-4">
                 {/* Progress pills */}
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <span style={{
-                    padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600,
-                    background: iaaComplete === advisor.total_accounts ? C.greenBg : C.amberBg,
-                    color: iaaComplete === advisor.total_accounts ? C.green : C.amber,
-                    border: `1px solid ${iaaComplete === advisor.total_accounts ? C.greenBorder : C.amberBorder}`,
-                  }}>
+                <div className="flex gap-2">
+                  <span className={`badge-glass ${iaaComplete === advisor.total_accounts ? 'badge-success' : 'badge-warning'}`}>
                     IAA {iaaComplete}/{advisor.total_accounts}
                   </span>
-                  <span style={{
-                    padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600,
-                    background: pwComplete === advisor.total_accounts ? C.greenBg : C.amberBg,
-                    color: pwComplete === advisor.total_accounts ? C.green : C.amber,
-                    border: `1px solid ${pwComplete === advisor.total_accounts ? C.greenBorder : C.amberBorder}`,
-                  }}>
+                  <span className={`badge-glass ${pwComplete === advisor.total_accounts ? 'badge-success' : 'badge-warning'}`}>
                     Paperwork {pwComplete}/{advisor.total_accounts}
                   </span>
                 </div>
 
-                <span style={{
-                  fontSize: 18, color: C.slate,
-                  transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                  transition: 'transform 200ms ease',
-                  display: 'inline-block',
-                }}>
+                <span className={`text-lg text-slate inline-block transition-smooth ${isExpanded ? 'rotate-180' : 'rotate-0'}`}>
                   ▾
                 </span>
               </div>
@@ -474,20 +403,16 @@ export default function TransitionsPage() {
 
             {/* ── Expanded Accounts Table ────────────────────────────────────── */}
             {isExpanded && (
-              <div style={{ padding: '0 20px 16px', overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <div className="px-5 pb-4 overflow-x-auto">
+                <table className="w-full text-sm premium-table">
                   <thead>
-                    <tr style={{ borderBottom: `2px solid ${C.border}` }}>
+                    <tr className="border-b-2 border-cream-border">
                       {[
                         'Household', 'Account Type', 'Primary Holder', 'Readiness',
                         'IAA Status', 'Paperwork', 'DocuSign IAA', 'DocuSign PW',
                         'Portal', 'Contra Firm', 'New Acct #', 'Fee Schedule', 'Notes',
                       ].map(h => (
-                        <th key={h} style={{
-                          padding: '10px 8px', textAlign: 'left', fontSize: 11,
-                          fontWeight: 600, color: C.slate, textTransform: 'uppercase',
-                          letterSpacing: 0.5, whiteSpace: 'nowrap',
-                        }}>
+                        <th key={h} className="px-2 py-2.5 text-left text-xs font-semibold text-slate uppercase tracking-wide whitespace-nowrap">
                           {h}
                         </th>
                       ))}
@@ -495,48 +420,48 @@ export default function TransitionsPage() {
                   </thead>
                   <tbody>
                     {advisor.accounts.map(acc => (
-                      <tr key={acc.id} style={{ borderBottom: `1px solid ${C.border}` }}>
-                        <td style={{ padding: '10px 8px', fontWeight: 500, color: C.dark, maxWidth: 160 }}>
+                      <tr key={acc.id} className="border-b border-cream-border">
+                        <td className="px-2 py-2.5 font-medium text-charcoal max-w-[160px]">
                           {acc.household_name || acc.account_name || '—'}
                         </td>
-                        <td style={{ padding: '10px 8px', color: C.dark }}>
+                        <td className="px-2 py-2.5 text-charcoal">
                           {acc.account_type || '—'}
                         </td>
-                        <td style={{ padding: '10px 8px', color: C.dark }}>
+                        <td className="px-2 py-2.5 text-charcoal">
                           <div>{[acc.primary_first_name, acc.primary_last_name].filter(Boolean).join(' ') || '—'}</div>
                           {acc.primary_email && (
-                            <div style={{ fontSize: 11, color: C.slate }}>{acc.primary_email}</div>
+                            <div className="text-xs text-slate">{acc.primary_email}</div>
                           )}
                         </td>
-                        <td style={{ padding: '10px 8px', ...statusStyle(acc.document_readiness) }}>
+                        <td className={`px-2 py-2.5 ${statusClass(acc.document_readiness)}`}>
                           {acc.document_readiness || '—'}
                         </td>
-                        <td style={{ padding: '10px 8px', ...statusStyle(acc.status_of_iaa) }}>
+                        <td className={`px-2 py-2.5 ${statusClass(acc.status_of_iaa)}`}>
                           {acc.status_of_iaa || '—'}
                         </td>
-                        <td style={{ padding: '10px 8px', ...statusStyle(acc.status_of_account_paperwork) }}>
+                        <td className={`px-2 py-2.5 ${statusClass(acc.status_of_account_paperwork)}`}>
                           {acc.status_of_account_paperwork || '—'}
                         </td>
-                        <td style={{ padding: '10px 8px' }}>
+                        <td className="px-2 py-2.5">
                           <DocuSignPill status={acc.docusign_iaa_status} />
                         </td>
-                        <td style={{ padding: '10px 8px' }}>
+                        <td className="px-2 py-2.5">
                           <DocuSignPill status={acc.docusign_paperwork_status} />
                         </td>
-                        <td style={{ padding: '10px 8px', ...statusStyle(acc.portal_status) }}>
+                        <td className={`px-2 py-2.5 ${statusClass(acc.portal_status)}`}>
                           {acc.portal_status || '—'}
                         </td>
-                        <td style={{ padding: '10px 8px', color: C.dark, fontSize: 12 }}>
+                        <td className="px-2 py-2.5 text-charcoal text-xs">
                           {acc.contra_account_firm || '—'}
                         </td>
-                        <td style={{ padding: '10px 8px', color: C.dark, fontFamily: 'monospace', fontSize: 12 }}>
+                        <td className="px-2 py-2.5 text-charcoal font-mono text-xs">
                           {acc.new_account_number || '—'}
                         </td>
-                        <td style={{ padding: '10px 8px', color: C.dark, fontSize: 12 }}>
+                        <td className="px-2 py-2.5 text-charcoal text-xs">
                           {acc.fee_schedule || '—'}
                         </td>
-                        <td style={{ padding: '10px 8px', color: C.slate, fontSize: 12, maxWidth: 200 }}>
-                          <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <td className="px-2 py-2.5 text-slate text-xs max-w-[200px]">
+                          <div className="overflow-hidden text-ellipsis whitespace-nowrap">
                             {acc.notes || '—'}
                           </div>
                         </td>
@@ -552,7 +477,7 @@ export default function TransitionsPage() {
 
       {/* ── Results count ───────────────────────────────────────────────────── */}
       {data && filteredAdvisors.length > 0 && (
-        <div style={{ textAlign: 'center', padding: '16px 0', fontSize: 12, color: C.slate }}>
+        <div className="text-center py-4 text-xs text-slate">
           Showing {filteredAdvisors.length} advisor{filteredAdvisors.length !== 1 ? 's' : ''} · {filteredAdvisors.reduce((s, a) => s + a.total_accounts, 0)} accounts
         </div>
       )}

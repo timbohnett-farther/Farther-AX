@@ -457,6 +457,245 @@ h1, h2, h3, h4, h5, h6 {
   background-clip: text;
 }
 
+/* ============================================
+   EXECUTIVE DASHBOARD COMPONENTS
+   ============================================ */
+
+/* Insight Card - For financial insights with mini charts */
+.insight-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 4px 24px 0 rgba(31, 38, 135, 0.06),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.insight-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #1d7682 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.insight-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 40px 0 rgba(31, 38, 135, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+}
+
+.insight-card:hover::after {
+  opacity: 1;
+}
+
+/* Metric Hero - Large hero metric with gradient text */
+.metric-hero {
+  font-family: 'ABC Arizona Text', Georgia, serif;
+  font-weight: 700;
+  font-size: 3rem;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #1d7682 0%, #155a63 50%, #333333 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.03em;
+}
+
+/* Time Period Selector - Bloomberg-style time toggle */
+.time-selector {
+  display: inline-flex;
+  gap: 0;
+  background: rgba(91, 106, 113, 0.06);
+  border-radius: 8px;
+  padding: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.time-selector button {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #5b6a71;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.time-selector button:hover {
+  color: #333333;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.time-selector button.active {
+  background: white;
+  color: #1d7682;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Dashboard Section - Clean section dividers */
+.dashboard-section {
+  position: relative;
+  margin-bottom: 32px;
+}
+
+.dashboard-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(29, 118, 130, 0.1);
+}
+
+/* Pace Tracker - For on-track/behind visual */
+.pace-bar {
+  position: relative;
+  height: 8px;
+  background: rgba(91, 106, 113, 0.08);
+  border-radius: 4px;
+  overflow: visible;
+}
+
+.pace-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pace-bar-marker {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 16px;
+  background: #333333;
+  border-radius: 1px;
+  opacity: 0.4;
+}
+
+/* Status Dot - Animated status indicator */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+}
+
+.status-dot.active::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0.3;
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0; transform: scale(1.5); }
+}
+
+/* Mini Sparkline Container */
+.sparkline-container {
+  height: 40px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.sparkline-container:hover {
+  opacity: 1;
+}
+
+/* Financial Ticker Bar */
+.ticker-bar {
+  display: flex;
+  gap: 24px;
+  padding: 12px 20px;
+  background: rgba(29, 118, 130, 0.04);
+  border: 1px solid rgba(29, 118, 130, 0.08);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+/* Accordion - Premium expandable sections */
+.accordion-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.05);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.accordion-card.expanded {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  border-color: rgba(29, 118, 130, 0.15);
+}
+
+/* Progress Ring - Circular progress indicator */
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  stroke-linecap: round;
+}
+
+/* Tremor Chart Overrides - More premium styling */
+.tremor-AreaChart-root,
+.tremor-BarChart-root,
+.tremor-LineChart-root,
+.tremor-DonutChart-root {
+  --tremor-brand-DEFAULT: #1d7682;
+}
+
+/* Override Tremor's default grid lines */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: rgba(29, 118, 130, 0.06);
+}
+
+/* Override Tremor tooltip */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(29, 118, 130, 0.15) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
