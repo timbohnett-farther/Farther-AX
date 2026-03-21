@@ -5,6 +5,21 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import {
+  HomeIcon,
+  DocumentPlusIcon,
+  RectangleStackIcon,
+  SparklesIcon,
+  PencilSquareIcon,
+  EnvelopeIcon,
+  PhotoIcon,
+  BookOpenIcon,
+  ChartBarIcon,
+  ShieldCheckIcon,
+  BoltIcon,
+  UserGroupIcon,
+  Cog6ToothIcon,
+} from "@heroicons/react/24/outline";
 
 const navItems = [
   { step: 1, label: "Introduction", href: "/introduction" },
@@ -22,16 +37,27 @@ const navItems = [
   { step: 13, label: "Knowledge Check", href: "/knowledge-check" },
 ];
 
-const commandCenterItems = [
-  { label: 'Pipeline', href: '/command-center', icon: '◈' },
-  { label: 'Advisor Hub', href: '/command-center/advisor-hub', icon: '◇' },
-  { label: 'Onboarding', href: '/command-center/onboarding', icon: '✓' },
-  { label: 'Team', href: '/command-center/team', icon: '●' },
-  { label: 'Metrics', href: '/command-center/metrics', icon: '▲' },
-  { label: 'Complexity', href: '/command-center/complexity', icon: '◉' },
-  { label: 'Transitions', href: '/command-center/transitions', icon: '⇄' },
-  { label: 'AI Assistant', href: '/command-center/ai', icon: '✦' },
-  { label: 'RIA Hub', href: '/command-center/ria-hub', icon: '⬡' },
+const coreOps = [
+  { label: "Pipeline", href: "/command-center", icon: HomeIcon },
+  { label: "Advisor Hub", href: "/command-center/advisor-hub", icon: DocumentPlusIcon },
+  { label: "Onboarding", href: "/command-center/onboarding", icon: RectangleStackIcon },
+  { label: "Transitions", href: "/command-center/transitions", icon: RectangleStackIcon },
+  { label: "RIA Hub", href: "/command-center/ria-hub", icon: RectangleStackIcon },
+];
+
+const contentCampaigns = [
+  { label: "Super Team", href: "/command-center/super-team", icon: SparklesIcon },
+  { label: "Content Studio", href: "/command-center/content-studio", icon: PencilSquareIcon },
+  { label: "HubSpot Campaigns", href: "/command-center/campaigns", icon: EnvelopeIcon },
+  { label: "Design & Visuals", href: "/command-center/design", icon: PhotoIcon },
+  { label: "Content Library", href: "/command-center/library", icon: BookOpenIcon },
+];
+
+const insightsGov = [
+  { label: "Analytics Hub", href: "/command-center/analytics", icon: ChartBarIcon },
+  { label: "Compliance", href: "/command-center/compliance", icon: ShieldCheckIcon },
+  { label: "Integrations", href: "/command-center/automation", icon: BoltIcon },
+  { label: "Team Activity", href: "/command-center/activity", icon: UserGroupIcon },
 ];
 
 const externalLinks = [
@@ -41,11 +67,51 @@ const externalLinks = [
   { label: "AX Email Templates", href: "#" },
 ];
 
-/**
- * Sidebar - Main navigation component
- *
- * Migrated to Tailwind utilities (removed all inline styles)
- */
+function NavGroup({
+  label,
+  items,
+  pathname,
+  labelClassName,
+}: {
+  label: string;
+  items: { label: string; href: string; icon: React.ComponentType<{ className?: string }> }[];
+  pathname: string;
+  labelClassName?: string;
+}) {
+  return (
+    <>
+      <p className={`px-3 mb-2 text-[10px] font-semibold tracking-widest uppercase ${labelClassName ?? "text-charcoal-muted"}`}>
+        {label}
+      </p>
+      <ul className="space-y-0.5 mb-1">
+        {items.map((item) => {
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/command-center" && pathname.startsWith(item.href));
+          const Icon = item.icon;
+          return (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-smooth ${
+                  isActive
+                    ? "text-white bg-teal/25 border-l-2 border-teal"
+                    : "text-white/50 hover:text-white/80 hover:bg-white/5"
+                }`}
+              >
+                <span className={isActive ? "text-teal" : "text-charcoal-muted"}>
+                  <Icon className="w-4 h-4 shrink-0" />
+                </span>
+                <span className="leading-snug">{item.label}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
+}
+
 export default function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -58,7 +124,7 @@ export default function Sidebar() {
   return (
     <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-charcoal">
       {/* Logo / Brand */}
-      <div className="px-6 pt-8 pb-6 border-b border-white/10">
+      <div className="px-6 pt-8 pb-5 border-b border-white/10">
         <Image
           src="/images/farther-wordmark-cream.png"
           alt="Farther"
@@ -66,42 +132,39 @@ export default function Sidebar() {
           height={28}
           className="mb-2 object-contain object-left"
         />
-        <p className="text-xs tracking-widest uppercase text-slate">
-          AX Playbook
+        <p className="text-[10px] tracking-widest uppercase text-slate">
+          Marketing Command Center
         </p>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
-        {/* Command Center — first */}
-        <p className="px-3 mb-2 text-xs font-semibold tracking-widest uppercase text-teal">
-          Command Center
-        </p>
-        <ul className="space-y-0.5">
-          {commandCenterItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/command-center' && pathname.startsWith(item.href));
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-smooth ${
-                    isActive
-                      ? 'text-white bg-teal/25 border-l-2 border-teal'
-                      : 'text-white/50 hover:text-white/80 hover:bg-white/5'
-                  }`}
-                >
-                  <span className="text-xs w-5 shrink-0 text-center text-teal">
-                    {item.icon}
-                  </span>
-                  <span className="leading-snug">{item.label}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        {/* ── Command Center Groups ─────────────────── */}
+        <NavGroup
+          label="Core Operations"
+          items={coreOps}
+          pathname={pathname}
+          labelClassName="text-teal"
+        />
+
+        <div className="my-2 border-t border-white/[0.06]" />
+
+        <NavGroup
+          label="Content & Campaigns"
+          items={contentCampaigns}
+          pathname={pathname}
+        />
+
+        <div className="my-2 border-t border-white/[0.06]" />
+
+        <NavGroup
+          label="Insights & Governance"
+          items={insightsGov}
+          pathname={pathname}
+        />
 
         {/* Divider */}
-        <div className="my-4 border-t border-white/10" />
+        <div className="my-3 border-t border-white/10" />
 
         {/* AX Training & Information — collapsible */}
         <button
@@ -171,6 +234,21 @@ export default function Sidebar() {
           </ul>
         )}
       </nav>
+
+      {/* Settings Link */}
+      <div className="px-3 py-2 border-t border-white/10">
+        <Link
+          href="/command-center/settings"
+          className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-smooth ${
+            pathname === "/command-center/settings"
+              ? "text-white bg-teal/25"
+              : "text-white/50 hover:text-white/80 hover:bg-white/5"
+          }`}
+        >
+          <Cog6ToothIcon className="w-4 h-4 shrink-0 text-charcoal-muted" />
+          <span>Settings</span>
+        </Link>
+      </div>
 
       {/* User / Sign Out */}
       {session?.user && (
