@@ -48,7 +48,7 @@ export default function RepaperAcatPage() {
             className="text-2xl font-bold mb-3"
             style={{
               fontFamily: "'ABC Arizona Text', Georgia, serif",
-              color: "#333333",
+              color: "#FAF7F2",
             }}
           >
             Detailed Content Coming Soon
@@ -63,13 +63,13 @@ export default function RepaperAcatPage() {
         {/* Preview */}
         <div
           className="rounded-lg p-6 border"
-          style={{ borderColor: "#dde8f0", backgroundColor: "rgba(250,247,242,0.8)" }}
+          style={{ borderColor: "rgba(250,247,242,0.08)", backgroundColor: "#2f2f2f" }}
         >
           <h3
             className="text-lg font-semibold mb-4"
             style={{
               fontFamily: "'ABC Arizona Text', Georgia, serif",
-              color: "#333333",
+              color: "#FAF7F2",
             }}
           >
             What This Section Will Cover

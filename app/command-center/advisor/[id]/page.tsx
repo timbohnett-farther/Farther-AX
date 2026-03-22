@@ -63,7 +63,7 @@ function Section({ title, children, highlight, icon }: { title: string; children
     }}>
       <div style={{
         padding: '12px 20px', borderBottom: `1px solid ${highlight ? 'rgba(29,118,130,0.15)' : C.border}`,
-        background: highlight ? 'rgba(29,118,130,0.05)' : '#f7f4ef',
+        background: highlight ? 'rgba(29,118,130,0.05)' : '#2a2a2a',
         display: 'flex', alignItems: 'center', gap: 8,
       }}>
         {icon && <span style={{ fontSize: 14 }}>{icon}</span>}
@@ -389,7 +389,7 @@ function OverviewTab({ deal, contact, extracted }: { deal: Record<string, any>; 
               </thead>
               <tbody>
                 {(extracted.team_members as Array<{ name: string; title: string | null; licenses: string | null; compensation: string | null; notes: string | null; staying: boolean | null }>).map((m, i) => (
-                  <tr key={i} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? C.cardBg : '#faf7f2' }}>
+                  <tr key={i} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? C.cardBg : '#262626' }}>
                     <td style={{ padding: '8px 12px', fontWeight: 500 }}>{m.name}</td>
                     <td style={{ padding: '8px 12px', color: C.slate }}>{m.title ?? '—'}</td>
                     <td style={{ padding: '8px 12px' }}>{m.licenses ? <Badge label={m.licenses} /> : '—'}</td>
@@ -641,7 +641,7 @@ function EngagementsTab({ engagements, extracted, notes }: { engagements: any[];
             {filtered.map((e, i) => {
               const body = getBody(e).replace(/<[^>]+>/g, '').trim();
               return (
-                <div key={e.id || i} style={{ padding: '12px 16px', borderRadius: 8, border: `1px solid ${C.border}`, background: i % 2 === 0 ? C.cardBg : '#faf7f2' }}>
+                <div key={e.id || i} style={{ padding: '12px 16px', borderRadius: 8, border: `1px solid ${C.border}`, background: i % 2 === 0 ? C.cardBg : '#262626' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: body ? 6 : 0 }}>
                     <span style={{ width: 24, height: 24, borderRadius: '50%', background: `${typeColors[e.type] || C.slate}15`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: typeColors[e.type] || C.slate }}>{typeIcons[e.type] || '●'}</span>
                     <span style={{ fontSize: 13, fontWeight: 600, color: C.dark, flex: 1 }}>{getTitle(e)}</span>

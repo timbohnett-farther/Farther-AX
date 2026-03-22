@@ -400,7 +400,7 @@ export default function BreakawayPage() {
           </h2>
           <div
             style={{
-              backgroundColor: "#fff",
+              backgroundColor: "#2f2f2f",
               border: `1px solid ${COLORS.creamBorder}`,
               borderRadius: "10px",
               padding: "1.25rem 1.5rem",
