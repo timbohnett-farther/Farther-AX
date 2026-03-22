@@ -21,16 +21,16 @@ export const colors = {
   bg800: '#1a1a1a',
   bg900: '#111111',
 
-  // Surface (for inline styles referencing "card bg")
-  cardBg: 'rgba(255, 255, 255, 0.07)',
-  border: 'rgba(255, 255, 255, 0.12)',
-  borderSubtle: 'rgba(255, 255, 255, 0.06)',
+  // Surface
+  cardBg: '#2f2f2f',
+  border: 'rgba(250, 247, 242, 0.08)',
+  borderSubtle: 'rgba(250, 247, 242, 0.05)',
 
-  // Text (white at varying opacity)
-  textPrimary: 'rgba(255, 255, 255, 0.9)',
-  textSecondary: 'rgba(255, 255, 255, 0.6)',
-  textMuted: 'rgba(255, 255, 255, 0.4)',
-  textTertiary: 'rgba(255, 255, 255, 0.3)',
+  // Text (cream-based)
+  textPrimary: '#FAF7F2',
+  textSecondary: 'rgba(250, 247, 242, 0.6)',
+  textMuted: 'rgba(250, 247, 242, 0.4)',
+  textTertiary: 'rgba(250, 247, 242, 0.3)',
 
   // Market colors
   bull: '#10b981',

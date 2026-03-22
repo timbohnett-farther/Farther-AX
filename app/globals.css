@@ -197,7 +197,7 @@ body {
   font-family: 'Fakt', system-ui, sans-serif;
   background: linear-gradient(165deg, #2a2a2a 0%, #1a1a1a 50%, #111111 100%);
   background-attachment: fixed;
-  color: rgba(255, 255, 255, 0.9);
+  color: #FAF7F2;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -212,40 +212,34 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Glass Card — base */
 .glass-card {
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, #2f2f2f 0%, #272727 100%);
+  border: 1px solid rgba(250, 247, 242, 0.08);
   border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(250, 247, 242, 0.04);
   transition: all 0.3s ease;
 }
 
 .glass-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+  background: linear-gradient(135deg, #343434 0%, #2c2c2c 100%);
+  border-color: rgba(29, 118, 130, 0.25);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(250, 247, 242, 0.06);
   transform: translateY(-1px);
 }
 
 /* Glass Card Dark — deeper cards */
 .glass-card-dark {
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, #1e1e1e 0%, #181818 100%);
+  border: 1px solid rgba(29, 118, 130, 0.15);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
   border-radius: 16px;
 }
 
 /* Stat Card — KPI metrics */
 .stat-card {
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, #2f2f2f 0%, #272727 100%);
+  border: 1px solid rgba(250, 247, 242, 0.08);
   border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(250, 247, 242, 0.04);
   padding: 24px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -269,27 +263,25 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .stat-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+  background: linear-gradient(135deg, #343434 0%, #2c2c2c 100%);
+  border-color: rgba(29, 118, 130, 0.25);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45), 0 0 20px rgba(29, 118, 130, 0.1);
   transform: translateY(-2px);
 }
 
 /* Chart Card — data visualizations */
 .chart-card {
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, #2f2f2f 0%, #272727 100%);
+  border: 1px solid rgba(250, 247, 242, 0.08);
   border-radius: 20px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(250, 247, 242, 0.04);
   padding: 28px;
   transition: all 0.3s ease;
 }
 
 .chart-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: linear-gradient(135deg, #343434 0%, #2c2c2c 100%);
+  border-color: rgba(29, 118, 130, 0.15);
   box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
 }
 
@@ -382,7 +374,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Shimmer — loading states */
 .shimmer {
   position: relative;
-  background: rgba(255, 255, 255, 0.04);
+  background: #262626;
   border-radius: 16px;
   overflow: hidden;
 }
@@ -409,23 +401,22 @@ h1, h2, h3, h4, h5, h6 {
    ============================================ */
 
 .premium-table {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(12px);
+  background: #262626;
   border-radius: 16px;
   overflow: hidden;
 }
 
 .premium-table thead {
-  background: rgba(255, 255, 255, 0.04);
+  background: #2a2a2a;
 }
 
 .premium-table tbody tr {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(250, 247, 242, 0.05);
   transition: all 0.2s ease;
 }
 
 .premium-table tbody tr:hover {
-  background: rgba(29, 118, 130, 0.06);
+  background: rgba(29, 118, 130, 0.08);
   box-shadow: inset 3px 0 0 0 rgba(29, 118, 130, 0.5);
 }
 
@@ -434,9 +425,8 @@ h1, h2, h3, h4, h5, h6 {
    ============================================ */
 
 .badge-glass {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #2a2a2a;
+  border: 1px solid rgba(250, 247, 242, 0.08);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.75rem;
@@ -486,9 +476,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass-btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #2a2a2a;
+  color: #FAF7F2;
+  border: 1px solid rgba(250, 247, 242, 0.12);
   border-radius: 12px;
   padding: 12px 20px;
   font-size: 0.875rem;
@@ -498,13 +488,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: #333333;
+  border-color: rgba(29, 118, 130, 0.3);
 }
 
 .glass-btn-ghost {
   background: transparent;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(250, 247, 242, 0.6);
   border: none;
   border-radius: 12px;
   padding: 12px 20px;
@@ -515,8 +505,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass-btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.9);
+  background: #2a2a2a;
+  color: #FAF7F2;
 }
 
 /* ============================================
@@ -524,10 +514,10 @@ h1, h2, h3, h4, h5, h6 {
    ============================================ */
 
 .glass-input {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #262626;
+  border: 1px solid rgba(250, 247, 242, 0.1);
   border-radius: 12px;
-  color: white;
+  color: #FAF7F2;
   padding: 10px 14px;
   font-size: 0.875rem;
   outline: none;
@@ -535,11 +525,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(250, 247, 242, 0.35);
 }
 
 .glass-input:focus {
-  background: rgba(255, 255, 255, 0.1);
+  background: #2e2e2e;
   border-color: #1d7682;
   box-shadow: 0 0 0 3px rgba(29, 118, 130, 0.15);
 }

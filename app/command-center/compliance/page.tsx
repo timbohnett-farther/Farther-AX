@@ -3,9 +3,9 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const C = {
-  dark: 'rgba(255,255,255,0.9)', white: '#1a1a1a', slate: 'rgba(255,255,255,0.4)',
+  dark: '#FAF7F2', white: '#1a1a1a', slate: 'rgba(250,247,242,0.5)',
   teal: '#1d7682', bg: '#111111',
-  cardBg: 'rgba(255,255,255,0.07)', border: 'rgba(255,255,255,0.12)',
+  cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
   green: '#10b981', greenBg: 'rgba(16,185,129,0.15)',
   amber: '#f59e0b', amberBg: 'rgba(245,158,11,0.15)', amberBorder: 'rgba(245,158,11,0.3)',
   red: '#ef4444', redBg: 'rgba(239,68,68,0.15)', redBorder: 'rgba(239,68,68,0.3)',

@@ -21,7 +21,7 @@ export default function RootLayout({
           fontFamily: "'Fakt', system-ui, sans-serif",
           background: "linear-gradient(165deg, #2a2a2a 0%, #1a1a1a 50%, #111111 100%)",
           backgroundAttachment: "fixed",
-          color: "rgba(255, 255, 255, 0.9)",
+          color: "#FAF7F2",
         }}
       >
         <SessionProvider>
