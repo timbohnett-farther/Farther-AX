@@ -127,14 +127,14 @@ export default function ComplexityEducationPage() {
   ];
 
   return (
-    <main className="min-h-screen py-12 px-4 bg-cream font-sans">
+    <main className="min-h-screen py-12 px-4 bg-transparent font-sans">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-10">
           <p className="text-xs tracking-widest uppercase mb-2 text-teal">
             Command Center — Education
           </p>
-          <h1 className="text-3xl font-light mb-3 text-charcoal font-serif">
+          <h1 className="text-3xl font-light mb-3 text-cream font-serif">
             Transition Complexity Scoring
           </h1>
           <p className="text-sm leading-relaxed text-gray-600">
@@ -147,7 +147,7 @@ export default function ComplexityEducationPage() {
 
         {/* Tiers */}
         <section className="mb-10">
-          <h2 className="text-lg font-medium mb-4 text-charcoal font-serif">
+          <h2 className="text-lg font-medium mb-4 text-cream font-serif">
             Score Tiers
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -178,7 +178,7 @@ export default function ComplexityEducationPage() {
 
         {/* Scoring Factors */}
         <section className="mb-10">
-          <h2 className="text-lg font-medium mb-4 text-charcoal font-serif">
+          <h2 className="text-lg font-medium mb-4 text-cream font-serif">
             Scoring Factors
           </h2>
           <p className="text-sm mb-6 text-gray-600">
@@ -189,7 +189,7 @@ export default function ComplexityEducationPage() {
             {factors.map((factor) => (
               <DataCard key={factor.name}>
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="text-sm font-semibold text-charcoal">
+                  <span className="text-sm font-semibold text-cream">
                     {factor.name}
                   </span>
                   <span className="text-xs px-2 py-0.5 rounded-sm bg-cream-dark text-gray-600">
@@ -209,31 +209,31 @@ export default function ComplexityEducationPage() {
 
         {/* How It's Used */}
         <section className="mb-10">
-          <h2 className="text-lg font-medium mb-4 text-charcoal font-serif">
+          <h2 className="text-lg font-medium mb-4 text-cream font-serif">
             How Complexity Scores Are Used
           </h2>
           <DataCard>
             <div className="space-y-4 text-sm text-gray-700">
               <p>
-                <span className="font-semibold text-charcoal">Staffing Decisions</span>{" "}
+                <span className="font-semibold text-cream">Staffing Decisions</span>{" "}
                 — The tier directly informs which AXM, CTM, and support staff should be assigned.
                 Critical transitions get senior staff and dedicated pairs; Low complexity can be
                 handled by any available team member.
               </p>
               <p>
-                <span className="font-semibold text-charcoal">Timeline Planning</span>{" "}
+                <span className="font-semibold text-cream">Timeline Planning</span>{" "}
                 — Each tier has a recommended graduation timeline. Low/Moderate transitions target
                 45 days. High complexity extends to 60 days. Critical transitions plan for 75 days.
                 The launch timer on the pipeline dashboard reflects these extended targets.
               </p>
               <p>
-                <span className="font-semibold text-charcoal">Pipeline Visibility</span>{" "}
+                <span className="font-semibold text-cream">Pipeline Visibility</span>{" "}
                 — The complexity badge appears in the pipeline table so leadership can spot
                 high-complexity deals at a glance. The advisor detail page shows a full factor
                 breakdown so AXMs understand exactly what&apos;s driving the score.
               </p>
               <p>
-                <span className="font-semibold text-charcoal">Recalculation</span>{" "}
+                <span className="font-semibold text-cream">Recalculation</span>{" "}
                 — Scores are recalculated whenever the pipeline data refreshes. As new information is
                 added to a deal in HubSpot — new notes, updated properties, team data — the score
                 automatically adjusts. There is no manual scoring; the system reads directly from
@@ -245,7 +245,7 @@ export default function ComplexityEducationPage() {
 
         {/* Keywords Reference */}
         <section className="mb-10">
-          <h2 className="text-lg font-medium mb-4 text-charcoal font-serif">
+          <h2 className="text-lg font-medium mb-4 text-cream font-serif">
             Note Keywords Reference
           </h2>
           <p className="text-sm mb-4 text-gray-600">

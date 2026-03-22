@@ -122,7 +122,7 @@ function CellValue({ value }: { value: string }) {
   }
   if (value === "–") {
     return (
-      <span className="text-charcoal-muted" aria-label="Not applicable">
+      <span className="text-cream-muted" aria-label="Not applicable">
         –
       </span>
     );
@@ -214,7 +214,7 @@ const definitions = [
 
 export default function KeyDocumentsPage() {
   return (
-    <main className="min-h-screen bg-cream text-charcoal font-sans">
+    <main className="min-h-screen text-cream font-sans">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         {/* Page header */}
@@ -222,7 +222,7 @@ export default function KeyDocumentsPage() {
           <p className="text-sm font-semibold text-gold-dark uppercase tracking-widest mb-2">
             Step 03 of 13
           </p>
-          <h1 className="font-serif text-4xl sm:text-5xl text-charcoal mb-3">
+          <h1 className="font-serif text-4xl sm:text-5xl text-cream mb-3">
             Key Documents
           </h1>
           <p className="text-gold font-serif text-lg sm:text-xl">
@@ -235,7 +235,7 @@ export default function KeyDocumentsPage() {
 
         {/* Section 1: Introduction */}
         <section className="mb-12">
-          <p className="text-charcoal leading-relaxed text-base sm:text-lg max-w-4xl">
+          <p className="text-cream leading-relaxed text-base sm:text-lg max-w-4xl">
             Every advisor onboarding involves a set of core documents. Which documents apply depends on
             the advisor&apos;s pathway and the transition method selected. Use the matrix below to quickly
             identify which documents are required for any given scenario, then refer to the definitions
@@ -245,7 +245,7 @@ export default function KeyDocumentsPage() {
 
         {/* Section 2: Document Applicability Matrix */}
         <section className="mb-14">
-          <h2 className="font-serif text-2xl sm:text-3xl text-charcoal mb-6">
+          <h2 className="font-serif text-2xl sm:text-3xl text-cream mb-6">
             Document Applicability Matrix
           </h2>
 
@@ -253,14 +253,14 @@ export default function KeyDocumentsPage() {
           <div className="overflow-x-auto rounded-lg border border-cream-border shadow-xs">
             <table className="min-w-full text-sm border-collapse">
               <thead>
-                <tr className="bg-cream-dark">
-                  <th className="text-left px-4 py-3 font-semibold text-charcoal text-sm border-b border-cream-border whitespace-nowrap">
+                <tr className="bg-charcoal-700">
+                  <th className="text-left px-4 py-3 font-semibold text-cream text-sm border-b border-cream-border whitespace-nowrap">
                     Document
                   </th>
                   {columns.map((col) => (
                     <th
                       key={col.key}
-                      className="text-center px-4 py-3 font-semibold text-charcoal text-sm border-b border-cream-border whitespace-nowrap"
+                      className="text-center px-4 py-3 font-semibold text-cream text-sm border-b border-cream-border whitespace-nowrap"
                     >
                       {col.label}
                     </th>
@@ -273,13 +273,13 @@ export default function KeyDocumentsPage() {
                     key={row.document}
                     className={
                       idx % 2 === 0
-                        ? "bg-cream hover:bg-cream-dark transition-colors"
-                        : "bg-charcoal-600/40 hover:bg-cream-dark transition-colors"
+                        ? "bg-cream hover:bg-charcoal-700 transition-colors"
+                        : "bg-charcoal-600/40 hover:bg-charcoal-700 transition-colors"
                     }
                   >
-                    <td className="px-4 py-3 border-b border-cream-border font-medium text-charcoal whitespace-nowrap">
+                    <td className="px-4 py-3 border-b border-cream-border font-medium text-cream whitespace-nowrap">
                       <span className="font-semibold">{row.document}</span>
-                      <span className="block text-xs text-charcoal-muted font-normal mt-0.5 max-w-[160px] whitespace-normal leading-tight">
+                      <span className="block text-xs text-cream-muted font-normal mt-0.5 max-w-[160px] whitespace-normal leading-tight">
                         {row.fullName !== row.document ? row.fullName : ""}
                       </span>
                     </td>
@@ -298,13 +298,13 @@ export default function KeyDocumentsPage() {
           </div>
 
           {/* Legend */}
-          <div className="mt-4 flex flex-wrap gap-6 text-sm text-charcoal-muted">
+          <div className="mt-4 flex flex-wrap gap-6 text-sm text-cream-muted">
             <span className="flex items-center gap-2">
               <span className="text-gold font-bold text-base">✓</span>
               Required
             </span>
             <span className="flex items-center gap-2">
-              <span className="text-charcoal-muted font-medium">–</span>
+              <span className="text-cream-muted font-medium">–</span>
               Not Applicable
             </span>
             <span className="flex items-center gap-2">
@@ -319,7 +319,7 @@ export default function KeyDocumentsPage() {
 
         {/* Section 3: Document Definitions */}
         <section className="mb-16">
-          <h2 className="font-serif text-2xl sm:text-3xl text-charcoal mb-8">
+          <h2 className="font-serif text-2xl sm:text-3xl text-cream mb-8">
             Document Definitions
           </h2>
 
@@ -331,37 +331,37 @@ export default function KeyDocumentsPage() {
               >
                 {/* Card header */}
                 <div className="flex items-start gap-4 mb-3">
-                  <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-cream-dark text-gold-dark text-xs font-bold font-sans">
+                  <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-charcoal-700 text-gold-dark text-xs font-bold font-sans">
                     {String(idx + 1).padStart(2, "0")}
                   </span>
                   <div>
-                    <h3 className="font-serif text-xl text-charcoal mb-0.5">
+                    <h3 className="font-serif text-xl text-cream mb-0.5">
                       <span className="text-gold-dark">{def.code}</span>
                       {def.code !== def.title && (
-                        <span className="text-charcoal"> — {def.title}</span>
+                        <span className="text-cream"> — {def.title}</span>
                       )}
                     </h3>
                   </div>
                 </div>
 
                 {/* Body */}
-                <p className="text-charcoal leading-relaxed mb-4 pl-12">
+                <p className="text-cream leading-relaxed mb-4 pl-12">
                   {def.body}
                 </p>
 
                 {/* Meta row */}
                 <div className="pl-12 flex flex-wrap gap-6 text-sm">
                   <div>
-                    <span className="font-semibold text-charcoal-muted uppercase tracking-wide text-xs">
+                    <span className="font-semibold text-cream-muted uppercase tracking-wide text-xs">
                       Owner
                     </span>
-                    <p className="text-charcoal mt-0.5">{def.owner}</p>
+                    <p className="text-cream mt-0.5">{def.owner}</p>
                   </div>
                   <div>
-                    <span className="font-semibold text-charcoal-muted uppercase tracking-wide text-xs">
+                    <span className="font-semibold text-cream-muted uppercase tracking-wide text-xs">
                       Timing
                     </span>
-                    <p className="text-charcoal mt-0.5">{def.timing}</p>
+                    <p className="text-cream mt-0.5">{def.timing}</p>
                   </div>
                 </div>
               </div>
@@ -374,13 +374,13 @@ export default function KeyDocumentsPage() {
           <div className="flex items-center justify-between">
             <Link
               href="/onboarding-vs-transitions"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg glass-card text-charcoal hover:bg-cream-dark hover:border-gold-dark transition-colors text-sm font-medium"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg glass-card text-cream hover:bg-charcoal-700 hover:border-gold-dark transition-colors text-sm font-medium"
             >
               <span aria-hidden="true">←</span>
               Back
             </Link>
 
-            <span className="text-xs font-semibold text-charcoal-muted tracking-widest uppercase">
+            <span className="text-xs font-semibold text-cream-muted tracking-widest uppercase">
               03 / 13
             </span>
 

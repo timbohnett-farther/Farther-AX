@@ -61,7 +61,7 @@ export default function UIShowcasePage() {
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-serif font-bold text-charcoal mb-4">
+          <h1 className="text-5xl font-serif font-bold text-cream mb-4">
             Farther UI Component Library
           </h1>
           <p className="text-lg text-slate">
@@ -71,7 +71,7 @@ export default function UIShowcasePage() {
 
         {/* Stat Cards */}
         <section>
-          <h2 className="text-3xl font-serif font-semibold text-charcoal mb-6">
+          <h2 className="text-3xl font-serif font-semibold text-cream mb-6">
             Stat Cards
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -109,7 +109,7 @@ export default function UIShowcasePage() {
 
         {/* Status Badges */}
         <section>
-          <h2 className="text-3xl font-serif font-semibold text-charcoal mb-6">
+          <h2 className="text-3xl font-serif font-semibold text-cream mb-6">
             Status Badges
           </h2>
           <DataCard title="Various Status States">
@@ -129,7 +129,7 @@ export default function UIShowcasePage() {
 
         {/* Score Badges */}
         <section>
-          <h2 className="text-3xl font-serif font-semibold text-charcoal mb-6">
+          <h2 className="text-3xl font-serif font-semibold text-cream mb-6">
             Score Badges
           </h2>
           <DataCard title="Complexity & Health Scores">
@@ -146,7 +146,7 @@ export default function UIShowcasePage() {
 
         {/* Progress Indicators */}
         <section>
-          <h2 className="text-3xl font-serif font-semibold text-charcoal mb-6">
+          <h2 className="text-3xl font-serif font-semibold text-cream mb-6">
             Progress Indicators
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -174,7 +174,7 @@ export default function UIShowcasePage() {
 
         {/* Metric Bars */}
         <section>
-          <h2 className="text-3xl font-serif font-semibold text-charcoal mb-6">
+          <h2 className="text-3xl font-serif font-semibold text-cream mb-6">
             Metric Bars
           </h2>
           <MetricBar
@@ -187,7 +187,7 @@ export default function UIShowcasePage() {
 
         {/* Charts */}
         <section>
-          <h2 className="text-3xl font-serif font-semibold text-charcoal mb-6">
+          <h2 className="text-3xl font-serif font-semibold text-cream mb-6">
             Chart Containers
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -247,7 +247,7 @@ export default function UIShowcasePage() {
 
         {/* Filter Bar */}
         <section>
-          <h2 className="text-3xl font-serif font-semibold text-charcoal mb-6">
+          <h2 className="text-3xl font-serif font-semibold text-cream mb-6">
             Filter Bar
           </h2>
           <DataCard>
@@ -279,7 +279,7 @@ export default function UIShowcasePage() {
 
         {/* Tab Group */}
         <section>
-          <h2 className="text-3xl font-serif font-semibold text-charcoal mb-6">
+          <h2 className="text-3xl font-serif font-semibold text-cream mb-6">
             Tab Group
           </h2>
           <TabGroup
@@ -322,7 +322,7 @@ export default function UIShowcasePage() {
 
         {/* Data Cards */}
         <section>
-          <h2 className="text-3xl font-serif font-semibold text-charcoal mb-6">
+          <h2 className="text-3xl font-serif font-semibold text-cream mb-6">
             Data Cards
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -356,7 +356,7 @@ export default function UIShowcasePage() {
 
         {/* Premium Effects Demo */}
         <section>
-          <h2 className="text-3xl font-serif font-semibold text-charcoal mb-6">
+          <h2 className="text-3xl font-serif font-semibold text-cream mb-6">
             Premium CSS Effects
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

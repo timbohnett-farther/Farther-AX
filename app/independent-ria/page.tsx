@@ -1,15 +1,15 @@
 import PageLayout from "@/components/PageLayout";
 
 const COLORS = {
-  charcoal: "#333333",
-  charcoalMuted: "#5b6a71",
+  charcoal: "#FAF7F2",
+  charcoalMuted: "rgba(250,247,242,0.5)",
   gold: "#1d7682",
-  cream: "#FAF7F2",
-  creamDark: "#f0f5f9",
-  creamBorder: "#dde8f0",
-  blueBg: "#EFF6FF",
+  cream: "#1a1a1a",
+  creamDark: "#222222",
+  creamBorder: "rgba(250,247,242,0.08)",
+  blueBg: "rgba(59,130,246,0.15)",
   blueBorder: "#3B82F6",
-  blueText: "#1E40AF",
+  blueText: "#60a5fa",
 };
 
 const characteristics = [
@@ -106,7 +106,7 @@ export default function IndependentRIAPage() {
               <div
                 key={c.label}
                 style={{
-                  backgroundColor: "#fff",
+                  backgroundColor: "#2f2f2f",
                   border: `1px solid ${COLORS.creamBorder}`,
                   borderRadius: "10px",
                   padding: "1.25rem",

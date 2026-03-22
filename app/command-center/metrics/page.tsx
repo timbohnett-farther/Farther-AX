@@ -80,9 +80,9 @@ export default function MetricsDashboard() {
     }));
 
   return (
-    <div className="px-10 py-10 min-h-screen bg-cream font-sans">
+    <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-charcoal font-serif mb-2">
+        <h1 className="text-3xl font-bold text-cream font-serif mb-2">
           AX Metrics
         </h1>
         <p className="text-slate text-sm">

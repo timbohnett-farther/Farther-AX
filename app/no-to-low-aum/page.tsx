@@ -52,7 +52,7 @@ export default function NoToLowAUMPage() {
       <div className="max-w-4xl mx-auto">
 
         {/* Intro */}
-        <p className="text-charcoal-muted leading-relaxed text-base mb-12 max-w-3xl">
+        <p className="text-cream-muted leading-relaxed text-base mb-12 max-w-3xl">
           The No to Low AUM pathway applies to advisors bringing fewer than $15–20 million in assets
           under management to Farther. While Farther welcomes advisors at all stages, advisors below
           this threshold follow a modified, training-first onboarding approach before proceeding to
@@ -65,7 +65,7 @@ export default function NoToLowAUMPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               When This Pathway Applies
             </h2>
@@ -75,20 +75,20 @@ export default function NoToLowAUMPage() {
           <div
             className="rounded-xl px-7 py-6 border-l-4"
             style={{
-              backgroundColor: "#EBF3FB",
+              backgroundColor: "rgba(91,155,213,0.15)",
               borderLeftColor: "#5B9BD5",
-              border: "1px solid #BDD7EE",
+              border: "1px solid rgba(91,155,213,0.3)",
               borderLeft: "4px solid #5B9BD5",
             }}
           >
             <div className="flex items-start gap-4">
               <div
                 className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mt-0.5"
-                style={{ backgroundColor: "#5B9BD5", color: "#FAF7F2" }}
+                style={{ backgroundColor: "#5B9BD5", color: "#1a1a1a" }}
               >
                 i
               </div>
-              <p className="leading-relaxed text-sm" style={{ color: "#1E3A5F" }}>
+              <p className="leading-relaxed text-sm" style={{ color: "#93c5fd" }}>
                 This pathway is triggered when an advisor&apos;s projected AUM at launch is below $15–20M.
                 The exact threshold is assessed case-by-case with input from the Focus Team, which
                 evaluates the advisor&apos;s growth trajectory, client quality, and strategic fit.
@@ -103,7 +103,7 @@ export default function NoToLowAUMPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               Key Characteristics
             </h2>
@@ -114,23 +114,23 @@ export default function NoToLowAUMPage() {
               <div
                 key={idx}
                 className="rounded-xl p-6 border"
-                style={{ backgroundColor: "#f0f5f9", borderColor: "#dde8f0" }}
+                style={{ backgroundColor: "#222222", borderColor: "rgba(250,247,242,0.08)" }}
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0"
-                    style={{ backgroundColor: "#1d7682", color: "#FAF7F2" }}
+                    style={{ backgroundColor: "#1d7682", color: "#1a1a1a" }}
                   >
                     {item.icon}
                   </div>
                   <h3
                     className="font-serif text-lg leading-tight"
-                    style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+                    style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
                   >
                     {item.title}
                   </h3>
                 </div>
-                <p className="text-sm leading-relaxed" style={{ color: "#5b6a71" }}>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(250,247,242,0.5)" }}>
                   {item.body}
                 </p>
               </div>
@@ -144,7 +144,7 @@ export default function NoToLowAUMPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               The Focus Team Review
             </h2>
@@ -185,7 +185,7 @@ export default function NoToLowAUMPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               Training Curriculum Priority
             </h2>

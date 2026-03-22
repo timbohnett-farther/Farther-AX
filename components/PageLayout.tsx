@@ -32,11 +32,11 @@ export default function PageLayout({
   const totalStr = String(totalSteps).padStart(2, "0");
 
   return (
-    <div className="min-h-screen flex flex-col bg-cream">
+    <div className="min-h-screen flex flex-col bg-transparent">
       {/* Top bar */}
       <header className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b border-cream-border bg-cream">
         <div>
-          <h1 className="text-2xl font-bold font-serif text-charcoal leading-tight">
+          <h1 className="text-2xl font-bold font-serif text-cream leading-tight">
             {title}
           </h1>
           {subtitle && (
@@ -60,7 +60,7 @@ export default function PageLayout({
       <div className="flex-1 px-10 py-8">{children}</div>
 
       {/* Bottom navigation */}
-      <footer className="px-10 py-6 border-t border-cream-border bg-cream-dark flex items-center justify-between">
+      <footer className="px-10 py-6 border-t border-cream-border bg-charcoal-700 flex items-center justify-between">
         <div>
           {backHref ? (
             <Link

@@ -102,14 +102,14 @@ function SummaryPanel({ deal, summaryType }: { deal: Deal; summaryType: SummaryT
     <div>
       <div className="flex items-center gap-3 mb-4">
         <SparklesIcon className="h-5 w-5 text-teal" />
-        <h4 className="text-base font-semibold text-charcoal">{labels[summaryType]}</h4>
+        <h4 className="text-base font-semibold text-cream">{labels[summaryType]}</h4>
         <button onClick={generate} disabled={loading} className="bg-teal hover:bg-teal-dark text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-smooth disabled:opacity-50 disabled:cursor-not-allowed">
           {loading ? 'Generating…' : summary ? 'Regenerate' : 'Generate with AI'}
         </button>
       </div>
       {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
       {summary ? (
-        <div className="text-sm text-charcoal leading-relaxed whitespace-pre-wrap bg-teal/5 rounded-xl p-4 border-l-3 border-teal">
+        <div className="text-sm text-cream leading-relaxed whitespace-pre-wrap bg-teal/5 rounded-xl p-4 border-l-3 border-teal">
           {summary}
         </div>
       ) : !loading ? (
@@ -191,12 +191,12 @@ function EmailComposer({ deal }: { deal: Deal }) {
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2 mb-1">
         <EnvelopeIcon className="h-5 w-5 text-teal" />
-        <h4 className="text-base font-semibold text-charcoal">Email Composer</h4>
+        <h4 className="text-base font-semibold text-cream">Email Composer</h4>
       </div>
 
       {/* To */}
       <div>
-        <label className="text-xs font-semibold text-charcoal mb-1 block">To</label>
+        <label className="text-xs font-semibold text-cream mb-1 block">To</label>
         <p className="text-sm text-slate bg-cream-dark/50 rounded-lg px-3 py-2">
           {primaryContact ? `${contactName(primaryContact)} <${primaryContact.email || 'no email'}>` : 'No contacts available'}
         </p>
@@ -204,7 +204,7 @@ function EmailComposer({ deal }: { deal: Deal }) {
 
       {/* Template */}
       <div>
-        <label className="text-xs font-semibold text-charcoal mb-1 block">Template</label>
+        <label className="text-xs font-semibold text-cream mb-1 block">Template</label>
         <select value={selectedTemplate} onChange={e => applyTemplate(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-charcoal-light text-cream focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth">
           <option value="">Custom Email</option>
           {templates.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
@@ -213,13 +213,13 @@ function EmailComposer({ deal }: { deal: Deal }) {
 
       {/* Subject */}
       <div>
-        <label className="text-xs font-semibold text-charcoal mb-1 block">Subject</label>
+        <label className="text-xs font-semibold text-cream mb-1 block">Subject</label>
         <input type="text" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Email subject…" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-charcoal-light text-cream focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth" />
       </div>
 
       {/* Body */}
       <div>
-        <label className="text-xs font-semibold text-charcoal mb-1 block">Body</label>
+        <label className="text-xs font-semibold text-cream mb-1 block">Body</label>
         <textarea value={body} onChange={e => setBody(e.target.value)} rows={8} placeholder="Write your email here…" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-charcoal-light text-cream focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth resize-y leading-relaxed" />
       </div>
 
@@ -271,7 +271,7 @@ function DriveLinkPanel({ dealId }: { dealId: string }) {
     <div>
       <div className="flex items-center gap-2 mb-4">
         <FolderIcon className="h-5 w-5 text-teal" />
-        <h4 className="text-base font-semibold text-charcoal">Shared Drive Folder</h4>
+        <h4 className="text-base font-semibold text-cream">Shared Drive Folder</h4>
       </div>
       {link ? (
         <div className="bg-teal/5 rounded-xl p-4 border-l-3 border-teal">
@@ -327,7 +327,7 @@ function OverviewTab({ deal }: { deal: Deal }) {
           ].filter(f => f.value && f.value !== '—').map(f => (
             <div key={f.label}>
               <p className="text-xs text-slate uppercase tracking-wider mb-1">{f.label}</p>
-              <p className="text-sm text-charcoal">{f.value}</p>
+              <p className="text-sm text-cream">{f.value}</p>
             </div>
           ))}
         </div>
@@ -336,19 +336,19 @@ function OverviewTab({ deal }: { deal: Deal }) {
             {p.advisor_pain_points && (
               <div>
                 <p className="text-xs text-slate uppercase tracking-wider mb-1">Pain Points</p>
-                <p className="text-sm text-charcoal leading-relaxed">{p.advisor_pain_points}</p>
+                <p className="text-sm text-cream leading-relaxed">{p.advisor_pain_points}</p>
               </div>
             )}
             {p.advisor_goals && (
               <div>
                 <p className="text-xs text-slate uppercase tracking-wider mb-1">Goals</p>
-                <p className="text-sm text-charcoal leading-relaxed">{p.advisor_goals}</p>
+                <p className="text-sm text-cream leading-relaxed">{p.advisor_goals}</p>
               </div>
             )}
             {p.advisor_top_care_abouts && (
               <div className="md:col-span-2">
                 <p className="text-xs text-slate uppercase tracking-wider mb-1">Care Abouts</p>
-                <p className="text-sm text-charcoal leading-relaxed">{p.advisor_top_care_abouts}</p>
+                <p className="text-sm text-cream leading-relaxed">{p.advisor_top_care_abouts}</p>
               </div>
             )}
           </div>
@@ -360,12 +360,12 @@ function OverviewTab({ deal }: { deal: Deal }) {
         <DataCard title="Contacts">
           <div className="flex flex-col gap-2">
             {deal.contacts.map(c => (
-              <div key={c.id} className="flex items-center gap-3 p-3 bg-cream/50 rounded-lg hover:bg-cream transition-smooth">
+              <div key={c.id} className="flex items-center gap-3 p-3 bg-cream/50 rounded-lg hover:bg-charcoal-600 transition-smooth">
                 <div className="w-8 h-8 rounded-full bg-teal text-white flex items-center justify-center text-xs font-bold shrink-0">
                   {(c.firstName || '?')[0]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-charcoal">{contactName(c)}</p>
+                  <p className="text-sm font-semibold text-cream">{contactName(c)}</p>
                   <p className="text-xs text-slate truncate">{[c.jobTitle, c.email, c.phone].filter(Boolean).join(' · ')}</p>
                 </div>
                 {c.yearsInIndustry && <Badge color="teal" size="sm">{c.yearsInIndustry}yr</Badge>}
@@ -382,7 +382,7 @@ function OverviewTab({ deal }: { deal: Deal }) {
             {deal.notes.slice(0, 5).map(n => (
               <div key={n.id} className="p-3 bg-cream/50 rounded-lg border-l-2 border-gray-200">
                 <p className="text-xs text-slate mb-1">{fmtDate(n.timestamp)}</p>
-                <p className="text-sm text-charcoal leading-relaxed">{n.body.slice(0, 400)}{n.body.length > 400 ? '…' : ''}</p>
+                <p className="text-sm text-cream leading-relaxed">{n.body.slice(0, 400)}{n.body.length > 400 ? '…' : ''}</p>
               </div>
             ))}
           </div>
@@ -413,13 +413,13 @@ function DealCard({ deal, expanded, onToggle }: { deal: Deal; expanded: boolean;
   return (
     <Card className={`glass-card overflow-hidden transition-smooth ${expanded ? 'shadow-glass-hover' : ''}`}>
       {/* Header — always visible */}
-      <div onClick={onToggle} className="cursor-pointer flex items-center justify-between -m-6 p-4 hover:bg-cream/30 transition-smooth">
+      <div onClick={onToggle} className="cursor-pointer flex items-center justify-between -m-6 p-4 hover:bg-charcoal-600/30 transition-smooth">
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-bold shrink-0 ${isLaunched ? 'bg-emerald-100 text-emerald-700' : 'bg-teal/10 text-teal'}`}>
             {(p.dealname || '?')[0]}
           </div>
           <div>
-            <p className="text-base font-semibold text-charcoal font-serif">{p.dealname || 'Unknown'}</p>
+            <p className="text-base font-semibold text-cream font-serif">{p.dealname || 'Unknown'}</p>
             <p className="text-xs text-slate">
               {[p.current_firm__cloned_, primaryContact ? contactName(primaryContact) : null].filter(Boolean).join(' · ')}
             </p>
@@ -501,10 +501,10 @@ export default function RiaHubPage() {
   const step7 = deals.filter(d => d.stageLabel.includes('Step 7')).length;
 
   return (
-    <div className="px-10 py-10 min-h-screen bg-cream font-sans">
+    <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-charcoal font-serif mb-2">
+        <h1 className="text-3xl font-bold text-cream font-serif mb-2">
           RIA Hub
         </h1>
         <p className="text-slate text-sm">

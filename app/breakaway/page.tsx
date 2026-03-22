@@ -1,15 +1,15 @@
 import PageLayout from "@/components/PageLayout";
 
 const COLORS = {
-  charcoal: "#333333",
-  charcoalMuted: "#5b6a71",
+  charcoal: "#FAF7F2",
+  charcoalMuted: "rgba(250,247,242,0.5)",
   gold: "#1d7682",
-  cream: "#FAF7F2",
-  creamDark: "#f0f5f9",
-  creamBorder: "#dde8f0",
-  amberBg: "#FEF3C7",
+  cream: "#1a1a1a",
+  creamDark: "#222222",
+  creamBorder: "rgba(250,247,242,0.08)",
+  amberBg: "rgba(245,158,11,0.15)",
   amberBorder: "#F59E0B",
-  amberText: "#92400E",
+  amberText: "#fbbf24",
 };
 
 const characteristics = [
@@ -143,7 +143,7 @@ export default function BreakawayPage() {
               <div
                 key={c.label}
                 style={{
-                  backgroundColor: "#fff",
+                  backgroundColor: "#2f2f2f",
                   border: `1px solid ${COLORS.creamBorder}`,
                   borderRadius: "10px",
                   padding: "1.25rem",

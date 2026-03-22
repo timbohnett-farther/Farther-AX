@@ -82,7 +82,7 @@ export default function AIAssistant() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-cream font-sans">
+    <div className="flex flex-col h-screen bg-transparent font-sans">
       {/* Header */}
       <div className="px-10 pt-6 pb-4 border-b border-cream-border glass-card">
         <div className="flex items-center gap-3">
@@ -90,7 +90,7 @@ export default function AIAssistant() {
             ✦
           </div>
           <div>
-            <h1 className="text-lg font-bold text-charcoal font-serif">
+            <h1 className="text-lg font-bold text-cream font-serif">
               AX AI Assistant
             </h1>
             <p className="text-xs text-slate">
@@ -147,7 +147,7 @@ export default function AIAssistant() {
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input); } }}
             placeholder="Ask about pipeline, advisors, onboarding status, risks…"
             rows={2}
-            className="flex-1 px-4 py-3 rounded-xl border border-cream-border text-sm resize-none text-charcoal bg-cream outline-hidden focus:border-teal focus:ring-1 focus:ring-teal transition-smooth"
+            className="flex-1 px-4 py-3 rounded-xl border border-cream-border text-sm resize-none text-cream bg-cream outline-hidden focus:border-teal focus:ring-1 focus:ring-teal transition-smooth"
           />
           <button
             type="submit"

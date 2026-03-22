@@ -88,13 +88,13 @@ function MemberForm({
     <DataCard className="mb-6">
       <form onSubmit={handleSubmit}>
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-base font-semibold text-charcoal">
+          <h3 className="text-base font-semibold text-cream">
             {initial ? 'Edit Team Member' : 'Add Team Member'}
           </h3>
           <button
             type="button"
             onClick={onCancel}
-            className="bg-transparent border-none text-lg text-slate cursor-pointer hover:text-charcoal"
+            className="bg-transparent border-none text-lg text-slate cursor-pointer hover:text-cream"
           >
             ×
           </button>
@@ -175,7 +175,7 @@ function MemberForm({
           <button
             type="button"
             onClick={onCancel}
-            className="px-5 py-2 rounded-md text-sm font-medium bg-white text-slate border border-cream-border cursor-pointer hover:bg-cream transition-smooth"
+            className="px-5 py-2 rounded-md text-sm font-medium bg-white text-slate border border-cream-border cursor-pointer hover:bg-charcoal-600 transition-smooth"
           >
             Cancel
           </button>
@@ -250,11 +250,11 @@ export default function TeamPage() {
   if (error) return <div className="px-10 py-16 text-red-600">Failed to load team data.</div>;
 
   return (
-    <div className="px-10 py-10 min-h-screen bg-cream font-sans">
+    <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
       {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-charcoal font-serif mb-2">
+          <h1 className="text-3xl font-bold text-cream font-serif mb-2">
             Team Management
           </h1>
           <p className="text-slate text-sm">
@@ -292,7 +292,7 @@ export default function TeamPage() {
               className={`px-3 py-3.5 rounded-lg border text-center cursor-pointer transition-smooth ${
                 isActive
                   ? `${style.bg} ${style.border}`
-                  : 'glass-card hover:bg-cream'
+                  : 'glass-card hover:bg-charcoal-600'
               }`}
             >
               <div className={`text-2xl font-bold font-serif ${style.color}`}>
@@ -382,7 +382,7 @@ export default function TeamPage() {
                             key={member.id}
                             className={`border-b border-cream-border ${i % 2 === 0 ? 'glass-card' : 'bg-cream'} ${!member.active ? 'opacity-50' : ''}`}
                           >
-                            <td className="px-3.5 py-2.5 font-semibold text-charcoal">
+                            <td className="px-3.5 py-2.5 font-semibold text-cream">
                               {member.name}
                             </td>
                             <td className="px-3.5 py-2.5">

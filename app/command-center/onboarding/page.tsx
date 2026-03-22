@@ -113,7 +113,7 @@ function WorkloadDashboard() {
                 className="cursor-pointer flex items-center justify-between mb-3"
               >
                 <div>
-                  <p className="text-sm font-bold text-charcoal mb-0.5">{w.member_name}</p>
+                  <p className="text-sm font-bold text-cream mb-0.5">{w.member_name}</p>
                   <p className="text-xs text-slate">
                     {w.active_deals} advisor{w.active_deals !== 1 ? 's' : ''} · {w.total_complexity} pts
                   </p>
@@ -192,9 +192,9 @@ function PhaseSection({ phase, tasks, onToggle }: {
     <div className="mb-3 border border-cream-border rounded-lg overflow-hidden">
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-cream-dark border-none cursor-pointer hover:bg-cream transition-smooth"
+        className="w-full flex items-center justify-between px-4 py-3 bg-charcoal-700 border-none cursor-pointer hover:bg-charcoal-600 transition-smooth"
       >
-        <span className="font-semibold text-charcoal text-sm">{PHASE_LABELS[phase]}</span>
+        <span className="font-semibold text-cream text-sm">{PHASE_LABELS[phase]}</span>
         <div className="flex items-center gap-4 flex-1 ml-5">
           <div className="flex-1">
             <div className="flex items-center gap-2">
@@ -226,7 +226,7 @@ function PhaseSection({ phase, tasks, onToggle }: {
                 className="mt-0.5 accent-teal w-4 h-4 cursor-pointer shrink-0"
               />
               <div className="flex-1">
-                <span className={`text-sm ${task.completed ? 'text-slate line-through' : 'text-charcoal'}`}>
+                <span className={`text-sm ${task.completed ? 'text-slate line-through' : 'text-cream'}`}>
                   {task.label}
                   {task.optional && <span className="ml-1.5 text-[10px] text-slate italic">(opt)</span>}
                 </span>
@@ -272,7 +272,7 @@ function AdvisorChecklist({ deal }: { deal: { id: string; dealname: string; deal
             href={`/command-center/advisor/${deal.id}`}
             className="no-underline"
           >
-            <h3 className="text-base font-bold text-charcoal font-serif mb-1 hover:text-teal cursor-pointer transition-smooth">
+            <h3 className="text-base font-bold text-cream font-serif mb-1 hover:text-teal cursor-pointer transition-smooth">
               {deal.dealname}
             </h3>
           </Link>
@@ -280,7 +280,7 @@ function AdvisorChecklist({ deal }: { deal: { id: string; dealname: string; deal
         </div>
         <div className="text-center">
           <div className={`w-14 h-14 rounded-full border-[3px] ${pct === 100 ? 'border-teal' : 'border-cream-border'} flex items-center justify-center flex-col`}>
-            <span className={`text-sm font-bold ${pct === 100 ? 'text-teal' : 'text-charcoal'}`}>{pct}%</span>
+            <span className={`text-sm font-bold ${pct === 100 ? 'text-teal' : 'text-cream'}`}>{pct}%</span>
           </div>
           <p className="text-[10px] text-slate mt-1">{completedCount}/43</p>
         </div>
@@ -324,10 +324,10 @@ export default function OnboardingTracker() {
   );
 
   return (
-    <div className="px-10 py-10 min-h-screen bg-cream font-sans">
+    <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-charcoal font-serif mb-2">
+          <h1 className="text-3xl font-bold text-cream font-serif mb-2">
             Active Onboarding
           </h1>
           <p className="text-slate text-sm">
@@ -347,7 +347,7 @@ export default function OnboardingTracker() {
               className={`px-3.5 py-1.5 rounded text-xs font-medium transition-smooth border-none cursor-pointer ${
                 activeTab === tab.key
                   ? 'bg-teal text-white'
-                  : 'bg-transparent text-slate hover:text-charcoal'
+                  : 'bg-transparent text-slate hover:text-cream'
               }`}
             >
               {tab.label}

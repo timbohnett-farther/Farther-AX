@@ -10,15 +10,16 @@
    ============================================ */
 
 @theme {
-  /* ── Cream (text on dark backgrounds) ────────── */
+  /* ── Cream (light text on dark backgrounds) ──── */
   --color-cream: #FAF7F2;
-  --color-cream-dark: #f0ebe3;
+  --color-cream-dark: rgba(250, 247, 242, 0.7);
   --color-cream-border: rgba(250, 247, 242, 0.08);
+  --color-cream-muted: rgba(250, 247, 242, 0.5);
 
-  /* ── Charcoal = cream text (dark theme semantic flip) ── */
-  --color-charcoal: #FAF7F2;
-  --color-charcoal-light: rgba(250, 247, 242, 0.7);
-  --color-charcoal-muted: rgba(250, 247, 242, 0.5);
+  /* ── Charcoal (dark backgrounds + sidebar) ──── */
+  --color-charcoal: #333333;
+  --color-charcoal-light: #444444;
+  --color-charcoal-muted: #5b6a71;
 
   /* ── Charcoal Scale (backgrounds) ────────────── */
   --color-charcoal-50: #f5f5f5;

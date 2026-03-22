@@ -56,7 +56,7 @@ export default function LPOAPage() {
       <div className="max-w-4xl mx-auto">
 
         {/* Intro */}
-        <p className="text-charcoal-muted leading-relaxed text-base mb-12 max-w-3xl">
+        <p className="text-cream-muted leading-relaxed text-base mb-12 max-w-3xl">
           The LPOA (Limited Power of Attorney) transition method allows Farther to transfer client
           assets without requiring individual client signatures on new paperwork. Instead, the advisor
           signs a single LPOA document granting Farther authority to act on behalf of clients. This is
@@ -69,7 +69,7 @@ export default function LPOAPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               At a Glance
             </h2>
@@ -80,11 +80,11 @@ export default function LPOAPage() {
               <div
                 key={idx}
                 className="rounded-xl border text-center px-6 py-7"
-                style={{ backgroundColor: "#f0f5f9", borderColor: "#dde8f0" }}
+                style={{ backgroundColor: "#222222", borderColor: "rgba(250,247,242,0.08)" }}
               >
                 <p
                   className="text-xs uppercase tracking-widest font-medium mb-3"
-                  style={{ color: "#5b6a71" }}
+                  style={{ color: "rgba(250,247,242,0.5)" }}
                 >
                   {card.label}
                 </p>
@@ -105,7 +105,7 @@ export default function LPOAPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               How LPOA Works
             </h2>
@@ -113,7 +113,7 @@ export default function LPOAPage() {
 
           <div
             className="rounded-xl border overflow-hidden"
-            style={{ borderColor: "#dde8f0" }}
+            style={{ borderColor: "rgba(250,247,242,0.08)" }}
           >
             {processSteps.map((step, idx) => {
               const isLast = idx === processSteps.length - 1;
@@ -122,8 +122,8 @@ export default function LPOAPage() {
                   key={idx}
                   className="flex items-start gap-5 px-6 py-5 border-b last:border-b-0 relative"
                   style={{
-                    backgroundColor: idx % 2 === 0 ? "#FAF7F2" : "#f0f5f9",
-                    borderColor: "#dde8f0",
+                    backgroundColor: idx % 2 === 0 ? "transparent" : "#222222",
+                    borderColor: "rgba(250,247,242,0.08)",
                   }}
                 >
                   {/* Step number */}
@@ -131,8 +131,8 @@ export default function LPOAPage() {
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold font-sans shrink-0"
                       style={{
-                        backgroundColor: isLast ? "#1d7682" : "#333333",
-                        color: "#FAF7F2",
+                        backgroundColor: isLast ? "#1d7682" : "#FAF7F2",
+                        color: isLast ? "#1a1a1a" : "#1a1a1a",
                       }}
                     >
                       {idx + 1}
@@ -142,14 +142,14 @@ export default function LPOAPage() {
                         className="w-px mt-1"
                         style={{
                           height: "20px",
-                          backgroundColor: "#dde8f0",
+                          backgroundColor: "rgba(250,247,242,0.08)",
                         }}
                       />
                     )}
                   </div>
                   <p
                     className="text-sm leading-relaxed pt-1.5"
-                    style={{ color: "#333333" }}
+                    style={{ color: "#FAF7F2" }}
                   >
                     {step}
                   </p>
@@ -165,7 +165,7 @@ export default function LPOAPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               Custodian Availability
             </h2>
@@ -176,23 +176,23 @@ export default function LPOAPage() {
               <div
                 key={idx}
                 className="rounded-xl border p-6"
-                style={{ backgroundColor: "#f0f5f9", borderColor: "#dde8f0" }}
+                style={{ backgroundColor: "#222222", borderColor: "rgba(250,247,242,0.08)" }}
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center font-serif font-bold text-lg shrink-0"
-                    style={{ backgroundColor: "#333333", color: "#FAF7F2" }}
+                    style={{ backgroundColor: "#FAF7F2", color: "#1a1a1a" }}
                   >
                     {c.icon}
                   </div>
                   <h3
                     className="font-serif text-lg"
-                    style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+                    style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
                   >
                     {c.name}
                   </h3>
                 </div>
-                <p className="text-sm leading-relaxed" style={{ color: "#5b6a71" }}>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(250,247,242,0.5)" }}>
                   {c.body}
                 </p>
               </div>
@@ -206,7 +206,7 @@ export default function LPOAPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#333333", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
             >
               Key Considerations
             </h2>
@@ -214,16 +214,16 @@ export default function LPOAPage() {
 
           <div
             className="rounded-xl border overflow-hidden"
-            style={{ backgroundColor: "#FAF7F2", borderColor: "#dde8f0" }}
+            style={{ backgroundColor: "transparent", borderColor: "rgba(250,247,242,0.08)" }}
           >
             {/* Dark header bar */}
             <div
               className="px-6 py-3 border-b"
-              style={{ backgroundColor: "#333333", borderColor: "#dde8f0" }}
+              style={{ backgroundColor: "#FAF7F2", borderColor: "rgba(250,247,242,0.08)" }}
             >
               <span
                 className="text-xs uppercase tracking-widest font-medium"
-                style={{ color: "#1d7682" }}
+                style={{ color: "#1a1a1a" }}
               >
                 Important Notes
               </span>
@@ -234,15 +234,15 @@ export default function LPOAPage() {
                 <li
                   key={idx}
                   className="flex items-start gap-4 px-6 py-4"
-                  style={{ borderColor: "#dde8f0" }}
+                  style={{ borderColor: "rgba(250,247,242,0.08)" }}
                 >
                   <span
                     className="shrink-0 mt-0.5 text-base"
-                    style={{ color: "#1d7682" }}
+                    style={{ color: "#1a1a1a" }}
                   >
                     ▸
                   </span>
-                  <span className="text-sm leading-relaxed" style={{ color: "#333333" }}>
+                  <span className="text-sm leading-relaxed" style={{ color: "#FAF7F2" }}>
                     {item}
                   </span>
                 </li>
