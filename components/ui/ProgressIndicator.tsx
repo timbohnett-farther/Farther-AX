@@ -30,9 +30,9 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
   return (
     <div className={`space-y-2 ${className}`}>
       <Flex justifyContent="between" alignItems="center">
-        <Text className="text-sm font-medium text-gray-700">{label}</Text>
+        <Text className="text-sm font-medium text-cream-muted">{label}</Text>
         {showPercentage && (
-          <Text className="text-sm font-semibold text-gray-900">
+          <Text className="text-sm font-semibold text-cream">
             {percentage.toFixed(0)}%
           </Text>
         )}
@@ -48,8 +48,8 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
                 className="absolute"
                 style={{ left: `${position}%` }}
               >
-                <div className="w-0.5 h-2 bg-gray-400 -translate-x-1/2" />
-                <Text className="text-xs text-gray-500 -translate-x-1/2 whitespace-nowrap">
+                <div className="w-0.5 h-2 bg-teal/40 -translate-x-1/2" />
+                <Text className="text-xs text-slate -translate-x-1/2 whitespace-nowrap">
                   {marker.label}
                 </Text>
               </div>

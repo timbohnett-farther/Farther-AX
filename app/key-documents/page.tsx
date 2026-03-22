@@ -273,8 +273,8 @@ export default function KeyDocumentsPage() {
                     key={row.document}
                     className={
                       idx % 2 === 0
-                        ? "bg-cream hover:bg-charcoal-700 transition-colors"
-                        : "bg-charcoal-600/40 hover:bg-charcoal-700 transition-colors"
+                        ? "bg-charcoal-600/40 hover:bg-charcoal-700 transition-colors"
+                        : "bg-charcoal-600/20 hover:bg-charcoal-700 transition-colors"
                     }
                   >
                     <td className="px-4 py-3 border-b border-cream-border font-medium text-cream whitespace-nowrap">

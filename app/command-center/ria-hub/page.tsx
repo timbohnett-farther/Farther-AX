@@ -197,7 +197,7 @@ function EmailComposer({ deal }: { deal: Deal }) {
       {/* To */}
       <div>
         <label className="text-xs font-semibold text-cream mb-1 block">To</label>
-        <p className="text-sm text-slate bg-cream-dark/50 rounded-lg px-3 py-2">
+        <p className="text-sm text-slate bg-charcoal-700/50 rounded-lg px-3 py-2">
           {primaryContact ? `${contactName(primaryContact)} <${primaryContact.email || 'no email'}>` : 'No contacts available'}
         </p>
       </div>

@@ -20,7 +20,7 @@ export default function RepaperAcatPage() {
             <div
               key={stat.label}
               className="rounded-lg p-5 border text-center"
-              style={{ borderColor: "#dde8f0", backgroundColor: "rgba(250,247,242,0.8)" }}
+              style={{ borderColor: "rgba(250,247,242,0.08)", backgroundColor: "#2f2f2f" }}
             >
               <p className="text-xs tracking-widest uppercase mb-1" style={{ color: "#155961" }}>
                 {stat.label}
@@ -29,7 +29,7 @@ export default function RepaperAcatPage() {
                 className="text-xl font-bold"
                 style={{
                   fontFamily: "'ABC Arizona Text', Georgia, serif",
-                  color: "#333333",
+                  color: "#FAF7F2",
                 }}
               >
                 {stat.value}
@@ -41,7 +41,7 @@ export default function RepaperAcatPage() {
         {/* Coming Soon Banner */}
         <div
           className="rounded-xl p-8 border mb-8 text-center"
-          style={{ backgroundColor: "#f0f5f9", borderColor: "#dde8f0" }}
+          style={{ backgroundColor: "#2a2a2a", borderColor: "rgba(250,247,242,0.08)" }}
         >
           <div className="text-5xl mb-4" style={{ color: "#1d7682" }}>◆</div>
           <h2
@@ -53,7 +53,7 @@ export default function RepaperAcatPage() {
           >
             Detailed Content Coming Soon
           </h2>
-          <p className="text-base leading-relaxed" style={{ color: "#5b6a71" }}>
+          <p className="text-base leading-relaxed" style={{ color: "rgba(250,247,242,0.5)" }}>
             The Repaper / ACAT section will provide complete guidance for executing
             the most comprehensive transition method — including client paperwork
             workflows, ACAT submission procedures, and timeline management.
@@ -86,7 +86,7 @@ export default function RepaperAcatPage() {
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3">
                 <span style={{ color: "#1d7682", marginTop: "2px" }}>▸</span>
-                <span className="text-sm" style={{ color: "#444444" }}>{item}</span>
+                <span className="text-sm" style={{ color: "#FAF7F2" }}>{item}</span>
               </li>
             ))}
           </ul>

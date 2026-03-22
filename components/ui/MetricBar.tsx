@@ -34,9 +34,9 @@ export const MetricBar: React.FC<MetricBarProps> = ({
     <Card className={`glass-card ${className}`}>
       {title && (
         <div className="mb-4">
-          <Title className="text-lg font-serif text-gray-900">{title}</Title>
+          <Title className="text-lg font-serif text-cream">{title}</Title>
           {subtitle && (
-            <Text className="mt-1 text-sm text-gray-600">{subtitle}</Text>
+            <Text className="mt-1 text-sm text-slate">{subtitle}</Text>
           )}
         </div>
       )}

@@ -137,7 +137,7 @@ export default function ComplexityEducationPage() {
           <h1 className="text-3xl font-light mb-3 text-cream font-serif">
             Transition Complexity Scoring
           </h1>
-          <p className="text-sm leading-relaxed text-gray-600">
+          <p className="text-sm leading-relaxed text-slate">
             The complexity score is an objective, data-driven rating that helps us staff transitions
             appropriately, set realistic timelines, and ensure every advisor gets the right resources
             from day one. Scores range from 0 to 105 and are computed automatically from HubSpot
@@ -161,14 +161,14 @@ export default function ComplexityEducationPage() {
                   <span className={`text-sm font-semibold ${t.textColor}`}>
                     {t.tier}
                   </span>
-                  <span className="text-xs ml-auto text-gray-500">
+                  <span className="text-xs ml-auto text-slate">
                     {t.range} pts
                   </span>
                 </div>
-                <p className="text-xs leading-relaxed mb-2 text-gray-700">
+                <p className="text-xs leading-relaxed mb-2 text-cream-muted">
                   {t.desc}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-slate">
                   Estimated graduation: {t.days} days
                 </p>
               </DataCard>
@@ -181,7 +181,7 @@ export default function ComplexityEducationPage() {
           <h2 className="text-lg font-medium mb-4 text-cream font-serif">
             Scoring Factors
           </h2>
-          <p className="text-sm mb-6 text-gray-600">
+          <p className="text-sm mb-6 text-slate">
             The score is additive — each factor contributes independently. The final score is the
             sum of all nine factors.
           </p>
@@ -192,14 +192,14 @@ export default function ComplexityEducationPage() {
                   <span className="text-sm font-semibold text-cream">
                     {factor.name}
                   </span>
-                  <span className="text-xs px-2 py-0.5 rounded-sm bg-cream-dark text-gray-600">
+                  <span className="text-xs px-2 py-0.5 rounded-sm bg-charcoal-700 text-slate">
                     {factor.category}
                   </span>
                   <span className="text-xs ml-auto font-mono text-teal">
                     0 – {factor.max} pts
                   </span>
                 </div>
-                <p className="text-xs leading-relaxed text-gray-700">
+                <p className="text-xs leading-relaxed text-cream-muted">
                   {factor.description}
                 </p>
               </DataCard>
@@ -213,7 +213,7 @@ export default function ComplexityEducationPage() {
             How Complexity Scores Are Used
           </h2>
           <DataCard>
-            <div className="space-y-4 text-sm text-gray-700">
+            <div className="space-y-4 text-sm text-cream-muted">
               <p>
                 <span className="font-semibold text-cream">Staffing Decisions</span>{" "}
                 — The tier directly informs which AXM, CTM, and support staff should be assigned.
@@ -248,7 +248,7 @@ export default function ComplexityEducationPage() {
           <h2 className="text-lg font-medium mb-4 text-cream font-serif">
             Note Keywords Reference
           </h2>
-          <p className="text-sm mb-4 text-gray-600">
+          <p className="text-sm mb-4 text-slate">
             The following keywords in deal notes, transition notes, and descriptions trigger
             qualitative complexity signals:
           </p>
@@ -257,7 +257,7 @@ export default function ComplexityEducationPage() {
               {keywords.map((kw) => (
                 <span
                   key={kw}
-                  className="text-xs px-2 py-1 rounded-sm font-mono bg-cream-dark text-gray-600 border border-cream-border"
+                  className="text-xs px-2 py-1 rounded-sm font-mono bg-charcoal-700 text-slate border border-cream-border"
                 >
                   {kw}
                 </span>
@@ -268,7 +268,7 @@ export default function ComplexityEducationPage() {
 
         {/* Footer */}
         <div className="text-center pt-6 border-t border-cream-border">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-slate">
             Complexity scoring is an evolving system. As we refine the algorithm based on real
             transition outcomes, weights and thresholds may be adjusted.
           </p>

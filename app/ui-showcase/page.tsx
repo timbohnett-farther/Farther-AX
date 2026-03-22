@@ -56,7 +56,7 @@ export default function UIShowcasePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-cream to-cream-dark p-8">
+    <div className="min-h-screen bg-transparent p-8">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}
@@ -64,7 +64,7 @@ export default function UIShowcasePage() {
           <h1 className="text-5xl font-serif font-bold text-cream mb-4">
             Farther UI Component Library
           </h1>
-          <p className="text-lg text-slate">
+          <p className="text-lg text-cream-muted">
             Tremor-based components with Farther branding and premium glass effects
           </p>
         </div>
@@ -289,7 +289,7 @@ export default function UIShowcasePage() {
                 badge: 12,
                 content: (
                   <DataCard>
-                    <p className="text-gray-700">
+                    <p className="text-cream-muted">
                       Overview content with 12 items. This demonstrates the tab panel content area.
                     </p>
                   </DataCard>
@@ -300,7 +300,7 @@ export default function UIShowcasePage() {
                 badge: 8,
                 content: (
                   <DataCard>
-                    <p className="text-gray-700">
+                    <p className="text-cream-muted">
                       Analytics content with 8 items. Each tab can contain complex layouts.
                     </p>
                   </DataCard>
@@ -310,7 +310,7 @@ export default function UIShowcasePage() {
                 label: 'Settings',
                 content: (
                   <DataCard>
-                    <p className="text-gray-700">
+                    <p className="text-cream-muted">
                       Settings content without a badge. Badges are optional.
                     </p>
                   </DataCard>
@@ -332,7 +332,7 @@ export default function UIShowcasePage() {
               decoration="top"
               decorationColor="teal"
             >
-              <p className="text-gray-700">
+              <p className="text-cream-muted">
                 This is a basic data card with glass morphism effect.
                 Perfect for grouping related content.
               </p>
@@ -347,7 +347,7 @@ export default function UIShowcasePage() {
                 </button>
               }
             >
-              <p className="text-gray-700">
+              <p className="text-cream-muted">
                 Cards can include action buttons in the header for quick access to features.
               </p>
             </DataCard>
@@ -362,21 +362,21 @@ export default function UIShowcasePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="glass-card p-6">
               <h3 className="text-lg font-serif font-semibold mb-2">Glass Card</h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate">
                 Hover to see elevation effect
               </p>
             </div>
 
             <div className="stat-card">
               <h3 className="text-lg font-serif font-semibold mb-2">Stat Card</h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate">
                 Hover to see top border accent
               </p>
             </div>
 
             <div className="chart-card">
               <h3 className="text-lg font-serif font-semibold mb-2">Chart Card</h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate">
                 Frosted glass with blur
               </p>
             </div>
@@ -385,10 +385,10 @@ export default function UIShowcasePage() {
 
         {/* Footer */}
         <div className="text-center pt-12 pb-8">
-          <p className="text-slate">
+          <p className="text-cream-muted">
             Component library built with Tremor UI and Farther branding
           </p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-cream-muted mt-2">
             All components support responsive layouts and dark mode variants
           </p>
         </div>

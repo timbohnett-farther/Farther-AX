@@ -36,12 +36,12 @@ export const StatCard: React.FC<StatCardProps> = ({
     >
       <Flex justifyContent="between" alignItems="start">
         <div>
-          <Text className="text-sm text-gray-600 font-medium">{title}</Text>
-          <Metric className="mt-2 text-3xl font-semibold text-gray-900">
+          <Text className="text-sm text-cream-muted font-medium">{title}</Text>
+          <Metric className="mt-2 text-3xl font-semibold text-cream">
             {value}
           </Metric>
           {subtitle && (
-            <Text className="mt-1 text-xs text-gray-500">{subtitle}</Text>
+            <Text className="mt-1 text-xs text-slate">{subtitle}</Text>
           )}
         </div>
         {icon && (

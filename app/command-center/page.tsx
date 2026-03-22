@@ -978,7 +978,7 @@ function RecruitingTab() {
                 <div style={{
                   maxWidth: '75%', padding: '8px 14px',
                   borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
-                  background: msg.role === 'user' ? C.teal : '#f7f4ef',
+                  background: msg.role === 'user' ? C.teal : '#2f2f2f',
                   color: msg.role === 'user' ? C.white : C.dark,
                   fontSize: 13, lineHeight: 1.5, whiteSpace: 'pre-wrap',
                   border: msg.role === 'user' ? 'none' : `1px solid ${C.border}`,
@@ -989,7 +989,7 @@ function RecruitingTab() {
             ))}
             {aiLoading && (
               <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-                <div style={{ padding: '8px 14px', borderRadius: '14px 14px 14px 4px', background: '#f7f4ef', border: `1px solid ${C.border}`, fontSize: 13, color: C.slate }}>
+                <div style={{ padding: '8px 14px', borderRadius: '14px 14px 14px 4px', background: '#2f2f2f', border: `1px solid ${C.border}`, fontSize: 13, color: C.slate }}>
                   Thinking…
                 </div>
               </div>
@@ -1152,7 +1152,7 @@ function RecruitingTab() {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
-              <tr style={{ borderBottom: `1px solid ${C.border}`, background: '#f7f4ef' }}>
+              <tr style={{ borderBottom: `1px solid ${C.border}`, background: '#2f2f2f' }}>
                 {[
                   { key: 'dealname', label: 'Advisor / Deal' },
                   { key: 'current_firm__cloned_', label: 'Prior Firm' },
@@ -1326,7 +1326,7 @@ function AcquisitionsTab() {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
-              <tr style={{ borderBottom: `1px solid ${C.border}`, background: '#f7f4ef' }}>
+              <tr style={{ borderBottom: `1px solid ${C.border}`, background: '#2f2f2f' }}>
                 {['Deal Name', 'Prior Firm', 'Type', 'Stage', 'Exp. AUM', 'Households', 'Target Date', 'Owner'].map(h => (
                   <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: C.slate, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
                     {h}

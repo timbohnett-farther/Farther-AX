@@ -14,8 +14,8 @@ export default function MAPage() {
         <div
           className="rounded-xl p-8 border mb-8 text-center"
           style={{
-            backgroundColor: "#f0f5f9",
-            borderColor: "#dde8f0",
+            backgroundColor: "#2a2a2a",
+            borderColor: "rgba(250,247,242,0.08)",
           }}
         >
           <div
@@ -28,12 +28,12 @@ export default function MAPage() {
             className="text-2xl font-bold mb-3"
             style={{
               fontFamily: "'ABC Arizona Text', Georgia, serif",
-              color: "#333333",
+              color: "#FAF7F2",
             }}
           >
             Content Coming Soon
           </h2>
-          <p className="text-base leading-relaxed" style={{ color: "#5b6a71" }}>
+          <p className="text-base leading-relaxed" style={{ color: "rgba(250,247,242,0.5)" }}>
             The M&A pathway section is currently being developed. This section will
             cover the complete advisor onboarding process for practices joining Farther
             through an acquisition or merger transaction.
@@ -43,13 +43,13 @@ export default function MAPage() {
         {/* Preview of what's coming */}
         <div
           className="rounded-lg p-6 border"
-          style={{ borderColor: "#dde8f0", backgroundColor: "rgba(250,247,242,0.8)" }}
+          style={{ borderColor: "rgba(250,247,242,0.08)", backgroundColor: "#2f2f2f" }}
         >
           <h3
             className="text-lg font-semibold mb-4"
             style={{
               fontFamily: "'ABC Arizona Text', Georgia, serif",
-              color: "#333333",
+              color: "#FAF7F2",
             }}
           >
             What This Section Will Cover
@@ -65,7 +65,7 @@ export default function MAPage() {
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3">
                 <span style={{ color: "#1d7682", marginTop: "2px" }}>▸</span>
-                <span className="text-sm" style={{ color: "#444444" }}>
+                <span className="text-sm" style={{ color: "#FAF7F2" }}>
                   {item}
                 </span>
               </li>

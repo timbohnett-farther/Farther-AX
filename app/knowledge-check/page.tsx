@@ -160,8 +160,8 @@ export default function KnowledgeCheckPage() {
           <div
             className="rounded-xl border p-10 text-center"
             style={{
-              backgroundColor: "#f0f5f9",
-              borderColor: "#dde8f0",
+              backgroundColor: "#2a2a2a",
+              borderColor: "rgba(250,247,242,0.08)",
             }}
           >
             {/* Trophy / score badge */}
@@ -181,7 +181,7 @@ export default function KnowledgeCheckPage() {
               className="text-3xl font-bold mb-3"
               style={{
                 fontFamily: "'ABC Arizona Text', Georgia, serif",
-                color: "#333333",
+                color: "#FAF7F2",
               }}
             >
               You scored {score} / 7
@@ -189,7 +189,7 @@ export default function KnowledgeCheckPage() {
 
             <p
               className="text-base mb-8 max-w-md mx-auto leading-relaxed"
-              style={{ color: "#444444" }}
+              style={{ color: "#FAF7F2" }}
             >
               {getScoreMessage(score)}
             </p>
@@ -219,12 +219,12 @@ export default function KnowledgeCheckPage() {
                     <div>
                       <p
                         className="text-sm font-medium"
-                        style={{ color: "#333333" }}
+                        style={{ color: "#FAF7F2" }}
                       >
                         Q{q.id}: {q.question}
                       </p>
                       {!correct && userAns !== null && (
-                        <p className="text-xs mt-0.5" style={{ color: "#5b6a71" }}>
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(250,247,242,0.5)" }}>
                           Correct answer: {q.options[q.correctIndex]}
                         </p>
                       )}
@@ -250,7 +250,7 @@ export default function KnowledgeCheckPage() {
               <div className="flex items-center justify-between mb-2">
                 <span
                   className="text-sm font-medium"
-                  style={{ color: "#5b6a71" }}
+                  style={{ color: "rgba(250,247,242,0.5)" }}
                 >
                   Question {currentIndex + 1} of {QUESTIONS.length}
                 </span>
@@ -264,7 +264,7 @@ export default function KnowledgeCheckPage() {
               {/* Progress bar */}
               <div
                 className="w-full rounded-full h-2"
-                style={{ backgroundColor: "#dde8f0" }}
+                style={{ backgroundColor: "rgba(250,247,242,0.08)" }}
               >
                 <div
                   className="h-2 rounded-full transition-all duration-500"
@@ -280,15 +280,15 @@ export default function KnowledgeCheckPage() {
             <div
               className="rounded-xl border p-8"
               style={{
-                backgroundColor: "#f0f5f9",
-                borderColor: "#dde8f0",
+                backgroundColor: "#2a2a2a",
+                borderColor: "rgba(250,247,242,0.08)",
               }}
             >
               <h2
                 className="text-xl font-bold mb-6 leading-snug"
                 style={{
                   fontFamily: "'ABC Arizona Text', Georgia, serif",
-                  color: "#333333",
+                  color: "#FAF7F2",
                 }}
               >
                 {currentQuestion.question}
@@ -300,9 +300,9 @@ export default function KnowledgeCheckPage() {
                   const isSelected = selectedAnswer === i;
                   const isCorrect = i === currentQuestion.correctIndex;
 
-                  let borderColor = "#dde8f0";
-                  let bgColor = "#FAF7F2";
-                  let textColor = "#333333";
+                  let borderColor = "rgba(250,247,242,0.08)";
+                  let bgColor = "#2f2f2f";
+                  let textColor = "#FAF7F2";
 
                   if (isAnswered) {
                     if (isCorrect) {
@@ -314,9 +314,9 @@ export default function KnowledgeCheckPage() {
                       bgColor = "rgba(252,165,165,0.18)";
                       textColor = "#7F1D1D";
                     } else {
-                      bgColor = "#FAF7F2";
-                      borderColor = "#dde8f0";
-                      textColor = "#8a9aa1";
+                      bgColor = "#2f2f2f";
+                      borderColor = "rgba(250,247,242,0.08)";
+                      textColor = "rgba(250,247,242,0.5)";
                     }
                   }
 
@@ -342,12 +342,12 @@ export default function KnowledgeCheckPage() {
                               ? "#16A34A"
                               : isSelected
                               ? "#DC2626"
-                              : "#dde8f0"
+                              : "rgba(250,247,242,0.08)"
                             : "#1d7682",
                           color: isAnswered
                             ? isCorrect || isSelected
                               ? "#fff"
-                              : "#8a9aa1"
+                              : "rgba(250,247,242,0.5)"
                             : "#fff",
                         }}
                       >
@@ -408,7 +408,7 @@ export default function KnowledgeCheckPage() {
                       ? "Correct"
                       : "Incorrect"}
                   </p>
-                  <p className="text-sm leading-relaxed" style={{ color: "#333333" }}>
+                  <p className="text-sm leading-relaxed" style={{ color: "#FAF7F2" }}>
                     {currentQuestion.explanation}
                   </p>
                 </div>

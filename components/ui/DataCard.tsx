@@ -35,9 +35,9 @@ export const DataCard: React.FC<DataCardProps> = ({
         <div className="flex items-center justify-between mb-4">
           {title && (
             <div>
-              <Title className="text-lg font-serif text-gray-900">{title}</Title>
+              <Title className="text-lg font-serif text-cream">{title}</Title>
               {subtitle && (
-                <Text className="mt-1 text-sm text-gray-600">{subtitle}</Text>
+                <Text className="mt-1 text-sm text-slate">{subtitle}</Text>
               )}
             </div>
           )}

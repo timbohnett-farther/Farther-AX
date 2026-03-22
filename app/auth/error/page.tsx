@@ -14,14 +14,14 @@ function ErrorContent() {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4"
-      style={{ backgroundColor: "#FAF7F2" }}
+      style={{ backgroundColor: "transparent" }}
     >
       <div
         className="w-full max-w-md rounded-2xl p-10 text-center"
         style={{
-          backgroundColor: "#FAF7F2",
-          border: "1px solid #E8E0D5",
-          boxShadow: "0 4px 32px rgba(51,51,51,0.08)",
+          backgroundColor: "#2f2f2f",
+          border: "1px solid rgba(250,247,242,0.08)",
+          boxShadow: "0 4px 32px rgba(0,0,0,0.3)",
         }}
       >
         <div className="flex justify-center mb-8">
@@ -47,7 +47,7 @@ function ErrorContent() {
             fontFamily: "'ABC Arizona Text', Georgia, serif",
             fontSize: "1.5rem",
             fontWeight: 300,
-            color: "#333333",
+            color: "#FAF7F2",
           }}
         >
           {isAccessDenied ? "Access Denied" : "Sign-In Error"}
@@ -57,7 +57,7 @@ function ErrorContent() {
           className="mb-8 text-sm leading-relaxed"
           style={{
             fontFamily: "'Fakt', system-ui, sans-serif",
-            color: "#5b6a71",
+            color: "rgba(250,247,242,0.5)",
           }}
         >
           {isAccessDenied

@@ -34,7 +34,7 @@ export default function PageLayout({
   return (
     <div className="min-h-screen flex flex-col bg-transparent">
       {/* Top bar */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b border-cream-border bg-cream">
+      <header className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b border-cream-border bg-transparent">
         <div>
           <h1 className="text-2xl font-bold font-serif text-cream leading-tight">
             {title}

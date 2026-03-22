@@ -152,24 +152,24 @@ export default function NoToLowAUMPage() {
 
           <div
             className="rounded-xl overflow-hidden border"
-            style={{ borderColor: "#dde8f0" }}
+            style={{ borderColor: "rgba(250,247,242,0.08)" }}
           >
             <div
               className="px-7 py-5 border-b"
-              style={{ backgroundColor: "#f0f5f9", borderColor: "#dde8f0" }}
+              style={{ backgroundColor: "#2a2a2a", borderColor: "rgba(250,247,242,0.08)" }}
             >
-              <p className="text-sm leading-relaxed" style={{ color: "#333333" }}>
+              <p className="text-sm leading-relaxed" style={{ color: "#FAF7F2" }}>
                 The Focus Team is an internal Farther committee that reviews borderline advisor
                 candidates. Their assessment covers the following areas. The AXM must present the
                 advisor&apos;s profile to the Focus Team before initiating any onboarding steps.
               </p>
             </div>
-            <div className="px-7 py-6" style={{ backgroundColor: "#FAF7F2" }}>
+            <div className="px-7 py-6" style={{ backgroundColor: "#2f2f2f" }}>
               <ul className="space-y-3">
                 {focusTeamItems.map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3">
                     <span className="shrink-0 mt-0.5" style={{ color: "#1d7682" }}>◆</span>
-                    <span className="text-sm leading-relaxed" style={{ color: "#333333" }}>
+                    <span className="text-sm leading-relaxed" style={{ color: "#FAF7F2" }}>
                       {item}
                     </span>
                   </li>
@@ -193,11 +193,11 @@ export default function NoToLowAUMPage() {
 
           <div
             className="rounded-xl border overflow-hidden"
-            style={{ borderColor: "#dde8f0" }}
+            style={{ borderColor: "rgba(250,247,242,0.08)" }}
           >
             <div
               className="px-2 py-1 border-b"
-              style={{ backgroundColor: "#333333", borderColor: "#dde8f0" }}
+              style={{ backgroundColor: "#2a2a2a", borderColor: "rgba(250,247,242,0.08)" }}
             >
               <span
                 className="text-xs uppercase tracking-widest font-medium px-5 py-3 inline-block"
@@ -206,20 +206,20 @@ export default function NoToLowAUMPage() {
                 Required Training Modules — In Order
               </span>
             </div>
-            <div style={{ backgroundColor: "#FAF7F2" }}>
+            <div style={{ backgroundColor: "#2f2f2f" }}>
               {trainingItems.map((item, idx) => (
                 <div
                   key={idx}
                   className="flex items-center gap-5 px-6 py-4 border-b last:border-b-0"
-                  style={{ borderColor: "#dde8f0" }}
+                  style={{ borderColor: "rgba(250,247,242,0.08)" }}
                 >
                   <span
                     className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold font-sans"
-                    style={{ backgroundColor: "#f0f5f9", color: "#1d7682", border: "1px solid #dde8f0" }}
+                    style={{ backgroundColor: "#2a2a2a", color: "#1d7682", border: "1px solid rgba(250,247,242,0.08)" }}
                   >
                     {String(idx + 1).padStart(2, "0")}
                   </span>
-                  <span className="text-sm leading-relaxed" style={{ color: "#333333" }}>
+                  <span className="text-sm leading-relaxed" style={{ color: "#FAF7F2" }}>
                     {item}
                   </span>
                 </div>

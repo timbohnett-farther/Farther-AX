@@ -25,9 +25,9 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
     <Card className={`chart-card chart-glow ${className}`}>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <Title className="text-xl font-serif text-gray-900">{title}</Title>
+          <Title className="text-xl font-serif text-cream">{title}</Title>
           {subtitle && (
-            <Text className="mt-1 text-sm text-gray-600">{subtitle}</Text>
+            <Text className="mt-1 text-sm text-slate">{subtitle}</Text>
           )}
         </div>
         {action && <div>{action}</div>}

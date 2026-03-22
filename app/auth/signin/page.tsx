@@ -22,15 +22,15 @@ function SignInContent() {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4"
-      style={{ backgroundColor: "#FAF7F2" }}
+      style={{ backgroundColor: "transparent" }}
     >
       {/* Card */}
       <div
         className="w-full max-w-md rounded-2xl p-10"
         style={{
-          backgroundColor: "#FAF7F2",
-          border: "1px solid #E8E0D5",
-          boxShadow: "0 4px 32px rgba(51,51,51,0.08)",
+          backgroundColor: "#2f2f2f",
+          border: "1px solid rgba(250,247,242,0.08)",
+          boxShadow: "0 4px 32px rgba(0,0,0,0.3)",
         }}
       >
         {/* Logo */}
@@ -52,7 +52,7 @@ function SignInContent() {
             fontFamily: "'ABC Arizona Text', Georgia, serif",
             fontSize: "1.35rem",
             fontWeight: 300,
-            color: "#333333",
+            color: "#FAF7F2",
             lineHeight: 1.45,
           }}
         >
@@ -63,7 +63,7 @@ function SignInContent() {
           style={{
             fontFamily: "'Fakt', system-ui, sans-serif",
             fontSize: "0.9rem",
-            color: "#5b6a71",
+            color: "rgba(250,247,242,0.5)",
           }}
         >
           Sign in with your Farther Google account to continue.
@@ -115,7 +115,7 @@ function SignInContent() {
           className="mt-5 text-center text-xs"
           style={{
             fontFamily: "'Fakt', system-ui, sans-serif",
-            color: "#5b6a71",
+            color: "rgba(250,247,242,0.5)",
           }}
         >
           Access restricted to{" "}
@@ -129,7 +129,7 @@ function SignInContent() {
         className="mt-8 text-xs"
         style={{
           fontFamily: "'Fakt', system-ui, sans-serif",
-          color: "#5b6a71",
+          color: "rgba(250,247,242,0.5)",
         }}
       >
         Farther Wealth Management · Internal Use Only

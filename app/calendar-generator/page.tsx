@@ -62,7 +62,7 @@ function AttendeeRow({
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
       <div style={{ width: 110, flexShrink: 0 }}>
-        <span style={{ fontSize: 11, fontWeight: 600, color: "#5b6a71", fontFamily: "'Fakt', sans-serif" }}>
+        <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(250,247,242,0.5)", fontFamily: "'Fakt', sans-serif" }}>
           {label}
           {required && <span style={{ color: "#c0392b" }}> *</span>}
         </span>
@@ -76,9 +76,9 @@ function AttendeeRow({
           flex: 1,
           padding: "7px 12px",
           borderRadius: 6,
-          border: "1px solid #dde8f0",
-          backgroundColor: "#FAF7F2",
-          color: "#333333",
+          border: "1px solid rgba(250,247,242,0.08)",
+          backgroundColor: "#2f2f2f",
+          color: "#FAF7F2",
           fontSize: 13,
           outline: "none",
           fontFamily: "'Fakt', sans-serif",
@@ -93,9 +93,9 @@ function AttendeeRow({
           flex: 1,
           padding: "7px 12px",
           borderRadius: 6,
-          border: "1px solid #dde8f0",
-          backgroundColor: "#FAF7F2",
-          color: "#333333",
+          border: "1px solid rgba(250,247,242,0.08)",
+          backgroundColor: "#2f2f2f",
+          color: "#FAF7F2",
           fontSize: 13,
           outline: "none",
           fontFamily: "'Fakt', sans-serif",
