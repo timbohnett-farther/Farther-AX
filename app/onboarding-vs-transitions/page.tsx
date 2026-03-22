@@ -44,7 +44,7 @@ export default function OnboardingVsTransitions() {
 
           <div className="grid md:grid-cols-2 gap-5">
             {/* Onboarding Card */}
-            <div className="bg-cream-dark border border-cream-border rounded-xl p-7">
+            <div className="glass-card-dark rounded-xl p-7">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-9 h-9 rounded-lg bg-gold flex items-center justify-center text-cream text-sm font-bold shrink-0">
                   ◈
@@ -60,7 +60,7 @@ export default function OnboardingVsTransitions() {
             </div>
 
             {/* Transitions Card */}
-            <div className="bg-cream-dark border border-cream-border rounded-xl p-7">
+            <div className="glass-card-dark rounded-xl p-7">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-9 h-9 rounded-lg bg-charcoal flex items-center justify-center text-cream text-sm font-bold shrink-0">
                   ⇌
@@ -82,7 +82,7 @@ export default function OnboardingVsTransitions() {
           <h2 className="font-serif text-2xl text-charcoal mb-6">
             AXM — Advisor Experience Manager
           </h2>
-          <div className="bg-cream-dark border border-cream-border rounded-xl overflow-hidden">
+          <div className="glass-card-dark rounded-xl overflow-hidden">
             {/* Card Header */}
             <div className="border-b border-cream-border px-8 py-6 flex flex-wrap gap-6 items-start">
               <div className="flex items-center gap-4">
@@ -177,7 +177,7 @@ export default function OnboardingVsTransitions() {
           <h2 className="font-serif text-2xl text-charcoal mb-6">
             AXA — Advisor Experience Associate
           </h2>
-          <div className="bg-cream-dark border border-cream-border rounded-xl overflow-hidden">
+          <div className="glass-card-dark rounded-xl overflow-hidden">
             {/* Card Header */}
             <div className="border-b border-cream-border px-8 py-6 flex flex-wrap gap-6 items-start">
               <div className="flex items-center gap-4">

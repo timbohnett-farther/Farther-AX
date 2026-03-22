@@ -92,7 +92,7 @@ function WorkloadDashboard() {
         <StatCard
           title={overloaded > 0 ? 'Overloaded' : 'Team Status'}
           value={overloaded > 0 ? `${overloaded} AXM${overloaded > 1 ? 's' : ''}` : 'Balanced'}
-          className={overloaded > 0 ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}
+          className={overloaded > 0 ? 'bg-red-500/20 border-red-500/30' : 'bg-emerald-500/20 border-emerald-500/30'}
         />
       </div>
 
@@ -336,7 +336,7 @@ export default function OnboardingTracker() {
         </div>
 
         {/* Tab switcher */}
-        <div className="flex gap-1 bg-white border border-cream-border rounded-lg p-1">
+        <div className="flex gap-1 glass-card rounded-lg p-1">
           {[
             { key: 'workload' as const, label: 'AXM Workload' },
             { key: 'checklists' as const, label: 'Checklists' },

@@ -29,7 +29,7 @@ function MessageBubble({ message }: { message: Message }) {
         className={`max-w-[72%] px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
           isUser
             ? 'rounded-[18px_18px_4px_18px] bg-teal text-white'
-            : 'rounded-[18px_18px_18px_4px] bg-white text-charcoal border border-cream-border'
+            : 'rounded-[18px_18px_18px_4px] glass-card text-cream'
         }`}
       >
         {message.content}
@@ -84,7 +84,7 @@ export default function AIAssistant() {
   return (
     <div className="flex flex-col h-screen bg-cream font-sans">
       {/* Header */}
-      <div className="px-10 pt-6 pb-4 border-b border-cream-border bg-white">
+      <div className="px-10 pt-6 pb-4 border-b border-cream-border glass-card">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-teal flex items-center justify-center text-base text-white">
             ✦
@@ -111,7 +111,7 @@ export default function AIAssistant() {
                 <button
                   key={prompt}
                   onClick={() => sendMessage(prompt)}
-                  className="px-3.5 py-1.5 rounded-full border border-cream-border bg-white text-slate text-xs cursor-pointer hover:bg-cream hover:border-teal transition-smooth"
+                  className="px-3.5 py-1.5 rounded-full border border-cream-border glass-card text-slate text-xs cursor-pointer hover:bg-charcoal-600 hover:border-teal transition-smooth"
                 >
                   {prompt}
                 </button>
@@ -127,7 +127,7 @@ export default function AIAssistant() {
             <div className="w-8 h-8 rounded-full bg-teal flex items-center justify-center text-sm text-white">
               ✦
             </div>
-            <div className="px-4 py-3 rounded-[18px_18px_18px_4px] bg-white border border-cream-border">
+            <div className="px-4 py-3 rounded-[18px_18px_18px_4px] glass-card border border-cream-border">
               <span className="text-slate text-xs">Thinking…</span>
             </div>
           </div>
@@ -136,7 +136,7 @@ export default function AIAssistant() {
       </div>
 
       {/* Input */}
-      <div className="px-10 py-4 pb-6 bg-white border-t border-cream-border">
+      <div className="px-10 py-4 pb-6 glass-card border-t border-cream-border">
         <form
           onSubmit={e => { e.preventDefault(); sendMessage(input); }}
           className="flex gap-3 items-end"

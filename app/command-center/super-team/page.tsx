@@ -200,7 +200,7 @@ export default function SuperTeamPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border p-6 shadow-xs hover:shadow-md transition-shadow" style={{ borderColor: C.border }}>
+        <div className="bg-[#2f2f2f] rounded-xl border p-6 shadow-xs hover:shadow-md transition-shadow" style={{ borderColor: C.border }}>
           <div className="flex items-center gap-2 mb-2">
             <div
               className="w-2 h-2 rounded-full"
@@ -216,7 +216,7 @@ export default function SuperTeamPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border p-6 shadow-xs hover:shadow-md transition-shadow" style={{ borderColor: C.border }}>
+        <div className="bg-[#2f2f2f] rounded-xl border p-6 shadow-xs hover:shadow-md transition-shadow" style={{ borderColor: C.border }}>
           <div className="mb-2">
             <span style={{ color: C.slate, fontSize: '14px' }}>Active Workflows</span>
           </div>
@@ -228,7 +228,7 @@ export default function SuperTeamPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border p-6 shadow-xs hover:shadow-md transition-shadow" style={{ borderColor: C.border }}>
+        <div className="bg-[#2f2f2f] rounded-xl border p-6 shadow-xs hover:shadow-md transition-shadow" style={{ borderColor: C.border }}>
           <div className="mb-2">
             <span style={{ color: C.slate, fontSize: '14px' }}>Avg Response Time</span>
           </div>
@@ -335,7 +335,7 @@ export default function SuperTeamPage() {
         >
           Active Workflows
         </h2>
-        <div className="bg-white rounded-xl border shadow-xs overflow-hidden" style={{ borderColor: C.border }}>
+        <div className="bg-[#2f2f2f] rounded-xl border shadow-xs overflow-hidden" style={{ borderColor: C.border }}>
           <table className="w-full">
             <thead>
               <tr style={{ backgroundColor: C.cardBg, borderBottom: `1px solid ${C.border}` }}>
@@ -435,7 +435,7 @@ export default function SuperTeamPage() {
       {/* Performance Metrics */}
       <div className="grid grid-cols-2 gap-6">
         {/* Team Performance Chart */}
-        <div className="bg-white rounded-xl border p-6 shadow-xs" style={{ borderColor: C.border }}>
+        <div className="bg-[#2f2f2f] rounded-xl border p-6 shadow-xs" style={{ borderColor: C.border }}>
           <h3
             className="text-lg font-semibold mb-4"
             style={{
@@ -487,7 +487,7 @@ export default function SuperTeamPage() {
         </div>
 
         {/* Activation History Chart */}
-        <div className="bg-white rounded-xl border p-6 shadow-xs" style={{ borderColor: C.border }}>
+        <div className="bg-[#2f2f2f] rounded-xl border p-6 shadow-xs" style={{ borderColor: C.border }}>
           <h3
             className="text-lg font-semibold mb-4"
             style={{

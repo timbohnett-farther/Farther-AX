@@ -106,7 +106,7 @@ function MemberForm({
               Full Name *
             </label>
             <input
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-charcoal-light text-cream focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="Jane Smith"
@@ -118,7 +118,7 @@ function MemberForm({
             </label>
             <input
               type="email"
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-charcoal-light text-cream focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="jane@farther.com"
@@ -129,7 +129,7 @@ function MemberForm({
               Role *
             </label>
             <select
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-charcoal-light text-cream focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               value={role}
               onChange={e => setRole(e.target.value)}
             >
@@ -143,7 +143,7 @@ function MemberForm({
               Phone
             </label>
             <input
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-charcoal-light text-cream focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               value={phone}
               onChange={e => setPhone(e.target.value)}
               placeholder="(555) 123-4567"
@@ -154,7 +154,7 @@ function MemberForm({
               Calendar Link
             </label>
             <input
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-white text-charcoal focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-charcoal-light text-cream focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               value={calendarLink}
               onChange={e => setCalendarLink(e.target.value)}
               placeholder="https://calendar.google.com/..."
@@ -292,7 +292,7 @@ export default function TeamPage() {
               className={`px-3 py-3.5 rounded-lg border text-center cursor-pointer transition-smooth ${
                 isActive
                   ? `${style.bg} ${style.border}`
-                  : 'bg-white border-cream-border hover:bg-cream'
+                  : 'glass-card hover:bg-cream'
               }`}
             >
               <div className={`text-2xl font-bold font-serif ${style.color}`}>
@@ -357,7 +357,7 @@ export default function TeamPage() {
                         {roleDesc}
                       </span>
                     </div>
-                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full bg-white ${roleStyle.color}`}>
+                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#2f2f2f] ${roleStyle.color}`}>
                       {group.members.length}
                     </span>
                   </div>
@@ -380,7 +380,7 @@ export default function TeamPage() {
                         {group.members.map((member, i) => (
                           <tr
                             key={member.id}
-                            className={`border-b border-cream-border ${i % 2 === 0 ? 'bg-white' : 'bg-cream'} ${!member.active ? 'opacity-50' : ''}`}
+                            className={`border-b border-cream-border ${i % 2 === 0 ? 'glass-card' : 'bg-cream'} ${!member.active ? 'opacity-50' : ''}`}
                           >
                             <td className="px-3.5 py-2.5 font-semibold text-charcoal">
                               {member.name}

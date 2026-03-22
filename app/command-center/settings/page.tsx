@@ -207,7 +207,7 @@ export default function SettingsPage() {
       </div>
 
       {/* API Connections */}
-      <div className="bg-white rounded-xl shadow-xs border" style={{ borderColor: C.border }}>
+      <div className="bg-[#2f2f2f] rounded-xl shadow-xs border" style={{ borderColor: C.border }}>
         <div className="p-6 border-b" style={{ borderColor: C.border }}>
           <h2
             className="text-xl font-semibold"
@@ -282,7 +282,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Notification Preferences */}
-      <div className="bg-white rounded-xl shadow-xs border" style={{ borderColor: C.border }}>
+      <div className="bg-[#2f2f2f] rounded-xl shadow-xs border" style={{ borderColor: C.border }}>
         <div className="p-6 border-b" style={{ borderColor: C.border }}>
           <h2
             className="text-xl font-semibold"
@@ -325,7 +325,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Team Configuration */}
-      <div className="bg-white rounded-xl shadow-xs border" style={{ borderColor: C.border }}>
+      <div className="bg-[#2f2f2f] rounded-xl shadow-xs border" style={{ borderColor: C.border }}>
         <div className="p-6 border-b" style={{ borderColor: C.border }}>
           <h2
             className="text-xl font-semibold"
@@ -416,7 +416,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Brand Guidelines & Assets */}
-      <div className="bg-white rounded-xl shadow-xs border" style={{ borderColor: C.border }}>
+      <div className="bg-[#2f2f2f] rounded-xl shadow-xs border" style={{ borderColor: C.border }}>
         <div className="p-6 border-b" style={{ borderColor: C.border }}>
           <h2
             className="text-xl font-semibold"
@@ -449,7 +449,7 @@ export default function SettingsPage() {
             {brandAssets.map((asset, idx) => (
               <div
                 key={idx}
-                className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow"
+                className="bg-[#2f2f2f] border rounded-lg p-4 hover:shadow-md transition-shadow"
                 style={{ borderColor: C.border }}
               >
                 <div className="flex items-start gap-3">

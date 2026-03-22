@@ -205,7 +205,7 @@ function EmailComposer({ deal }: { deal: Deal }) {
       {/* Template */}
       <div>
         <label className="text-xs font-semibold text-charcoal mb-1 block">Template</label>
-        <select value={selectedTemplate} onChange={e => applyTemplate(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth">
+        <select value={selectedTemplate} onChange={e => applyTemplate(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-charcoal-light text-cream focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth">
           <option value="">Custom Email</option>
           {templates.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
         </select>
@@ -214,13 +214,13 @@ function EmailComposer({ deal }: { deal: Deal }) {
       {/* Subject */}
       <div>
         <label className="text-xs font-semibold text-charcoal mb-1 block">Subject</label>
-        <input type="text" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Email subject…" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth" />
+        <input type="text" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Email subject…" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-charcoal-light text-cream focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth" />
       </div>
 
       {/* Body */}
       <div>
         <label className="text-xs font-semibold text-charcoal mb-1 block">Body</label>
-        <textarea value={body} onChange={e => setBody(e.target.value)} rows={8} placeholder="Write your email here…" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth resize-y leading-relaxed" />
+        <textarea value={body} onChange={e => setBody(e.target.value)} rows={8} placeholder="Write your email here…" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-charcoal-light text-cream focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth resize-y leading-relaxed" />
       </div>
 
       {/* Send */}
@@ -285,8 +285,8 @@ function DriveLinkPanel({ dealId }: { dealId: string }) {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          <input type="text" value={url} onChange={e => setUrl(e.target.value)} placeholder="Google Drive folder URL…" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth" />
-          <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Folder name (optional)" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth" />
+          <input type="text" value={url} onChange={e => setUrl(e.target.value)} placeholder="Google Drive folder URL…" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-charcoal-light text-cream focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth" />
+          <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Folder name (optional)" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-charcoal-light text-cream focus:ring-2 focus:ring-teal/20 focus:border-teal transition-smooth" />
           <button onClick={save} disabled={saving || !url} className="self-start bg-teal hover:bg-teal-dark text-white px-4 py-2 rounded-lg text-xs font-semibold transition-smooth disabled:opacity-50 disabled:cursor-not-allowed">
             {saving ? 'Saving…' : 'Save Link'}
           </button>

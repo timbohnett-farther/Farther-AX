@@ -274,7 +274,7 @@ export default function KeyDocumentsPage() {
                     className={
                       idx % 2 === 0
                         ? "bg-cream hover:bg-cream-dark transition-colors"
-                        : "bg-white/40 hover:bg-cream-dark transition-colors"
+                        : "bg-charcoal-600/40 hover:bg-cream-dark transition-colors"
                     }
                   >
                     <td className="px-4 py-3 border-b border-cream-border font-medium text-charcoal whitespace-nowrap">
@@ -327,7 +327,7 @@ export default function KeyDocumentsPage() {
             {definitions.map((def, idx) => (
               <div
                 key={def.id}
-                className="bg-white/60 border border-cream-border rounded-lg p-6"
+                className="glass-card rounded-lg p-6"
               >
                 {/* Card header */}
                 <div className="flex items-start gap-4 mb-3">
@@ -374,7 +374,7 @@ export default function KeyDocumentsPage() {
           <div className="flex items-center justify-between">
             <Link
               href="/onboarding-vs-transitions"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-cream-border bg-white/60 text-charcoal hover:bg-cream-dark hover:border-gold-dark transition-colors text-sm font-medium"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg glass-card text-charcoal hover:bg-cream-dark hover:border-gold-dark transition-colors text-sm font-medium"
             >
               <span aria-hidden="true">←</span>
               Back

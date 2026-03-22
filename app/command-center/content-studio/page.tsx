@@ -271,7 +271,7 @@ export default function ContentStudioPage() {
           return (
             <div
               key={type.id}
-              className="bg-white rounded-xl p-5 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+              className="bg-[#2f2f2f] rounded-xl p-5 hover:shadow-md transition-shadow duration-200 cursor-pointer"
               style={{
                 borderLeft: `4px solid ${type.accentColor}`,
               }}
@@ -321,7 +321,7 @@ export default function ContentStudioPage() {
       </div>
 
       {/* Recent Drafts Table */}
-      <div className="bg-white rounded-xl p-6" style={{ border: `1px solid ${C.border}` }}>
+      <div className="bg-[#2f2f2f] rounded-xl p-6" style={{ border: `1px solid ${C.border}` }}>
         <h2
           className="text-2xl font-bold mb-4"
           style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: C.dark }}
@@ -450,7 +450,7 @@ export default function ContentStudioPage() {
       </div>
 
       {/* Template Grid */}
-      <div className="bg-white rounded-xl p-6" style={{ border: `1px solid ${C.border}` }}>
+      <div className="bg-[#2f2f2f] rounded-xl p-6" style={{ border: `1px solid ${C.border}` }}>
         <div className="flex items-center justify-between mb-4">
           <h2
             className="text-2xl font-bold"
@@ -482,7 +482,7 @@ export default function ContentStudioPage() {
           {templates.map((template, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-200 cursor-pointer"
+              className="bg-[#2f2f2f] rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-200 cursor-pointer"
               style={{ border: `1px solid ${C.border}` }}
             >
               <div
@@ -521,7 +521,7 @@ export default function ContentStudioPage() {
       {/* Generation Stats */}
       <div className="grid grid-cols-3 gap-6">
         {/* Content by Type */}
-        <div className="bg-white rounded-xl p-6" style={{ border: `1px solid ${C.border}` }}>
+        <div className="bg-[#2f2f2f] rounded-xl p-6" style={{ border: `1px solid ${C.border}` }}>
           <h3
             className="text-xl font-bold mb-4"
             style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: C.dark }}
@@ -573,7 +573,7 @@ export default function ContentStudioPage() {
         </div>
 
         {/* Publishing Velocity */}
-        <div className="bg-white rounded-xl p-6" style={{ border: `1px solid ${C.border}` }}>
+        <div className="bg-[#2f2f2f] rounded-xl p-6" style={{ border: `1px solid ${C.border}` }}>
           <h3
             className="text-xl font-bold mb-4"
             style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: C.dark }}
@@ -618,7 +618,7 @@ export default function ContentStudioPage() {
         </div>
 
         {/* Engagement Metrics */}
-        <div className="bg-white rounded-xl p-6" style={{ border: `1px solid ${C.border}` }}>
+        <div className="bg-[#2f2f2f] rounded-xl p-6" style={{ border: `1px solid ${C.border}` }}>
           <h3
             className="text-xl font-bold mb-4"
             style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: C.dark }}
