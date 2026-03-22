@@ -3,19 +3,19 @@
 import React from 'react';
 
 const C = {
-  dark: '#333333',
-  white: '#FAF7F2',
-  slate: '#5b6a71',
+  dark: '#e0dbd3',
+  white: '#121212',
+  slate: '#8a8a8a',
   teal: '#1d7682',
-  bg: '#FAF7F2',
-  cardBg: '#FDFAF5',
-  border: '#e8e2d9',
-  green: '#27ae60',
-  greenBg: 'rgba(39,174,96,0.10)',
-  amber: '#b27d2e',
-  amberBg: 'rgba(178,125,46,0.08)',
-  red: '#c0392b',
-  redBg: 'rgba(192,57,43,0.08)',
+  bg: '#121212',
+  cardBg: '#1e1e1e',
+  border: '#2a2a2a',
+  green: '#4CAF50',
+  greenBg: 'rgba(76,175,80,0.10)',
+  amber: '#FFB74D',
+  amberBg: 'rgba(255,183,77,0.10)',
+  red: '#EF5350',
+  redBg: 'rgba(239,83,80,0.10)',
 };
 
 const apiConnections = [

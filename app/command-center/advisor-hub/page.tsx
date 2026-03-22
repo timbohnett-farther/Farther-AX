@@ -8,13 +8,13 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 const C = {
-  dark: '#333333', white: '#ffffff', slate: '#5b6a71',
-  teal: '#1d7682', bg: '#FAF7F2',
-  cardBg: '#ffffff', border: '#e8e2d9',
-  gold: '#c8a951', goldBg: 'rgba(200,169,81,0.10)',
-  green: '#27ae60', greenBg: 'rgba(39,174,96,0.10)',
-  amber: '#b27d2e',
-  red: '#c0392b',
+  dark: '#e0dbd3', white: '#1e1e1e', slate: '#8a8a8a',
+  teal: '#1d7682', bg: '#121212',
+  cardBg: '#1e1e1e', border: '#2a2a2a',
+  gold: '#FFD54F', goldBg: 'rgba(255,213,79,0.10)',
+  green: '#4CAF50', greenBg: 'rgba(76,175,80,0.10)',
+  amber: '#FFB74D',
+  red: '#EF5350',
 };
 
 // ── Sentiment tier config (mirrors lib/sentiment.ts) ─────────────────────────

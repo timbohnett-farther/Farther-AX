@@ -9,14 +9,14 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const C = {
-  dark: '#333333', white: '#ffffff', slate: '#5b6a71',
-  lightBlue: '#b6d0ed', teal: '#1d7682', bg: '#FAF7F2',
-  cardBg: '#ffffff', border: '#e8e2d9', amber: '#d97706',
-  green: '#059669', red: '#dc2626',
-  redBg: 'rgba(220,38,38,0.08)', redBorder: 'rgba(220,38,38,0.18)',
-  amberBg: 'rgba(217,119,6,0.08)', amberBorder: 'rgba(217,119,6,0.18)',
-  gold: '#c8a951', goldBg: 'rgba(200,169,81,0.10)',
-  greenBg: 'rgba(5,150,105,0.08)',
+  dark: '#e0dbd3', white: '#1e1e1e', slate: '#8a8a8a',
+  lightBlue: '#2a9aa8', teal: '#1d7682', bg: '#121212',
+  cardBg: '#1e1e1e', border: '#2a2a2a', amber: '#FFB74D',
+  green: '#4CAF50', red: '#EF5350',
+  redBg: 'rgba(239,83,80,0.10)', redBorder: 'rgba(239,83,80,0.20)',
+  amberBg: 'rgba(255,183,77,0.10)', amberBorder: 'rgba(255,183,77,0.20)',
+  gold: '#FFD54F', goldBg: 'rgba(255,213,79,0.10)',
+  greenBg: 'rgba(76,175,80,0.10)',
 };
 
 const STAGE_LABELS: Record<string, string> = {

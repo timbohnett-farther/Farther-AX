@@ -1,61 +1,61 @@
 /**
- * Farther Design Tokens
+ * Farther Design Tokens — Dark Theme
  *
  * Centralized color palette and Tailwind class helpers.
  * Replaces duplicated `const C = {...}` objects across files.
  */
 
-// Core brand colors
+// Core brand colors — dark theme
 export const colors = {
   // Primary palette
-  dark: '#333333',
-  white: '#ffffff',
-  slate: '#5b6a71',
-  teal: '#1d7682',
-  tealDark: '#155a63',
-  tealLight: '#a3d4d9',
+  dark: '#e0dbd3',        // Primary text (light on dark)
+  white: '#1e1e1e',       // Surface/card bg (dark)
+  slate: '#8a8a8a',       // Secondary text
+  teal: '#1d7682',        // Brand accent
+  tealDark: '#155a63',    // Darker teal
+  tealLight: '#2a9aa8',   // Brighter teal for emphasis
 
   // Background colors
-  bg: '#FAF7F2',           // Cream background
-  bgDark: '#F0EBE3',       // Cream-dark
-  cardBg: '#ffffff',       // Card background
-  border: '#e8e2d9',       // Border color
-  borderLight: '#E0DCD6',
+  bg: '#121212',          // Page background
+  bgDark: '#0a0a0a',     // Deeper bg
+  cardBg: '#1e1e1e',     // Card background
+  border: '#2a2a2a',     // Border color
+  borderLight: '#333333',
 
   // Text colors
-  textPrimary: '#333333',
-  textSecondary: '#5b6a71',
-  textMuted: '#888888',
-  textLight: '#555555',
+  textPrimary: '#e0dbd3',
+  textSecondary: '#8a8a8a',
+  textMuted: '#6a6a6a',
+  textLight: '#c8c2ba',
 
-  // Market colors
-  bull: '#10b981',         // Green for gains
-  bullLight: '#d1fae5',
-  bullDark: '#059669',
-  bear: '#ef4444',         // Red for losses
-  bearLight: '#fee2e2',
-  bearDark: '#dc2626',
-  neutral: '#6b7280',
+  // Market colors (brightened for dark bg)
+  bull: '#4CAF50',
+  bullLight: '#1a2e1c',
+  bullDark: '#66BB6A',
+  bear: '#EF5350',
+  bearLight: '#2e1a1a',
+  bearDark: '#EF5350',
+  neutral: '#8a8a8a',
 
-  // Tier/wealth colors
-  gold: '#f59e0b',
-  goldLight: '#fef3c7',
-  goldDark: '#d97706',
-  silver: '#94a3b8',
-  platinum: '#e0e7ff',
-  bronze: '#d97706',
+  // Tier/wealth colors (brightened for dark bg)
+  gold: '#FFB74D',
+  goldLight: '#2e2518',
+  goldDark: '#FFA726',
+  silver: '#90A4AE',
+  platinum: '#9fa8da',
+  bronze: '#BCAAA4',
 
-  // Status colors
-  success: '#10b981',
-  warning: '#f59e0b',
-  danger: '#ef4444',
+  // Status colors (brightened for dark bg)
+  success: '#4CAF50',
+  warning: '#FFB74D',
+  danger: '#EF5350',
   info: '#1d7682',
 } as const;
 
-// Tailwind utility class helpers
+// Tailwind utility class helpers — dark theme
 export const tw = {
   // Card styles
-  card: 'bg-white rounded-xl border border-gray-200 shadow-xs',
+  card: 'bg-surface rounded-xl border border-[#2a2a2a] shadow-glass',
   cardGlass: 'glass-card',
   cardStat: 'stat-card',
   cardChart: 'chart-card',
@@ -68,19 +68,19 @@ export const tw = {
   badgeDanger: 'badge-danger',
 
   // Button styles
-  btnPrimary: 'bg-teal hover:bg-teal-dark text-white px-4 py-2 rounded-lg font-medium transition-smooth',
-  btnSecondary: 'bg-white hover:bg-gray-50 text-teal border border-teal px-4 py-2 rounded-lg font-medium transition-smooth',
-  btnGhost: 'hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium transition-smooth',
+  btnPrimary: 'bg-teal hover:bg-teal-dark text-charcoal px-4 py-2 rounded-lg font-medium transition-smooth shadow-glow-teal',
+  btnSecondary: 'bg-transparent hover:bg-surface-hover text-teal border border-teal px-4 py-2 rounded-lg font-medium transition-smooth',
+  btnGhost: 'hover:bg-surface-hover text-charcoal-muted px-4 py-2 rounded-lg font-medium transition-smooth',
 
   // Text styles
   heading1: 'text-4xl font-serif font-semibold text-charcoal',
   heading2: 'text-3xl font-serif font-semibold text-charcoal',
   heading3: 'text-2xl font-serif font-semibold text-charcoal',
   heading4: 'text-xl font-serif font-semibold text-charcoal',
-  bodyLarge: 'text-lg text-gray-700',
-  bodyRegular: 'text-base text-gray-700',
-  bodySmall: 'text-sm text-gray-600',
-  caption: 'text-xs text-gray-500',
+  bodyLarge: 'text-lg text-charcoal-light',
+  bodyRegular: 'text-base text-charcoal-light',
+  bodySmall: 'text-sm text-charcoal-muted',
+  caption: 'text-xs text-slate',
 
   // Layout utilities
   container: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',

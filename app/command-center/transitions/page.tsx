@@ -8,14 +8,14 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 const C = {
-  dark: '#333333', white: '#ffffff', slate: '#5b6a71',
-  teal: '#1d7682', bg: '#FAF7F2',
-  cardBg: '#ffffff', border: '#e8e2d9',
-  red: '#c0392b', redBg: 'rgba(192,57,43,0.08)', redBorder: 'rgba(192,57,43,0.18)',
-  amber: '#b27d2e', amberBg: 'rgba(178,125,46,0.08)', amberBorder: 'rgba(178,125,46,0.18)',
-  gold: '#c8a951', goldBg: 'rgba(200,169,81,0.10)',
-  green: '#27ae60', greenBg: 'rgba(39,174,96,0.10)', greenBorder: 'rgba(39,174,96,0.18)',
-  blue: '#2980b9', blueBg: 'rgba(41,128,185,0.10)', blueBorder: 'rgba(41,128,185,0.18)',
+  dark: '#e0dbd3', white: '#1e1e1e', slate: '#8a8a8a',
+  teal: '#1d7682', bg: '#121212',
+  cardBg: '#1e1e1e', border: '#2a2a2a',
+  red: '#EF5350', redBg: 'rgba(239,83,80,0.10)', redBorder: 'rgba(239,83,80,0.20)',
+  amber: '#FFB74D', amberBg: 'rgba(255,183,77,0.10)', amberBorder: 'rgba(255,183,77,0.20)',
+  gold: '#FFD54F', goldBg: 'rgba(255,213,79,0.10)',
+  green: '#4CAF50', greenBg: 'rgba(76,175,80,0.10)', greenBorder: 'rgba(76,175,80,0.20)',
+  blue: '#42A5F5', blueBg: 'rgba(66,165,245,0.10)', blueBorder: 'rgba(66,165,245,0.20)',
 };
 
 // ── Status color map ─────────────────────────────────────────────────────────

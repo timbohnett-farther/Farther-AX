@@ -15,34 +15,34 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Tremor color mappings — Tremor reads these at build time
+        // Tremor color mappings — dark theme
         tremor: {
           brand: {
-            faint: "#FAF7F2",
-            muted: "#F0EBE3",
-            subtle: "#a3d4d9",
+            faint: "#0f2e32",
+            muted: "#122d30",
+            subtle: "#1a5560",
             DEFAULT: "#1d7682",
-            emphasis: "#155a63",
-            inverted: "#FFFFFF",
+            emphasis: "#2a9aa8",
+            inverted: "#e0dbd3",
           },
           background: {
-            muted: "#FAF7F2",
-            subtle: "#F0EBE3",
-            DEFAULT: "#FFFFFF",
-            emphasis: "#333333",
+            muted: "#121212",
+            subtle: "#1a1a1a",
+            DEFAULT: "#1e1e1e",
+            emphasis: "#e0dbd3",
           },
           border: {
-            DEFAULT: "#E0DCD6",
+            DEFAULT: "#2a2a2a",
           },
           ring: {
             DEFAULT: "#1d7682",
           },
           content: {
-            subtle: "#888888",
-            DEFAULT: "#555555",
-            emphasis: "#333333",
-            strong: "#000000",
-            inverted: "#FFFFFF",
+            subtle: "#6a6a6a",
+            DEFAULT: "#8a8a8a",
+            emphasis: "#c8c2ba",
+            strong: "#e0dbd3",
+            inverted: "#121212",
           },
         },
       },
