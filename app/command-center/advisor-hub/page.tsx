@@ -8,13 +8,13 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 const C = {
-  dark: '#e0dbd3', white: '#1e1e1e', slate: '#8a8a8a',
-  teal: '#1d7682', bg: '#121212',
-  cardBg: '#1e1e1e', border: '#2a2a2a',
-  gold: '#FFD54F', goldBg: 'rgba(255,213,79,0.10)',
-  green: '#4CAF50', greenBg: 'rgba(76,175,80,0.10)',
-  amber: '#FFB74D',
-  red: '#EF5350',
+  dark: 'rgba(255,255,255,0.9)', white: '#1a1a1a', slate: 'rgba(255,255,255,0.4)',
+  teal: '#1d7682', bg: '#111111',
+  cardBg: 'rgba(255,255,255,0.07)', border: 'rgba(255,255,255,0.12)',
+  green: '#10b981', greenBg: 'rgba(16,185,129,0.15)',
+  amber: '#f59e0b', amberBg: 'rgba(245,158,11,0.15)', amberBorder: 'rgba(245,158,11,0.3)',
+  red: '#ef4444', redBg: 'rgba(239,68,68,0.15)', redBorder: 'rgba(239,68,68,0.3)',
+  gold: '#f59e0b', goldBg: 'rgba(245,158,11,0.15)',
 };
 
 // ── Sentiment tier config (mirrors lib/sentiment.ts) ─────────────────────────

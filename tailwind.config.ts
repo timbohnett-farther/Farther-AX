@@ -1,9 +1,9 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Slim Tailwind config kept for Tremor 3.x compatibility.
- * Tremor scans this file for its color tokens.
- * All custom theme values now live in app/globals.css @theme block.
+ * Farther AX — Tailwind Config
+ * Full color scales + Tremor integration.
+ * Glass-morphism classes live in app/globals.css.
  */
 const config: Config = {
   content: [
@@ -15,34 +15,67 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Tremor color mappings — dark theme
+        charcoal: {
+          50: '#f5f5f5',
+          100: '#e0e0e0',
+          200: '#bdbdbd',
+          300: '#9e9e9e',
+          400: '#757575',
+          500: '#333333',
+          600: '#2a2a2a',
+          700: '#222222',
+          800: '#1a1a1a',
+          900: '#111111',
+          DEFAULT: '#333333',
+        },
+        teal: {
+          50: '#e8f5f7',
+          100: '#b8e0e5',
+          200: '#88cbd3',
+          300: '#58b6c1',
+          400: '#28a1af',
+          500: '#1d7682',
+          600: '#186068',
+          700: '#134a4e',
+          800: '#0e3434',
+          900: '#091e1a',
+          DEFAULT: '#1d7682',
+        },
+        ice: {
+          50: '#f0f6fc',
+          100: '#dce9f7',
+          200: '#b6d0ed',
+          300: '#90b7e3',
+          400: '#6a9ed9',
+          DEFAULT: '#b6d0ed',
+        },
+        slate: {
+          DEFAULT: '#5b6a71',
+        },
+        // Tremor color mappings
         tremor: {
           brand: {
-            faint: "#0f2e32",
-            muted: "#122d30",
-            subtle: "#1a5560",
-            DEFAULT: "#1d7682",
-            emphasis: "#2a9aa8",
-            inverted: "#e0dbd3",
+            faint: '#091e1a',
+            muted: '#0e3434',
+            subtle: '#134a4e',
+            DEFAULT: '#1d7682',
+            emphasis: '#28a1af',
+            inverted: '#ffffff',
           },
           background: {
-            muted: "#121212",
-            subtle: "#1a1a1a",
-            DEFAULT: "#1e1e1e",
-            emphasis: "#e0dbd3",
+            muted: '#111111',
+            subtle: '#1a1a1a',
+            DEFAULT: '#222222',
+            emphasis: '#ffffff',
           },
-          border: {
-            DEFAULT: "#2a2a2a",
-          },
-          ring: {
-            DEFAULT: "#1d7682",
-          },
+          border: { DEFAULT: 'rgba(255, 255, 255, 0.06)' },
+          ring: { DEFAULT: '#1d7682' },
           content: {
-            subtle: "#6a6a6a",
-            DEFAULT: "#8a8a8a",
-            emphasis: "#c8c2ba",
-            strong: "#e0dbd3",
-            inverted: "#121212",
+            subtle: 'rgba(255, 255, 255, 0.3)',
+            DEFAULT: 'rgba(255, 255, 255, 0.6)',
+            emphasis: 'rgba(255, 255, 255, 0.9)',
+            strong: '#ffffff',
+            inverted: '#111111',
           },
         },
       },

@@ -1,61 +1,65 @@
 /**
- * Farther Design Tokens — Dark Theme
+ * Farther Design Tokens — Dark Glass Theme
  *
  * Centralized color palette and Tailwind class helpers.
- * Replaces duplicated `const C = {...}` objects across files.
+ * Matches the Farther Marketing Command Center Brand Spec.
  */
 
-// Core brand colors — dark theme
+// Core brand colors
 export const colors = {
-  // Primary palette
-  dark: '#e0dbd3',        // Primary text (light on dark)
-  white: '#1e1e1e',       // Surface/card bg (dark)
-  slate: '#8a8a8a',       // Secondary text
-  teal: '#1d7682',        // Brand accent
-  tealDark: '#155a63',    // Darker teal
-  tealLight: '#2a9aa8',   // Brighter teal for emphasis
+  // Core 5
+  charcoal: '#333333',
+  white: '#ffffff',
+  slate: '#5b6a71',
+  ice: '#b6d0ed',
+  teal: '#1d7682',
+  tealDark: '#155961',
+  tealLight: '#28a1af',
 
-  // Background colors
-  bg: '#121212',          // Page background
-  bgDark: '#0a0a0a',     // Deeper bg
-  cardBg: '#1e1e1e',     // Card background
-  border: '#2a2a2a',     // Border color
-  borderLight: '#333333',
+  // Background gradient stops
+  bg600: '#2a2a2a',
+  bg800: '#1a1a1a',
+  bg900: '#111111',
 
-  // Text colors
-  textPrimary: '#e0dbd3',
-  textSecondary: '#8a8a8a',
-  textMuted: '#6a6a6a',
-  textLight: '#c8c2ba',
+  // Surface (for inline styles referencing "card bg")
+  cardBg: 'rgba(255, 255, 255, 0.07)',
+  border: 'rgba(255, 255, 255, 0.12)',
+  borderSubtle: 'rgba(255, 255, 255, 0.06)',
 
-  // Market colors (brightened for dark bg)
-  bull: '#4CAF50',
-  bullLight: '#1a2e1c',
-  bullDark: '#66BB6A',
-  bear: '#EF5350',
-  bearLight: '#2e1a1a',
-  bearDark: '#EF5350',
-  neutral: '#8a8a8a',
+  // Text (white at varying opacity)
+  textPrimary: 'rgba(255, 255, 255, 0.9)',
+  textSecondary: 'rgba(255, 255, 255, 0.6)',
+  textMuted: 'rgba(255, 255, 255, 0.4)',
+  textTertiary: 'rgba(255, 255, 255, 0.3)',
 
-  // Tier/wealth colors (brightened for dark bg)
-  gold: '#FFB74D',
-  goldLight: '#2e2518',
-  goldDark: '#FFA726',
-  silver: '#90A4AE',
-  platinum: '#9fa8da',
-  bronze: '#BCAAA4',
+  // Market colors
+  bull: '#10b981',
+  bullDark: '#059669',
+  bear: '#ef4444',
+  bearDark: '#dc2626',
+  neutral: '#6b7280',
 
-  // Status colors (brightened for dark bg)
-  success: '#4CAF50',
-  warning: '#FFB74D',
-  danger: '#EF5350',
+  // Tier/wealth colors
+  gold: '#f59e0b',
+  goldDark: '#d97706',
+  silver: '#94a3b8',
+  platinum: '#e0e7ff',
+  bronze: '#d97706',
+
+  // Status colors
+  success: '#10b981',
+  warning: '#f59e0b',
+  danger: '#ef4444',
   info: '#1d7682',
+
+  // Chart palette
+  chart: ['#1d7682', '#28a1af', '#b6d0ed', '#88cbd3', '#5b6a71', '#8a9aa2'],
 } as const;
 
-// Tailwind utility class helpers — dark theme
+// Tailwind utility class helpers
 export const tw = {
   // Card styles
-  card: 'bg-surface rounded-xl border border-[#2a2a2a] shadow-glass',
+  card: 'glass-card',
   cardGlass: 'glass-card',
   cardStat: 'stat-card',
   cardChart: 'chart-card',
@@ -68,19 +72,19 @@ export const tw = {
   badgeDanger: 'badge-danger',
 
   // Button styles
-  btnPrimary: 'bg-teal hover:bg-teal-dark text-charcoal px-4 py-2 rounded-lg font-medium transition-smooth shadow-glow-teal',
-  btnSecondary: 'bg-transparent hover:bg-surface-hover text-teal border border-teal px-4 py-2 rounded-lg font-medium transition-smooth',
-  btnGhost: 'hover:bg-surface-hover text-charcoal-muted px-4 py-2 rounded-lg font-medium transition-smooth',
+  btnPrimary: 'glass-btn-primary',
+  btnSecondary: 'glass-btn-secondary',
+  btnGhost: 'glass-btn-ghost',
 
-  // Text styles
-  heading1: 'text-4xl font-serif font-semibold text-charcoal',
-  heading2: 'text-3xl font-serif font-semibold text-charcoal',
-  heading3: 'text-2xl font-serif font-semibold text-charcoal',
-  heading4: 'text-xl font-serif font-semibold text-charcoal',
-  bodyLarge: 'text-lg text-charcoal-light',
-  bodyRegular: 'text-base text-charcoal-light',
-  bodySmall: 'text-sm text-charcoal-muted',
-  caption: 'text-xs text-slate',
+  // Text styles (white at varying opacity)
+  heading1: 'text-4xl font-serif font-semibold text-white tracking-wide',
+  heading2: 'text-3xl font-serif font-semibold text-white tracking-wide',
+  heading3: 'text-2xl font-serif font-semibold text-white',
+  heading4: 'text-xl font-serif font-semibold text-white',
+  bodyLarge: 'text-lg text-white/60',
+  bodyRegular: 'text-base text-white/60',
+  bodySmall: 'text-sm text-white/60',
+  caption: 'text-xs text-white/30',
 
   // Layout utilities
   container: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
@@ -104,23 +108,23 @@ export const typography = {
 
 // Spacing scale (matches Tailwind)
 export const spacing = {
-  xs: '0.25rem',    // 4px
-  sm: '0.5rem',     // 8px
-  md: '1rem',       // 16px
-  lg: '1.5rem',     // 24px
-  xl: '2rem',       // 32px
-  '2xl': '3rem',    // 48px
-  '3xl': '4rem',    // 64px
+  xs: '0.25rem',
+  sm: '0.5rem',
+  md: '1rem',
+  lg: '1.5rem',
+  xl: '2rem',
+  '2xl': '3rem',
+  '3xl': '4rem',
 } as const;
 
 // Border radius scale
 export const borderRadius = {
-  sm: '0.375rem',   // 6px
-  md: '0.5rem',     // 8px
-  lg: '0.75rem',    // 12px
-  xl: '1rem',       // 16px
-  '2xl': '1.25rem', // 20px
-  full: '9999px',   // Pill shape
+  sm: '0.375rem',
+  md: '0.5rem',
+  lg: '0.75rem',
+  xl: '1rem',
+  '2xl': '1.25rem',
+  full: '9999px',
 } as const;
 
 // Animation durations
@@ -130,7 +134,7 @@ export const duration = {
   slow: '500ms',
 } as const;
 
-// Breakpoints (matches Tailwind defaults)
+// Breakpoints
 export const breakpoints = {
   sm: '640px',
   md: '768px',
@@ -139,7 +143,7 @@ export const breakpoints = {
   '2xl': '1536px',
 } as const;
 
-// Helper functions for dynamic classes
+// Helper functions
 export const getStatusColor = (status: string): string => {
   const statusMap: Record<string, string> = {
     success: colors.success,
@@ -190,14 +194,8 @@ export const formatNumber = (value: number): string => {
 };
 
 export const formatCompactCurrency = (value: number): string => {
-  if (value >= 1_000_000_000) {
-    return `$${(value / 1_000_000_000).toFixed(1)}B`;
-  }
-  if (value >= 1_000_000) {
-    return `$${(value / 1_000_000).toFixed(1)}M`;
-  }
-  if (value >= 1_000) {
-    return `$${(value / 1_000).toFixed(1)}K`;
-  }
+  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
   return formatCurrency(value);
 };

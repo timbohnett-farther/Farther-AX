@@ -19,8 +19,9 @@ export default function RootLayout({
         className="antialiased"
         style={{
           fontFamily: "'Fakt', system-ui, sans-serif",
-          backgroundColor: "#121212",
-          color: "#e0dbd3",
+          background: "linear-gradient(165deg, #2a2a2a 0%, #1a1a1a 50%, #111111 100%)",
+          backgroundAttachment: "fixed",
+          color: "rgba(255, 255, 255, 0.9)",
         }}
       >
         <SessionProvider>
