@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
+import Image from 'next/image';
 import { DataCard, StatusBadge } from '@/components/ui';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
@@ -254,9 +255,12 @@ export default function TeamPage() {
       {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-cream font-serif mb-2">
-            Team Management
-          </h1>
+          <div className="flex items-center gap-3 mb-2">
+            <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={28} height={28} />
+            <h1 className="text-3xl font-bold text-cream font-serif">
+              Team Management
+            </h1>
+          </div>
           <p className="text-slate text-sm">
             Manage AX team members · Assign to advisors
           </p>

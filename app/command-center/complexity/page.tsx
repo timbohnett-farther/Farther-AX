@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { DataCard } from '@/components/ui';
 
 /**
@@ -134,9 +135,12 @@ export default function ComplexityEducationPage() {
           <p className="text-xs tracking-widest uppercase mb-2 text-teal">
             Command Center — Education
           </p>
-          <h1 className="text-3xl font-light mb-3 text-cream font-serif">
-            Transition Complexity Scoring
-          </h1>
+          <div className="flex items-center gap-3 mb-3">
+            <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={28} height={28} />
+            <h1 className="text-3xl font-light text-cream font-serif">
+              Transition Complexity Scoring
+            </h1>
+          </div>
           <p className="text-sm leading-relaxed text-slate">
             The complexity score is an objective, data-driven rating that helps us staff transitions
             appropriately, set realistic timelines, and ensure every advisor gets the right resources

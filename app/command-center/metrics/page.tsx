@@ -1,6 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
+import Image from 'next/image';
 import { StatCard, MetricBar } from '@/components/ui';
 import { formatCompactCurrency } from '@/lib/design-tokens';
 import {
@@ -95,9 +96,12 @@ export default function MetricsDashboard() {
   return (
     <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-cream font-serif mb-2">
-          AX Metrics
-        </h1>
+        <div className="flex items-center gap-3 mb-2">
+          <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={28} height={28} />
+          <h1 className="text-3xl font-bold text-cream font-serif">
+            AX Metrics
+          </h1>
+        </div>
         <p className="text-slate text-sm">
           Live pipeline metrics · refreshes every 12 hours
         </p>

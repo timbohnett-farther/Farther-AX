@@ -34,9 +34,16 @@ function SignInContent() {
         }}
       >
         {/* Logo */}
-        <div className="flex justify-center mb-8">
+        <div className="flex flex-col items-center mb-8">
           <Image
-            src="/images/farther-wordmark-navy.png"
+            src="/images/Farther_Symbol_RGB_Cream.svg"
+            alt=""
+            width={48}
+            height={48}
+            className="mb-4"
+          />
+          <Image
+            src="/images/farther-wordmark-cream.png"
             alt="Farther"
             width={140}
             height={32}

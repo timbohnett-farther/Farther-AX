@@ -2,6 +2,7 @@
 
 import useSWR from 'swr';
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ONBOARDING_STAGE_IDS, STAGE_LABELS } from '@/lib/onboarding-tasks';
 import type { OnboardingTask, Phase } from '@/lib/onboarding-tasks';
@@ -327,9 +328,12 @@ export default function OnboardingTracker() {
     <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-cream font-serif mb-2">
-            Active Onboarding
-          </h1>
+          <div className="flex items-center gap-3 mb-2">
+            <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={28} height={28} />
+            <h1 className="text-3xl font-bold text-cream font-serif">
+              Active Onboarding
+            </h1>
+          </div>
           <p className="text-slate text-sm">
             {onboardingDeals.length} advisor{onboardingDeals.length !== 1 ? 's' : ''} in onboarding · Team capacity tracking · 43-task checklist
           </p>

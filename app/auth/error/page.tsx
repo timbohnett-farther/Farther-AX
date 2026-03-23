@@ -24,9 +24,16 @@ function ErrorContent() {
           boxShadow: "0 4px 32px rgba(0,0,0,0.3)",
         }}
       >
-        <div className="flex justify-center mb-8">
+        <div className="flex flex-col items-center mb-8">
           <Image
-            src="/images/farther-wordmark-navy.png"
+            src="/images/Farther_Symbol_RGB_Cream.svg"
+            alt=""
+            width={48}
+            height={48}
+            className="mb-4"
+          />
+          <Image
+            src="/images/farther-wordmark-cream.png"
             alt="Farther"
             width={140}
             height={32}

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import useSWR from 'swr';
+import Image from 'next/image';
 import { Card, Text, Badge } from '@tremor/react';
 import { StatCard, DataCard, StatusBadge, TabGroup, FilterBar } from '@/components/ui';
 import { formatCompactCurrency } from '@/lib/design-tokens';
@@ -504,9 +505,12 @@ export default function RiaHubPage() {
     <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-cream font-serif mb-2">
-          RIA Hub
-        </h1>
+        <div className="flex items-center gap-3 mb-2">
+          <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={28} height={28} />
+          <h1 className="text-3xl font-bold text-cream font-serif">
+            RIA Hub
+          </h1>
+        </div>
         <p className="text-slate text-sm">
           Relationship intelligence for advisors in onboarding — AI briefings, communications, and collaboration tools.
         </p>

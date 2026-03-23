@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import useSWR from 'swr';
+import Image from 'next/image';
 import Link from 'next/link';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
@@ -1392,9 +1393,12 @@ export default function PipelineDashboard() {
     <div style={{ padding: '40px 40px', minHeight: '100vh', background: C.bg, fontFamily: "'Fakt', system-ui, sans-serif" }}>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 6 }}>
-          Pipeline Dashboard
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+          <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={28} height={28} />
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+            Pipeline Dashboard
+          </h1>
+        </div>
         <p style={{ color: C.slate, fontSize: 14 }}>
           Live HubSpot data · refreshes every 30s
         </p>

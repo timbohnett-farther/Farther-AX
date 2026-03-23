@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import useSWR from 'swr';
+import Image from 'next/image';
 import Link from 'next/link';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
@@ -215,9 +216,12 @@ export default function TransitionsPage() {
         <Link href="/command-center" style={{ fontSize: 13, color: C.slate, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
           ← Back to Pipeline
         </Link>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, margin: '8px 0 4px' }}>
-          Client Transition Dashboard
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 4px' }}>
+          <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={28} height={28} />
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark }}>
+            Client Transition Dashboard
+          </h1>
+        </div>
         <p style={{ fontSize: 14, color: C.slate, margin: 0 }}>
           Track client transitions, document statuses, and DocuSign progress by advisor
         </p>

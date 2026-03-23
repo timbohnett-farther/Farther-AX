@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import useSWR from 'swr';
+import Image from 'next/image';
 import Link from 'next/link';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
@@ -638,12 +639,15 @@ export default function AdvisorHubPage() {
     <div style={{ padding: '40px 48px', maxWidth: 1400, margin: '0 auto' }}>
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
-        <h1 style={{
-          fontSize: 32, fontWeight: 700, color: C.dark, marginBottom: 6,
-          fontFamily: "'ABC Arizona Text', Georgia, serif",
-        }}>
-          Advisor Hub
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+          <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={28} height={28} />
+          <h1 style={{
+            fontSize: 32, fontWeight: 700, color: C.dark,
+            fontFamily: "'ABC Arizona Text', Georgia, serif",
+          }}>
+            Advisor Hub
+          </h1>
+        </div>
         <p style={{ fontSize: 14, color: C.slate }}>
           Full directory of advisors across all pipeline stages
         </p>
