@@ -431,6 +431,122 @@ function U4Card({ dealId, contactId, contactEmail, advisorName }: { dealId: stri
   );
 }
 
+// ── Tech Intake Card ──────────────────────────────────────────────────────────
+function TechIntakeCard({ dealId, contactId, contactEmail, advisorName }: { dealId: string; contactId: string | null; contactEmail: string | null; advisorName: string }) {
+  const { data, mutate } = useSWR(dealId ? `/api/command-center/advisor/${dealId}/tech-intake` : null, fetcher);
+  const [sending, setSending] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const status = data?.status ?? 'not_sent';
+  const APP_URL = typeof window !== 'undefined' ? window.location.origin : '';
+
+  const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
+    not_sent: { label: 'Not Sent', color: '#94a3b8', bg: 'rgba(148,163,184,0.18)' },
+    sent: { label: 'Awaiting Advisor', color: '#fbbf24', bg: 'rgba(251,191,36,0.18)' },
+    completed: { label: 'Received', color: '#4ade80', bg: 'rgba(74,222,128,0.18)' },
+    expired: { label: 'Expired', color: '#f87171', bg: 'rgba(248,113,113,0.18)' },
+  };
+
+  const cfg = statusConfig[status] || statusConfig.not_sent;
+
+  const handleSend = async () => {
+    if (!contactEmail) return;
+    setSending(true);
+    try {
+      await fetch('/api/tech-intake/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dealId, contactId, contactEmail, advisorName }),
+      });
+      mutate();
+    } catch { /* silent */ }
+    setSending(false);
+  };
+
+  const handleCopyLink = async () => {
+    if (!data?.token) return;
+    await navigator.clipboard.writeText(`${APP_URL}/forms/tech-intake/${data.token}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Section title="Technology Intake Form" highlight icon="◎">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: C.slate }}>Status:</span>
+          <span style={{
+            display: 'inline-block', padding: '4px 12px', borderRadius: 6,
+            background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 700,
+            border: `1px solid ${cfg.color}40`,
+          }}>{cfg.label}</span>
+        </div>
+
+        {(status === 'not_sent' || status === 'expired') && contactEmail && (
+          <button onClick={handleSend} disabled={sending}
+            style={{
+              padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: sending ? 'not-allowed' : 'pointer',
+              border: 'none', background: `linear-gradient(135deg, ${C.teal}, #28a1af)`, color: '#fff',
+              boxShadow: '0 4px 16px rgba(29,118,130,0.3)', opacity: sending ? 0.7 : 1,
+            }}>
+            {sending ? 'Sending...' : (status === 'expired' ? 'Resend Form' : 'Send Tech Intake')}
+          </button>
+        )}
+
+        {!contactEmail && status === 'not_sent' && (
+          <span style={{ fontSize: 12, color: C.amber }}>No email on file — cannot send form</span>
+        )}
+      </div>
+
+      {(status === 'sent' || status === 'completed' || status === 'expired') && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0 20px' }}>
+          {data?.sentAt && (
+            <div style={{ marginBottom: 8 }}>
+              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Sent</p>
+              <p style={{ fontSize: 13, color: C.dark }}>{new Date(data.sentAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+            </div>
+          )}
+          {data?.sentBy && (
+            <div style={{ marginBottom: 8 }}>
+              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Sent By</p>
+              <p style={{ fontSize: 13, color: C.dark }}>{data.sentBy}</p>
+            </div>
+          )}
+          {data?.completedAt && (
+            <div style={{ marginBottom: 8 }}>
+              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Received</p>
+              <p style={{ fontSize: 13, color: C.green, fontWeight: 600 }}>{new Date(data.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {data?.token && status !== 'not_sent' && (
+        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+          <button onClick={handleCopyLink}
+            style={{
+              padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+              border: `1px solid ${C.border}`, background: copied ? C.greenBg : C.cardBg,
+              color: copied ? C.green : C.slate,
+            }}>
+            {copied ? '✓ Copied!' : 'Copy Form Link'}
+          </button>
+          {status === 'sent' && (
+            <button onClick={handleSend} disabled={sending}
+              style={{
+                padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                border: `1px solid ${C.border}`, background: C.cardBg, color: C.slate,
+                opacity: sending ? 0.7 : 1,
+              }}>
+              {sending ? 'Resending...' : 'Resend Email'}
+            </button>
+          )}
+        </div>
+      )}
+    </Section>
+  );
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // TAB CONTENT COMPONENTS
 // ══════════════════════════════════════════════════════════════════════════════
@@ -444,6 +560,13 @@ function OverviewTab({ deal, contact, extracted, dealId }: { deal: Record<string
   return (
     <>
       <U4Card
+        dealId={dealId}
+        contactId={contact?.vid?.toString() || contact?.id?.toString() || null}
+        contactEmail={contact?.email || null}
+        advisorName={deal.dealname || 'Advisor'}
+      />
+
+      <TechIntakeCard
         dealId={dealId}
         contactId={contact?.vid?.toString() || contact?.id?.toString() || null}
         contactEmail={contact?.email || null}
