@@ -416,11 +416,11 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
           }}
             onMouseEnter={e => {
               e.currentTarget.style.borderColor = C.teal;
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(29,118,130,0.08)';
+              e.currentTarget.style.background = 'rgba(29,118,130,0.04)';
             }}
             onMouseLeave={e => {
               e.currentTarget.style.borderColor = pace.status === 'behind' ? 'rgba(192,57,43,0.2)' : C.border;
-              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.background = C.cardBg;
             }}
           >
             {/* Advisor Name */}
@@ -870,11 +870,11 @@ export default function AdvisorHubPage() {
               }}
                 onMouseEnter={e => {
                   e.currentTarget.style.borderColor = C.teal;
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(29,118,130,0.08)';
+                  e.currentTarget.style.background = 'rgba(29,118,130,0.04)';
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.borderColor = C.border;
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.background = C.cardBg;
                 }}
               >
                 {/* Name — clickable link */}

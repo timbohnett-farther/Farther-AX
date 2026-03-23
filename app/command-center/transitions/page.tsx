@@ -499,7 +499,10 @@ export default function TransitionsPage() {
                   </thead>
                   <tbody>
                     {advisor.accounts.map(acc => (
-                      <tr key={acc.id} style={{ borderBottom: `1px solid ${C.border}` }}>
+                      <tr key={acc.id} style={{ borderBottom: `1px solid ${C.border}`, transition: 'background 120ms ease' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'; }}
+                      >
                         <td style={{ padding: '10px 8px', fontWeight: 500, color: C.dark, maxWidth: 160 }}>
                           {acc.household_name || acc.account_name || '—'}
                         </td>

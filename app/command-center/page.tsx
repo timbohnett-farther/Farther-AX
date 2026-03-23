@@ -385,7 +385,10 @@ function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[
             </thead>
             <tbody>
               {deals.map((deal, i) => (
-                <tr key={deal.id} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? 'transparent' : 'rgba(250,247,242,0.02)' }}>
+                <tr key={deal.id} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? 'transparent' : 'rgba(250,247,242,0.02)', transition: 'background 120ms ease' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? 'transparent' : 'rgba(250,247,242,0.02)'; }}
+                >
                   <td style={{ padding: '8px 10px' }}>
                     <Link href={`/command-center/advisor/${deal.id}`} style={{ color: C.teal, fontWeight: 600, textDecoration: 'none' }}>{deal.dealname}</Link>
                   </td>
@@ -891,6 +894,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
               <YAxis tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
                 contentStyle={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, color: C.dark }}
+                itemStyle={{ color: C.dark }}
                 formatter={(value: unknown, name: unknown) => {
                   const v = Number(value);
                   if (name === 'count') return [v, 'Advisors'];
@@ -916,6 +920,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
               />
               <Tooltip
                 contentStyle={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, color: C.dark }}
+                itemStyle={{ color: C.dark }}
                 formatter={(value: unknown, name: unknown) => [formatAUM(Number(value)), name === 'actual' ? 'Launched AUM' : 'Pace Target']}
                 labelStyle={{ color: C.slate, marginBottom: 4 }}
               />
@@ -1542,7 +1547,11 @@ function RecruitingTab() {
                     <tr key={deal.id} style={{
                       borderBottom: `1px solid ${C.border}`,
                       background: i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)',
-                    }}>
+                      transition: 'background 120ms ease',
+                    }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)'; }}
+                    >
                       <td style={{ padding: '10px 14px' }}>
                         <Link href={`/command-center/advisor/${deal.id}`} style={{ fontWeight: 600, color: C.teal, textDecoration: 'none' }}>
                           {deal.dealname}
@@ -1661,7 +1670,11 @@ function AcquisitionsTab() {
                     borderBottom: `1px solid ${C.border}`,
                     background: deal.isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)',
                     opacity: rowOpacity,
-                  }}>
+                    transition: 'background 120ms ease',
+                  }}
+                    onMouseEnter={e => { if (!deal.isTerminal) (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = deal.isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)'; }}
+                  >
                     <td style={{ padding: '10px 14px' }}>
                       <Link
                         href={`/command-center/advisor/${deal.id}`}
