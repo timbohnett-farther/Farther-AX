@@ -11,7 +11,15 @@ function getAuthClient(): GoogleAuth {
   if (authClient) return authClient;
 
   const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  let rawKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ?? '';
+
+  // Strip wrapping quotes if present (some env parsers leave them)
+  if ((rawKey.startsWith('"') && rawKey.endsWith('"')) || (rawKey.startsWith("'") && rawKey.endsWith("'"))) {
+    rawKey = rawKey.slice(1, -1);
+  }
+
+  // Convert literal \n sequences to real newlines
+  const privateKey = rawKey.replace(/\\n/g, '\n');
 
   if (!clientEmail || !privateKey) {
     throw new Error(

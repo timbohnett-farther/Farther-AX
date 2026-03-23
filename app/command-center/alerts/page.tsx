@@ -8,7 +8,10 @@ import { DataCard, StatCard } from '@/components/ui';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
-interface Alert {
+// ── Types ───────────────────────────────────────────────────────────────────
+
+interface TaskAlert {
+  type: 'task_overdue';
   deal_id: string;
   deal_name: string;
   task_key: string;
@@ -20,6 +23,38 @@ interface Alert {
   days_overdue: number;
   is_hard_gate: boolean;
 }
+
+interface SentimentAlert {
+  type: 'sentiment_drop';
+  deal_id: string;
+  deal_name: string;
+  previous_tier: string;
+  current_tier: string;
+  previous_score: number;
+  current_score: number;
+  score_change: number;
+  changed_at: string;
+}
+
+interface AumAlert {
+  type: 'aum_behind';
+  deal_id: string;
+  deal_name: string;
+  transfer_pct: number;
+  expected_pct: number;
+  deficit: number;
+  days_since_launch: number;
+  transition_type: string;
+  pace_status: 'warning' | 'behind';
+  expected_aum: number;
+  actual_aum: number;
+}
+
+type Alert = TaskAlert | SentimentAlert | AumAlert;
+
+type AlertTab = 'all' | 'task_overdue' | 'sentiment_drop' | 'aum_behind';
+
+// ── Role badge colors ───────────────────────────────────────────────────────
 
 const ROLE_BADGE_COLORS: Record<string, string> = {
   AXM: 'bg-teal/15 text-teal',
@@ -40,28 +75,139 @@ const ROLE_BADGE_COLORS: Record<string, string> = {
   'RIA Leadership': 'bg-fuchsia-400/15 text-fuchsia-400',
 };
 
+// ── Sentiment tier colors ───────────────────────────────────────────────────
+
+const TIER_COLORS: Record<string, string> = {
+  'Advocate': 'bg-emerald-500/15 text-emerald-400',
+  'Positive': 'bg-teal/15 text-teal',
+  'Neutral': 'bg-amber-500/15 text-amber-400',
+  'At Risk': 'bg-orange-500/15 text-orange-400',
+  'High Risk': 'bg-red-500/15 text-red-400',
+};
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
 function formatDate(d: string) {
-  return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (!d) return '';
+  return new Date(d.includes('T') ? d : d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
+
+function formatCurrency(n: number) {
+  if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1)}B`;
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
+  return `$${n}`;
+}
+
+// ── Task Alert Row ──────────────────────────────────────────────────────────
+
+function TaskAlertRow({ alert }: { alert: TaskAlert }) {
+  return (
+    <div className={`flex items-center gap-3 px-3 py-2.5 border-b border-cream-border last:border-b-0 ${
+      alert.is_hard_gate ? 'bg-red-500/5 border-l-2 border-l-red-500' : ''
+    }`}>
+      {alert.is_hard_gate && (
+        <span className="w-2 h-2 rounded-full bg-teal shrink-0" title="Hard gate" />
+      )}
+      <div className="flex-1 min-w-0">
+        <span className="text-sm text-cream">{alert.task_label}</span>
+        <span className="text-[10px] text-slate ml-2">{alert.phase_label}</span>
+      </div>
+      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap ${ROLE_BADGE_COLORS[alert.owner] ?? 'bg-slate/15 text-slate'}`}>
+        {alert.owner}
+      </span>
+      <span className="text-[10px] text-red-400 font-bold whitespace-nowrap">
+        {alert.days_overdue}d overdue
+      </span>
+      <span className="text-[10px] text-slate whitespace-nowrap">
+        Due {formatDate(alert.due_date)}
+      </span>
+    </div>
+  );
+}
+
+// ── Sentiment Alert Row ─────────────────────────────────────────────────────
+
+function SentimentAlertRow({ alert }: { alert: SentimentAlert }) {
+  return (
+    <div className="flex items-center gap-3 px-3 py-2.5 border-b border-cream-border last:border-b-0 bg-orange-500/5 border-l-2 border-l-orange-500">
+      <div className="flex-1 min-w-0">
+        <span className="text-sm text-cream">Sentiment dropped</span>
+        <div className="flex items-center gap-2 mt-1">
+          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${TIER_COLORS[alert.previous_tier] ?? 'bg-slate/15 text-slate'}`}>
+            {alert.previous_tier}
+          </span>
+          <span className="text-[10px] text-slate">&rarr;</span>
+          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${TIER_COLORS[alert.current_tier] ?? 'bg-slate/15 text-slate'}`}>
+            {alert.current_tier}
+          </span>
+        </div>
+      </div>
+      <div className="text-right">
+        <span className="text-[10px] text-red-400 font-bold block">
+          {alert.score_change > 0 ? '+' : ''}{alert.score_change.toFixed(1)} pts
+        </span>
+        <span className="text-[10px] text-slate">
+          {alert.current_score.toFixed(0)}/100
+        </span>
+      </div>
+      {alert.changed_at && (
+        <span className="text-[10px] text-slate whitespace-nowrap">
+          {formatDate(alert.changed_at)}
+        </span>
+      )}
+    </div>
+  );
+}
+
+// ── AUM Alert Row ───────────────────────────────────────────────────────────
+
+function AumAlertRow({ alert }: { alert: AumAlert }) {
+  const isCritical = alert.pace_status === 'behind';
+  return (
+    <div className={`flex items-center gap-3 px-3 py-2.5 border-b border-cream-border last:border-b-0 ${
+      isCritical ? 'bg-red-500/5 border-l-2 border-l-red-500' : 'bg-amber-500/5 border-l-2 border-l-amber-500'
+    }`}>
+      <div className="flex-1 min-w-0">
+        <span className="text-sm text-cream">AUM transfer {isCritical ? 'behind target' : 'slower than expected'}</span>
+        <div className="flex items-center gap-3 mt-1">
+          <span className="text-[10px] text-slate">
+            {alert.transfer_pct}% transferred · expected {alert.expected_pct}% by day {alert.days_since_launch}
+          </span>
+        </div>
+      </div>
+      <div className="text-right shrink-0">
+        <span className={`text-[10px] font-bold block ${isCritical ? 'text-red-400' : 'text-amber-400'}`}>
+          {alert.deficit}% behind
+        </span>
+        <span className="text-[10px] text-slate">
+          {formatCurrency(alert.actual_aum)} / {formatCurrency(alert.expected_aum)}
+        </span>
+      </div>
+      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap ${
+        isCritical ? 'bg-red-500/15 text-red-400' : 'bg-amber-500/15 text-amber-400'
+      }`}>
+        {alert.transition_type}
+      </span>
+    </div>
+  );
+}
+
+// ── Main Page ───────────────────────────────────────────────────────────────
 
 export default function AlertsPage() {
   const { data, isLoading, error } = useSWR('/api/command-center/alerts', fetcher, { refreshInterval: 300_000 });
-  const [filterOwner, setFilterOwner] = useState<string>('all');
-  const [filterGate, setFilterGate] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<AlertTab>('all');
 
   if (isLoading) return <div className="px-10 py-16 text-slate">Loading alerts...</div>;
   if (error) return <div className="px-10 py-16 text-red-600">Failed to load alerts.</div>;
 
-  const alerts: Alert[] = data?.alerts ?? [];
-  const totalAlerts = data?.total ?? 0;
-  const hardGateAlerts = data?.hard_gates ?? 0;
+  const allAlerts: Alert[] = data?.alerts ?? [];
+  const counts = data?.counts ?? { task_overdue: 0, hard_gates: 0, sentiment_drop: 0, aum_behind: 0, aum_critical: 0 };
 
-  // Get unique owners for filter
-  const owners = Array.from(new Set(alerts.map(a => a.owner))).sort();
-
-  let filtered = alerts;
-  if (filterOwner !== 'all') filtered = filtered.filter(a => a.owner === filterOwner);
-  if (filterGate) filtered = filtered.filter(a => a.is_hard_gate);
+  // Filter by tab
+  let filtered = allAlerts;
+  if (activeTab !== 'all') filtered = filtered.filter(a => a.type === activeTab);
 
   // Group by advisor
   const grouped = new Map<string, { deal_id: string; deal_name: string; alerts: Alert[] }>();
@@ -72,6 +218,13 @@ export default function AlertsPage() {
     grouped.get(a.deal_id)!.alerts.push(a);
   }
 
+  const tabs: { key: AlertTab; label: string; count: number }[] = [
+    { key: 'all', label: 'All Alerts', count: allAlerts.length },
+    { key: 'task_overdue', label: 'Overdue Tasks', count: counts.task_overdue },
+    { key: 'sentiment_drop', label: 'Sentiment Drops', count: counts.sentiment_drop },
+    { key: 'aum_behind', label: 'AUM Pace', count: counts.aum_behind },
+  ];
+
   return (
     <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
       <div className="relative mb-6">
@@ -81,95 +234,107 @@ export default function AlertsPage() {
             Onboarding Alerts
           </h1>
           <p className="text-slate text-sm">
-            Tasks past their recommended due dates
+            Overdue tasks, sentiment shifts, and AUM transfer pace
           </p>
         </div>
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
         <StatCard
-          title="Total Overdue"
-          value={totalAlerts}
-          className={totalAlerts > 0 ? 'bg-red-500/10 border-red-500/20' : ''}
+          title="Total Alerts"
+          value={allAlerts.length}
+          className={allAlerts.length > 0 ? 'bg-red-500/10 border-red-500/20' : ''}
+        />
+        <StatCard
+          title="Overdue Tasks"
+          value={counts.task_overdue}
+          className={counts.task_overdue > 0 ? 'bg-red-500/10 border-red-500/20' : ''}
         />
         <StatCard
           title="Hard Gate Blockers"
-          value={hardGateAlerts}
-          className={hardGateAlerts > 0 ? 'bg-amber-500/10 border-amber-500/20' : ''}
+          value={counts.hard_gates}
+          className={counts.hard_gates > 0 ? 'bg-amber-500/10 border-amber-500/20' : ''}
         />
         <StatCard
-          title="Advisors Affected"
-          value={Array.from(new Set(alerts.map(a => a.deal_id))).length}
+          title="Sentiment Drops"
+          value={counts.sentiment_drop}
+          className={counts.sentiment_drop > 0 ? 'bg-orange-500/10 border-orange-500/20' : ''}
+        />
+        <StatCard
+          title="AUM Off Pace"
+          value={counts.aum_behind}
+          className={counts.aum_behind > 0 ? 'bg-amber-500/10 border-amber-500/20' : ''}
         />
       </div>
 
-      {/* Filters */}
-      <div className="flex items-center gap-3 mb-5 flex-wrap">
-        <span className="text-xs text-slate font-semibold uppercase tracking-wider">Filter:</span>
-        <button
-          onClick={() => setFilterGate(g => !g)}
-          className={`px-3 py-1.5 rounded-md text-xs font-medium border-none cursor-pointer transition-smooth ${
-            filterGate ? 'bg-teal text-white' : 'bg-charcoal-700 text-slate hover:text-cream'
-          }`}
-        >
-          Hard Gates Only
-        </button>
-        <select
-          value={filterOwner}
-          onChange={e => setFilterOwner(e.target.value)}
-          className="px-3 py-1.5 rounded-md text-xs font-medium bg-charcoal-700 text-slate border border-cream-border cursor-pointer"
-        >
-          <option value="all">All Owners</option>
-          {owners.map(o => <option key={o} value={o}>{o}</option>)}
-        </select>
+      {/* Tabs */}
+      <div className="flex gap-1 glass-card rounded-lg p-1 mb-6 w-fit">
+        {tabs.map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-3.5 py-1.5 rounded text-xs font-medium transition-smooth border-none cursor-pointer flex items-center gap-1.5 ${
+              activeTab === tab.key
+                ? 'bg-teal text-white'
+                : 'bg-transparent text-slate hover:text-cream'
+            }`}
+          >
+            {tab.label}
+            {tab.count > 0 && (
+              <span className={`text-[9px] px-1 py-0.5 rounded-sm font-bold ${
+                activeTab === tab.key ? 'bg-white/20' : 'bg-red-500/20 text-red-400'
+              }`}>
+                {tab.count}
+              </span>
+            )}
+          </button>
+        ))}
       </div>
 
+      {/* Alert list */}
       {filtered.length === 0 ? (
         <DataCard className="text-center py-16">
           <p className="text-slate text-sm">
-            {totalAlerts === 0 ? 'No overdue tasks. All on track!' : 'No alerts match current filters.'}
+            {allAlerts.length === 0
+              ? 'No alerts. All advisors are on track!'
+              : 'No alerts in this category.'}
           </p>
         </DataCard>
       ) : (
         Array.from(grouped.values()).map(group => (
           <DataCard key={group.deal_id} className="mb-4">
-            <div className="flex items-center justify-between pb-3 border-b border-cream-border mb-3">
+            <div className="flex items-center justify-between pb-3 border-b border-cream-border mb-0">
               <Link href={`/command-center/advisor/${group.deal_id}`} className="no-underline">
                 <h3 className="text-sm font-bold text-cream font-serif hover:text-teal cursor-pointer transition-smooth">
                   {group.deal_name}
                 </h3>
               </Link>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-red-500/15 text-red-400 font-bold">
-                {group.alerts.length} overdue
-              </span>
+              <div className="flex items-center gap-2">
+                {group.alerts.some(a => a.type === 'task_overdue') && (
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-red-500/15 text-red-400 font-bold">
+                    {group.alerts.filter(a => a.type === 'task_overdue').length} overdue
+                  </span>
+                )}
+                {group.alerts.some(a => a.type === 'sentiment_drop') && (
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-orange-500/15 text-orange-400 font-bold">
+                    Sentiment
+                  </span>
+                )}
+                {group.alerts.some(a => a.type === 'aum_behind') && (
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 font-bold">
+                    AUM Pace
+                  </span>
+                )}
+              </div>
             </div>
-            <div className="space-y-0">
-              {group.alerts.map(alert => (
-                <div
-                  key={alert.task_key}
-                  className={`flex items-center gap-3 px-3 py-2.5 border-b border-cream-border last:border-b-0 ${
-                    alert.is_hard_gate ? 'bg-red-500/5 border-l-2 border-l-red-500' : ''
-                  }`}
-                >
-                  {alert.is_hard_gate && (
-                    <span className="w-2 h-2 rounded-full bg-teal shrink-0" title="Hard gate" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <span className="text-sm text-cream">{alert.task_label}</span>
-                    <span className="text-[10px] text-slate ml-2">{alert.phase_label}</span>
-                  </div>
-                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap ${ROLE_BADGE_COLORS[alert.owner] ?? 'bg-slate/15 text-slate'}`}>
-                    {alert.owner}
-                  </span>
-                  <span className="text-[10px] text-red-400 font-bold whitespace-nowrap">
-                    {alert.days_overdue}d overdue
-                  </span>
-                  <span className="text-[10px] text-slate whitespace-nowrap">
-                    Due {formatDate(alert.due_date)}
-                  </span>
-                </div>
-              ))}
+            <div>
+              {group.alerts.map((alert, i) => {
+                if (alert.type === 'task_overdue') return <TaskAlertRow key={`t-${i}`} alert={alert} />;
+                if (alert.type === 'sentiment_drop') return <SentimentAlertRow key={`s-${i}`} alert={alert} />;
+                if (alert.type === 'aum_behind') return <AumAlertRow key={`a-${i}`} alert={alert} />;
+                return null;
+              })}
             </div>
           </DataCard>
         ))
