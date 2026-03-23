@@ -893,6 +893,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
               <XAxis dataKey="month" tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
+                cursor={{ fill: 'rgba(250,247,242,0.04)' }}
                 contentStyle={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, color: C.dark }}
                 itemStyle={{ color: C.dark }}
                 formatter={(value: unknown, name: unknown) => {
@@ -919,6 +920,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                 tickFormatter={(v: number) => formatAUM(v)}
               />
               <Tooltip
+                cursor={{ stroke: 'rgba(250,247,242,0.08)', strokeWidth: 1 }}
                 contentStyle={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, color: C.dark }}
                 itemStyle={{ color: C.dark }}
                 formatter={(value: unknown, name: unknown) => [formatAUM(Number(value)), name === 'actual' ? 'Launched AUM' : 'Pace Target']}
