@@ -12,7 +12,6 @@ import {
   SparklesIcon,
   ChartBarIcon,
   UserGroupIcon,
-  CurrencyDollarIcon,
 } from "@heroicons/react/24/outline";
 
 const navItems = [
@@ -38,7 +37,6 @@ const coreOps = [
   { label: "Transitions", href: "/command-center/transitions", icon: RectangleStackIcon },
   { label: "Team", href: "/command-center/team", icon: UserGroupIcon },
   { label: "Complexity", href: "/command-center/complexity", icon: ChartBarIcon },
-  { label: "Billing", href: "/command-center/billing", icon: CurrencyDollarIcon },
   { label: "Metrics", href: "/command-center/metrics", icon: ChartBarIcon },
   { label: "AI Assistant", href: "/command-center/ai", icon: SparklesIcon },
 ];
