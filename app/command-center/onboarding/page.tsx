@@ -46,9 +46,30 @@ const STATUS_COLORS = {
   red: 'red',
 } as const;
 
-// ── AXM Workload Dashboard ──────────────────────────────────────────────────
+// Static Tailwind class mappings (dynamic classes get purged at build)
+const BORDER_CLASSES: Record<string, string> = {
+  emerald: 'border-emerald-400/30',
+  amber: 'border-amber-400/30',
+  red: 'border-red-400/30',
+};
+const BADGE_CLASSES: Record<string, string> = {
+  emerald: 'bg-emerald-500/20 text-emerald-400',
+  amber: 'bg-amber-500/20 text-amber-400',
+  red: 'bg-red-500/20 text-red-400',
+};
+
+const CAPACITY_ROLES = ['AXM', 'AXA', 'CTM', 'CTA'] as const;
+const ROLE_LABELS: Record<string, string> = {
+  AXM: 'Advisor Experience Managers',
+  AXA: 'Advisor Experience Associates',
+  CTM: 'Client Transition Managers',
+  CTA: 'Client Transition Associates',
+};
+
+// ── Capacity Planning Dashboard ─────────────────────────────────────────────
 function WorkloadDashboard() {
-  const { data, isLoading } = useSWR('/api/command-center/workload?role=AXM', fetcher, { refreshInterval: 43_200_000 });
+  const [activeRole, setActiveRole] = useState<string>('AXM');
+  const { data, isLoading } = useSWR(`/api/command-center/workload?role=${activeRole}`, fetcher, { refreshInterval: 43_200_000 });
   const [expandedMember, setExpandedMember] = useState<number | null>(null);
 
   if (isLoading) {
@@ -58,16 +79,6 @@ function WorkloadDashboard() {
   const workload: WorkloadEntry[] = data?.workload ?? [];
   const maxCapacity: number = data?.maxCapacity ?? 250;
 
-  if (workload.length === 0) {
-    return (
-      <DataCard className="text-center mb-7">
-        <p className="text-slate text-sm">
-          No active AXMs found. Add team members in the Team page to see workload balancing.
-        </p>
-      </DataCard>
-    );
-  }
-
   const totalAdvisors = workload.reduce((sum, w) => sum + w.active_deals, 0);
   const avgComplexity = workload.length > 0
     ? Math.round(workload.reduce((sum, w) => sum + w.total_complexity, 0) / workload.length)
@@ -76,10 +87,36 @@ function WorkloadDashboard() {
 
   return (
     <div className="mb-7">
+      {/* Role Tabs */}
+      <div className="flex gap-0 border-b-2 border-white/5 mb-5">
+        {CAPACITY_ROLES.map(role => {
+          const isActive = activeRole === role;
+          return (
+            <button
+              key={role}
+              onClick={() => { setActiveRole(role); setExpandedMember(null); }}
+              className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-0.5 cursor-pointer bg-transparent border-transparent transition-all ${
+                isActive ? 'text-teal border-teal' : 'text-slate hover:text-cream'
+              }`}
+            >
+              {role}
+            </button>
+          );
+        })}
+      </div>
+
+      {workload.length === 0 ? (
+        <DataCard className="text-center mb-4">
+          <p className="text-slate text-sm">
+            No active {activeRole}s found. Add team members with the {activeRole} role in the Team page.
+          </p>
+        </DataCard>
+      ) : (
+      <>
       {/* Summary row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         <StatCard
-          title="Active AXMs"
+          title={`Active ${activeRole}s`}
           value={workload.length}
         />
         <StatCard
@@ -92,12 +129,15 @@ function WorkloadDashboard() {
         />
         <StatCard
           title={overloaded > 0 ? 'Overloaded' : 'Team Status'}
-          value={overloaded > 0 ? `${overloaded} AXM${overloaded > 1 ? 's' : ''}` : 'Balanced'}
+          value={overloaded > 0 ? `${overloaded} member${overloaded > 1 ? 's' : ''}` : 'Balanced'}
           className={overloaded > 0 ? 'bg-red-500/20 border-red-500/30' : 'bg-emerald-500/20 border-emerald-500/30'}
         />
       </div>
 
-      {/* AXM Cards */}
+      {/* Role description */}
+      <p className="text-xs text-slate mb-4">{ROLE_LABELS[activeRole] ?? activeRole}</p>
+
+      {/* Member Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {workload.map(w => {
           const isExpanded = expandedMember === w.member_id;
@@ -106,7 +146,7 @@ function WorkloadDashboard() {
           return (
             <DataCard
               key={w.member_id}
-              className={`border-${statusColor}-200`}
+              className={BORDER_CLASSES[statusColor] ?? ''}
             >
               {/* Header */}
               <div
@@ -120,7 +160,7 @@ function WorkloadDashboard() {
                   </p>
                 </div>
                 <div>
-                  <span className={`inline-block px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase bg-${statusColor}-100 text-${statusColor}-700`}>
+                  <span className={`inline-block px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase ${BADGE_CLASSES[statusColor] ?? ''}`}>
                     {w.capacity_status}
                   </span>
                 </div>
@@ -175,6 +215,8 @@ function WorkloadDashboard() {
           );
         })}
       </div>
+      </>
+      )}
     </div>
   );
 }
