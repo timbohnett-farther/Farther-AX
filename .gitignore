@@ -27,6 +27,11 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
+
+# service account keys
+google-service-account.json
+*-service-account*.json
 
 # vercel
 .vercel

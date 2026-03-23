@@ -85,6 +85,25 @@ async function migrate() {
       CREATE UNIQUE INDEX IF NOT EXISTS idx_transition_clients_sheet_id_row
         ON transition_clients(sheet_id, sheet_row_index);
 
+      -- Added: track which Drive workbook each row came from
+      ALTER TABLE transition_clients
+        ADD COLUMN IF NOT EXISTS workbook_name VARCHAR(512);
+
+      -- Workbook-to-advisor mapping (manual assignment, locking)
+      CREATE TABLE IF NOT EXISTS transition_workbooks (
+        id SERIAL PRIMARY KEY,
+        sheet_id VARCHAR(255) UNIQUE NOT NULL,
+        workbook_name VARCHAR(512),
+        sheet_url TEXT,
+        detected_advisor_name VARCHAR(255),
+        assigned_advisor_name VARCHAR(255),
+        hubspot_contact_id VARCHAR(128),
+        is_locked BOOLEAN DEFAULT FALSE,
+        last_synced_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
       CREATE TABLE IF NOT EXISTS docusign_tokens (
         id SERIAL PRIMARY KEY,
         access_token TEXT NOT NULL,

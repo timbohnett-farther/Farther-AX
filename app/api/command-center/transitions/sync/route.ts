@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { fetchSheetData, listSheetsInFolder, DriveFile } from '@/lib/google-sheets';
 import pool from '@/lib/db';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -59,8 +58,7 @@ interface TransitionRecord {
 }
 
 // ── Header → field mapping ────────────────────────────────────────────────────
-// Resolves a raw sheet header string to a TransitionRecord field name.
-// Returns null when the header has no matching field.
+
 function resolveHeader(
   header: string,
   lcityCount: number,
@@ -68,7 +66,6 @@ function resolveHeader(
   const h = header.trim();
   const hl = h.toLowerCase();
 
-  // Simple exact matches first
   const exactMap: Record<string, keyof TransitionRecord> = {
     'Farther Contact': 'farther_contact',
     'Advisor Name': 'advisor_name',
@@ -84,8 +81,6 @@ function resolveHeader(
     'Account Type': 'account_type',
     'Notes': 'notes',
     'Billing Setup': 'billing_setup',
-    // Address city/state/zip/country columns share the same header names —
-    // caller tracks which occurrence this is via lcityCount.
     'LCity': lcityCount === 0 ? 'primary_city' : 'secondary_city',
     'LState': lcityCount === 0 ? 'primary_state' : 'secondary_state',
     'LZip': lcityCount === 0 ? 'primary_zip' : 'secondary_zip',
@@ -98,11 +93,9 @@ function resolveHeader(
 
   if (exactMap[h] !== undefined) return exactMap[h];
 
-  // Flexible substring / keyword matching for multi-line / variant headers
   if (hl.includes('household name')) return 'household_name';
   if (hl.includes('billing group')) return 'billing_group';
 
-  // Primary fields
   if (hl.includes('primary') && hl.includes('first name')) return 'primary_first_name';
   if (hl.includes('primary') && hl.includes('middle name')) return 'primary_middle_name';
   if (hl.includes('primary') && hl.includes('last name')) return 'primary_last_name';
@@ -111,7 +104,6 @@ function resolveHeader(
   if (hl.includes('primary') && hl.includes('ssn')) return 'primary_ssn_last4';
   if (hl.includes('primary') && hl.includes('street')) return 'primary_street';
 
-  // Secondary fields
   if (hl.includes('secondary') && hl.includes('first name')) return 'secondary_first_name';
   if (hl.includes('secondary') && hl.includes('middle name')) return 'secondary_middle_name';
   if (hl.includes('secondary') && hl.includes('last name')) return 'secondary_last_name';
@@ -132,19 +124,17 @@ function resolveHeader(
   return null;
 }
 
-// ── Parse a single sheet row into a TransitionRecord ─────────────────────────
+// ── Parse helpers ─────────────────────────────────────────────────────────────
+
 function parseRow(
-  headers: string[],
   cells: string[],
   fieldIndex: Map<keyof TransitionRecord, number>,
 ): Partial<TransitionRecord> {
   const record = {} as Record<keyof TransitionRecord, string>;
 
-  // Use Array.from so iteration works regardless of TypeScript target setting
   Array.from(fieldIndex.entries()).forEach(([field, colIdx]) => {
     const raw = (cells[colIdx] ?? '').trim();
 
-    // SSN: only store last 4 digits for security
     if (field === 'primary_ssn_last4' || field === 'secondary_ssn_last4') {
       const digits = raw.replace(/\D/g, '');
       record[field] = digits.length >= 4 ? digits.slice(-4) : digits;
@@ -157,26 +147,18 @@ function parseRow(
   return record;
 }
 
-// ── Build the field→column index map from header row ─────────────────────────
-// This runs once per sync so the per-row lookup is O(1).
 function buildFieldIndex(headers: string[]): Map<keyof TransitionRecord, number> {
   const index = new Map<keyof TransitionRecord, number>();
-  // lcityCount tracks how many times we've seen LCity so we can distinguish
-  // primary (first occurrence) vs secondary (second occurrence) address columns.
   let lcityCount = 0;
 
   for (let i = 0; i < headers.length; i++) {
     const field = resolveHeader(headers[i], lcityCount);
     if (field === null) continue;
 
-    // Only assign the first occurrence for each field (later duplicates ignored)
-    // EXCEPT for the lcity family — those get assigned twice intentionally via lcityCount.
     if (!index.has(field)) {
       index.set(field, i);
     }
 
-    // Advance lcityCount after we've processed the primary city group so that
-    // the NEXT occurrence of LCity maps to the secondary set.
     if (headers[i] === 'LCity') {
       lcityCount += 1;
     }
@@ -185,73 +167,63 @@ function buildFieldIndex(headers: string[]): Map<keyof TransitionRecord, number>
   return index;
 }
 
-// ── POST handler ──────────────────────────────────────────────────────────────
+// ── Sync a single workbook's Transitions tab ─────────────────────────────────
 
-export async function POST(req: NextRequest) {
+interface WorkbookResult {
+  sheetId: string;
+  workbookName: string;
+  detectedAdvisor: string | null;
+  synced: number;
+  total: number;
+  error?: string;
+}
+
+async function syncWorkbook(
+  sheetId: string,
+  workbookName: string,
+  range: string,
+): Promise<WorkbookResult> {
   try {
-    // Auth check — we need the Google access token to call Sheets API
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    const accessToken = (session as unknown as Record<string, unknown>).access_token as string | undefined;
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: 'No Google access token on session. Please sign out and sign in again.' },
-        { status: 401 },
-      );
-    }
-
-    const body = await req.json();
-    const { sheetId, sheetRange } = body as { sheetId?: string; sheetRange?: string };
-
-    if (!sheetId) {
-      return NextResponse.json({ error: 'sheetId is required' }, { status: 400 });
-    }
-
-    const range = sheetRange ?? 'Transition!A1:AQ';
-
-    // ── Fetch from Google Sheets API v4 ─────────────────────────────────────
-    const sheetsUrl =
-      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}`;
-
-    const sheetsRes = await fetch(sheetsUrl, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-
-    if (!sheetsRes.ok) {
-      const errText = await sheetsRes.text();
-      console.error('[transitions/sync] Google Sheets error:', sheetsRes.status, errText);
-      return NextResponse.json(
-        { error: `Google Sheets API error ${sheetsRes.status}: ${errText}` },
-        { status: 502 },
-      );
-    }
-
-    const sheetsData = await sheetsRes.json();
-    const allRows: string[][] = sheetsData.values ?? [];
+    const allRows = await fetchSheetData(sheetId, range);
 
     if (allRows.length < 2) {
-      return NextResponse.json({ synced: 0, total: 0 });
+      return { sheetId, workbookName, detectedAdvisor: null, synced: 0, total: 0 };
     }
 
-    // First row is headers; remaining rows are data
     const headers = allRows[0];
     const dataRows = allRows.slice(1);
     const fieldIndex = buildFieldIndex(headers);
 
-    // ── Upsert each row into transition_clients ──────────────────────────────
+    // Detect advisor name from the first non-empty data row
+    const advisorColIdx = fieldIndex.get('advisor_name');
+    let detectedAdvisor: string | null = null;
+    if (advisorColIdx !== undefined) {
+      for (const row of dataRows) {
+        const val = (row[advisorColIdx] ?? '').trim();
+        if (val) { detectedAdvisor = val; break; }
+      }
+    }
+
+    // Upsert workbook mapping (don't overwrite locked assignments)
+    const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}`;
+    await pool.query(
+      `INSERT INTO transition_workbooks (sheet_id, workbook_name, sheet_url, detected_advisor_name, last_synced_at)
+       VALUES ($1, $2, $3, $4, NOW())
+       ON CONFLICT (sheet_id) DO UPDATE SET
+         workbook_name          = EXCLUDED.workbook_name,
+         sheet_url              = EXCLUDED.sheet_url,
+         detected_advisor_name  = EXCLUDED.detected_advisor_name,
+         last_synced_at         = NOW()`,
+      [sheetId, workbookName, sheetUrl, detectedAdvisor],
+    );
+
     let synced = 0;
 
     for (let i = 0; i < dataRows.length; i++) {
       const cells = dataRows[i];
-
-      // Skip fully empty rows
       if (cells.every(c => !c.trim())) continue;
 
-      const record = parseRow(headers, cells, fieldIndex);
-
-      // sheet_row_index is 1-based (row 2 in the sheet = index 1 here since headers are row 1)
+      const record = parseRow(cells, fieldIndex);
       const sheetRowIndex = i + 1;
 
       await pool.query(
@@ -259,6 +231,7 @@ export async function POST(req: NextRequest) {
         INSERT INTO transition_clients (
           sheet_id,
           sheet_row_index,
+          workbook_name,
           farther_contact,
           advisor_name,
           custodian,
@@ -317,9 +290,10 @@ export async function POST(req: NextRequest) {
           $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
           $31, $32, $33, $34, $35, $36, $37, $38, $39, $40,
           $41, $42, $43, $44, $45, $46, $47, $48, $49, $50,
-          $51, $52, NOW()
+          $51, $52, $53, NOW()
         )
         ON CONFLICT (sheet_id, sheet_row_index) DO UPDATE SET
+          workbook_name                  = EXCLUDED.workbook_name,
           farther_contact                = EXCLUDED.farther_contact,
           advisor_name                   = EXCLUDED.advisor_name,
           custodian                      = EXCLUDED.custodian,
@@ -375,6 +349,7 @@ export async function POST(req: NextRequest) {
         [
           sheetId,
           sheetRowIndex,
+          workbookName,
           record.farther_contact ?? null,
           record.advisor_name ?? null,
           record.custodian ?? null,
@@ -431,7 +406,73 @@ export async function POST(req: NextRequest) {
       synced += 1;
     }
 
-    return NextResponse.json({ synced, total: dataRows.length });
+    return { sheetId, workbookName, detectedAdvisor, synced, total: dataRows.length };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`[transitions/sync] Error syncing "${workbookName}" (${sheetId}):`, message);
+    return { sheetId, workbookName, detectedAdvisor: null, synced: 0, total: 0, error: message };
+  }
+}
+
+// ── POST handler ──────────────────────────────────────────────────────────────
+// POST with no body → sync all workbooks in the Drive folder
+// POST with { sheetId } → sync a single workbook
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json().catch(() => ({}));
+    const { sheetId, sheetRange } = body as { sheetId?: string; sheetRange?: string };
+
+    const range = sheetRange ?? 'Transitions!A1:AQ';
+
+    // ── Single workbook sync ────────────────────────────────────────────────
+    if (sheetId) {
+      const result = await syncWorkbook(sheetId, '', range);
+      if (result.error) {
+        return NextResponse.json({ error: result.error }, { status: 502 });
+      }
+      return NextResponse.json(result);
+    }
+
+    // ── Full folder sync ────────────────────────────────────────────────────
+    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+    if (!folderId) {
+      return NextResponse.json(
+        { error: 'GOOGLE_DRIVE_FOLDER_ID env var is not set' },
+        { status: 500 },
+      );
+    }
+
+    const sheets: DriveFile[] = await listSheetsInFolder(folderId);
+
+    if (sheets.length === 0) {
+      return NextResponse.json({
+        workbooks: [],
+        summary: { total_workbooks: 0, total_synced: 0, total_rows: 0, errors: 0 },
+      });
+    }
+
+    const results: WorkbookResult[] = [];
+
+    for (const sheet of sheets) {
+      console.log(`[transitions/sync] Syncing "${sheet.name}" (${sheet.id})…`);
+      const result = await syncWorkbook(sheet.id, sheet.name, range);
+      results.push(result);
+    }
+
+    const totalSynced = results.reduce((sum, r) => sum + r.synced, 0);
+    const totalRows = results.reduce((sum, r) => sum + r.total, 0);
+    const errors = results.filter(r => r.error).length;
+
+    return NextResponse.json({
+      workbooks: results,
+      summary: {
+        total_workbooks: sheets.length,
+        total_synced: totalSynced,
+        total_rows: totalRows,
+        errors,
+      },
+    });
   } catch (err) {
     console.error('[transitions/sync]', err);
     const message = err instanceof Error ? err.message : String(err);

@@ -5,6 +5,8 @@ import pool from '@/lib/db';
 
 interface TransitionClientRow {
   id: number;
+  sheet_id: string | null;
+  workbook_name: string | null;
   advisor_name: string | null;
   farther_contact: string | null;
   household_name: string | null;
@@ -32,6 +34,7 @@ interface TransitionClientRow {
 interface AdvisorGroup {
   advisor_name: string;
   farther_contact: string | null;
+  sheet_url: string | null;
   total_accounts: number;
   accounts: TransitionClientRow[];
 }
@@ -43,6 +46,8 @@ export async function GET() {
     const result = await pool.query<TransitionClientRow>(`
       SELECT
         id,
+        sheet_id,
+        workbook_name,
         advisor_name,
         farther_contact,
         household_name,
@@ -80,6 +85,7 @@ export async function GET() {
         advisorMap.set(key, {
           advisor_name: key,
           farther_contact: row.farther_contact,
+          sheet_url: row.sheet_id ? `https://docs.google.com/spreadsheets/d/${row.sheet_id}` : null,
           total_accounts: 0,
           accounts: [],
         });

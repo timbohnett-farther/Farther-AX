@@ -114,7 +114,7 @@ function SummaryCard({ label, value, sub, accent, icon }: { label: string; value
         <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.3, color: accent ? C.white : C.slate }}>{icon}</span>
       )}
       <p style={{ fontSize: 11, color: accent ? 'rgba(255,255,255,0.7)' : C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{label}</p>
-      <p style={{ fontSize: 28, fontWeight: 700, color: accent ? C.white : C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{value}</p>
+      <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{value}</p>
       {sub && <p style={{ fontSize: 12, color: accent ? 'rgba(255,255,255,0.6)' : C.slate, marginTop: 4 }}>{sub}</p>}
     </div>
   );
@@ -1232,7 +1232,7 @@ function RecruitingTab() {
                   return (
                     <tr key={deal.id} style={{
                       borderBottom: `1px solid ${C.border}`,
-                      background: i % 2 === 0 ? C.cardBg : '#faf7f2',
+                      background: i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)',
                     }}>
                       <td style={{ padding: '10px 14px' }}>
                         <Link href={`/command-center/advisor/${deal.id}`} style={{ fontWeight: 600, color: C.teal, textDecoration: 'none' }}>
@@ -1340,7 +1340,7 @@ function AcquisitionsTab() {
                 return (
                   <tr key={deal.id} style={{
                     borderBottom: `1px solid ${C.border}`,
-                    background: deal.isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? C.cardBg : '#faf7f2',
+                    background: deal.isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)',
                     opacity: rowOpacity,
                   }}>
                     <td style={{ padding: '10px 14px' }}>
