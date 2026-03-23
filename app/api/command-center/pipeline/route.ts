@@ -24,7 +24,7 @@ const DEAL_PROPERTIES = [
   // Identity
   'dealname', 'dealstage', 'pipeline', 'hubspot_owner_id', 'createdate', 'hs_lastmodifieddate',
   // AUM & Revenue
-  'aum', 'transferable_aum', 'transferable_aum__', 't12_revenue', 'fee_based_revenue',
+  'aum', 'transferable_aum', 'transferable_aum__', 'current_value', 't12_revenue', 'fee_based_revenue',
   'projected_revenue', 'expected_revenue', 'insurance_annuity_revenue', 'broker_dealer_revenue',
   'n401k_aum', 'n401k_revenue', 'book_assets', 'book_acquired___inherited__',
   'initial_aum', 'initial_aum_date', 'new_aum_projected_amount',

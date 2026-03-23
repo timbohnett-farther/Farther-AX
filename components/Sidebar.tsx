@@ -35,7 +35,6 @@ const coreOps = [
   { label: "Advisor Hub", href: "/command-center/advisor-hub", icon: DocumentPlusIcon },
   { label: "Onboarding", href: "/command-center/onboarding", icon: RectangleStackIcon },
   { label: "Transitions", href: "/command-center/transitions", icon: RectangleStackIcon },
-  { label: "RIA Hub", href: "/command-center/ria-hub", icon: RectangleStackIcon },
   { label: "Team", href: "/command-center/team", icon: UserGroupIcon },
   { label: "Complexity", href: "/command-center/complexity", icon: ChartBarIcon },
   { label: "Metrics", href: "/command-center/metrics", icon: ChartBarIcon },

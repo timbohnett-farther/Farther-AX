@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import useSWR from 'swr';
 import Image from 'next/image';
 import Link from 'next/link';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, Area, Line } from 'recharts';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -49,6 +50,21 @@ const STAGE_COLORS: Record<string, string> = {
 };
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Name-to-color mapper for recruiter/team members ─────────────────────────
+const NAME_COLORS = [
+  '#5ec4cf', '#f59e0b', '#8b5cf6', '#ef4444', '#10b981', '#3b82f6',
+  '#ec4899', '#f97316', '#06b6d4', '#84cc16', '#a78bfa', '#fb923c',
+  '#14b8a6', '#e879f9', '#fbbf24', '#6366f1',
+];
+const nameColorCache: Record<string, string> = {};
+function getNameColor(name: string): string {
+  if (!name) return C.slate;
+  if (nameColorCache[name]) return nameColorCache[name];
+  const idx = Object.keys(nameColorCache).length % NAME_COLORS.length;
+  nameColorCache[name] = NAME_COLORS[idx];
+  return nameColorCache[name];
+}
+
 function formatAUM(n: number | null | undefined): string {
   if (!n || isNaN(n)) return '—';
   if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1)}B`;
@@ -72,6 +88,9 @@ interface Deal {
   id: string;
   dealname: string;
   transferable_aum: string | null;
+  current_value: string | null;
+  t12_revenue: string | null;
+  fee_based_revenue: string | null;
   dealstage: string;
   current_firm__cloned_: string | null;
   custodian__cloned_: string | null;
@@ -104,15 +123,22 @@ interface AcquisitionsStage {
 }
 
 // ── Shared UI components ─────────────────────────────────────────────────────
-function SummaryCard({ label, value, sub, accent, icon }: { label: string; value: string; sub?: string; accent?: boolean; icon?: string }) {
+function SummaryCard({ label, value, sub, accent, icon, iconColor, onClick }: { label: string; value: string; sub?: string; accent?: boolean; icon?: string; iconColor?: string; onClick?: () => void }) {
   return (
-    <div style={{
-      background: accent ? C.teal : C.cardBg,
-      border: `1px solid ${accent ? C.teal : C.border}`,
-      borderRadius: 8, padding: '20px 24px', position: 'relative',
-    }}>
+    <div
+      onClick={onClick}
+      style={{
+        background: accent ? C.teal : C.cardBg,
+        border: `1px solid ${accent ? C.teal : C.border}`,
+        borderRadius: 8, padding: '20px 24px', position: 'relative',
+        cursor: onClick ? 'pointer' : 'default',
+        transition: 'border-color 150ms ease, box-shadow 150ms ease',
+      }}
+      onMouseEnter={e => { if (onClick) { (e.currentTarget as HTMLDivElement).style.borderColor = iconColor || C.teal; (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 0 1px ${iconColor || C.teal}40`; } }}
+      onMouseLeave={e => { if (onClick) { (e.currentTarget as HTMLDivElement).style.borderColor = accent ? C.teal : C.border; (e.currentTarget as HTMLDivElement).style.boxShadow = 'none'; } }}
+    >
       {icon && (
-        <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.3, color: accent ? C.white : C.slate }}>{icon}</span>
+        <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: iconColor || (accent ? C.white : C.slate) }}>{icon}</span>
       )}
       <p style={{ fontSize: 11, color: accent ? 'rgba(255,255,255,0.7)' : C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{label}</p>
       <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{value}</p>
@@ -280,13 +306,19 @@ function ComplexityBadge({ score, tier, tierColor }: { score: number; tier: stri
 }
 
 // ── Horizontal bar component ─────────────────────────────────────────────────
-function HorizontalBar({ items, maxValue, perItemMax }: { items: { label: string; value: number; color: string; sub?: string; display?: string }[]; maxValue: number; perItemMax?: number[] }) {
+function HorizontalBar({ items, maxValue, perItemMax }: { items: { label: string; value: number; color: string; sub?: string; display?: string; onClick?: () => void }[]; maxValue: number; perItemMax?: number[] }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {items.map((item, i) => {
         const cap = perItemMax?.[i] ?? maxValue;
         return (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div
+            key={i}
+            onClick={item.onClick}
+            style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: item.onClick ? 'pointer' : 'default', borderRadius: 4, transition: 'background 150ms ease' }}
+            onMouseEnter={e => { if (item.onClick) (e.currentTarget as HTMLDivElement).style.background = 'rgba(250,247,242,0.04)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
+          >
             <div style={{ width: 130, fontSize: 12, color: C.slate, textAlign: 'right', flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {item.label}
             </div>
@@ -307,12 +339,68 @@ function HorizontalBar({ items, maxValue, perItemMax }: { items: { label: string
   );
 }
 
+// ── Drill-Down Panel ─────────────────────────────────────────────────────────
+function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[]; onClose: () => void }) {
+  const getAUM = (d: Deal) => parseFloat(d.transferable_aum ?? '0') || 0;
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 999, display: 'flex', justifyContent: 'flex-end' }} onClick={onClose}>
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(2px)' }} />
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          position: 'relative', width: '100%', maxWidth: 720, height: '100vh',
+          background: '#1a1a1a', borderLeft: `1px solid ${C.border}`,
+          display: 'flex', flexDirection: 'column', overflow: 'hidden',
+          animation: 'slideInRight 200ms ease',
+        }}
+      >
+        {/* Header */}
+        <div style={{ padding: '20px 24px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+          <div>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 2 }}>{title}</h3>
+            <p style={{ fontSize: 12, color: C.slate }}>{deals.length} deals · {formatAUM(deals.reduce((s, d) => s + getAUM(d), 0))} total AUM</p>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.slate, fontSize: 20, cursor: 'pointer', padding: '4px 8px', borderRadius: 4 }}>✕</button>
+        </div>
+        {/* Table */}
+        <div style={{ flex: 1, overflow: 'auto', padding: '0 24px 24px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginTop: 12 }}>
+            <thead>
+              <tr style={{ borderBottom: `1px solid ${C.border}`, position: 'sticky', top: 0, background: '#1a1a1a', zIndex: 1 }}>
+                {['Advisor', 'Stage', 'Exp. AUM', 'Launch Date'].map(h => (
+                  <th key={h} style={{ padding: '8px 10px', textAlign: h === 'Advisor' ? 'left' : 'right', color: C.slate, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {deals.map((deal, i) => (
+                <tr key={deal.id} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? 'transparent' : 'rgba(250,247,242,0.02)' }}>
+                  <td style={{ padding: '8px 10px' }}>
+                    <Link href={`/command-center/advisor/${deal.id}`} style={{ color: C.teal, fontWeight: 600, textDecoration: 'none' }}>{deal.dealname}</Link>
+                  </td>
+                  <td style={{ padding: '8px 10px', textAlign: 'right' }}>
+                    <StageBadge stageId={deal.dealstage} label={STAGE_LABELS[deal.dealstage] ?? deal.dealstage} />
+                  </td>
+                  <td style={{ padding: '8px 10px', textAlign: 'right', color: C.teal, fontWeight: 600 }}>{formatAUM(getAUM(deal))}</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'right', color: C.slate }}>{formatDate(deal.desired_start_date ?? deal.actual_launch_date)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <style>{`@keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
+    </div>
+  );
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // COMMAND DASHBOARD (Analytics overlay for Recruiting tab)
 // ══════════════════════════════════════════════════════════════════════════════
 function CommandDashboard({ deals }: { deals: Deal[] }) {
   const { data: aumData } = useSWR('/api/command-center/aum-tracker', fetcher);
   const { data: sentimentData } = useSWR('/api/command-center/sentiment/scores', fetcher);
+  const [drillDown, setDrillDown] = useState<{ title: string; deals: Deal[] } | null>(null);
 
   const analytics = useMemo(() => {
     const activeDeals = deals.filter(d => ACTIVE_STAGE_IDS.includes(d.dealstage));
@@ -425,6 +513,47 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
     const quarterLabel = `Q${Math.floor(now.getMonth() / 3) + 1}`;
     const monthLabel = now.toLocaleString('en-US', { month: 'long' });
 
+    // ── Monthly Launches (last 6 months) ──
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthlyLaunches: { month: string; count: number; aum: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(year, now.getMonth() - i, 1);
+      const mStart = new Date(d.getFullYear(), d.getMonth(), 1);
+      const mEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59);
+      const mDeals = allLaunchedDeals.filter(dl => {
+        const ls = getLaunchDate(dl);
+        if (!ls) return false;
+        const ld = new Date(ls);
+        return ld >= mStart && ld <= mEnd;
+      });
+      monthlyLaunches.push({
+        month: monthNames[d.getMonth()],
+        count: mDeals.length,
+        aum: mDeals.reduce((acc, dl) => acc + getAUM(dl), 0),
+      });
+    }
+
+    // ── Cumulative YTD Launched AUM ──
+    const currentMonth = now.getMonth();
+    const cumulativeYtd: { month: string; actual: number; target: number }[] = [];
+    let runningAum = 0;
+    for (let m = 0; m <= currentMonth; m++) {
+      const mStart = new Date(year, m, 1);
+      const mEnd = new Date(year, m + 1, 0, 23, 59, 59);
+      const mDeals = allLaunchedDeals.filter(dl => {
+        const ls = getLaunchDate(dl);
+        if (!ls) return false;
+        const ld = new Date(ls);
+        return ld >= mStart && ld <= mEnd;
+      });
+      runningAum += mDeals.reduce((acc, dl) => acc + getAUM(dl), 0);
+      cumulativeYtd.push({
+        month: monthNames[m],
+        actual: runningAum,
+        target: ANNUAL_GOAL * ((m + 1) / 12),
+      });
+    }
+
     return {
       activeDeals, launchedDeals, preLaunchDeals,
       stageFunnel, totalActiveAUM, preLaunchAUM,
@@ -439,6 +568,8 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
       mtdDeficit, qtdDeficit,
       monthlyGoal, quarterlyGoal,
       quarterLabel, monthLabel,
+      // Charts
+      monthlyLaunches, cumulativeYtd,
     };
   }, [deals]);
 
@@ -576,25 +707,29 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           label="Total Pipeline AUM"
           value={formatAUM(a.totalActiveAUM)}
           sub={`${a.activeDeals.length} active deals`}
-          accent icon="◈"
+          accent icon="◈" iconColor="#28a1af"
+          onClick={() => setDrillDown({ title: 'Total Pipeline AUM', deals: a.activeDeals })}
         />
         <SummaryCard
           label="Pre-Launch AUM"
           value={formatAUM(a.preLaunchAUM)}
           sub={`${a.preLaunchDeals.length} in funnel`}
-          icon="▸"
+          icon="▸" iconColor="#8b5cf6"
+          onClick={() => setDrillDown({ title: 'Pre-Launch Advisors', deals: a.preLaunchDeals })}
         />
         <SummaryCard
           label="Launching in 30 Days"
           value={String(a.launches30.length)}
           sub={formatAUM(a.launches30AUM) + ' projected'}
-          icon="⏱"
+          icon="⏱" iconColor="#f59e0b"
+          onClick={() => setDrillDown({ title: 'Launching in 30 Days', deals: a.launches30 })}
         />
         <SummaryCard
           label="Launched Advisors"
           value={String(a.launchedDeals.length)}
           sub="Step 7 – Within 90 days"
-          icon="✓"
+          icon="✓" iconColor="#10b981"
+          onClick={() => setDrillDown({ title: 'Launched Advisors (< 90 days)', deals: a.launchedDeals })}
         />
       </div>
 
@@ -607,12 +742,20 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           for (const s of scores) tierCounts[s.tier] = (tierCounts[s.tier] ?? 0) + 1;
           const atRisk = (tierCounts['At Risk'] ?? 0) + (tierCounts['High Risk'] ?? 0);
           const positive = (tierCounts['Advocate'] ?? 0) + (tierCounts['Positive'] ?? 0);
+          const scoredDealIds = new Set(scores.map((s: { deal_id: string }) => s.deal_id));
+          const sentimentDeals = deals.filter(d => scoredDealIds.has(d.id));
           return (
-            <div style={{
-              background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
-              padding: '20px 24px', position: 'relative',
-            }}>
-              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.25, color: '#1d7682' }}>✦</span>
+            <div
+              onClick={() => sentimentDeals.length > 0 && setDrillDown({ title: 'Sentiment Tracked Advisors', deals: sentimentDeals })}
+              style={{
+                background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+                padding: '20px 24px', position: 'relative', cursor: sentimentDeals.length > 0 ? 'pointer' : 'default',
+                transition: 'border-color 150ms ease',
+              }}
+              onMouseEnter={e => { if (sentimentDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = '#1d7682'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
+            >
+              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: '#1d7682' }}>✦</span>
               <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Sentiment Tracking</p>
               <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
                 {scores.length > 0 ? `${scores.length}` : '—'}
@@ -627,42 +770,67 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
         })()}
 
         {/* Current AUM vs Expected */}
-        <div style={{
-          background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
-          padding: '20px 24px', position: 'relative',
-        }}>
-          <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.25, color: C.teal }}>◎</span>
-          <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Current vs Expected AUM</p>
-          <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
-            {aumData?.summary?.overall_transfer_pct != null ? `${aumData.summary.overall_transfer_pct}%` : '—'}
-          </p>
-          <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
-            {aumData?.summary
-              ? `${formatAUM(aumData.summary.total_actual_aum)} of ${formatAUM(aumData.summary.total_expected_aum)}`
-              : 'Loading...'}
-          </p>
-        </div>
+        {(() => {
+          const aumDealIds = new Set((aumData?.advisors ?? []).map((a: { deal_id: string }) => a.deal_id));
+          const aumDeals = deals.filter(d => aumDealIds.has(d.id));
+          return (
+            <div
+              onClick={() => aumDeals.length > 0 && setDrillDown({ title: 'Current vs Expected AUM', deals: aumDeals })}
+              style={{
+                background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+                padding: '20px 24px', position: 'relative', cursor: aumDeals.length > 0 ? 'pointer' : 'default',
+                transition: 'border-color 150ms ease',
+              }}
+              onMouseEnter={e => { if (aumDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = C.teal; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
+            >
+              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: C.teal }}>◎</span>
+              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Current vs Expected AUM</p>
+              <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+                {aumData?.summary?.overall_transfer_pct != null ? `${aumData.summary.overall_transfer_pct}%` : '—'}
+              </p>
+              <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
+                {aumData?.summary
+                  ? `${formatAUM(aumData.summary.total_actual_aum)} of ${formatAUM(aumData.summary.total_expected_aum)}`
+                  : 'Loading...'}
+              </p>
+            </div>
+          );
+        })()}
 
         {/* On Book Revenue */}
-        <div style={{
-          background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
-          padding: '20px 24px', position: 'relative',
-        }}>
-          <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.25, color: C.green }}>$</span>
-          <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>On Book Revenue</p>
-          <p style={{ fontSize: 28, fontWeight: 700, color: C.green, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
-            {aumData?.summary?.total_current_revenue ? formatAUM(aumData.summary.total_current_revenue) : '—'}
-          </p>
-          <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
-            {aumData?.summary?.advisors_with_actual
-              ? `${aumData.summary.advisors_with_actual} advisors with AUM on book`
-              : 'Based on current AUM × fee rate'}
-          </p>
-        </div>
+        {(() => {
+          const revenueDeals = deals.filter(d => {
+            const aumAdvisor = (aumData?.advisors ?? []).find((a: { deal_id: string; current_revenue: number | null }) => a.deal_id === d.id);
+            return aumAdvisor?.current_revenue && aumAdvisor.current_revenue > 0;
+          });
+          return (
+            <div
+              onClick={() => revenueDeals.length > 0 && setDrillDown({ title: 'On Book Revenue Advisors', deals: revenueDeals })}
+              style={{
+                background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+                padding: '20px 24px', position: 'relative', cursor: revenueDeals.length > 0 ? 'pointer' : 'default',
+                transition: 'border-color 150ms ease',
+              }}
+              onMouseEnter={e => { if (revenueDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = C.green; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
+            >
+              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: C.green }}>$</span>
+              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>On Book Revenue</p>
+              <p style={{ fontSize: 28, fontWeight: 700, color: C.green, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+                {aumData?.summary?.total_current_revenue ? formatAUM(aumData.summary.total_current_revenue) : '—'}
+              </p>
+              <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
+                {aumData?.summary?.advisors_with_actual
+                  ? `${aumData.summary.advisors_with_actual} advisors with AUM on book`
+                  : 'Based on current AUM × fee rate'}
+              </p>
+            </div>
+          );
+        })()}
 
         {/* Expected Revenue */}
         {(() => {
-          // Expected revenue = total expected AUM × weighted avg fee rate
           const advisors = aumData?.advisors ?? [];
           let totalExpectedRevenue = 0;
           for (const adv of advisors) {
@@ -670,12 +838,22 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
               totalExpectedRevenue += adv.expected_aum * (adv.fee_rate_bps / 10000);
             }
           }
+          const expectedRevenueDeals = deals.filter(d => {
+            const adv = advisors.find((a: { deal_id: string }) => a.deal_id === d.id);
+            return adv?.expected_aum && adv.expected_aum > 0;
+          });
           return (
-            <div style={{
-              background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
-              padding: '20px 24px', position: 'relative',
-            }}>
-              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.25, color: C.gold }}>★</span>
+            <div
+              onClick={() => expectedRevenueDeals.length > 0 && setDrillDown({ title: 'Expected Revenue Advisors', deals: expectedRevenueDeals })}
+              style={{
+                background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+                padding: '20px 24px', position: 'relative', cursor: expectedRevenueDeals.length > 0 ? 'pointer' : 'default',
+                transition: 'border-color 150ms ease',
+              }}
+              onMouseEnter={e => { if (expectedRevenueDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = C.gold; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
+            >
+              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: C.gold }}>★</span>
               <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Expected Revenue</p>
               <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
                 {totalExpectedRevenue > 0 ? formatAUM(Math.round(totalExpectedRevenue)) : '—'}
@@ -688,6 +866,59 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             </div>
           );
         })()}
+      </div>
+
+      {/* ── Rolling 6-Month Trend Charts ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+        {/* Monthly Launches Bar Chart */}
+        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24 }}>
+          <SectionHeader title="Monthly Launches" subtitle="Advisors launched per month (last 6 months)" />
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={a.monthlyLaunches} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(250,247,242,0.06)" vertical={false} />
+              <XAxis dataKey="month" tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, color: C.dark }}
+                formatter={(value: unknown, name: unknown) => {
+                  const v = Number(value);
+                  if (name === 'count') return [v, 'Advisors'];
+                  return [formatAUM(v), 'AUM'];
+                }}
+                labelStyle={{ color: C.slate, marginBottom: 4 }}
+              />
+              <Bar dataKey="count" fill={C.teal} radius={[4, 4, 0, 0]} maxBarSize={40} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Cumulative YTD Launched AUM */}
+        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24 }}>
+          <SectionHeader title="Cumulative YTD Launched AUM" subtitle={`Running total vs $25B linear pace`} />
+          <ResponsiveContainer width="100%" height={220}>
+            <ComposedChart data={a.cumulativeYtd} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(250,247,242,0.06)" vertical={false} />
+              <XAxis dataKey="month" tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis
+                tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false}
+                tickFormatter={(v: number) => formatAUM(v)}
+              />
+              <Tooltip
+                contentStyle={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, color: C.dark }}
+                formatter={(value: unknown, name: unknown) => [formatAUM(Number(value)), name === 'actual' ? 'Launched AUM' : 'Pace Target']}
+                labelStyle={{ color: C.slate, marginBottom: 4 }}
+              />
+              <defs>
+                <linearGradient id="aumGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={C.teal} stopOpacity={0.2} />
+                  <stop offset="95%" stopColor={C.teal} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <Area type="monotone" dataKey="actual" fill="url(#aumGradient)" stroke={C.teal} strokeWidth={2} />
+              <Line type="monotone" dataKey="target" stroke={C.slate} strokeWidth={1.5} strokeDasharray="6 3" dot={false} />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* ── Row 1: Stage Funnel + Launch Countdown ── */}
@@ -705,6 +936,10 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
               display: formatAUM(s.aum),
               color: s.color,
               sub: `${s.count} deals`,
+              onClick: () => {
+                const stageDeals = deals.filter(d => d.dealstage === s.id);
+                if (stageDeals.length > 0) setDrillDown({ title: STAGE_LABELS[s.id], deals: stageDeals });
+              },
             }))}
           />
         </div>
@@ -715,15 +950,22 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           {/* 30/60/90 tabs */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 16 }}>
             {[
-              { label: '90 Days', count: a.launches90.length, aum: a.launches90AUM, color: C.teal },
-              { label: '60 Days', count: a.launches60.length, aum: a.launches60AUM, color: C.amber },
-              { label: '30 Days', count: a.launches30.length, aum: a.launches30AUM, color: C.red },
+              { label: '90 Days', count: a.launches90.length, aum: a.launches90AUM, color: C.teal, deals: a.launches90 },
+              { label: '60 Days', count: a.launches60.length, aum: a.launches60AUM, color: C.amber, deals: a.launches60 },
+              { label: '30 Days', count: a.launches30.length, aum: a.launches30AUM, color: C.red, deals: a.launches30 },
             ].map(item => (
-              <div key={item.label} style={{
-                padding: '12px 14px', borderRadius: 6,
-                background: `${item.color}10`, border: `1px solid ${item.color}30`,
-                textAlign: 'center',
-              }}>
+              <div
+                key={item.label}
+                onClick={() => item.deals.length > 0 && setDrillDown({ title: `Launching in ${item.label}`, deals: item.deals })}
+                style={{
+                  padding: '12px 14px', borderRadius: 6,
+                  background: `${item.color}10`, border: `1px solid ${item.color}30`,
+                  textAlign: 'center', cursor: item.deals.length > 0 ? 'pointer' : 'default',
+                  transition: 'border-color 150ms ease',
+                }}
+                onMouseEnter={e => { if (item.deals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = item.color; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = `${item.color}30`; }}
+              >
                 <div style={{ fontSize: 22, fontWeight: 700, color: item.color, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
                   {item.count}
                 </div>
@@ -787,6 +1029,8 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
         </div>
       </div>
 
+      {/* Drill-Down Panel */}
+      {drillDown && <DrillDownPanel title={drillDown.title} deals={drillDown.deals} onClose={() => setDrillDown(null)} />}
     </div>
   );
 }
@@ -1148,6 +1392,55 @@ function RecruitingTab() {
         })}
       </div>
 
+      {/* Recruiter Scorecard */}
+      {(() => {
+        const recruiterMap: Record<string, { deals: number; aum: number; launched: number; launchedAum: number }> = {};
+        for (const deal of allActiveDeals) {
+          const name = deal.ownerName ?? 'Unassigned';
+          if (!recruiterMap[name]) recruiterMap[name] = { deals: 0, aum: 0, launched: 0, launchedAum: 0 };
+          recruiterMap[name].deals += 1;
+          recruiterMap[name].aum += parseFloat(deal.transferable_aum ?? '0') || 0;
+          if (deal.dealstage === '100411705') {
+            recruiterMap[name].launched += 1;
+            recruiterMap[name].launchedAum += parseFloat(deal.transferable_aum ?? '0') || 0;
+          }
+        }
+        const recruiters = Object.entries(recruiterMap).sort((a, b) => b[1].aum - a[1].aum);
+        if (recruiters.length === 0) return null;
+        return (
+          <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24, marginBottom: 20 }}>
+            <SectionHeader title="Recruiter Scorecard" subtitle="Pipeline contribution by recruiter" />
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(recruiters.length, 6)}, 1fr)`, gap: 12 }}>
+              {recruiters.slice(0, 6).map(([name, stats]) => (
+                <div key={name} style={{ padding: '14px 16px', borderRadius: 8, background: 'rgba(91,106,113,0.04)', border: `1px solid ${C.border}` }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: getNameColor(name), marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {name}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 11, color: C.slate }}>Deals</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: C.dark }}>{stats.deals}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 11, color: C.slate }}>Pipeline AUM</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: C.teal }}>{formatAUM(stats.aum)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 11, color: C.slate }}>Launched</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: C.green }}>{stats.launched}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 11, color: C.slate }}>Launched AUM</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: C.green }}>{formatAUM(stats.launchedAum)}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Deals Table */}
       <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
@@ -1201,10 +1494,14 @@ function RecruitingTab() {
                     return ((parseFloat(a.transferable_aum ?? '0') || 0) - (parseFloat(b.transferable_aum ?? '0') || 0)) * dir;
                   }
                   if (sortCol === 'actual_aum') {
-                    return ((aumMap[a.id]?.actual_aum ?? 0) - (aumMap[b.id]?.actual_aum ?? 0)) * dir;
+                    const aVal = parseFloat(a.current_value ?? '0') || aumMap[a.id]?.actual_aum || 0;
+                    const bVal = parseFloat(b.current_value ?? '0') || aumMap[b.id]?.actual_aum || 0;
+                    return (aVal - bVal) * dir;
                   }
                   if (sortCol === 'current_revenue') {
-                    return ((aumMap[a.id]?.current_revenue ?? 0) - (aumMap[b.id]?.current_revenue ?? 0)) * dir;
+                    const aVal = parseFloat(a.t12_revenue ?? '0') || parseFloat(a.fee_based_revenue ?? '0') || aumMap[a.id]?.current_revenue || 0;
+                    const bVal = parseFloat(b.t12_revenue ?? '0') || parseFloat(b.fee_based_revenue ?? '0') || aumMap[b.id]?.current_revenue || 0;
+                    return (aVal - bVal) * dir;
                   }
                   if (sortCol === 'complexity') {
                     return ((complexityScores[a.id]?.score ?? 0) - (complexityScores[b.id]?.score ?? 0)) * dir;
@@ -1241,19 +1538,29 @@ function RecruitingTab() {
                         </Link>
                       </td>
                       <td style={{ padding: '10px 14px', color: C.slate }}>{deal.current_firm__cloned_ ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: C.slate }}>{deal.firm_type ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: C.slate }}>{deal.firm_type ? deal.firm_type.replace(/_/g, ' ') : '—'}</td>
                       <td style={{ padding: '10px 14px' }}>
                         <StageBadge stageId={deal.dealstage} label={STAGE_LABELS[deal.dealstage] ?? deal.dealstage} />
                       </td>
                       <td style={{ padding: '10px 14px', color: C.teal, fontWeight: 600 }}>
                         {formatAUM(parseFloat(deal.transferable_aum ?? '0'))}
                       </td>
-                      <td style={{ padding: '10px 14px', color: aumMap[deal.id]?.actual_aum ? C.dark : C.slate, fontWeight: aumMap[deal.id]?.actual_aum ? 600 : 400 }}>
-                        {aumMap[deal.id]?.actual_aum ? formatAUM(aumMap[deal.id].actual_aum) : '—'}
-                      </td>
-                      <td style={{ padding: '10px 14px', color: aumMap[deal.id]?.current_revenue ? C.green : C.slate, fontWeight: aumMap[deal.id]?.current_revenue ? 600 : 400 }}>
-                        {aumMap[deal.id]?.current_revenue ? formatAUM(aumMap[deal.id].current_revenue) : '—'}
-                      </td>
+                      {(() => {
+                        const tranAum = parseFloat(deal.current_value ?? '0') || aumMap[deal.id]?.actual_aum || null;
+                        return (
+                          <td style={{ padding: '10px 14px', color: tranAum ? C.dark : C.slate, fontWeight: tranAum ? 600 : 400 }}>
+                            {tranAum ? formatAUM(tranAum) : '—'}
+                          </td>
+                        );
+                      })()}
+                      {(() => {
+                        const revenue = parseFloat(deal.t12_revenue ?? '0') || parseFloat(deal.fee_based_revenue ?? '0') || aumMap[deal.id]?.current_revenue || null;
+                        return (
+                          <td style={{ padding: '10px 14px', color: revenue ? C.green : C.slate, fontWeight: revenue ? 600 : 400 }}>
+                            {revenue ? formatAUM(revenue) : '—'}
+                          </td>
+                        );
+                      })()}
                       <td style={{ padding: '10px 14px' }}>
                         {cx ? <ComplexityBadge score={cx.score} tier={cx.tier} tierColor={cx.tierColor} /> : <span style={{ color: C.slate, fontSize: 11 }}>…</span>}
                       </td>
@@ -1263,11 +1570,11 @@ function RecruitingTab() {
                       <td style={{ padding: '10px 14px' }}>
                         <LaunchTimer deal={deal} />
                       </td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXM ? C.teal : C.slate, fontWeight: teamAssignments[deal.id]?.AXM ? 600 : 400 }}>{teamAssignments[deal.id]?.AXM ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXA ? C.dark : C.slate, fontWeight: teamAssignments[deal.id]?.AXA ? 500 : 400 }}>{teamAssignments[deal.id]?.AXA ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTM ? '#2f73a8' : C.slate, fontWeight: teamAssignments[deal.id]?.CTM ? 600 : 400 }}>{teamAssignments[deal.id]?.CTM ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTA ? C.dark : C.slate, fontWeight: teamAssignments[deal.id]?.CTA ? 500 : 400 }}>{teamAssignments[deal.id]?.CTA ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: C.slate }}>{deal.ownerName ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXM ? getNameColor(teamAssignments[deal.id].AXM) : C.slate, fontWeight: teamAssignments[deal.id]?.AXM ? 600 : 400 }}>{teamAssignments[deal.id]?.AXM ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXA ? getNameColor(teamAssignments[deal.id].AXA) : C.slate, fontWeight: teamAssignments[deal.id]?.AXA ? 600 : 400 }}>{teamAssignments[deal.id]?.AXA ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTM ? getNameColor(teamAssignments[deal.id].CTM) : C.slate, fontWeight: teamAssignments[deal.id]?.CTM ? 600 : 400 }}>{teamAssignments[deal.id]?.CTM ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTA ? getNameColor(teamAssignments[deal.id].CTA) : C.slate, fontWeight: teamAssignments[deal.id]?.CTA ? 600 : 400 }}>{teamAssignments[deal.id]?.CTA ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: deal.ownerName ? getNameColor(deal.ownerName) : C.slate, fontWeight: deal.ownerName ? 600 : 400 }}>{deal.ownerName ?? '—'}</td>
                     </tr>
                   );
                 });
@@ -1299,13 +1606,13 @@ function AcquisitionsTab() {
     <>
       {/* Summary Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
-        <SummaryCard label="Total M&A Pipeline" value={formatAUM(totalAUM)} sub={`${activeDeals.length} active deals`} accent icon="◈" />
-        <SummaryCard label="Total Deals" value={String(deals.length)} sub={`${activeDeals.length} active · ${terminalDeals.length} closed`} icon="▸" />
-        <SummaryCard label="Active Stages" value={String(stages.filter(s => !s.isTerminal && s.count > 0).length)} sub="in progress" icon="▲" />
+        <SummaryCard label="Total M&A Pipeline" value={formatAUM(totalAUM)} sub={`${activeDeals.length} active deals`} accent icon="◈" iconColor="#28a1af" />
+        <SummaryCard label="Total Deals" value={String(deals.length)} sub={`${activeDeals.length} active · ${terminalDeals.length} closed`} icon="▸" iconColor="#3b82f6" />
+        <SummaryCard label="Active Stages" value={String(stages.filter(s => !s.isTerminal && s.count > 0).length)} sub="in progress" icon="▲" iconColor="#8b5cf6" />
         <SummaryCard
           label="Avg Deal Size"
           value={activeDeals.length ? formatAUM(totalAUM / activeDeals.length) : '—'}
-          sub="transferable AUM" icon="✦"
+          sub="transferable AUM" icon="✦" iconColor="#c8a951"
         />
       </div>
 
@@ -1353,7 +1660,7 @@ function AcquisitionsTab() {
                       </Link>
                     </td>
                     <td style={{ padding: '10px 14px', color: C.slate }}>{deal.current_firm__cloned_ ?? '—'}</td>
-                    <td style={{ padding: '10px 14px', color: C.slate }}>{deal.firm_type ?? '—'}</td>
+                    <td style={{ padding: '10px 14px', color: C.slate }}>{deal.firm_type ? deal.firm_type.replace(/_/g, ' ') : '—'}</td>
                     <td style={{ padding: '10px 14px' }}>
                       <StageBadge stageId={deal.dealstage} label={deal.stageLabel} isTerminal={deal.isTerminal} />
                     </td>
@@ -1364,7 +1671,7 @@ function AcquisitionsTab() {
                     <td style={{ padding: '10px 14px', color: C.slate }}>
                       {formatDate(deal.desired_start_date)}
                     </td>
-                    <td style={{ padding: '10px 14px', color: C.slate }}>{deal.ownerName ?? '—'}</td>
+                    <td style={{ padding: '10px 14px', color: deal.ownerName ? getNameColor(deal.ownerName) : C.slate, fontWeight: deal.ownerName ? 600 : 400 }}>{deal.ownerName ?? '—'}</td>
                   </tr>
                 );
               })}
@@ -1385,7 +1692,7 @@ export default function PipelineDashboard() {
   const [activeTab, setActiveTab] = useState<TabKey>('recruiting');
 
   const tabs: { key: TabKey; label: string; sublabel: string }[] = [
-    { key: 'recruiting', label: 'Advisor Recruiting', sublabel: 'Pipeline 751770' },
+    { key: 'recruiting', label: 'Advisor Recruiting', sublabel: 'Advisor Pipeline' },
     { key: 'acquisitions', label: 'Acquisitions', sublabel: 'M&A Pipeline' },
   ];
 
