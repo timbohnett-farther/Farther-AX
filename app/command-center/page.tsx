@@ -8,6 +8,17 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
+// Shared SWR config: data refreshes 3x/day, never refetches on tab focus/reconnect,
+// keeps previous data on revalidation so the page never goes blank.
+const SWR_OPTS = {
+  refreshInterval: 8 * 60 * 60 * 1000,   // 8 hours
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,
+  dedupingInterval: 60 * 60 * 1000,       // dedup within 1 hour
+  keepPreviousData: true,
+  errorRetryCount: 2,
+} as const;
+
 // ── Design tokens ────────────────────────────────────────────────────────────
 const C = {
   dark: '#FAF7F2', white: '#1a1a1a', slate: 'rgba(250,247,242,0.5)',
@@ -398,8 +409,8 @@ function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[
 // COMMAND DASHBOARD (Analytics overlay for Recruiting tab)
 // ══════════════════════════════════════════════════════════════════════════════
 function CommandDashboard({ deals }: { deals: Deal[] }) {
-  const { data: aumData } = useSWR('/api/command-center/aum-tracker', fetcher);
-  const { data: sentimentData } = useSWR('/api/command-center/sentiment/scores', fetcher);
+  const { data: aumData } = useSWR('/api/command-center/aum-tracker', fetcher, SWR_OPTS);
+  const { data: sentimentData } = useSWR('/api/command-center/sentiment/scores', fetcher, SWR_OPTS);
   const [drillDown, setDrillDown] = useState<{ title: string; deals: Deal[] } | null>(null);
 
   const analytics = useMemo(() => {
@@ -1039,7 +1050,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 // ADVISOR RECRUITING TAB
 // ══════════════════════════════════════════════════════════════════════════════
 function RecruitingTab() {
-  const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, { refreshInterval: 43_200_000 });
+  const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, SWR_OPTS);
   const [showDashboard, setShowDashboard] = useState(true);
   const [complexityScores, setComplexityScores] = useState<Record<string, { score: number; tier: string; tierColor: string }>>({});
   const [advisorTab, setAdvisorTab] = useState<'launch_to_grad' | 'early' | 'completed'>('launch_to_grad');
@@ -1056,7 +1067,7 @@ function RecruitingTab() {
   const [aiLoading, setAiLoading] = useState(false);
   const aiBottomRef = useRef<HTMLDivElement>(null);
   const [teamAssignments, setTeamAssignments] = useState<Record<string, Record<string, string>>>({});
-  const { data: aumData } = useSWR('/api/command-center/aum-tracker?all=true', fetcher);
+  const { data: aumData } = useSWR('/api/command-center/aum-tracker?all=true', fetcher, SWR_OPTS);
 
   const deals: Deal[] = useMemo(
     () => (data?.deals ?? []).filter((d: Deal) => !d.dealname?.toLowerCase().includes('test')),
@@ -1591,7 +1602,7 @@ function RecruitingTab() {
 // ACQUISITIONS TAB
 // ══════════════════════════════════════════════════════════════════════════════
 function AcquisitionsTab() {
-  const { data, error, isLoading } = useSWR('/api/command-center/acquisitions', fetcher, { refreshInterval: 43_200_000 });
+  const { data, error, isLoading } = useSWR('/api/command-center/acquisitions', fetcher, SWR_OPTS);
 
   if (isLoading) return <div style={{ padding: '60px 0', color: C.slate }}>Loading acquisitions…</div>;
   if (error || data?.error) return <div style={{ padding: '60px 0', color: C.red }}>Failed to load acquisitions data.</div>;

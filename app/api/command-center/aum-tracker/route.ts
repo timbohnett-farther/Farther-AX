@@ -14,6 +14,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { withCache } from '@/lib/api-cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -136,99 +137,97 @@ async function fetchManagedAccountsByAdvisor(): Promise<Record<string, ManagedAc
   return result;
 }
 
-// ── GET handler ──────────────────────────────────────────────────────────────
+// ── Fresh data fetcher (called by cache on miss) ─────────────────────────────
+async function fetchAumData(includeAll: boolean) {
+  const [deals, managedAccounts] = await Promise.all([
+    fetchLaunchedDeals(),
+    fetchManagedAccountsByAdvisor(),
+  ]);
+
+  const advisors = deals.map(deal => {
+    const dealName = deal.properties.dealname ?? '—';
+    const managed = managedAccounts[dealName] ?? null;
+
+    const expectedAum = parseFloat(deal.properties.transferable_aum ?? '0') || null;
+    const actualAum = managed?.total_bd_market_value ?? null;
+    const feeRateBps = managed?.weighted_fee_bps ?? null;
+    const launchDate = deal.properties.actual_launch_date || deal.properties.desired_start_date;
+
+    let transferPct: number | null = null;
+    if (expectedAum && actualAum && expectedAum > 0) {
+      transferPct = Math.round((actualAum / expectedAum) * 100);
+    }
+
+    let currentRevenue: number | null = null;
+    if (actualAum && feeRateBps && feeRateBps > 0) {
+      currentRevenue = Math.round((actualAum * feeRateBps) / 10000 * 100) / 100;
+    }
+
+    let daysSinceLaunch: number | null = null;
+    if (launchDate) {
+      daysSinceLaunch = Math.floor((Date.now() - new Date(launchDate).getTime()) / (1000 * 60 * 60 * 24));
+    }
+
+    return {
+      deal_id: deal.id,
+      advisor_name: dealName,
+      expected_aum: expectedAum,
+      actual_aum: actualAum,
+      transfer_pct: transferPct,
+      fee_rate_bps: feeRateBps,
+      current_revenue: currentRevenue,
+      launch_date: launchDate ?? null,
+      days_since_launch: daysSinceLaunch,
+      prior_firm: deal.properties.current_firm__cloned_ ?? null,
+      households: deal.properties.client_households ? parseInt(deal.properties.client_households) : null,
+      transition_type: deal.properties.transition_type ?? null,
+      managed_account_count: managed?.account_count ?? 0,
+    };
+  });
+
+  const GRADUATION_DAYS = 90;
+  const filtered = advisors.filter(a => {
+    if (a.advisor_name.toLowerCase().includes('test')) return false;
+    if (includeAll) return true;
+    return a.days_since_launch === null || a.days_since_launch <= GRADUATION_DAYS;
+  });
+
+  filtered.sort((a, b) => {
+    const lastA = (a.advisor_name.split(/\s+/).pop() ?? '').toLowerCase();
+    const lastB = (b.advisor_name.split(/\s+/).pop() ?? '').toLowerCase();
+    return lastA.localeCompare(lastB);
+  });
+
+  const withExpected = filtered.filter(a => a.expected_aum);
+  const withActual = filtered.filter(a => a.actual_aum);
+  const totalExpected = withExpected.reduce((sum, a) => sum + (a.expected_aum ?? 0), 0);
+  const totalActual = withActual.reduce((sum, a) => sum + (a.actual_aum ?? 0), 0);
+  const totalRevenue = filtered.reduce((sum, a) => sum + (a.current_revenue ?? 0), 0);
+
+  return {
+    advisors: filtered,
+    total: filtered.length,
+    summary: {
+      total_expected_aum: totalExpected,
+      total_actual_aum: totalActual,
+      overall_transfer_pct: totalExpected > 0 ? Math.round((totalActual / totalExpected) * 100) : null,
+      advisors_with_expected: withExpected.length,
+      advisors_with_actual: withActual.length,
+      total_current_revenue: totalRevenue,
+    },
+  };
+}
+
+// ── GET handler (cached — refreshes 3x/day, stale fallback on HubSpot errors) ─
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const includeAll = searchParams.get('all') === 'true';
+  const cacheKey = includeAll ? 'aum-tracker-all' : 'aum-tracker';
   try {
-    // Step 1: Fetch deals + managed accounts in parallel
-    const [deals, managedAccounts] = await Promise.all([
-      fetchLaunchedDeals(),
-      fetchManagedAccountsByAdvisor(),
-    ]);
-
-    // Step 2: Build advisor response by matching deal name to managed account advisor_name
-    const advisors = deals.map(deal => {
-      const dealName = deal.properties.dealname ?? '—';
-      const managed = managedAccounts[dealName] ?? null;
-
-      const expectedAum = parseFloat(deal.properties.transferable_aum ?? '0') || null;
-      const actualAum = managed?.total_bd_market_value ?? null;
-      const feeRateBps = managed?.weighted_fee_bps ?? null;
-      const launchDate = deal.properties.actual_launch_date || deal.properties.desired_start_date;
-
-      // Transfer percentage: actual / expected
-      let transferPct: number | null = null;
-      if (expectedAum && actualAum && expectedAum > 0) {
-        transferPct = Math.round((actualAum / expectedAum) * 100);
-      }
-
-      // Revenue = BD Market Value × Fee Rate BPS / 10,000
-      // e.g. $286,222,952 × 63.1 / 10000 = $1,806,067
-      let currentRevenue: number | null = null;
-      if (actualAum && feeRateBps && feeRateBps > 0) {
-        currentRevenue = Math.round((actualAum * feeRateBps) / 10000 * 100) / 100;
-      }
-
-      // Days since launch
-      let daysSinceLaunch: number | null = null;
-      if (launchDate) {
-        daysSinceLaunch = Math.floor((Date.now() - new Date(launchDate).getTime()) / (1000 * 60 * 60 * 24));
-      }
-
-      return {
-        deal_id: deal.id,
-        advisor_name: dealName,
-        expected_aum: expectedAum,
-        actual_aum: actualAum,
-        transfer_pct: transferPct,
-        fee_rate_bps: feeRateBps,
-        current_revenue: currentRevenue,
-        launch_date: launchDate ?? null,
-        days_since_launch: daysSinceLaunch,
-        prior_firm: deal.properties.current_firm__cloned_ ?? null,
-        households: deal.properties.client_households ? parseInt(deal.properties.client_households) : null,
-        transition_type: deal.properties.transition_type ?? null,
-        managed_account_count: managed?.account_count ?? 0,
-      };
-    });
-
-    // Filter: always exclude test advisors; optionally limit to graduation window
-    const GRADUATION_DAYS = 90;
-    const filtered = advisors.filter(a => {
-      if (a.advisor_name.toLowerCase().includes('test')) return false;
-      // When ?all=true, include all launched advisors (for pipeline table)
-      if (includeAll) return true;
-      // Default: only include advisors within 90-day graduation window
-      return a.days_since_launch === null || a.days_since_launch <= GRADUATION_DAYS;
-    });
-
-    // Sort by advisor name (last name)
-    filtered.sort((a, b) => {
-      const lastA = (a.advisor_name.split(/\s+/).pop() ?? '').toLowerCase();
-      const lastB = (b.advisor_name.split(/\s+/).pop() ?? '').toLowerCase();
-      return lastA.localeCompare(lastB);
-    });
-
-    // Summary stats
-    const withExpected = filtered.filter(a => a.expected_aum);
-    const withActual = filtered.filter(a => a.actual_aum);
-    const totalExpected = withExpected.reduce((sum, a) => sum + (a.expected_aum ?? 0), 0);
-    const totalActual = withActual.reduce((sum, a) => sum + (a.actual_aum ?? 0), 0);
-    const totalRevenue = filtered.reduce((sum, a) => sum + (a.current_revenue ?? 0), 0);
-
-    return NextResponse.json({
-      advisors: filtered,
-      total: filtered.length,
-      summary: {
-        total_expected_aum: totalExpected,
-        total_actual_aum: totalActual,
-        overall_transfer_pct: totalExpected > 0 ? Math.round((totalActual / totalExpected) * 100) : null,
-        advisors_with_expected: withExpected.length,
-        advisors_with_actual: withActual.length,
-        total_current_revenue: totalRevenue,
-      },
-    });
+    const { data, cached } = await withCache(cacheKey, () => fetchAumData(includeAll));
+    const res = NextResponse.json(data);
+    if (cached) res.headers.set('X-Cache', 'HIT');
+    return res;
   } catch (err) {
     console.error('[aum-tracker]', err);
     const message = err instanceof Error ? err.message : String(err);

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withCache } from '@/lib/api-cache';
 
 // Support both env var names so Railway config doesn't need to change
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
@@ -123,27 +124,32 @@ async function fetchOwners(): Promise<Record<string, string>> {
   return map;
 }
 
-// ── GET handler ───────────────────────────────────────────────────────────────
+// ── Fresh data fetcher (called by cache on miss) ─────────────────────────────
+async function fetchPipelineData() {
+  const [rawDeals, owners] = await Promise.all([
+    fetchActiveDeals(),
+    fetchOwners(),
+  ]);
+
+  const deals = enrichLaunchStatus(rawDeals);
+
+  const enriched = deals.map(deal => ({
+    id: deal.id,
+    ...deal.properties,
+    ownerName: owners[deal.properties.hubspot_owner_id ?? ''] ?? null,
+    daysSinceLaunch: (deal as { daysSinceLaunch?: number }).daysSinceLaunch ?? null,
+  }));
+
+  return { deals: enriched, total: enriched.length };
+}
+
+// ── GET handler (cached — refreshes 3x/day, stale fallback on HubSpot errors) ─
 export async function GET() {
   try {
-    const [rawDeals, owners] = await Promise.all([
-      fetchActiveDeals(),
-      fetchOwners(),
-    ]);
-
-    const deals = enrichLaunchStatus(rawDeals);
-
-    const enriched = deals.map(deal => ({
-      id: deal.id,
-      ...deal.properties,
-      ownerName: owners[deal.properties.hubspot_owner_id ?? ''] ?? null,
-      daysSinceLaunch: (deal as { daysSinceLaunch?: number }).daysSinceLaunch ?? null,
-    }));
-
-    return NextResponse.json({
-      deals: enriched,
-      total: enriched.length,
-    });
+    const { data, cached } = await withCache('pipeline', fetchPipelineData);
+    const res = NextResponse.json(data);
+    if (cached) res.headers.set('X-Cache', 'HIT');
+    return res;
   } catch (err) {
     console.error('[pipeline]', err);
     const message = err instanceof Error ? err.message : String(err);

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withCache } from '@/lib/api-cache';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const ACQUISITIONS_PIPELINE_ID = '668946996';
@@ -105,56 +106,57 @@ async function fetchOwners(): Promise<Record<string, string>> {
   return map;
 }
 
-// ── GET handler ──────────────────────────────────────────────────────────────
-export async function GET() {
-  try {
-    const [deals, stages, owners] = await Promise.all([
-      fetchAcquisitionsDeals(),
-      fetchPipelineStages(),
-      fetchOwners(),
-    ]);
+// ── Fresh data fetcher (called by cache on miss) ─────────────────────────────
+async function fetchAcquisitionsData() {
+  const [deals, stages, owners] = await Promise.all([
+    fetchAcquisitionsDeals(),
+    fetchPipelineStages(),
+    fetchOwners(),
+  ]);
 
-    // Determine which stages are "closed" based on their label
-    const closedKeywords = ['closed', 'passed', 'lost', 'dead'];
-    const terminalStageIds = new Set(
-      Object.values(stages)
-        .filter(s => closedKeywords.some(kw => s.label.toLowerCase().includes(kw)))
-        .map(s => s.id),
-    );
+  const closedKeywords = ['closed', 'passed', 'lost', 'dead'];
+  const terminalStageIds = new Set(
+    Object.values(stages)
+      .filter(s => closedKeywords.some(kw => s.label.toLowerCase().includes(kw)))
+      .map(s => s.id),
+  );
 
-    const enriched = deals.map(deal => ({
-      id: deal.id,
-      ...deal.properties,
-      ownerName: owners[deal.properties.hubspot_owner_id ?? ''] ?? null,
-      stageLabel: stages[deal.properties.dealstage ?? '']?.label ?? deal.properties.dealstage,
-      stageOrder: stages[deal.properties.dealstage ?? '']?.displayOrder ?? 999,
-      isTerminal: terminalStageIds.has(deal.properties.dealstage ?? ''),
+  const enriched = deals.map(deal => ({
+    id: deal.id,
+    ...deal.properties,
+    ownerName: owners[deal.properties.hubspot_owner_id ?? ''] ?? null,
+    stageLabel: stages[deal.properties.dealstage ?? '']?.label ?? deal.properties.dealstage,
+    stageOrder: stages[deal.properties.dealstage ?? '']?.displayOrder ?? 999,
+    isTerminal: terminalStageIds.has(deal.properties.dealstage ?? ''),
+  }));
+
+  enriched.sort((a, b) => {
+    const orderDiff = a.stageOrder - b.stageOrder;
+    if (orderDiff !== 0) return orderDiff;
+    const nameA = (a as Record<string, unknown>).dealname as string ?? '';
+    const nameB = (b as Record<string, unknown>).dealname as string ?? '';
+    return nameA.localeCompare(nameB);
+  });
+
+  const stageSummary = Object.values(stages)
+    .sort((a, b) => a.displayOrder - b.displayOrder)
+    .map(s => ({
+      id: s.id,
+      label: s.label,
+      count: deals.filter(d => d.properties.dealstage === s.id).length,
+      isTerminal: terminalStageIds.has(s.id),
     }));
 
-    // Sort by stage order, then by deal name
-    enriched.sort((a, b) => {
-      const orderDiff = a.stageOrder - b.stageOrder;
-      if (orderDiff !== 0) return orderDiff;
-      const nameA = (a as Record<string, unknown>).dealname as string ?? '';
-      const nameB = (b as Record<string, unknown>).dealname as string ?? '';
-      return nameA.localeCompare(nameB);
-    });
+  return { deals: enriched, total: enriched.length, stages: stageSummary };
+}
 
-    // Build stage summary for frontend funnel display
-    const stageSummary = Object.values(stages)
-      .sort((a, b) => a.displayOrder - b.displayOrder)
-      .map(s => ({
-        id: s.id,
-        label: s.label,
-        count: deals.filter(d => d.properties.dealstage === s.id).length,
-        isTerminal: terminalStageIds.has(s.id),
-      }));
-
-    return NextResponse.json({
-      deals: enriched,
-      total: enriched.length,
-      stages: stageSummary,
-    });
+// ── GET handler (cached — refreshes 3x/day, stale fallback on HubSpot errors) ─
+export async function GET() {
+  try {
+    const { data, cached } = await withCache('acquisitions', fetchAcquisitionsData);
+    const res = NextResponse.json(data);
+    if (cached) res.headers.set('X-Cache', 'HIT');
+    return res;
   } catch (err) {
     console.error('[acquisitions]', err);
     const message = err instanceof Error ? err.message : String(err);
