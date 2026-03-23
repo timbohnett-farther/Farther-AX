@@ -1056,6 +1056,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 // ══════════════════════════════════════════════════════════════════════════════
 function RecruitingTab() {
   const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, SWR_OPTS);
+  const { data: teamData } = useSWR('/api/command-center/team?role=Recruiter', fetcher, SWR_OPTS);
   const [showDashboard, setShowDashboard] = useState(true);
   const [complexityScores, setComplexityScores] = useState<Record<string, { score: number; tier: string; tierColor: string }>>({});
   const [advisorTab, setAdvisorTab] = useState<'launch_to_grad' | 'early' | 'completed'>('launch_to_grad');
@@ -1410,9 +1411,14 @@ function RecruitingTab() {
 
       {/* Recruiter Scorecard */}
       {(() => {
+        // Only count deal owners who are actual recruiters from the team database
+        const recruiterNames = new Set(
+          (teamData?.members ?? []).map((m: { name: string }) => m.name)
+        );
         const recruiterMap: Record<string, { deals: number; aum: number; launched: number; launchedAum: number }> = {};
         for (const deal of allActiveDeals) {
-          const name = deal.ownerName ?? 'Unassigned';
+          const name = deal.ownerName;
+          if (!name || !recruiterNames.has(name)) continue;
           if (!recruiterMap[name]) recruiterMap[name] = { deals: 0, aum: 0, launched: 0, launchedAum: 0 };
           recruiterMap[name].deals += 1;
           recruiterMap[name].aum += parseFloat(deal.transferable_aum ?? '0') || 0;
