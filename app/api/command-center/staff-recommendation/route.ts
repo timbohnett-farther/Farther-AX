@@ -15,7 +15,7 @@ const MAX_CAPACITY = 250;
 const RED_THRESHOLD = 220;
 
 interface TeamMember {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: string;
@@ -55,7 +55,7 @@ export async function GET(request: Request) {
 
     // 2. Get all active team members for relevant roles
     const membersResult = await pool.query(
-      `SELECT * FROM team_members WHERE active = TRUE AND role IN ('AXM', 'AXA', 'CTM', 'CTA') ORDER BY role, name`
+      `SELECT * FROM team_members WHERE is_active = TRUE AND role IN ('AXM', 'AXA', 'CTM', 'CTA') ORDER BY role, name`
     );
     const members: TeamMember[] = membersResult.rows;
 
@@ -63,7 +63,7 @@ export async function GET(request: Request) {
     const assignmentsResult = await pool.query(
       `SELECT a.member_id, a.deal_id FROM advisor_assignments a
        JOIN team_members t ON a.member_id = t.id
-       WHERE t.active = TRUE`
+       WHERE t.is_active = TRUE`
     );
 
     // 4. Get complexity scores for all currently assigned deals
@@ -90,7 +90,7 @@ export async function GET(request: Request) {
     }
 
     // 5. Compute current load per member
-    const memberLoads: Record<number, { totalComplexity: number; dealCount: number }> = {};
+    const memberLoads: Record<string, { totalComplexity: number; dealCount: number }> = {};
     for (const m of members) {
       memberLoads[m.id] = { totalComplexity: 0, dealCount: 0 };
     }

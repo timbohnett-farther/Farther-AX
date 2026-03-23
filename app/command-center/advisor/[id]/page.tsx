@@ -217,8 +217,8 @@ const ASSIGNMENT_ROLES = ['AXM', 'AXA', 'CTM', 'CTA'] as const;
 const ROLE_LABELS: Record<string, string> = { 'AXM': 'Advisor Experience Manager', 'AXA': 'Advisor Experience Associate', 'CTM': 'Customer Transition Manager', 'CTA': 'Customer Transition Associate' };
 const ROLE_COLORS_MAP: Record<string, string> = { 'AXM': C.teal, 'AXA': C.teal, 'CTM': '#c8a951', 'CTA': '#c8a951' };
 
-interface AssignmentRow { deal_id: string; role: string; member_id: number; member_name: string; member_email: string; member_phone: string | null; member_calendar: string | null; member_role: string; }
-interface AssignmentMember { id: number; name: string; email: string; role: string; phone: string | null; calendar_link: string | null; }
+interface AssignmentRow { deal_id: string; role: string; member_id: string; member_name: string; member_email: string; member_phone: string | null; member_calendar: string | null; member_role: string; }
+interface AssignmentMember { id: string; name: string; email: string; role: string; phone: string | null; calendar_link: string | null; }
 interface StaffRec { role: string; recommended: AssignmentMember | null; alternatives: AssignmentMember[]; reason: string; current_load: number; projected_load: number; capacity_status: 'green' | 'amber' | 'red'; }
 
 function TeamAssignmentPanel({ dealId }: { dealId: string }) {
@@ -232,12 +232,12 @@ function TeamAssignmentPanel({ dealId }: { dealId: string }) {
   const allMembers = teamData?.members ?? [];
   const recommendations = recData?.recommendations ?? [];
 
-  const getAssignedMemberId = (role: string): number | null => {
+  const getAssignedMemberId = (role: string): string | null => {
     const a = assignments.find(a => a.role === role);
     return a ? a.member_id : null;
   };
 
-  const handleAssign = useCallback(async (role: string, memberId: number | null) => {
+  const handleAssign = useCallback(async (role: string, memberId: string | null) => {
     if (!memberId) return;
     setSaving(role);
     try {
@@ -296,7 +296,7 @@ function TeamAssignmentPanel({ dealId }: { dealId: string }) {
                 </div>
                 {currentMemberId && <button onClick={() => handleRemove(role)} style={{ fontSize: 10, color: C.red, background: 'none', border: 'none', cursor: 'pointer' }}>Remove</button>}
               </div>
-              <select value={currentMemberId ?? ''} onChange={e => { const val = e.target.value ? parseInt(e.target.value) : null; if (val) handleAssign(role, val); }} disabled={saving === role} style={{ width: '100%', padding: '7px 10px', borderRadius: 5, border: `1px solid ${C.border}`, background: C.white, fontSize: 13, color: C.dark, cursor: 'pointer' }}>
+              <select value={currentMemberId ?? ''} onChange={e => { const val = e.target.value || null; if (val) handleAssign(role, val); }} disabled={saving === role} style={{ width: '100%', padding: '7px 10px', borderRadius: 5, border: `1px solid ${C.border}`, background: C.white, fontSize: 13, color: C.dark, cursor: 'pointer' }}>
                 <option value="">— Select {role} —</option>
                 {roleMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
               </select>
