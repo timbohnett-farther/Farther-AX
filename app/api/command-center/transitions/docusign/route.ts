@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { getStoredToken } from '@/lib/docusign';
 
 // ── Env vars ──────────────────────────────────────────────────────────────────
 const INTEGRATION_KEY = process.env.DOCUSIGN_INTEGRATION_KEY ?? '';
@@ -22,32 +22,6 @@ function buildAuthUrl(): string {
     `&client_id=${INTEGRATION_KEY}` +
     `&redirect_uri=${encodeURIComponent(redirectUri)}`
   );
-}
-
-// ── Token store helpers ───────────────────────────────────────────────────────
-// Reads the most recently stored DocuSign token. Returns null if none found.
-async function getStoredToken(): Promise<{
-  access_token: string;
-  refresh_token: string;
-  expires_at: Date;
-} | null> {
-  try {
-    const result = await pool.query<{
-      access_token: string;
-      refresh_token: string;
-      expires_at: Date;
-    }>(`
-      SELECT access_token, refresh_token, expires_at
-      FROM docusign_tokens
-      ORDER BY created_at DESC
-      LIMIT 1
-    `);
-    return result.rows[0] ?? null;
-  } catch (err) {
-    // Table may not exist yet on first run
-    console.warn('[docusign] Could not read docusign_tokens:', err);
-    return null;
-  }
 }
 
 // ── POST handler ──────────────────────────────────────────────────────────────

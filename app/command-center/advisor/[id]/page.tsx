@@ -751,9 +751,260 @@ function TeamContactsTab({ dealId, allContacts }: { dealId: string; allContacts:
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// CLIENT ONBOARDING TAB
+// ══════════════════════════════════════════════════════════════════════════════
+
+const PILL_COLORS: Record<string, { color: string; bg: string }> = {
+  completed: { color: '#4ade80', bg: 'rgba(74,222,128,0.12)' },
+  signed: { color: '#4ade80', bg: 'rgba(74,222,128,0.12)' },
+  sent: { color: '#fbbf24', bg: 'rgba(251,191,36,0.12)' },
+  delivered: { color: '#60a5fa', bg: 'rgba(96,165,250,0.12)' },
+  declined: { color: '#f87171', bg: 'rgba(248,113,113,0.12)' },
+  voided: { color: '#f87171', bg: 'rgba(248,113,113,0.12)' },
+};
+
+function StatusPill({ status }: { status: string | null | undefined }) {
+  const s = (status ?? '').toLowerCase().trim();
+  const match = PILL_COLORS[s];
+  const color = match?.color ?? '#94a3b8';
+  const bg = match?.bg ?? 'rgba(148,163,184,0.12)';
+  const label = s || 'not sent';
+  return (
+    <span style={{
+      display: 'inline-block', padding: '3px 10px', borderRadius: 6,
+      background: bg, color, fontSize: 12, fontWeight: 600,
+      border: `1px solid ${color}25`, textTransform: 'capitalize',
+    }}>{label}</span>
+  );
+}
+
+function deriveDocuSignStatus(envelopes: Array<{ status: string }>) {
+  if (!envelopes || envelopes.length === 0) return null;
+  if (envelopes.some(e => e.status === 'completed')) return 'completed';
+  if (envelopes.some(e => e.status === 'delivered')) return 'delivered';
+  if (envelopes.some(e => e.status === 'sent')) return 'sent';
+  if (envelopes.some(e => e.status === 'declined')) return 'declined';
+  if (envelopes.some(e => e.status === 'voided')) return 'voided';
+  return envelopes[0].status;
+}
+
+function latestEnvelopeDate(envelopes: Array<{ statusChangedDateTime?: string; completedDateTime?: string; sentDateTime?: string }>) {
+  let latest = '';
+  for (const e of envelopes) {
+    const d = e.completedDateTime || e.statusChangedDateTime || e.sentDateTime || '';
+    if (d > latest) latest = d;
+  }
+  return latest ? new Date(latest).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function ClientOnboardingTab({ data, isLoading }: { data: any; isLoading: boolean }) {
+  const [expandedRow, setExpandedRow] = useState<number | null>(null);
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {[1, 2, 3].map(i => <div key={i} style={{ height: 80, borderRadius: 10, background: 'rgba(91,106,113,0.06)', animation: 'shimmer 1.5s infinite' }} />)}
+      </div>
+    );
+  }
+
+  if (!data || data.error) {
+    return <EmptyState message={data?.error || 'No client onboarding data available. Ensure transition data has been synced.'} />;
+  }
+
+  const { summary, clients, docusign_connected } = data;
+
+  return (
+    <>
+      {/* DocuSign connection banner */}
+      {!docusign_connected && (
+        <div style={{
+          padding: '12px 16px', borderRadius: 8, marginBottom: 20,
+          background: C.amberBg, border: `1px solid ${C.amberBorder}`,
+          display: 'flex', alignItems: 'center', gap: 10,
+        }}>
+          <span style={{ fontSize: 16 }}>⚠</span>
+          <span style={{ fontSize: 13, color: C.amber, fontWeight: 500 }}>
+            DocuSign not connected — showing sheet data only. Connect via Transitions page for signing status.
+          </span>
+        </div>
+      )}
+
+      {/* Summary Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+        <StatCard label="Total Accounts" value={summary?.total_accounts ?? 0} color={C.teal} />
+        <StatCard label="IAAs Signed" value={summary?.iaa_signed ?? 0} color={C.green} />
+        <StatCard label="Paperwork Complete" value={summary?.paperwork_complete ?? 0} color={C.green} />
+        <StatCard label="Pending" value={summary?.pending ?? 0} color={C.amber} />
+      </div>
+
+      {/* Client Table */}
+      {(!clients || clients.length === 0) ? (
+        <EmptyState message="No transition clients found for this advisor." />
+      ) : (
+        <Section title={`Transition Clients (${clients.length})`} icon="◎">
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                  {['Client Name', 'Account Type', 'Custodian', 'IAA Status', 'Paperwork', 'DocuSign', 'Last Updated'].map(h => (
+                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', color: C.slate, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                {clients.map((client: any, i: number) => {
+                  const isExpanded = expandedRow === client.id;
+                  const dsStatus = deriveDocuSignStatus(client.envelopes ?? []);
+                  const iaaDisplayStatus = client.docusign_iaa_status || client.status_of_iaa;
+
+                  return (
+                    <>{/* Fragment for row + expansion */}
+                      <tr
+                        key={client.id}
+                        onClick={() => setExpandedRow(isExpanded ? null : client.id)}
+                        style={{
+                          borderBottom: `1px solid ${C.border}`,
+                          background: isExpanded ? 'rgba(29,118,130,0.04)' : (i % 2 === 0 ? C.cardBg : '#262626'),
+                          cursor: 'pointer', transition: 'background 0.15s',
+                        }}
+                      >
+                        <td style={{ padding: '10px 12px' }}>
+                          <div style={{ fontWeight: 600, color: C.dark }}>
+                            {[client.primary_first_name, client.primary_last_name].filter(Boolean).join(' ') || '—'}
+                          </div>
+                          {client.household_name && (
+                            <div style={{ fontSize: 11, color: C.slate, marginTop: 2 }}>{client.household_name}</div>
+                          )}
+                        </td>
+                        <td style={{ padding: '10px 12px', color: C.slate }}>{client.account_type ?? '—'}</td>
+                        <td style={{ padding: '10px 12px', color: C.slate }}>{client.custodian ?? '—'}</td>
+                        <td style={{ padding: '10px 12px' }}><StatusPill status={iaaDisplayStatus} /></td>
+                        <td style={{ padding: '10px 12px' }}><StatusPill status={client.status_of_account_paperwork} /></td>
+                        <td style={{ padding: '10px 12px' }}>
+                          {docusign_connected ? <StatusPill status={dsStatus} /> : <span style={{ fontSize: 12, color: C.slate }}>—</span>}
+                        </td>
+                        <td style={{ padding: '10px 12px', fontSize: 12, color: C.slate }}>
+                          {latestEnvelopeDate(client.envelopes ?? [])}
+                        </td>
+                      </tr>
+
+                      {/* Expanded row */}
+                      {isExpanded && (
+                        <tr key={`${client.id}-expand`} style={{ background: 'rgba(29,118,130,0.02)' }}>
+                          <td colSpan={7} style={{ padding: '16px 20px' }}>
+                            {/* Client details */}
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px 20px', marginBottom: 16 }}>
+                              {client.primary_email && (
+                                <div>
+                                  <span style={{ fontSize: 10, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Email</span>
+                                  <p style={{ fontSize: 13, color: C.teal }}>{client.primary_email}</p>
+                                </div>
+                              )}
+                              {client.primary_phone && (
+                                <div>
+                                  <span style={{ fontSize: 10, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Phone</span>
+                                  <p style={{ fontSize: 13, color: C.dark }}>{client.primary_phone}</p>
+                                </div>
+                              )}
+                              {client.fee_schedule && (
+                                <div>
+                                  <span style={{ fontSize: 10, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fee Schedule</span>
+                                  <p style={{ fontSize: 13, color: C.dark }}>{client.fee_schedule}</p>
+                                </div>
+                              )}
+                              {client.document_readiness && (
+                                <div>
+                                  <span style={{ fontSize: 10, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Doc Readiness</span>
+                                  <p style={{ fontSize: 13, color: C.dark }}>{client.document_readiness}</p>
+                                </div>
+                              )}
+                              {client.notes && (
+                                <div style={{ gridColumn: 'span 4' }}>
+                                  <span style={{ fontSize: 10, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Notes</span>
+                                  <p style={{ fontSize: 13, color: C.dark, lineHeight: 1.5 }}>{client.notes}</p>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* DocuSign envelope details */}
+                            {!docusign_connected ? (
+                              <div style={{ padding: '10px 14px', borderRadius: 6, background: C.amberBg, border: `1px solid ${C.amberBorder}` }}>
+                                <span style={{ fontSize: 12, color: C.amber }}>DocuSign not connected</span>
+                              </div>
+                            ) : (!client.envelopes || client.envelopes.length === 0) ? (
+                              <div style={{ padding: '10px 14px', borderRadius: 6, background: 'rgba(91,106,113,0.04)', border: `1px solid ${C.border}` }}>
+                                <span style={{ fontSize: 12, color: C.slate }}>No DocuSign envelopes found for this client</span>
+                              </div>
+                            ) : (
+                              <div>
+                                <p style={{ fontSize: 11, fontWeight: 700, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                                  DocuSign Envelopes ({client.envelopes.length})
+                                </p>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                                  <thead>
+                                    <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                                      {['Subject', 'Status', 'Sent', 'Completed'].map(h => (
+                                        <th key={h} style={{ padding: '6px 10px', textAlign: 'left', color: C.slate, fontSize: 10, fontWeight: 600, textTransform: 'uppercase' }}>{h}</th>
+                                      ))}
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                                    {client.envelopes.map((env: any) => (
+                                      <tr key={env.envelopeId} style={{ borderBottom: `1px solid ${C.border}` }}>
+                                        <td style={{ padding: '6px 10px', color: C.dark }}>{env.emailSubject || '—'}</td>
+                                        <td style={{ padding: '6px 10px' }}><StatusPill status={env.status} /></td>
+                                        <td style={{ padding: '6px 10px', color: C.slate }}>
+                                          {env.sentDateTime ? new Date(env.sentDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'}
+                                        </td>
+                                        <td style={{ padding: '6px 10px', color: C.slate }}>
+                                          {env.completedDateTime ? new Date(env.completedDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+
+                                {/* Signers for the first envelope */}
+                                {client.envelopes[0]?.signers?.length > 0 && (
+                                  <div style={{ marginTop: 10 }}>
+                                    <p style={{ fontSize: 10, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Signers</p>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                                      {client.envelopes[0].signers.map((signer: any, si: number) => (
+                                        <div key={si} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 8px', borderRadius: 4, background: 'rgba(91,106,113,0.04)' }}>
+                                          <span style={{ fontSize: 12, color: C.dark, fontWeight: 500, flex: 1 }}>{signer.name}</span>
+                                          <span style={{ fontSize: 11, color: C.slate }}>{signer.email}</span>
+                                          <StatusPill status={signer.signedDateTime ? 'signed' : signer.status} />
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      )}
+                    </>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Section>
+      )}
+    </>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // MAIN ADVISOR PROFILE PAGE
 // ══════════════════════════════════════════════════════════════════════════════
-type ProfileTab = 'overview' | 'financials' | 'engagements' | 'tech' | 'team';
+type ProfileTab = 'overview' | 'financials' | 'engagements' | 'tech' | 'team' | 'onboarding';
 
 export default function AdvisorProfilePage() {
   const params = useParams();
@@ -785,6 +1036,13 @@ export default function AdvisorProfilePage() {
       .finally(() => setParseLoading(false));
   }, [pinnedNoteBody, extracted, parseLoading]);
 
+  // Client onboarding data (conditional on deal name being available)
+  const dealName = data?.deal?.properties?.dealname;
+  const { data: clientsData, isLoading: clientsLoading } = useSWR(
+    dealName ? `/api/command-center/advisor/${id}/clients?dealName=${encodeURIComponent(dealName)}` : null,
+    fetcher,
+  );
+
   if (isLoading) return <div style={{ padding: '60px 40px', color: C.slate }}>Loading advisor profile...</div>;
   if (error || data?.error) return <div style={{ padding: '60px 40px', color: C.red }}>Failed to load advisor data.</div>;
 
@@ -807,6 +1065,7 @@ export default function AdvisorProfilePage() {
     { key: 'engagements', label: 'Engagements', icon: '◉' },
     { key: 'tech', label: 'Tech & Complexity', icon: '◎' },
     { key: 'team', label: 'Team & Contacts', icon: '●' },
+    { key: 'onboarding', label: 'Client Onboarding', icon: '◎' },
   ];
 
   return (
@@ -897,8 +1156,9 @@ export default function AdvisorProfilePage() {
       {activeTab === 'engagements' && <EngagementsTab engagements={engagements} extracted={extracted} notes={notes} />}
       {activeTab === 'tech' && <TechComplexityTab deal={deal} team={team} extracted={extracted} dealId={id} />}
       {activeTab === 'team' && <TeamContactsTab dealId={id} allContacts={allContacts} />}
+      {activeTab === 'onboarding' && <ClientOnboardingTab data={clientsData} isLoading={clientsLoading} />}
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } } @keyframes shimmer { 0% { opacity: 0.5; } 50% { opacity: 0.8; } 100% { opacity: 0.5; } }`}</style>
     </div>
   );
 }
