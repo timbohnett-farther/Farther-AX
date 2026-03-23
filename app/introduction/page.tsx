@@ -21,11 +21,10 @@ export default function IntroductionPage() {
             </span>
             <div className="h-px flex-1 bg-gold opacity-30" />
           </div>
-          <h1 className="font-serif text-5xl lg:text-6xl text-cream leading-tight mb-5 tracking-tight">
-            Welcome to the<br />
-            <span className="text-gold">AX Playbook</span>
+          <h1 className="font-serif text-4xl lg:text-5xl text-cream leading-tight mb-5 tracking-tight text-center">
+            Welcome to the <span className="text-gold">AX Playbook</span>
           </h1>
-          <p className="font-sans text-base text-cream-muted tracking-wide">
+          <p className="font-sans text-base text-cream-muted tracking-wide text-center">
             Advisor Experience Onboarding &amp; Transition Reference
           </p>
         </header>
@@ -60,10 +59,10 @@ export default function IntroductionPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
             {/* Card 1: Breakaway */}
-            <div className="glass-card rounded-2xl p-8 group">
+            <div className="glass-card rounded-2xl p-8 group hover:shadow-[0_0_24px_rgba(29,118,130,0.2)] transition-all duration-300">
               <div className="flex items-start justify-between mb-6">
                 <span className="font-serif text-5xl text-gold opacity-25 leading-none select-none">01</span>
-                <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-3 py-1 rounded-full">
+                <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-3 py-1 rounded-full shadow-[0_0_8px_rgba(29,118,130,0.15)]">
                   High Compliance
                 </span>
               </div>
@@ -79,10 +78,10 @@ export default function IntroductionPage() {
             </div>
 
             {/* Card 2: Independent RIA */}
-            <div className="glass-card rounded-2xl p-8 group">
+            <div className="glass-card rounded-2xl p-8 group hover:shadow-[0_0_24px_rgba(16,185,129,0.15)] transition-all duration-300">
               <div className="flex items-start justify-between mb-6">
                 <span className="font-serif text-5xl text-gold opacity-25 leading-none select-none">02</span>
-                <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full">
+                <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.2)]">
                   Lower Legal Risk
                 </span>
               </div>
@@ -97,10 +96,10 @@ export default function IntroductionPage() {
             </div>
 
             {/* Card 3: M&A */}
-            <div className="glass-card rounded-2xl p-8 group">
+            <div className="glass-card rounded-2xl p-8 group hover:shadow-[0_0_24px_rgba(59,130,246,0.15)] transition-all duration-300">
               <div className="flex items-start justify-between mb-6">
                 <span className="font-serif text-5xl text-gold opacity-25 leading-none select-none">03</span>
-                <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-full">
+                <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.2)]">
                   Case-by-Case
                 </span>
               </div>
@@ -115,10 +114,10 @@ export default function IntroductionPage() {
             </div>
 
             {/* Card 4: No to Low AUM */}
-            <div className="glass-card rounded-2xl p-8 group">
+            <div className="glass-card rounded-2xl p-8 group hover:shadow-[0_0_24px_rgba(245,158,11,0.15)] transition-all duration-300">
               <div className="flex items-start justify-between mb-6">
                 <span className="font-serif text-5xl text-gold opacity-25 leading-none select-none">04</span>
-                <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full">
+                <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.2)]">
                   Training First
                 </span>
               </div>
@@ -153,7 +152,7 @@ export default function IntroductionPage() {
             <div className="glass-card rounded-2xl px-8 py-7">
               <div className="flex flex-col sm:flex-row sm:items-start gap-6">
                 <div className="shrink-0">
-                  <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-4 py-2 rounded-full whitespace-nowrap">
+                  <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-4 py-2 rounded-full whitespace-nowrap shadow-[0_0_8px_rgba(29,118,130,0.15)]">
                     4–6 weeks
                   </span>
                 </div>
@@ -178,7 +177,7 @@ export default function IntroductionPage() {
             <div className="glass-card rounded-2xl px-8 py-7">
               <div className="flex flex-col sm:flex-row sm:items-start gap-6">
                 <div className="shrink-0">
-                  <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-4 py-2 rounded-full whitespace-nowrap">
+                  <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-4 py-2 rounded-full whitespace-nowrap shadow-[0_0_8px_rgba(29,118,130,0.15)]">
                     6–8 weeks
                   </span>
                 </div>
@@ -203,7 +202,7 @@ export default function IntroductionPage() {
             <div className="glass-card rounded-2xl px-8 py-7">
               <div className="flex flex-col sm:flex-row sm:items-start gap-6">
                 <div className="shrink-0">
-                  <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-4 py-2 rounded-full whitespace-nowrap">
+                  <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-4 py-2 rounded-full whitespace-nowrap shadow-[0_0_8px_rgba(29,118,130,0.15)]">
                     8–12 weeks
                   </span>
                 </div>
@@ -256,7 +255,7 @@ export default function IntroductionPage() {
           </span>
           <Link
             href="/onboarding-vs-transitions"
-            className="group inline-flex items-center gap-3 font-sans text-sm tracking-wide bg-gold text-white px-8 py-4 rounded-full hover:bg-gold-dark transition-colors duration-200"
+            className="group inline-flex items-center gap-3 font-sans text-sm tracking-wide bg-gold text-white px-8 py-4 rounded-full hover:bg-gold-dark transition-all duration-200 shadow-[0_0_16px_rgba(29,118,130,0.3)] hover:shadow-[0_0_28px_rgba(29,118,130,0.5)] hover:-translate-y-0.5"
           >
             <span>Next</span>
             <span className="transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>

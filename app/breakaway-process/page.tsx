@@ -74,7 +74,11 @@ export default function BreakawayProcessPage() {
               <div className="flex items-center gap-4 mb-3">
                 <div
                   className="px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase"
-                  style={{ backgroundColor: "#1d7682", color: "white" }}
+                  style={{
+                    backgroundColor: "#1d7682",
+                    color: "white",
+                    boxShadow: "0 0 10px rgba(29, 118, 130, 0.3)"
+                  }}
                 >
                   {phase.phase}
                 </div>
@@ -88,8 +92,13 @@ export default function BreakawayProcessPage() {
                   {phase.title}
                 </h3>
                 <span
-                  className="text-sm px-2 py-0.5 rounded-sm border"
-                  style={{ color: "rgba(250,247,242,0.5)", borderColor: "rgba(250,247,242,0.08)" }}
+                  className="text-sm px-2 py-0.5 border"
+                  style={{
+                    color: "rgba(250,247,242,0.5)",
+                    borderColor: "rgba(250,247,242,0.08)",
+                    borderRadius: "9999px",
+                    boxShadow: "0 0 6px rgba(29, 118, 130, 0.15)"
+                  }}
                 >
                   {phase.duration}
                 </span>
@@ -97,7 +106,7 @@ export default function BreakawayProcessPage() {
 
               {/* Meetings table */}
               <div
-                className="rounded-lg border overflow-hidden"
+                className="rounded-lg border overflow-hidden transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
                 style={{ borderColor: "rgba(250,247,242,0.08)" }}
               >
                 <table className="w-full text-sm">
@@ -114,6 +123,7 @@ export default function BreakawayProcessPage() {
                     {phase.items.map((item, itemIdx) => (
                       <tr
                         key={itemIdx}
+                        className="transition-colors duration-200 hover:bg-white/5"
                         style={{
                           backgroundColor: itemIdx % 2 === 0 ? "#2f2f2f" : "#2a2a2a",
                           borderTop: "1px solid rgba(250,247,242,0.08)",
@@ -125,8 +135,13 @@ export default function BreakawayProcessPage() {
                         <td className="px-4 py-3" style={{ color: "#FAF7F2" }}>{item.followUp}</td>
                         <td className="px-4 py-3">
                           <span
-                            className="px-2 py-0.5 rounded-sm text-xs font-semibold"
-                            style={{ backgroundColor: "#2a2a2a", color: "#155961" }}
+                            className="px-2 py-0.5 text-xs font-semibold"
+                            style={{
+                              backgroundColor: "#2a2a2a",
+                              color: "#155961",
+                              borderRadius: "9999px",
+                              boxShadow: "0 0 6px rgba(29, 118, 130, 0.2)"
+                            }}
                           >
                             {item.owner}
                           </span>

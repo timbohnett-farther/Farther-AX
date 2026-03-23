@@ -115,21 +115,30 @@ const columns = [
 function CellValue({ value }: { value: string }) {
   if (value === "✓") {
     return (
-      <span className="text-gold font-bold text-lg" aria-label="Required">
+      <span
+        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/15 text-emerald-400 font-bold text-sm shadow-[0_0_8px_rgba(16,185,129,0.25)]"
+        aria-label="Required"
+      >
         ✓
       </span>
     );
   }
   if (value === "–") {
     return (
-      <span className="text-cream-muted" aria-label="Not applicable">
+      <span
+        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-red-500/15 text-red-400 font-medium text-sm shadow-[0_0_8px_rgba(239,68,68,0.2)]"
+        aria-label="Not applicable"
+      >
         –
       </span>
     );
   }
   if (value === "C") {
     return (
-      <span className="text-amber-600 font-semibold" aria-label="Conditional">
+      <span
+        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-amber-500/15 text-amber-400 font-semibold text-sm shadow-[0_0_8px_rgba(245,158,11,0.2)]"
+        aria-label="Conditional"
+      >
         C
       </span>
     );
@@ -300,15 +309,15 @@ export default function KeyDocumentsPage() {
           {/* Legend */}
           <div className="mt-4 flex flex-wrap gap-6 text-sm text-cream-muted">
             <span className="flex items-center gap-2">
-              <span className="text-gold font-bold text-base">✓</span>
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/15 text-emerald-400 font-bold text-xs shadow-[0_0_6px_rgba(16,185,129,0.25)]">✓</span>
               Required
             </span>
             <span className="flex items-center gap-2">
-              <span className="text-cream-muted font-medium">–</span>
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500/15 text-red-400 font-medium text-xs shadow-[0_0_6px_rgba(239,68,68,0.2)]">–</span>
               Not Applicable
             </span>
             <span className="flex items-center gap-2">
-              <span className="text-amber-600 font-semibold">C</span>
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-500/15 text-amber-400 font-semibold text-xs shadow-[0_0_6px_rgba(245,158,11,0.2)]">C</span>
               Conditional (see definitions)
             </span>
           </div>
@@ -374,7 +383,7 @@ export default function KeyDocumentsPage() {
           <div className="flex items-center justify-between">
             <Link
               href="/onboarding-vs-transitions"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg glass-card text-cream hover:bg-charcoal-700 hover:border-gold-dark transition-colors text-sm font-medium"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg glass-card text-cream hover:bg-charcoal-700 hover:border-teal transition-all duration-200 text-sm font-medium hover:shadow-[0_0_16px_rgba(29,118,130,0.2)]"
             >
               <span aria-hidden="true">←</span>
               Back
@@ -386,7 +395,7 @@ export default function KeyDocumentsPage() {
 
             <Link
               href="/breakaway"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gold text-white hover:bg-gold-dark transition-colors text-sm font-medium shadow-xs"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gold text-white hover:bg-gold-dark transition-all duration-200 text-sm font-medium shadow-[0_0_12px_rgba(29,118,130,0.3)] hover:shadow-[0_0_24px_rgba(29,118,130,0.5)] hover:-translate-y-0.5"
             >
               Next
               <span aria-hidden="true">→</span>

@@ -167,7 +167,10 @@ export default function KnowledgeCheckPage() {
             {/* Trophy / score badge */}
             <div
               className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
-              style={{ backgroundColor: "#1d7682" }}
+              style={{
+                backgroundColor: "#1d7682",
+                boxShadow: "0 0 24px rgba(29, 118, 130, 0.5)",
+              }}
             >
               <span
                 className="text-white text-3xl font-bold"
@@ -208,6 +211,9 @@ export default function KnowledgeCheckPage() {
                       backgroundColor: correct
                         ? "rgba(134,239,172,0.12)"
                         : "rgba(252,165,165,0.12)",
+                      boxShadow: correct
+                        ? "0 0 8px rgba(134, 239, 172, 0.15)"
+                        : "0 0 8px rgba(252, 165, 165, 0.15)",
                     }}
                   >
                     <span
@@ -236,8 +242,17 @@ export default function KnowledgeCheckPage() {
 
             <button
               onClick={handleRetake}
-              className="inline-flex items-center gap-2 px-7 py-3 rounded-md text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "#1d7682" }}
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-md text-sm font-semibold text-white transition-all"
+              style={{
+                backgroundColor: "#1d7682",
+                boxShadow: "0 0 16px rgba(29, 118, 130, 0.3)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "0 0 24px rgba(29, 118, 130, 0.5)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = "0 0 16px rgba(29, 118, 130, 0.3)";
+              }}
             >
               ↺ Retake Quiz
             </button>
@@ -271,6 +286,7 @@ export default function KnowledgeCheckPage() {
                   style={{
                     width: `${progressPercent}%`,
                     backgroundColor: "#1d7682",
+                    boxShadow: "0 0 8px rgba(29, 118, 130, 0.4)",
                   }}
                 />
               </div>
@@ -327,7 +343,7 @@ export default function KnowledgeCheckPage() {
                       key={i}
                       onClick={() => handleSelectAnswer(i)}
                       disabled={isAnswered}
-                      className="w-full text-left flex items-start gap-3 px-5 py-4 rounded-lg border transition-all duration-200"
+                      className="w-full text-left flex items-start gap-3 px-5 py-4 rounded-lg border transition-all duration-200 hover:shadow-[0_0_12px_rgba(29,118,130,0.15)]"
                       style={{
                         borderColor,
                         backgroundColor: bgColor,
@@ -419,8 +435,17 @@ export default function KnowledgeCheckPage() {
                 <div className="flex justify-end">
                   <button
                     onClick={handleNext}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                    style={{ backgroundColor: "#1d7682" }}
+                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md text-sm font-semibold text-white transition-all"
+                    style={{
+                      backgroundColor: "#1d7682",
+                      boxShadow: "0 0 16px rgba(29, 118, 130, 0.3)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = "0 0 24px rgba(29, 118, 130, 0.5)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = "0 0 16px rgba(29, 118, 130, 0.3)";
+                    }}
                   >
                     {isLastQuestion ? "See Results" : "Next Question"} →
                   </button>

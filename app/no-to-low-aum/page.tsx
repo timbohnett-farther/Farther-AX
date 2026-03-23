@@ -79,12 +79,13 @@ export default function NoToLowAUMPage() {
               borderLeftColor: "#5B9BD5",
               border: "1px solid rgba(91,155,213,0.3)",
               borderLeft: "4px solid #5B9BD5",
+              boxShadow: "0 0 12px rgba(91, 155, 213, 0.15)",
             }}
           >
             <div className="flex items-start gap-4">
               <div
-                className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mt-0.5"
-                style={{ backgroundColor: "#5B9BD5", color: "#1a1a1a" }}
+                className="shrink-0 w-8 h-8 flex items-center justify-center text-sm font-bold mt-0.5 shadow-[0_0_10px_rgba(91,155,213,0.4)]"
+                style={{ backgroundColor: "#5B9BD5", color: "#1a1a1a", borderRadius: "9999px" }}
               >
                 i
               </div>
@@ -113,12 +114,12 @@ export default function NoToLowAUMPage() {
             {keyCharacteristics.map((item, idx) => (
               <div
                 key={idx}
-                className="rounded-xl p-6 border"
+                className="rounded-xl p-6 border transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
                 style={{ backgroundColor: "#222222", borderColor: "rgba(250,247,242,0.08)" }}
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 shadow-[0_0_10px_rgba(29,118,130,0.3)]"
                     style={{ backgroundColor: "#1d7682", color: "#1a1a1a" }}
                   >
                     {item.icon}
@@ -214,8 +215,8 @@ export default function NoToLowAUMPage() {
                   style={{ borderColor: "rgba(250,247,242,0.08)" }}
                 >
                   <span
-                    className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold font-sans"
-                    style={{ backgroundColor: "#2a2a2a", color: "#1d7682", border: "1px solid rgba(250,247,242,0.08)" }}
+                    className="shrink-0 w-7 h-7 flex items-center justify-center text-xs font-bold font-sans shadow-[0_0_8px_rgba(29,118,130,0.3)]"
+                    style={{ backgroundColor: "#2a2a2a", color: "#1d7682", border: "1px solid rgba(250,247,242,0.08)", borderRadius: "9999px" }}
                   >
                     {String(idx + 1).padStart(2, "0")}
                   </span>

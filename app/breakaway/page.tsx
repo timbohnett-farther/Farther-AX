@@ -142,6 +142,7 @@ export default function BreakawayPage() {
             {characteristics.map((c) => (
               <div
                 key={c.label}
+                className="transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
                 style={{
                   backgroundColor: "#2f2f2f",
                   border: `1px solid ${COLORS.creamBorder}`,
@@ -167,13 +168,15 @@ export default function BreakawayPage() {
                   <span
                     style={{
                       display: "inline-block",
-                      fontSize: "0.75rem",
+                      fontSize: "0.7rem",
                       fontWeight: 600,
                       color: "#fff",
                       backgroundColor: c.badgeColor,
-                      borderRadius: "4px",
-                      padding: "2px 8px",
+                      borderRadius: "9999px",
+                      padding: "3px 12px",
                       alignSelf: "flex-start",
+                      boxShadow: `0 0 10px ${c.badgeColor}40`,
+                      letterSpacing: "0.03em",
                     }}
                   >
                     {c.badge}
@@ -335,6 +338,7 @@ export default function BreakawayPage() {
                       fontWeight: 700,
                       flexShrink: 0,
                       zIndex: 1,
+                      boxShadow: "0 0 12px rgba(29, 118, 130, 0.4)",
                     }}
                   >
                     {step.num}
@@ -399,6 +403,7 @@ export default function BreakawayPage() {
             Common Pitfalls
           </h2>
           <div
+            className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(239,68,68,0.12)]"
             style={{
               backgroundColor: "#2f2f2f",
               border: `1px solid ${COLORS.creamBorder}`,

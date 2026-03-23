@@ -34,7 +34,7 @@ export default function PageLayout({
   return (
     <div className="min-h-screen flex flex-col bg-transparent">
       {/* Top bar */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b border-cream-border bg-transparent">
+      <header className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b border-cream-border bg-charcoal/80 backdrop-blur-md">
         <div>
           <h1 className="text-2xl font-bold font-serif text-cream leading-tight">
             {title}
@@ -65,7 +65,7 @@ export default function PageLayout({
           {backHref ? (
             <Link
               href={backHref}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-smooth border border-cream-border text-slate bg-transparent hover:bg-white hover:border-teal"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border border-cream-border text-slate bg-transparent hover:bg-white/5 hover:border-teal hover:shadow-[0_0_16px_rgba(29,118,130,0.2)]"
             >
               ← {backLabel}
             </Link>
@@ -76,23 +76,26 @@ export default function PageLayout({
 
         {/* Step dots */}
         <div className="flex gap-1.5 items-center">
-          {Array.from({ length: totalSteps }).map((_, i) => (
-            <div
-              key={i}
-              className="rounded-full transition-all h-1.5 bg-teal-light"
-              style={{
-                width: i + 1 === step ? "20px" : "6px",
-                backgroundColor: i + 1 === step ? "#1d7682" : "#b6d0ed",
-              }}
-            />
-          ))}
+          {Array.from({ length: totalSteps }).map((_, i) => {
+            const isActive = i + 1 === step;
+            return (
+              <div
+                key={i}
+                className={`rounded-full transition-all duration-300 h-1.5 ${isActive ? 'shadow-[0_0_8px_rgba(29,118,130,0.6)]' : ''}`}
+                style={{
+                  width: isActive ? "20px" : "6px",
+                  backgroundColor: isActive ? "#1d7682" : i + 1 < step ? "rgba(29,118,130,0.4)" : "rgba(182,208,237,0.3)",
+                }}
+              />
+            );
+          })}
         </div>
 
         <div>
           {nextHref ? (
             <Link
               href={nextHref}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-smooth text-white bg-teal hover:bg-teal-dark"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-white bg-teal hover:bg-teal-dark shadow-[0_0_12px_rgba(29,118,130,0.3)] hover:shadow-[0_0_24px_rgba(29,118,130,0.5)] hover:-translate-y-0.5"
             >
               {nextLabel} →
             </Link>

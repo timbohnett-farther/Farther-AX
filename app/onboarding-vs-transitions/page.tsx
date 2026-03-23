@@ -44,9 +44,9 @@ export default function OnboardingVsTransitions() {
 
           <div className="grid md:grid-cols-2 gap-5">
             {/* Onboarding Card */}
-            <div className="glass-card-dark rounded-xl p-7">
+            <div className="glass-card-dark rounded-xl p-7 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-9 h-9 rounded-lg bg-gold flex items-center justify-center text-cream text-sm font-bold shrink-0">
+                <div className="w-9 h-9 rounded-lg bg-gold flex items-center justify-center text-cream text-sm font-bold shrink-0 shadow-[0_0_10px_rgba(29,118,130,0.3)]">
                   ◈
                 </div>
                 <h3 className="font-serif text-xl text-cream">Onboarding</h3>
@@ -60,9 +60,9 @@ export default function OnboardingVsTransitions() {
             </div>
 
             {/* Transitions Card */}
-            <div className="glass-card-dark rounded-xl p-7">
+            <div className="glass-card-dark rounded-xl p-7 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-9 h-9 rounded-lg bg-charcoal flex items-center justify-center text-cream text-sm font-bold shrink-0">
+                <div className="w-9 h-9 rounded-lg bg-charcoal flex items-center justify-center text-cream text-sm font-bold shrink-0 shadow-[0_0_10px_rgba(29,118,130,0.15)]">
                   ⇌
                 </div>
                 <h3 className="font-serif text-xl text-cream">Transitions</h3>
@@ -141,7 +141,7 @@ export default function OnboardingVsTransitions() {
                       (rel) => (
                         <span
                           key={rel}
-                          className="border border-cream-border text-cream text-xs px-3 py-1.5 rounded-full font-medium"
+                          className="border border-teal/30 bg-teal/10 text-cream text-xs px-3 py-1.5 rounded-full font-medium shadow-[0_0_6px_rgba(29,118,130,0.15)]"
                         >
                           {rel}
                         </span>
@@ -236,7 +236,7 @@ export default function OnboardingVsTransitions() {
                       (rel) => (
                         <span
                           key={rel}
-                          className="border border-cream-border text-cream text-xs px-3 py-1.5 rounded-full font-medium"
+                          className="border border-teal/30 bg-teal/10 text-cream text-xs px-3 py-1.5 rounded-full font-medium shadow-[0_0_6px_rgba(29,118,130,0.15)]"
                         >
                           {rel}
                         </span>
@@ -281,7 +281,7 @@ export default function OnboardingVsTransitions() {
             {/* Timeline visual */}
             <div className="mb-7">
               <div className="flex items-center gap-0 mb-2">
-                <div className="flex items-center gap-2 bg-gold bg-opacity-20 border border-gold border-opacity-40 rounded-lg px-4 py-2">
+                <div className="flex items-center gap-2 bg-gold bg-opacity-20 border border-gold border-opacity-40 rounded-lg px-4 py-2 shadow-[0_0_8px_rgba(29,118,130,0.2)]">
                   <span className="text-gold text-xs font-medium uppercase tracking-widest">Deal Signed</span>
                 </div>
                 <div className="flex-1 h-px bg-gold opacity-30 mx-1" />
@@ -289,7 +289,7 @@ export default function OnboardingVsTransitions() {
                   <span className="text-gold text-xs font-medium uppercase tracking-widest">Transition Initiated</span>
                 </div>
                 <div className="flex-1 h-px bg-gold opacity-30 mx-1" />
-                <div className="flex items-center gap-2 bg-gold bg-opacity-20 border border-gold border-opacity-40 rounded-lg px-4 py-2">
+                <div className="flex items-center gap-2 bg-gold bg-opacity-20 border border-gold border-opacity-40 rounded-lg px-4 py-2 shadow-[0_0_8px_rgba(29,118,130,0.2)]">
                   <span className="text-gold text-xs font-medium uppercase tracking-widest">Go Live</span>
                 </div>
                 <div className="flex-1 h-px bg-gold opacity-30 mx-1" />
@@ -339,7 +339,7 @@ export default function OnboardingVsTransitions() {
 
           <Link
             href="/key-documents"
-            className="group inline-flex items-center gap-2 bg-charcoal text-cream text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-charcoal-light transition-colors duration-200"
+            className="group inline-flex items-center gap-2 bg-teal text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-all duration-200 shadow-[0_0_12px_rgba(29,118,130,0.3)] hover:shadow-[0_0_24px_rgba(29,118,130,0.5)] hover:-translate-y-0.5"
           >
             Next
             <span className="group-hover:translate-x-0.5 transition-transform duration-200">→</span>

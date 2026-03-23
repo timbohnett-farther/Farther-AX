@@ -79,7 +79,7 @@ export default function LPOAPage() {
             {statCards.map((card, idx) => (
               <div
                 key={idx}
-                className="rounded-xl border text-center px-6 py-7"
+                className="rounded-xl border text-center px-6 py-7 transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.2)]"
                 style={{ backgroundColor: "#222222", borderColor: "rgba(250,247,242,0.08)" }}
               >
                 <p
@@ -133,6 +133,7 @@ export default function LPOAPage() {
                       style={{
                         backgroundColor: isLast ? "#1d7682" : "#FAF7F2",
                         color: isLast ? "#1a1a1a" : "#1a1a1a",
+                        boxShadow: "0 0 12px rgba(29, 118, 130, 0.4)",
                       }}
                     >
                       {idx + 1}
@@ -175,7 +176,7 @@ export default function LPOAPage() {
             {custodians.map((c, idx) => (
               <div
                 key={idx}
-                className="rounded-xl border p-6"
+                className="rounded-xl border p-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)]"
                 style={{ backgroundColor: "#222222", borderColor: "rgba(250,247,242,0.08)" }}
               >
                 <div className="flex items-center gap-3 mb-4">
