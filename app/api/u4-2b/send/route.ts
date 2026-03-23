@@ -9,7 +9,6 @@ const APP_URL = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || '
 
 // ── Branded HTML email template ─────────────────────────────────────────────
 function buildBrandedEmail({
-  advisorFirstName,
   bodyText,
   formLink,
   expiresDate,
@@ -18,7 +17,6 @@ function buildBrandedEmail({
   axmPhone,
   axmCalendar,
 }: {
-  advisorFirstName: string;
   bodyText: string;
   formLink: string;
   expiresDate: string;

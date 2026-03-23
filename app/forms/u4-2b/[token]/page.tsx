@@ -212,7 +212,7 @@ export default function U4FormPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [advisorName, setAdvisorName] = useState('');
-  const [tokenStatus, setTokenStatus] = useState<string>('');
+  const [, setTokenStatus] = useState<string>('');
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [submitting, setSubmitting] = useState(false);
