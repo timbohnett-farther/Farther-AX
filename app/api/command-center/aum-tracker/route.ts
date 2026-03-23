@@ -5,7 +5,7 @@
  *
  * For each launched advisor (Step 7), fetches:
  *   - Expected AUM from the deal record (transferable_aum)
- *   - Actual AUM (BD Market Value) from the Farther Managed Accounts custom object
+ *   - Actual AUM (Est. Market Value → current_value) from the Farther Managed Accounts custom object
  *   - Fee Rate BPS from the same managed accounts
  *   - Revenue = BD Market Value × Fee Rate BPS / 10,000
  *
@@ -78,12 +78,11 @@ async function fetchManagedAccountsByAdvisor(): Promise<Record<string, ManagedAc
 
   do {
     const body: Record<string, unknown> = {
-      filterGroups: [{
-        filters: [
-          { propertyName: 'bd_market_value', operator: 'HAS_PROPERTY' },
-        ],
-      }],
-      properties: ['advisor_name', 'bd_market_value', 'fee_rate_bps'],
+      filterGroups: [
+        { filters: [{ propertyName: 'current_value', operator: 'HAS_PROPERTY' }] },
+        { filters: [{ propertyName: 'bd_market_value', operator: 'HAS_PROPERTY' }] },
+      ],
+      properties: ['advisor_name', 'current_value', 'bd_market_value', 'fee_rate_bps'],
       limit: 100,
     };
     if (after) body.after = after;
@@ -104,7 +103,10 @@ async function fetchManagedAccountsByAdvisor(): Promise<Record<string, ManagedAc
 
     for (const acct of data.results ?? []) {
       const advisorName = (acct.properties?.advisor_name ?? '').trim();
-      const mv = parseFloat(acct.properties?.bd_market_value ?? '0') || 0;
+      // Prefer Est. Market Value (current_value), fall back to BD Market Value
+      const mv = parseFloat(acct.properties?.current_value ?? '0')
+        || parseFloat(acct.properties?.bd_market_value ?? '0')
+        || 0;
       const bps = parseFloat(acct.properties?.fee_rate_bps ?? '0') || 0;
 
       if (!advisorName || mv <= 0) continue;
