@@ -3,7 +3,7 @@
 ## CRITICAL — Single Source of Truth
 - **This is the ONLY repo for the AX Command Center / Billing Portal**
 - **GitHub**: `https://github.com/timbohnett-farther/Farther-AX`
-- **Local path**: `/Users/tim.bohnett/ClaudeCode/Farther-AX`
+- **Local path**: `/Users/tim.bohnett/Projects/Farther-AX`
 - **Railway deploys from**: `timbohnett-farther/Farther-AX` → `main` branch
 - **DO NOT push to or work in `farther-billing-portal` or any other repo for AX work**
 - **All code changes, builds, and deployments happen HERE and ONLY HERE**
