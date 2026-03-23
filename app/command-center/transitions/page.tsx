@@ -152,18 +152,25 @@ export default function TransitionsPage() {
 
   // ── Google Sheets Sync ─────────────────────────────────────────────────────
   async function handleSync() {
-    if (!sheetId.trim()) { setSyncResult('Please enter a Google Sheet ID'); return; }
     setSyncing(true);
     setSyncResult(null);
     try {
+      // If a sheet ID is provided, sync just that sheet; otherwise sync entire Drive folder
+      const body = sheetId.trim() ? { sheetId: sheetId.trim() } : {};
       const res = await fetch('/api/command-center/transitions/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sheetId: sheetId.trim() }),
+        body: JSON.stringify(body),
       });
       const result = await res.json();
       if (res.ok) {
-        setSyncResult(`Synced ${result.synced} of ${result.total} rows`);
+        if (result.summary) {
+          // Folder sync result
+          setSyncResult(`Synced ${result.summary.total_synced} rows from ${result.summary.total_workbooks} workbooks${result.summary.errors > 0 ? ` (${result.summary.errors} errors)` : ''}`);
+        } else {
+          // Single sheet result
+          setSyncResult(`Synced ${result.synced} of ${result.total} rows`);
+        }
         mutate();
       } else {
         setSyncResult(`Error: ${result.error}`);
@@ -315,21 +322,11 @@ export default function TransitionsPage() {
           padding: 20, marginBottom: 20,
         }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: C.dark, marginBottom: 12 }}>
-            Sync Transition Data from Google Sheets
+            Sync Transition Data from Google Drive
           </div>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <input
-              type="text"
-              placeholder="Google Sheet ID (from the URL)"
-              value={sheetId}
-              onChange={e => setSheetId(e.target.value)}
-              style={{
-                flex: 1, padding: '10px 14px', borderRadius: 8,
-                border: `1px solid ${C.border}`, fontSize: 13, outline: 'none',
-              }}
-            />
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
             <button
-              onClick={handleSync}
+              onClick={() => { setSheetId(''); handleSync(); }}
               disabled={syncing}
               style={{
                 padding: '10px 20px', borderRadius: 8, border: 'none',
@@ -337,22 +334,45 @@ export default function TransitionsPage() {
                 fontSize: 13, fontWeight: 600, cursor: syncing ? 'not-allowed' : 'pointer',
               }}
             >
-              {syncing ? 'Syncing...' : 'Start Sync'}
+              {syncing ? 'Syncing...' : '↻ Sync All Advisor Folders'}
+            </button>
+            <span style={{ fontSize: 12, color: C.slate }}>
+              Scans all advisor folders in the AX Shared Drive for transition spreadsheets
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <input
+              type="text"
+              placeholder="Or enter a specific Google Sheet ID..."
+              value={sheetId}
+              onChange={e => setSheetId(e.target.value)}
+              style={{
+                flex: 1, padding: '10px 14px', borderRadius: 8,
+                border: `1px solid ${C.border}`, fontSize: 13, outline: 'none',
+                background: C.white, color: C.dark,
+              }}
+            />
+            <button
+              onClick={handleSync}
+              disabled={syncing || !sheetId.trim()}
+              style={{
+                padding: '10px 20px', borderRadius: 8, border: `1px solid ${C.border}`,
+                background: syncing || !sheetId.trim() ? C.cardBg : C.white, color: syncing || !sheetId.trim() ? C.slate : C.dark,
+                fontSize: 13, fontWeight: 600, cursor: syncing || !sheetId.trim() ? 'not-allowed' : 'pointer',
+              }}
+            >
+              Sync Single Sheet
             </button>
           </div>
           {syncResult && (
             <div style={{
               marginTop: 10, fontSize: 13, padding: '8px 12px', borderRadius: 6,
-              background: syncResult.startsWith('Error') ? C.redBg : C.greenBg,
-              color: syncResult.startsWith('Error') ? C.red : C.green,
+              background: syncResult.startsWith('Error') || syncResult.startsWith('Sync failed') ? C.redBg : C.greenBg,
+              color: syncResult.startsWith('Error') || syncResult.startsWith('Sync failed') ? C.red : C.green,
             }}>
               {syncResult}
             </div>
           )}
-          <p style={{ fontSize: 12, color: C.slate, marginTop: 8 }}>
-            The Sheet ID is the long string in the Google Sheets URL between /d/ and /edit.
-            The sheet tab must be named &quot;Transition&quot;.
-          </p>
         </div>
       )}
 
