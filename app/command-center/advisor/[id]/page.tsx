@@ -998,6 +998,173 @@ function TeamContactsTab({ dealId, allContacts }: { dealId: string; allContacts:
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// ONBOARDING TASKS TAB (43-task checklist)
+// ══════════════════════════════════════════════════════════════════════════════
+
+const PHASE_CONFIG: Record<string, { label: string; color: string; bg: string; border: string }> = {
+  pre_launch:  { label: 'Pre-Launch', color: '#3b82f6', bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.2)' },
+  launch_day:  { label: 'Launch Day', color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)' },
+  post_launch: { label: 'Post-Launch', color: '#10b981', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)' },
+};
+
+interface ChecklistTask {
+  key: string; label: string; phase: string; optional?: boolean;
+  completed: boolean; completed_by: string | null; completed_at: string | null; notes: string | null;
+}
+
+function OnboardingTasksTab({ dealId }: { dealId: string }) {
+  const { data, error, isLoading, mutate } = useSWR<{ dealId: string; tasks: ChecklistTask[] }>(
+    dealId ? `/api/command-center/checklist/${dealId}` : null, fetcher
+  );
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [toggling, setToggling] = useState<string | null>(null);
+
+  const togglePhase = (phase: string) => setCollapsed(prev => ({ ...prev, [phase]: !prev[phase] }));
+
+  const handleToggle = useCallback(async (taskKey: string, currentCompleted: boolean) => {
+    if (!data) return;
+    setToggling(taskKey);
+    const newCompleted = !currentCompleted;
+    // Optimistic update
+    mutate(
+      { ...data, tasks: data.tasks.map(t => t.key === taskKey ? { ...t, completed: newCompleted, completed_by: newCompleted ? 'you' : null, completed_at: newCompleted ? new Date().toISOString() : null } : t) },
+      false
+    );
+    try {
+      await fetch(`/api/command-center/checklist/${dealId}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskKey, completed: newCompleted }),
+      });
+      mutate();
+    } catch { mutate(); }
+    setToggling(null);
+  }, [data, dealId, mutate]);
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {[1, 2, 3].map(i => <div key={i} style={{ height: 80, borderRadius: 10, background: 'rgba(91,106,113,0.06)', animation: 'shimmer 1.5s infinite' }} />)}
+      </div>
+    );
+  }
+  if (error || !data) return <EmptyState message="Failed to load onboarding tasks." />;
+
+  const tasks = data.tasks;
+  const totalCompleted = tasks.filter(t => t.completed).length;
+  const totalTasks = tasks.length;
+  const pctComplete = totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0;
+
+  const phases: { key: string; tasks: ChecklistTask[] }[] = [
+    { key: 'pre_launch', tasks: tasks.filter(t => t.phase === 'pre_launch') },
+    { key: 'launch_day', tasks: tasks.filter(t => t.phase === 'launch_day') },
+    { key: 'post_launch', tasks: tasks.filter(t => t.phase === 'post_launch') },
+  ];
+
+  return (
+    <>
+      {/* Summary row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 24, padding: '18px 24px', borderRadius: 10, background: C.cardBg, border: `1px solid ${C.border}` }}>
+        {/* Progress ring */}
+        <div style={{ position: 'relative', width: 56, height: 56, flexShrink: 0 }}>
+          <svg width="56" height="56" viewBox="0 0 56 56">
+            <circle cx="28" cy="28" r="24" fill="none" stroke={C.border} strokeWidth="4" />
+            <circle cx="28" cy="28" r="24" fill="none" stroke="#f59e0b" strokeWidth="4"
+              strokeDasharray={`${(pctComplete / 100) * 150.8} 150.8`}
+              strokeLinecap="round" transform="rotate(-90 28 28)" style={{ transition: 'stroke-dasharray 0.4s ease' }} />
+          </svg>
+          <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: '#f59e0b' }}>{pctComplete}%</span>
+        </div>
+        <div>
+          <p style={{ fontSize: 18, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{totalCompleted} / {totalTasks} Tasks Complete</p>
+          <p style={{ fontSize: 12, color: C.slate, marginTop: 2 }}>Advisor onboarding checklist progress</p>
+        </div>
+        {/* Phase mini stats */}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 16 }}>
+          {phases.map(p => {
+            const cfg = PHASE_CONFIG[p.key];
+            const done = p.tasks.filter(t => t.completed).length;
+            return (
+              <div key={p.key} style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: 11, color: cfg.color, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{cfg.label}</p>
+                <p style={{ fontSize: 16, fontWeight: 700, color: C.dark }}>{done}/{p.tasks.length}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Phase sections */}
+      {phases.map(p => {
+        const cfg = PHASE_CONFIG[p.key];
+        const done = p.tasks.filter(t => t.completed).length;
+        const phasePct = p.tasks.length > 0 ? Math.round((done / p.tasks.length) * 100) : 0;
+        const isCollapsed = collapsed[p.key] ?? false;
+
+        return (
+          <div key={p.key} style={{ marginBottom: 16, borderRadius: 10, border: `1px solid ${cfg.border}`, overflow: 'hidden', background: C.cardBg }}>
+            {/* Phase header */}
+            <button onClick={() => togglePhase(p.key)} style={{
+              width: '100%', padding: '14px 20px', background: cfg.bg, border: 'none',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12,
+            }}>
+              <span style={{ fontSize: 14, color: cfg.color, transition: 'transform 0.2s', transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)' }}>▼</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: cfg.color, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{cfg.label}</span>
+              <span style={{ fontSize: 12, color: C.slate }}>{done} / {p.tasks.length}</span>
+              {/* Progress bar */}
+              <div style={{ flex: 1, height: 5, background: 'rgba(91,106,113,0.08)', borderRadius: 3, overflow: 'hidden', marginLeft: 8 }}>
+                <div style={{ height: '100%', width: `${phasePct}%`, background: cfg.color, borderRadius: 3, transition: 'width 0.3s ease' }} />
+              </div>
+              <span style={{ fontSize: 12, fontWeight: 600, color: cfg.color, minWidth: 36, textAlign: 'right' }}>{phasePct}%</span>
+            </button>
+
+            {/* Task list */}
+            {!isCollapsed && (
+              <div style={{ padding: '8px 0' }}>
+                {p.tasks.map((task, ti) => (
+                  <div key={task.key} style={{
+                    display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px',
+                    borderBottom: ti < p.tasks.length - 1 ? `1px solid ${C.border}` : 'none',
+                    opacity: toggling === task.key ? 0.6 : 1, transition: 'opacity 0.15s',
+                  }}>
+                    {/* Checkbox */}
+                    <button onClick={() => handleToggle(task.key, task.completed)} style={{
+                      width: 22, height: 22, borderRadius: 5, flexShrink: 0, cursor: 'pointer',
+                      border: `2px solid ${task.completed ? cfg.color : 'rgba(250,247,242,0.2)'}`,
+                      background: task.completed ? cfg.color : 'transparent',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'all 0.15s ease',
+                    }}>
+                      {task.completed && <span style={{ fontSize: 13, color: '#fff', lineHeight: 1 }}>✓</span>}
+                    </button>
+                    {/* Label */}
+                    <span style={{
+                      fontSize: 13, color: task.completed ? C.slate : C.dark, flex: 1,
+                      textDecoration: task.completed ? 'line-through' : 'none',
+                      textDecorationColor: 'rgba(250,247,242,0.3)',
+                    }}>{task.label}</span>
+                    {/* Optional badge */}
+                    {task.optional && (
+                      <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: 'rgba(91,106,113,0.08)', color: C.slate, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Optional</span>
+                    )}
+                    {/* Completed info */}
+                    {task.completed && task.completed_at && (
+                      <span style={{ fontSize: 11, color: C.slate, whiteSpace: 'nowrap' }}>
+                        {new Date(task.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        {task.completed_by && task.completed_by !== 'you' && ` · ${task.completed_by.split('@')[0]}`}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // CLIENT ONBOARDING TAB
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -1251,7 +1418,7 @@ function ClientOnboardingTab({ data, isLoading }: { data: any; isLoading: boolea
 // ══════════════════════════════════════════════════════════════════════════════
 // MAIN ADVISOR PROFILE PAGE
 // ══════════════════════════════════════════════════════════════════════════════
-type ProfileTab = 'overview' | 'financials' | 'engagements' | 'tech' | 'team' | 'onboarding';
+type ProfileTab = 'overview' | 'financials' | 'engagements' | 'tech' | 'team' | 'tasks' | 'onboarding';
 
 export default function AdvisorProfilePage() {
   const params = useParams();
@@ -1306,13 +1473,14 @@ export default function AdvisorProfilePage() {
     ? pinnedNoteBody.replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').trim()
     : null;
 
-  const tabs: { key: ProfileTab; label: string; icon: string }[] = [
-    { key: 'overview', label: 'Overview', icon: '◈' },
-    { key: 'financials', label: 'Financials', icon: '▲' },
-    { key: 'engagements', label: 'Engagements', icon: '◉' },
-    { key: 'tech', label: 'Tech & Complexity', icon: '◎' },
-    { key: 'team', label: 'Team & Contacts', icon: '●' },
-    { key: 'onboarding', label: 'Client Onboarding', icon: '◎' },
+  const tabs: { key: ProfileTab; label: string; icon: string; color: string }[] = [
+    { key: 'overview', label: 'Overview', icon: '◈', color: '#28a1af' },
+    { key: 'financials', label: 'Financials', icon: '▲', color: '#10b981' },
+    { key: 'engagements', label: 'Engagements', icon: '◉', color: '#3b82f6' },
+    { key: 'tech', label: 'Tech & Complexity', icon: '◎', color: '#8b5cf6' },
+    { key: 'team', label: 'Team & Contacts', icon: '●', color: '#c8a951' },
+    { key: 'tasks', label: 'Onboarding Tasks', icon: '✦', color: '#f59e0b' },
+    { key: 'onboarding', label: 'Client Onboarding', icon: '◎', color: '#ef4444' },
   ];
 
   return (
@@ -1387,12 +1555,12 @@ export default function AdvisorProfilePage() {
           return (
             <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
               padding: '10px 20px', background: 'none', border: 'none',
-              borderBottom: `2px solid ${isActive ? C.teal : 'transparent'}`,
+              borderBottom: `2px solid ${isActive ? tab.color : 'transparent'}`,
               marginBottom: -2, cursor: 'pointer', transition: 'all 150ms ease',
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
-              <span style={{ fontSize: 14, opacity: isActive ? 1 : 0.5 }}>{tab.icon}</span>
-              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? C.teal : C.slate, fontFamily: "'Fakt', system-ui, sans-serif" }}>{tab.label}</span>
+              <span style={{ fontSize: 14, color: tab.color, opacity: isActive ? 1 : 0.5 }}>{tab.icon}</span>
+              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? tab.color : C.slate, fontFamily: "'Fakt', system-ui, sans-serif" }}>{tab.label}</span>
             </button>
           );
         })}
@@ -1403,6 +1571,7 @@ export default function AdvisorProfilePage() {
       {activeTab === 'engagements' && <EngagementsTab engagements={engagements} extracted={extracted} notes={notes} />}
       {activeTab === 'tech' && <TechComplexityTab deal={deal} team={team} extracted={extracted} dealId={id} />}
       {activeTab === 'team' && <TeamContactsTab dealId={id} allContacts={allContacts} />}
+      {activeTab === 'tasks' && <OnboardingTasksTab dealId={id} />}
       {activeTab === 'onboarding' && <ClientOnboardingTab data={clientsData} isLoading={clientsLoading} />}
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } } @keyframes shimmer { 0% { opacity: 0.5; } 50% { opacity: 0.8; } 100% { opacity: 0.5; } }`}</style>
