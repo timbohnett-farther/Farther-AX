@@ -1742,7 +1742,7 @@ export default function PipelineDashboard() {
   ];
 
   return (
-    <div style={{ padding: '40px 40px', minHeight: '100vh', background: C.bg, fontFamily: "'Fakt', system-ui, sans-serif" }}>
+    <div style={{ padding: '40px 40px', minHeight: '100vh', fontFamily: "'Fakt', system-ui, sans-serif" }}>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>

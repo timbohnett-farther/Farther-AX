@@ -1484,7 +1484,7 @@ export default function AdvisorProfilePage() {
   ];
 
   return (
-    <div style={{ padding: '32px 40px', minHeight: '100vh', background: C.bg, fontFamily: "'Fakt', system-ui, sans-serif" }}>
+    <div style={{ padding: '32px 40px', minHeight: '100vh', fontFamily: "'Fakt', system-ui, sans-serif" }}>
       <Link href="/command-center" style={{ fontSize: 13, color: C.slate, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 20 }}>
         ← Back to Pipeline
       </Link>
