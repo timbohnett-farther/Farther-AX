@@ -10,70 +10,70 @@ const phases = [
 ];
 
 const complianceTimeline = [
-  { days: "Days 0\u20135", title: "Pre-Onboarding", items: "Prior registrations, licenses, CRD review, U4 preparation, background checks" },
-  { days: "Days 5\u201310", title: "Conflicts & Disclosures", items: "OBA disclosures, personal trading accounts, Code of Ethics acknowledgment" },
-  { days: "Days 10\u201320", title: "Mandatory Training", items: "Cybersecurity, compliance fundamentals, email/social media rules \u2014 with timestamped completion records" },
-  { days: "Days 20\u201325", title: "Policy Attestations", items: "Handbook, cybersecurity policy, BCP, advertising rules" },
-  { days: "Days 25\u201330", title: "Supervisory Sign-Off", items: "Supervisor approval, full archive of onboarding file for exam review" },
+  { days: "Days 0–5", title: "Pre-Onboarding", items: "Prior registrations, licenses, CRD review, U4 preparation, background checks" },
+  { days: "Days 5–10", title: "Conflicts & Disclosures", items: "OBA disclosures, personal trading accounts, Code of Ethics acknowledgment" },
+  { days: "Days 10–20", title: "Mandatory Training", items: "Cybersecurity, compliance fundamentals, email/social media rules — with timestamped completion records" },
+  { days: "Days 20–25", title: "Policy Attestations", items: "Handbook, cybersecurity policy, BCP, advertising rules" },
+  { days: "Days 25–30", title: "Supervisory Sign-Off", items: "Supervisor approval, full archive of onboarding file for exam review" },
 ];
 
 const fartherCompliance = [
-  { issue: "Marketing Rule Compliance", detail: "Acquired advisors may have used testimonials, hypothetical performance, or social media in ways that don\u2019t comply with SEC Marketing Rule requirements" },
-  { issue: "Cybersecurity & Data Transfer", detail: "Farther\u2019s platform is a closed-loop encrypted ecosystem. Client data from acquired firms must be migrated into this ecosystem \u2014 not held in third-party systems" },
-  { issue: "Custody Rule", detail: "Confirm the acquired RIA\u2019s custody arrangements are properly disclosed and structured before migration begins" },
-  { issue: "Fiduciary Standard Alignment", detail: "Any acquired firm with commission-based compensation structures requires careful review to ensure alignment with Farther\u2019s fiduciary model" },
+  { issue: "Marketing Rule Compliance", detail: "Acquired advisors may have used testimonials, hypothetical performance, or social media in ways that don’t comply with SEC Marketing Rule requirements" },
+  { issue: "Cybersecurity & Data Transfer", detail: "Farther’s platform is a closed-loop encrypted ecosystem. Client data from acquired firms must be migrated into this ecosystem — not held in third-party systems" },
+  { issue: "Custody Rule", detail: "Confirm the acquired RIA’s custody arrangements are properly disclosed and structured before migration begins" },
+  { issue: "Fiduciary Standard Alignment", detail: "Any acquired firm with commission-based compensation structures requires careful review to ensure alignment with Farther’s fiduciary model" },
 ];
 
 const regFlags = [
-  "Unresolved SEC exam deficiencies \u2014 must be remediated before closing or on a defined timeline",
-  "Client complaint or arbitration history \u2014 pattern complaints suggest systemic service issues",
-  "State registration complexity \u2014 multi-state RIAs have layered filing requirements beyond SEC mandates",
-  "Insurance coverage gaps \u2014 E&O, Cyber, and Fiduciary coverage must be confirmed and transitioned",
+  "Unresolved SEC exam deficiencies — must be remediated before closing or on a defined timeline",
+  "Client complaint or arbitration history — pattern complaints suggest systemic service issues",
+  "State registration complexity — multi-state RIAs have layered filing requirements beyond SEC mandates",
+  "Insurance coverage gaps — E&O, Cyber, and Fiduciary coverage must be confirmed and transitioned",
 ];
 
 const techAdvantages = [
-  { label: "Home-built platform", desc: "No stitched-together vendor stack \u2014 fewer breaking points during migration" },
+  { label: "Home-built platform", desc: "No stitched-together vendor stack — fewer breaking points during migration" },
   { label: "AI Proposal tool", desc: "Acquired advisors can generate personalized client proposals in under 10 minutes" },
-  { label: "Closed-loop data", desc: "All client data stays within Farther\u2019s encrypted infrastructure; no third-party re-entry required" },
+  { label: "Closed-loop data", desc: "All client data stays within Farther’s encrypted infrastructure; no third-party re-entry required" },
   { label: "3x efficiency", desc: "Advisors can manage books 3x larger than industry average due to workflow gains" },
 ];
 
 const techRisks = [
-  "Vendor lock-in at the acquired firm \u2014 legacy CRM or portfolio management contracts may have expensive breakage clauses",
-  "Data integrity during migration \u2014 account history, client notes, and preferences must transfer cleanly",
-  "Cybersecurity posture \u2014 past breaches or vulnerabilities discovered post-close become Farther\u2019s liability",
+  "Vendor lock-in at the acquired firm — legacy CRM or portfolio management contracts may have expensive breakage clauses",
+  "Data integrity during migration — account history, client notes, and preferences must transfer cleanly",
+  "Cybersecurity posture — past breaches or vulnerabilities discovered post-close become Farther’s liability",
   "Custodian transitions are among the highest-risk moments for client attrition",
 ];
 
 const financialFlags = [
   "Advisors claiming higher AUM, revenue, or client count than disclosed in due diligence",
-  "Unusual billing arrangements or fee structures that don\u2019t align with the disclosed fee schedule",
+  "Unusual billing arrangements or fee structures that don’t align with the disclosed fee schedule",
   "Clients expressing surprise at fees or services they say they were never told about",
 ];
 
 const complianceFlags = [
   "Advisors referencing undisclosed activities (outside business activities, side arrangements)",
-  "Marketing materials, testimonials, or social media posts that weren\u2019t reviewed pre-deal",
+  "Marketing materials, testimonials, or social media posts that weren’t reviewed pre-deal",
   "Any mention of client complaints, disputes, or informal settlements not disclosed pre-close",
 ];
 
 const culturalFlags = [
-  "Advisor dissatisfaction with Farther\u2019s fiduciary model or technology requirements",
-  "Key person dependencies \u2014 if one advisor holds 80%+ of client relationships, disengagement is catastrophic",
-  "Client relationships that appear transactional rather than advisory \u2014 higher attrition risk",
+  "Advisor dissatisfaction with Farther’s fiduciary model or technology requirements",
+  "Key person dependencies — if one advisor holds 80%+ of client relationships, disengagement is catastrophic",
+  "Client relationships that appear transactional rather than advisory — higher attrition risk",
 ];
 
 const glossary = [
-  { term: "AUM", def: "Assets Under Management \u2014 the primary value driver of any RIA book" },
+  { term: "AUM", def: "Assets Under Management — the primary value driver of any RIA book" },
   { term: "Form ADV", def: "RIA registration document; contains disclosure of services, fees, conflicts, and exam history" },
-  { term: "Form CRS", def: "Client Relationship Summary \u2014 required for SEC-registered RIAs serving retail investors" },
+  { term: "Form CRS", def: "Client Relationship Summary — required for SEC-registered RIAs serving retail investors" },
   { term: "Earnout", def: "Deferred purchase price contingent on post-close performance metrics like AUM and client retention" },
-  { term: "OBA", def: "Outside Business Activity \u2014 any activity outside the advisor\u2019s primary registration that must be disclosed" },
-  { term: "U4", def: "FINRA registration form for individual advisors \u2014 must be filed and clean before activation" },
+  { term: "OBA", def: "Outside Business Activity — any activity outside the advisor’s primary registration that must be disclosed" },
+  { term: "U4", def: "FINRA registration form for individual advisors — must be filed and clean before activation" },
   { term: "Warm Handoff", def: "Transition model where selling advisor introduces successor advisor directly to clients over time" },
-  { term: "CRD", def: "Central Registration Depository \u2014 FINRA\u2019s database of advisor registration and disciplinary history" },
-  { term: "Fiduciary Standard", def: "Legal obligation to act in the client\u2019s best interest \u2014 Farther\u2019s non-negotiable baseline" },
-  { term: "IARD", def: "Investment Adviser Registration Depository \u2014 the SEC/state filing system for RIA registration" },
+  { term: "CRD", def: "Central Registration Depository — FINRA’s database of advisor registration and disciplinary history" },
+  { term: "Fiduciary Standard", def: "Legal obligation to act in the client’s best interest — Farther’s non-negotiable baseline" },
+  { term: "IARD", def: "Investment Adviser Registration Depository — the SEC/state filing system for RIA registration" },
 ];
 
 function SectionHeader({ part, title }: { part: string; title: string }) {
@@ -133,7 +133,7 @@ export default function MAPage() {
     <PageLayout
       step={6}
       title="M&A"
-      subtitle="Advisor Pathway \u2014 Mergers & Acquisitions"
+      subtitle="Advisor Pathway — Mergers & Acquisitions"
       backHref="/independent-ria"
       nextHref="/no-to-low-aum"
     >
@@ -212,8 +212,8 @@ export default function MAPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           {[
-            { label: "20\u201335%", sub: "of total purchase price now structured as earnout" },
-            { label: "1\u20133 years", sub: "typical earnout period; beyond 3 years creates strain" },
+            { label: "20–35%", sub: "of total purchase price now structured as earnout" },
+            { label: "1–3 years", sub: "typical earnout period; beyond 3 years creates strain" },
             { label: "AUM + Revenue", sub: "common performance triggers alongside client retention" },
             { label: "Buyer obligation", sub: "failure to deliver promised support can legally impair earnout" },
           ].map((s) => (
@@ -232,7 +232,7 @@ export default function MAPage() {
 
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 3: Compliance */}
-        <SectionHeader part="3" title="Compliance \u2014 What the Onboarding Team Must Know" />
+        <SectionHeader part="3" title="Compliance — What the Onboarding Team Must Know" />
         <p className="text-sm text-cream-muted leading-7 mb-6">
           Compliance is the highest-stakes area for any RIA acquisition. Errors here have regulatory, financial,
           and reputational consequences.
@@ -248,9 +248,9 @@ export default function MAPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             {[
-              { part: "Part 1", desc: "Statistical firm data \u2014 AUM, structure, investment strategies, examination history" },
-              { part: "Part 2A", desc: "Brochure \u2014 narrative disclosure of services, fees, conflicts of interest, and personnel" },
-              { part: "Part 2B", desc: "Brochure Supplement \u2014 background on key advisory personnel" },
+              { part: "Part 1", desc: "Statistical firm data — AUM, structure, investment strategies, examination history" },
+              { part: "Part 2A", desc: "Brochure — narrative disclosure of services, fees, conflicts of interest, and personnel" },
+              { part: "Part 2B", desc: "Brochure Supplement — background on key advisory personnel" },
               { part: "Part 3 / CRS", desc: "Client Relationship Summary for SEC-registered firms serving retail investors" },
             ].map((a) => (
               <div key={a.part} className="flex items-start gap-3 bg-white/[0.03] rounded-lg px-4 py-3">
@@ -333,7 +333,7 @@ export default function MAPage() {
 
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 4: Client Retention */}
-        <SectionHeader part="4" title="Client Retention \u2014 The Metric That Drives Everything" />
+        <SectionHeader part="4" title="Client Retention — The Metric That Drives Everything" />
         <p className="text-sm text-cream-muted leading-7 mb-6">
           Client retention is the single most important post-acquisition metric. Earnout payments depend on it.
           Farther&rsquo;s reputation as an acquirer depends on it.
@@ -342,10 +342,10 @@ export default function MAPage() {
         {/* Retention stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {[
-            { value: "86\u201394%+", label: "Well-executed transition retention" },
+            { value: "86–94%+", label: "Well-executed transition retention" },
             { value: "97%", label: "5-year RIA client retention baseline" },
             { value: "19%", label: "Avg attrition from poor custodian transitions" },
-            { value: "6\u20139 mo", label: "Pivotal retention window post-acquisition" },
+            { value: "6–9 mo", label: "Pivotal retention window post-acquisition" },
           ].map((s) => (
             <div key={s.label} className="glass-card rounded-lg p-4 text-center transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]">
               <p className="font-serif text-xl text-teal font-bold mb-1">{s.value}</p>
@@ -358,10 +358,10 @@ export default function MAPage() {
         <h3 className="font-serif text-base text-cream font-semibold mb-4">What Actually Drives Retention</h3>
         <div className="space-y-2.5 mb-6">
           {[
-            "Communicate with clients before anyone else does \u2014 don\u2019t let news travel through the grapevine",
-            "Keep messaging consistent across all clients \u2014 every touchpoint reinforces the same narrative",
-            "Frame the transition around client benefit \u2014 better technology, more personalized planning, stronger support",
-            "Get clients into Farther\u2019s service rhythm (reviews, communications, events) as fast as possible",
+            "Communicate with clients before anyone else does — don’t let news travel through the grapevine",
+            "Keep messaging consistent across all clients — every touchpoint reinforces the same narrative",
+            "Frame the transition around client benefit — better technology, more personalized planning, stronger support",
+            "Get clients into Farther’s service rhythm (reviews, communications, events) as fast as possible",
           ].map((item, i) => (
             <div key={i} className="flex items-start gap-3 glass-card rounded-lg px-5 py-3">
               <span className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-bold shadow-[0_0_6px_rgba(16,185,129,0.2)]">
@@ -383,8 +383,8 @@ export default function MAPage() {
           <ul className="space-y-2.5 mb-4">
             {[
               "Joint meetings with the seller during the transition period build trust before the seller steps back",
-              "Negotiate seller participation in the transition as part of deal terms \u2014 this directly protects retention and earnout performance",
-              "Use Farther\u2019s technology \u2014 CRM tracking, automated follow-up workflows, and the AI-powered proposal tool \u2014 to ensure no client is overlooked",
+              "Negotiate seller participation in the transition as part of deal terms — this directly protects retention and earnout performance",
+              "Use Farther’s technology — CRM tracking, automated follow-up workflows, and the AI-powered proposal tool — to ensure no client is overlooked",
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3 text-sm text-cream-muted leading-relaxed">
                 <span className="text-emerald-400 mt-0.5 shrink-0">&#9670;</span>
@@ -401,7 +401,7 @@ export default function MAPage() {
 
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 5: Technology */}
-        <SectionHeader part="5" title="Technology Integration \u2014 Farther\u2019s Competitive Advantage" />
+        <SectionHeader part="5" title="Technology Integration — Farther’s Competitive Advantage" />
 
         <h3 className="font-serif text-base text-cream font-semibold mb-4">What Makes Farther&rsquo;s Tech Stack Different</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
