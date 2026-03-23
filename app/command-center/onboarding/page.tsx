@@ -221,15 +221,27 @@ function WorkloadDashboard() {
   );
 }
 
+// ── Role badge colors ────────────────────────────────────────────────────────
+const ROLE_BADGE_COLORS: Record<string, string> = {
+  AXM: 'bg-teal/15 text-teal',
+  AXA: 'bg-cyan-400/15 text-cyan-400',
+  CTM: 'bg-amber-400/15 text-amber-400',
+  CTA: 'bg-yellow-500/15 text-yellow-500',
+};
+
 // ── Phase Section ─────────────────────────────────────────────────────────────
-function PhaseSection({ phase, tasks, onToggle }: {
+function PhaseSection({ phase, tasks, onToggle, roleFilter }: {
   phase: Phase;
   tasks: TaskRow[];
   onToggle: (key: string, completed: boolean) => void;
+  roleFilter: string;
 }) {
   const [open, setOpen] = useState(true);
-  const phaseTasks = tasks.filter(t => t.phase === phase);
+  const allPhaseTasks = tasks.filter(t => t.phase === phase);
+  const phaseTasks = roleFilter === 'all' ? allPhaseTasks : allPhaseTasks.filter(t => t.role === roleFilter);
   const completedCount = phaseTasks.filter(t => t.completed).length;
+
+  if (phaseTasks.length === 0) return null;
 
   return (
     <div className="mb-3 border border-cream-border rounded-lg overflow-hidden">
@@ -259,7 +271,7 @@ function PhaseSection({ phase, tasks, onToggle }: {
             <div
               key={task.key}
               className={`flex items-start gap-3 px-4 py-2.5 border-t border-cream-border ${
-                task.completed ? 'bg-teal/5' : 'bg-white'
+                task.completed ? 'bg-teal/5' : 'bg-charcoal-800'
               }`}
             >
               <input
@@ -269,10 +281,17 @@ function PhaseSection({ phase, tasks, onToggle }: {
                 className="mt-0.5 accent-teal w-4 h-4 cursor-pointer shrink-0"
               />
               <div className="flex-1">
-                <span className={`text-sm ${task.completed ? 'text-slate line-through' : 'text-cream'}`}>
-                  {task.label}
-                  {task.optional && <span className="ml-1.5 text-[10px] text-slate italic">(opt)</span>}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm ${task.completed ? 'text-slate line-through' : 'text-cream'}`}>
+                    {task.label}
+                    {task.optional && <span className="ml-1.5 text-[10px] text-slate italic">(opt)</span>}
+                  </span>
+                  {roleFilter === 'all' && task.role && (
+                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${ROLE_BADGE_COLORS[task.role] ?? 'bg-slate/15 text-slate'}`}>
+                      {task.role}
+                    </span>
+                  )}
+                </div>
                 {task.completed && task.completed_by && (
                   <p className="text-xs text-teal mt-0.5">
                     ✓ {task.completed_by.split('@')[0]}
@@ -289,13 +308,13 @@ function PhaseSection({ phase, tasks, onToggle }: {
 }
 
 // ── Advisor Checklist ─────────────────────────────────────────────────────────
-function AdvisorChecklist({ deal }: { deal: { id: string; dealname: string; dealstage: string } }) {
+function AdvisorChecklist({ deal, roleFilter }: { deal: { id: string; dealname: string; dealstage: string }; roleFilter: string }) {
   const { data, mutate } = useSWR(`/api/command-center/checklist/${deal.id}`, fetcher, { refreshInterval: 43_200_000 });
   const tasks: TaskRow[] = data?.tasks ?? [];
-  const completedCount = tasks.filter(t => t.completed).length;
+  const filteredTasks = roleFilter === 'all' ? tasks : tasks.filter(t => t.role === roleFilter);
+  const completedCount = filteredTasks.filter(t => t.completed).length;
 
   async function handleToggle(taskKey: string, completed: boolean) {
-    // Optimistic update
     mutate({ ...data, tasks: tasks.map(t => t.key === taskKey ? { ...t, completed } : t) }, false);
     await fetch(`/api/command-center/checklist/${deal.id}`, {
       method: 'PATCH',
@@ -305,7 +324,7 @@ function AdvisorChecklist({ deal }: { deal: { id: string; dealname: string; deal
     mutate();
   }
 
-  const pct = tasks.length ? Math.round((completedCount / tasks.length) * 100) : 0;
+  const pct = filteredTasks.length ? Math.round((completedCount / filteredTasks.length) * 100) : 0;
 
   return (
     <DataCard className="mb-6">
@@ -325,12 +344,12 @@ function AdvisorChecklist({ deal }: { deal: { id: string; dealname: string; deal
           <div className={`w-14 h-14 rounded-full border-[3px] ${pct === 100 ? 'border-teal' : 'border-cream-border'} flex items-center justify-center flex-col`}>
             <span className={`text-sm font-bold ${pct === 100 ? 'text-teal' : 'text-cream'}`}>{pct}%</span>
           </div>
-          <p className="text-[10px] text-slate mt-1">{completedCount}/43</p>
+          <p className="text-[10px] text-slate mt-1">{completedCount}/{filteredTasks.length}</p>
         </div>
       </div>
       <div>
         {(['pre_launch', 'launch_day', 'post_launch'] as Phase[]).map(phase => (
-          <PhaseSection key={phase} phase={phase} tasks={tasks} onToggle={handleToggle} />
+          <PhaseSection key={phase} phase={phase} tasks={tasks} onToggle={handleToggle} roleFilter={roleFilter} />
         ))}
       </div>
     </DataCard>
@@ -345,6 +364,7 @@ function AdvisorChecklist({ deal }: { deal: { id: string; dealname: string; deal
 export default function OnboardingTracker() {
   const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, { refreshInterval: 43_200_000 });
   const [activeTab, setActiveTab] = useState<'workload' | 'checklists'>('workload');
+  const [checklistRoleFilter, setChecklistRoleFilter] = useState<string>('all');
 
   if (isLoading) {
     return <div className="px-10 py-16 text-slate">Loading…</div>;
@@ -408,6 +428,27 @@ export default function OnboardingTracker() {
       {/* Checklists Tab */}
       {activeTab === 'checklists' && (
         <>
+          {/* Role filter */}
+          <div className="flex items-center gap-2 mb-5">
+            <span className="text-xs text-slate font-semibold uppercase tracking-wider mr-2">Filter by role:</span>
+            {['all', 'AXM', 'AXA', 'CTM', 'CTA'].map(role => {
+              const isActive = checklistRoleFilter === role;
+              return (
+                <button
+                  key={role}
+                  onClick={() => setChecklistRoleFilter(role)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium border-none cursor-pointer transition-smooth ${
+                    isActive
+                      ? 'bg-teal text-white'
+                      : 'bg-charcoal-700 text-slate hover:text-cream'
+                  }`}
+                >
+                  {role === 'all' ? 'All Tasks' : role}
+                </button>
+              );
+            })}
+          </div>
+
           {onboardingDeals.length === 0 ? (
             <DataCard className="text-center py-16">
               <p className="text-slate">
@@ -416,7 +457,7 @@ export default function OnboardingTracker() {
             </DataCard>
           ) : (
             onboardingDeals.map((deal: { id: string; dealname: string; dealstage: string }) => (
-              <AdvisorChecklist key={deal.id} deal={deal} />
+              <AdvisorChecklist key={deal.id} deal={deal} roleFilter={checklistRoleFilter} />
             ))
           )}
         </>
