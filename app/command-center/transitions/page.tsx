@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import useSWR from 'swr';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,6 +17,7 @@ const C = {
   red: '#f87171', redBg: 'rgba(248,113,113,0.2)', redBorder: 'rgba(248,113,113,0.35)',
   gold: '#fbbf24', goldBg: 'rgba(251,191,36,0.2)',
   blue: '#60a5fa', blueBg: 'rgba(96,165,250,0.2)', blueBorder: 'rgba(96,165,250,0.35)', greenBorder: 'rgba(74,222,128,0.35)',
+  purple: '#a78bfa', purpleBg: 'rgba(167,139,250,0.15)', purpleBorder: 'rgba(167,139,250,0.35)',
 };
 
 // ── Status color map ─────────────────────────────────────────────────────────
@@ -54,6 +55,111 @@ function DocuSignPill({ status }: { status: string | null }) {
     }}>
       {status}
     </span>
+  );
+}
+
+// ── DocuSign Envelope Card ───────────────────────────────────────────────────
+interface DocuSignSigner {
+  name: string;
+  email: string;
+  status: string;
+  signedDateTime?: string;
+  deliveredDateTime?: string;
+  sentDateTime?: string;
+}
+
+interface DocuSignEnvelope {
+  envelopeId: string;
+  status: string;
+  emailSubject: string;
+  sentDateTime?: string;
+  completedDateTime?: string;
+  signers: DocuSignSigner[];
+}
+
+function EnvelopeCard({ envelope }: { envelope: DocuSignEnvelope }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const fmtDate = (d?: string) => {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  return (
+    <div style={{
+      background: 'rgba(0,0,0,0.2)', borderRadius: 8,
+      border: `1px solid ${C.border}`, marginBottom: 8, overflow: 'hidden',
+    }}>
+      {/* Envelope header — clickable */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        style={{
+          width: '100%', padding: '10px 14px', border: 'none', cursor: 'pointer',
+          background: expanded ? 'rgba(43,184,196,0.04)' : 'transparent',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          textAlign: 'left', gap: 12,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+          <DocuSignPill status={envelope.status} />
+          <span style={{
+            fontSize: 13, color: C.dark, fontWeight: 500,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {envelope.emailSubject || 'No subject'}
+          </span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
+          <span style={{ fontSize: 11, color: C.slate }}>
+            Sent {fmtDate(envelope.sentDateTime)}
+          </span>
+          {envelope.completedDateTime && (
+            <span style={{ fontSize: 11, color: C.green }}>
+              Done {fmtDate(envelope.completedDateTime)}
+            </span>
+          )}
+          <span style={{
+            fontSize: 14, color: C.slate,
+            transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 150ms ease', display: 'inline-block',
+          }}>
+            ▾
+          </span>
+        </div>
+      </button>
+
+      {/* Expanded signer detail */}
+      {expanded && (
+        <div style={{ padding: '0 14px 12px' }}>
+          <div style={{ fontSize: 11, color: C.slate, fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            Signers
+          </div>
+          {envelope.signers.map((signer, i) => (
+            <div key={i} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '6px 0', borderTop: i > 0 ? `1px solid ${C.border}` : 'none',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <DocuSignPill status={signer.status} />
+                <div>
+                  <div style={{ fontSize: 13, color: C.dark, fontWeight: 500 }}>{signer.name}</div>
+                  <div style={{ fontSize: 11, color: C.slate }}>{signer.email}</div>
+                </div>
+              </div>
+              <div style={{ fontSize: 11, color: C.slate, textAlign: 'right' }}>
+                {signer.signedDateTime ? (
+                  <span style={{ color: C.green }}>Signed {fmtDate(signer.signedDateTime)}</span>
+                ) : signer.deliveredDateTime ? (
+                  <span style={{ color: C.amber }}>Delivered {fmtDate(signer.deliveredDateTime)}</span>
+                ) : signer.sentDateTime ? (
+                  <span>Sent {fmtDate(signer.sentDateTime)}</span>
+                ) : '—'}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -100,6 +206,17 @@ interface TransitionsData {
   };
 }
 
+interface DocuSignResponse {
+  connected: boolean;
+  totalEnvelopes: number;
+  matchedCount: number;
+  unmatchedCount: number;
+  advisors: Record<string, DocuSignEnvelope[]>;
+  unmatched: DocuSignEnvelope[];
+  error?: string;
+  authUrl?: string;
+}
+
 // ── Main Component ───────────────────────────────────────────────────────────
 export default function TransitionsPage() {
   const { data, error, isLoading, mutate } = useSWR<TransitionsData>(
@@ -111,8 +228,28 @@ export default function TransitionsPage() {
   const [syncResult, setSyncResult] = useState<string | null>(null);
   const [sheetId, setSheetId] = useState('');
   const [showSyncPanel, setShowSyncPanel] = useState(false);
-  const [docusignStatus, setDocusignStatus] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  // DocuSign state
+  const [docusignData, setDocusignData] = useState<DocuSignResponse | null>(null);
+  const [docusignLoading, setDocusignLoading] = useState(false);
+  const [docusignError, setDocusignError] = useState<string | null>(null);
+  const [showUnmatched, setShowUnmatched] = useState(false);
+
+  // ── Check URL params for DocuSign callback ──────────────────────────────────
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ds = params.get('docusign');
+    if (ds === 'connected') {
+      window.history.replaceState({}, '', '/command-center/transitions');
+      // Auto-fetch DocuSign data after OAuth callback
+      handleDocuSignFetch();
+    } else if (ds === 'error') {
+      setDocusignError('DocuSign connection failed: ' + (params.get('reason') ?? 'unknown'));
+      window.history.replaceState({}, '', '/command-center/transitions');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Filtered advisors ──────────────────────────────────────────────────────
   const filteredAdvisors = useMemo(() => {
@@ -155,7 +292,6 @@ export default function TransitionsPage() {
     setSyncing(true);
     setSyncResult(null);
     try {
-      // If a sheet ID is provided, sync just that sheet; otherwise sync entire Drive folder
       const body = sheetId.trim() ? { sheetId: sheetId.trim() } : {};
       const res = await fetch('/api/command-center/transitions/sync', {
         method: 'POST',
@@ -165,10 +301,8 @@ export default function TransitionsPage() {
       const result = await res.json();
       if (res.ok) {
         if (result.summary) {
-          // Folder sync result
           setSyncResult(`Synced ${result.summary.total_synced} rows from ${result.summary.total_workbooks} workbooks${result.summary.errors > 0 ? ` (${result.summary.errors} errors)` : ''}`);
         } else {
-          // Single sheet result
           setSyncResult(`Synced ${result.synced} of ${result.total} rows`);
         }
         mutate();
@@ -182,8 +316,10 @@ export default function TransitionsPage() {
     }
   }
 
-  // ── DocuSign Connect ───────────────────────────────────────────────────────
-  async function handleDocuSignConnect() {
+  // ── DocuSign Fetch ─────────────────────────────────────────────────────────
+  async function handleDocuSignFetch() {
+    setDocusignLoading(true);
+    setDocusignError(null);
     try {
       const res = await fetch('/api/command-center/transitions/docusign', {
         method: 'POST',
@@ -191,27 +327,30 @@ export default function TransitionsPage() {
         body: JSON.stringify({}),
       });
       const result = await res.json();
+
       if (result.error === 'not_authenticated' && result.authUrl) {
         window.location.href = result.authUrl;
-      } else if (res.ok) {
-        setDocusignStatus('Connected — ' + (result.totalSetSize ?? 0) + ' envelopes found');
+        return;
       }
+
+      if (!res.ok) {
+        setDocusignError(result.error || 'Unknown error');
+        return;
+      }
+
+      setDocusignData(result);
+      // Refresh transitions data since the POST wrote statuses back to DB
+      mutate();
     } catch (e) {
-      setDocusignStatus(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      setDocusignError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setDocusignLoading(false);
     }
   }
 
-  // ── Check URL params for DocuSign callback ────────────────────────────────
-  if (typeof window !== 'undefined' && !docusignStatus) {
-    const params = new URLSearchParams(window.location.search);
-    const ds = params.get('docusign');
-    if (ds === 'connected') {
-      setDocusignStatus('DocuSign connected successfully');
-      window.history.replaceState({}, '', '/command-center/transitions');
-    } else if (ds === 'error') {
-      setDocusignStatus('DocuSign connection failed: ' + (params.get('reason') ?? 'unknown'));
-      window.history.replaceState({}, '', '/command-center/transitions');
-    }
+  function handleDocuSignDisconnect() {
+    setDocusignData(null);
+    setDocusignError(null);
   }
 
   const summary = data?.summary;
@@ -304,14 +443,17 @@ export default function TransitionsPage() {
 
         {/* DocuSign Button */}
         <button
-          onClick={handleDocuSignConnect}
+          onClick={handleDocuSignFetch}
+          disabled={docusignLoading}
           style={{
             padding: '10px 18px', borderRadius: 8, border: `1px solid ${C.border}`,
-            background: C.white, color: C.dark, fontSize: 13, fontWeight: 600,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+            background: docusignLoading ? C.cardBg : C.white, color: docusignLoading ? C.slate : C.dark,
+            fontSize: 13, fontWeight: 600,
+            cursor: docusignLoading ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6,
           }}
         >
-          ✎ DocuSign Status
+          {docusignLoading ? '↻ Loading...' : '✎ DocuSign Status'}
         </button>
       </div>
 
@@ -376,17 +518,52 @@ export default function TransitionsPage() {
         </div>
       )}
 
-      {/* ── DocuSign Status ─────────────────────────────────────────────────── */}
-      {docusignStatus && (
+      {/* ── DocuSign Summary Bar ──────────────────────────────────────────────── */}
+      {docusignData && (
         <div style={{
-          background: docusignStatus.includes('Error') || docusignStatus.includes('failed') ? C.redBg : C.greenBg,
-          border: `1px solid ${docusignStatus.includes('Error') || docusignStatus.includes('failed') ? C.redBorder : C.greenBorder}`,
+          background: C.purpleBg, border: `1px solid ${C.purpleBorder}`,
           borderRadius: 8, padding: '10px 16px', marginBottom: 16, fontSize: 13,
-          color: docusignStatus.includes('Error') || docusignStatus.includes('failed') ? C.red : C.green,
+          color: C.purple,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
-          {docusignStatus}
-          <button onClick={() => setDocusignStatus(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'inherit' }}>×</button>
+          <span>
+            DocuSign: Connected · {docusignData.totalEnvelopes} envelopes · {docusignData.matchedCount} matched · {docusignData.unmatchedCount} unmatched
+          </span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={handleDocuSignFetch}
+              disabled={docusignLoading}
+              style={{
+                background: 'rgba(167,139,250,0.25)', border: `1px solid ${C.purpleBorder}`,
+                borderRadius: 6, padding: '4px 12px', fontSize: 12, fontWeight: 600,
+                color: C.purple, cursor: docusignLoading ? 'not-allowed' : 'pointer',
+              }}
+            >
+              ↻ Refresh
+            </button>
+            <button
+              onClick={handleDocuSignDisconnect}
+              style={{
+                background: 'none', border: `1px solid ${C.purpleBorder}`,
+                borderRadius: 6, padding: '4px 12px', fontSize: 12, fontWeight: 600,
+                color: C.purple, cursor: 'pointer',
+              }}
+            >
+              Disconnect
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── DocuSign Error ────────────────────────────────────────────────────── */}
+      {docusignError && (
+        <div style={{
+          background: C.redBg, border: `1px solid ${C.redBorder}`,
+          borderRadius: 8, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: C.red,
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        }}>
+          DocuSign Error: {docusignError}
+          <button onClick={() => setDocusignError(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'inherit' }}>×</button>
         </div>
       )}
 
@@ -431,6 +608,9 @@ export default function TransitionsPage() {
           a.status_of_account_paperwork === 'Completed' || a.docusign_paperwork_status?.toLowerCase() === 'completed'
         ).length;
 
+        // DocuSign envelopes for this advisor
+        const advisorEnvelopes = docusignData?.advisors?.[advisor.advisor_name] ?? [];
+
         return (
           <div key={advisor.advisor_name} style={{
             background: C.cardBg, borderRadius: 12, border: `1px solid ${C.border}`,
@@ -462,6 +642,7 @@ export default function TransitionsPage() {
                   <div style={{ fontSize: 12, color: C.slate }}>
                     {advisor.farther_contact && `Contact: ${advisor.farther_contact} · `}
                     {advisor.total_accounts} account{advisor.total_accounts !== 1 ? 's' : ''}
+                    {advisorEnvelopes.length > 0 && ` · ${advisorEnvelopes.length} envelope${advisorEnvelopes.length !== 1 ? 's' : ''}`}
                   </div>
                 </div>
               </div>
@@ -498,81 +679,104 @@ export default function TransitionsPage() {
               </div>
             </button>
 
-            {/* ── Expanded Accounts Table ────────────────────────────────────── */}
+            {/* ── Expanded Content ──────────────────────────────────────────── */}
             {isExpanded && (
-              <div style={{ padding: '0 20px 16px', overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                  <thead>
-                    <tr style={{ borderBottom: `2px solid ${C.border}` }}>
-                      {[
-                        'Household', 'Account Type', 'Primary Holder', 'Readiness',
-                        'IAA Status', 'Paperwork', 'DocuSign IAA', 'DocuSign PW',
-                        'Portal', 'Contra Firm', 'New Acct #', 'Fee Schedule', 'Notes',
-                      ].map(h => (
-                        <th key={h} style={{
-                          padding: '10px 8px', textAlign: 'left', fontSize: 11,
-                          fontWeight: 600, color: C.slate, textTransform: 'uppercase',
-                          letterSpacing: 0.5, whiteSpace: 'nowrap',
-                        }}>
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {advisor.accounts.map(acc => (
-                      <tr key={acc.id} style={{ borderBottom: `1px solid ${C.border}`, transition: 'background 120ms ease' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'; }}
-                      >
-                        <td style={{ padding: '10px 8px', fontWeight: 500, color: C.dark, maxWidth: 160 }}>
-                          {acc.household_name || acc.account_name || '—'}
-                        </td>
-                        <td style={{ padding: '10px 8px', color: C.dark }}>
-                          {acc.account_type || '—'}
-                        </td>
-                        <td style={{ padding: '10px 8px', color: C.dark }}>
-                          <div>{[acc.primary_first_name, acc.primary_last_name].filter(Boolean).join(' ') || '—'}</div>
-                          {acc.primary_email && (
-                            <div style={{ fontSize: 11, color: C.slate }}>{acc.primary_email}</div>
-                          )}
-                        </td>
-                        <td style={{ padding: '10px 8px', ...statusStyle(acc.document_readiness) }}>
-                          {acc.document_readiness || '—'}
-                        </td>
-                        <td style={{ padding: '10px 8px', ...statusStyle(acc.status_of_iaa) }}>
-                          {acc.status_of_iaa || '—'}
-                        </td>
-                        <td style={{ padding: '10px 8px', ...statusStyle(acc.status_of_account_paperwork) }}>
-                          {acc.status_of_account_paperwork || '—'}
-                        </td>
-                        <td style={{ padding: '10px 8px' }}>
-                          <DocuSignPill status={acc.docusign_iaa_status} />
-                        </td>
-                        <td style={{ padding: '10px 8px' }}>
-                          <DocuSignPill status={acc.docusign_paperwork_status} />
-                        </td>
-                        <td style={{ padding: '10px 8px', ...statusStyle(acc.portal_status) }}>
-                          {acc.portal_status || '—'}
-                        </td>
-                        <td style={{ padding: '10px 8px', color: C.dark, fontSize: 12 }}>
-                          {acc.contra_account_firm || '—'}
-                        </td>
-                        <td style={{ padding: '10px 8px', color: C.dark, fontFamily: 'monospace', fontSize: 12 }}>
-                          {acc.new_account_number || '—'}
-                        </td>
-                        <td style={{ padding: '10px 8px', color: C.dark, fontSize: 12 }}>
-                          {acc.fee_schedule || '—'}
-                        </td>
-                        <td style={{ padding: '10px 8px', color: C.slate, fontSize: 12, maxWidth: 200 }}>
-                          <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {acc.notes || '—'}
-                          </div>
-                        </td>
+              <div style={{ padding: '0 20px 16px' }}>
+                {/* Accounts Table */}
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                    <thead>
+                      <tr style={{ borderBottom: `2px solid ${C.border}` }}>
+                        {[
+                          'Household', 'Account Type', 'Primary Holder', 'Readiness',
+                          'IAA Status', 'Paperwork', 'DocuSign IAA', 'DocuSign PW',
+                          'Portal', 'Contra Firm', 'New Acct #', 'Fee Schedule', 'Notes',
+                        ].map(h => (
+                          <th key={h} style={{
+                            padding: '10px 8px', textAlign: 'left', fontSize: 11,
+                            fontWeight: 600, color: C.slate, textTransform: 'uppercase',
+                            letterSpacing: 0.5, whiteSpace: 'nowrap',
+                          }}>
+                            {h}
+                          </th>
+                        ))}
                       </tr>
+                    </thead>
+                    <tbody>
+                      {advisor.accounts.map(acc => (
+                        <tr key={acc.id} style={{ borderBottom: `1px solid ${C.border}`, transition: 'background 120ms ease' }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'; }}
+                        >
+                          <td style={{ padding: '10px 8px', fontWeight: 500, color: C.dark, maxWidth: 160 }}>
+                            {acc.household_name || acc.account_name || '—'}
+                          </td>
+                          <td style={{ padding: '10px 8px', color: C.dark }}>
+                            {acc.account_type || '—'}
+                          </td>
+                          <td style={{ padding: '10px 8px', color: C.dark }}>
+                            <div>{[acc.primary_first_name, acc.primary_last_name].filter(Boolean).join(' ') || '—'}</div>
+                            {acc.primary_email && (
+                              <div style={{ fontSize: 11, color: C.slate }}>{acc.primary_email}</div>
+                            )}
+                          </td>
+                          <td style={{ padding: '10px 8px', ...statusStyle(acc.document_readiness) }}>
+                            {acc.document_readiness || '—'}
+                          </td>
+                          <td style={{ padding: '10px 8px', ...statusStyle(acc.status_of_iaa) }}>
+                            {acc.status_of_iaa || '—'}
+                          </td>
+                          <td style={{ padding: '10px 8px', ...statusStyle(acc.status_of_account_paperwork) }}>
+                            {acc.status_of_account_paperwork || '—'}
+                          </td>
+                          <td style={{ padding: '10px 8px' }}>
+                            <DocuSignPill status={acc.docusign_iaa_status} />
+                          </td>
+                          <td style={{ padding: '10px 8px' }}>
+                            <DocuSignPill status={acc.docusign_paperwork_status} />
+                          </td>
+                          <td style={{ padding: '10px 8px', ...statusStyle(acc.portal_status) }}>
+                            {acc.portal_status || '—'}
+                          </td>
+                          <td style={{ padding: '10px 8px', color: C.dark, fontSize: 12 }}>
+                            {acc.contra_account_firm || '—'}
+                          </td>
+                          <td style={{ padding: '10px 8px', color: C.dark, fontFamily: 'monospace', fontSize: 12 }}>
+                            {acc.new_account_number || '—'}
+                          </td>
+                          <td style={{ padding: '10px 8px', color: C.dark, fontSize: 12 }}>
+                            {acc.fee_schedule || '—'}
+                          </td>
+                          <td style={{ padding: '10px 8px', color: C.slate, fontSize: 12, maxWidth: 200 }}>
+                            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {acc.notes || '—'}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* ── DocuSign Envelopes Section ──────────────────────────────── */}
+                {advisorEnvelopes.length > 0 && (
+                  <div style={{ marginTop: 16 }}>
+                    <div style={{
+                      fontSize: 13, fontWeight: 600, color: C.purple, marginBottom: 10,
+                      display: 'flex', alignItems: 'center', gap: 8,
+                    }}>
+                      <span style={{
+                        display: 'inline-block', width: 18, height: 18, borderRadius: 4,
+                        background: C.purpleBg, border: `1px solid ${C.purpleBorder}`,
+                        textAlign: 'center', lineHeight: '18px', fontSize: 11,
+                      }}>✎</span>
+                      DocuSign Envelopes ({advisorEnvelopes.length})
+                    </div>
+                    {advisorEnvelopes.map(env => (
+                      <EnvelopeCard key={env.envelopeId} envelope={env} />
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -583,6 +787,55 @@ export default function TransitionsPage() {
       {data && filteredAdvisors.length > 0 && (
         <div style={{ textAlign: 'center', padding: '16px 0', fontSize: 12, color: C.slate }}>
           Showing {filteredAdvisors.length} advisor{filteredAdvisors.length !== 1 ? 's' : ''} · {filteredAdvisors.reduce((s, a) => s + a.total_accounts, 0)} accounts
+        </div>
+      )}
+
+      {/* ── Unmatched Envelopes Section ───────────────────────────────────────── */}
+      {docusignData && docusignData.unmatched.length > 0 && (
+        <div style={{
+          background: C.cardBg, borderRadius: 12, border: `1px solid ${C.border}`,
+          marginTop: 8, overflow: 'hidden',
+        }}>
+          <button
+            onClick={() => setShowUnmatched(!showUnmatched)}
+            style={{
+              width: '100%', padding: '14px 20px', border: 'none', cursor: 'pointer',
+              background: showUnmatched ? 'rgba(251,191,36,0.04)' : 'transparent',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              textAlign: 'left',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{
+                display: 'inline-block', padding: '3px 10px', borderRadius: 12,
+                fontSize: 11, fontWeight: 600,
+                background: C.amberBg, border: `1px solid ${C.amberBorder}`, color: C.amber,
+              }}>
+                {docusignData.unmatched.length}
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: C.dark }}>
+                Unmatched DocuSign Envelopes
+              </span>
+              <span style={{ fontSize: 12, color: C.slate }}>
+                — Could not be auto-matched to any advisor
+              </span>
+            </div>
+            <span style={{
+              fontSize: 18, color: C.slate,
+              transform: showUnmatched ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 200ms ease', display: 'inline-block',
+            }}>
+              ▾
+            </span>
+          </button>
+
+          {showUnmatched && (
+            <div style={{ padding: '0 20px 16px' }}>
+              {docusignData.unmatched.map(env => (
+                <EnvelopeCard key={env.envelopeId} envelope={env} />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
