@@ -96,13 +96,20 @@ async function fetchAcquisitionsDeals(): Promise<DealResult[]> {
 
 // ── Fetch owners ─────────────────────────────────────────────────────────────
 async function fetchOwners(): Promise<Record<string, string>> {
-  const res = await fetch('https://api.hubapi.com/crm/v3/owners?limit=100', {
-    headers: { Authorization: `Bearer ${HUBSPOT_PAT}` },
-  });
-  if (!res.ok) return {};
-  const data = await res.json();
   const map: Record<string, string> = {};
-  for (const o of data.results) map[o.id] = `${o.firstName} ${o.lastName}`.trim();
+  let after: string | undefined;
+
+  do {
+    const url = `https://api.hubapi.com/crm/v3/owners?limit=100${after ? `&after=${after}` : ''}`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${HUBSPOT_PAT}` },
+    });
+    if (!res.ok) break;
+    const data = await res.json();
+    for (const o of data.results) map[o.id] = `${o.firstName} ${o.lastName}`.trim();
+    after = data.paging?.next?.after;
+  } while (after);
+
   return map;
 }
 
