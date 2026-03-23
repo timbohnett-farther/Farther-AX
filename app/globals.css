@@ -39,12 +39,12 @@
   --color-teal-200: #88cbd3;
   --color-teal-300: #58b6c1;
   --color-teal-400: #28a1af;
-  --color-teal-500: #1d7682;
+  --color-teal-500: #2bb8c4;
   --color-teal-600: #186068;
   --color-teal-700: #134a4e;
   --color-teal-800: #0e3434;
   --color-teal-900: #091e1a;
-  --color-teal: #1d7682;
+  --color-teal: #2bb8c4;
   --color-teal-dark: #155961;
 
   /* ── Ice Scale (soft accents) ───────────────── */
@@ -62,7 +62,7 @@
   --color-tremor-brand-faint: #091e1a;
   --color-tremor-brand-muted: #0e3434;
   --color-tremor-brand-subtle: #134a4e;
-  --color-tremor-brand: #1d7682;
+  --color-tremor-brand: #2bb8c4;
   --color-tremor-brand-emphasis: #28a1af;
   --color-tremor-brand-inverted: #ffffff;
 
@@ -73,7 +73,7 @@
 
   --color-tremor-border: rgba(255, 255, 255, 0.06);
 
-  --color-tremor-ring: #1d7682;
+  --color-tremor-ring: #2bb8c4;
 
   --color-tremor-content-subtle: rgba(255, 255, 255, 0.3);
   --color-tremor-content: rgba(255, 255, 255, 0.6);
@@ -88,7 +88,7 @@
 
   /* ── Gradients ──────────────────────────────── */
   --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
-  --background-image-gradient-wealth: linear-gradient(135deg, #1d7682 0%, #28a1af 100%);
+  --background-image-gradient-wealth: linear-gradient(135deg, #2bb8c4 0%, #28a1af 100%);
   --background-image-gradient-bull: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --background-image-gradient-bear: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   --background-image-gradient-gold: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
@@ -263,7 +263,7 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #1d7682, #b6d0ed);
+  background: linear-gradient(90deg, #2bb8c4, #b6d0ed);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -300,7 +300,7 @@ h1, h2, h3, h4, h5, h6 {
    ============================================ */
 
 .gradient-teal {
-  background: linear-gradient(135deg, #1d7682 0%, #28a1af 100%);
+  background: linear-gradient(135deg, #2bb8c4 0%, #28a1af 100%);
   box-shadow: 0 4px 16px rgba(29, 118, 130, 0.3);
 }
 
@@ -468,7 +468,7 @@ h1, h2, h3, h4, h5, h6 {
    ============================================ */
 
 .glass-btn-primary {
-  background: linear-gradient(135deg, #1d7682, #28a1af);
+  background: linear-gradient(135deg, #2bb8c4, #28a1af);
   color: white;
   border: none;
   border-radius: 12px;
@@ -540,7 +540,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .glass-input:focus {
   background: #2e2e2e;
-  border-color: #1d7682;
+  border-color: #2bb8c4;
   box-shadow: 0 0 0 3px rgba(29, 118, 130, 0.15);
 }
 
@@ -558,7 +558,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #1d7682, #b6d0ed);
+  background: linear-gradient(180deg, #2bb8c4, #b6d0ed);
   border-radius: 3px;
 }
 
@@ -601,7 +601,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Text gradients */
 .text-gradient-teal {
-  background: linear-gradient(135deg, #1d7682 0%, #28a1af 100%);
+  background: linear-gradient(135deg, #2bb8c4 0%, #28a1af 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

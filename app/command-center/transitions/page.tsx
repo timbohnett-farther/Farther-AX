@@ -10,7 +10,7 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 // ── Design tokens ────────────────────────────────────────────────────────────
 const C = {
   dark: '#FAF7F2', white: '#1a1a1a', slate: 'rgba(250,247,242,0.5)',
-  teal: '#1d7682', bg: '#111111',
+  teal: '#2bb8c4', bg: '#111111',
   cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
   green: '#4ade80', greenBg: 'rgba(74,222,128,0.2)',
   amber: '#fbbf24', amberBg: 'rgba(251,191,36,0.2)', amberBorder: 'rgba(251,191,36,0.35)',

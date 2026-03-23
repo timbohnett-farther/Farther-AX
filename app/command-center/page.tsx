@@ -23,7 +23,7 @@ const SWR_OPTS = {
 const C = {
   dark: '#FAF7F2', white: '#1a1a1a', slate: 'rgba(250,247,242,0.5)',
   lightBlue: '#b6d0ed',
-  teal: '#1d7682', bg: '#111111',
+  teal: '#2bb8c4', bg: '#111111',
   cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
   green: '#10b981', greenBg: 'rgba(16,185,129,0.15)',
   amber: '#f59e0b', amberBg: 'rgba(245,158,11,0.15)', amberBorder: 'rgba(245,158,11,0.3)',
@@ -769,10 +769,10 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                 padding: '20px 24px', position: 'relative', cursor: sentimentDeals.length > 0 ? 'pointer' : 'default',
                 transition: 'border-color 150ms ease',
               }}
-              onMouseEnter={e => { if (sentimentDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = '#1d7682'; }}
+              onMouseEnter={e => { if (sentimentDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = '#2bb8c4'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
             >
-              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: '#1d7682' }}>✦</span>
+              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: '#2bb8c4' }}>✦</span>
               <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Sentiment Tracking</p>
               <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
                 {scores.length > 0 ? `${scores.length}` : '—'}

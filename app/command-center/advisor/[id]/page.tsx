@@ -11,7 +11,7 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 const C = {
   dark: '#FAF7F2', white: '#1a1a1a', slate: 'rgba(250,247,242,0.5)',
   lightBlue: '#b6d0ed',
-  teal: '#1d7682', bg: '#111111',
+  teal: '#2bb8c4', bg: '#111111',
   cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
   green: '#10b981', greenBg: 'rgba(16,185,129,0.15)',
   amber: '#f59e0b', amberBg: 'rgba(245,158,11,0.15)', amberBorder: 'rgba(245,158,11,0.3)',

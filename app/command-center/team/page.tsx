@@ -10,7 +10,7 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 const ROLES = ['AXM', 'AXA', 'CTM', 'CTA', 'Recruiter', 'CX Manager', 'Compliance', 'RIA Leadership', 'Director'] as const;
 
 const ROLE_COLORS: Record<string, { bg: string; color: string; border: string; hex: string }> = {
-  'AXM':            { bg: 'bg-teal/10', color: 'text-teal', border: 'border-teal', hex: '#1d7682' },
+  'AXM':            { bg: 'bg-teal/10', color: 'text-teal', border: 'border-teal', hex: '#2bb8c4' },
   'AXA':            { bg: 'bg-cyan-500/10', color: 'text-cyan-400', border: 'border-cyan-400', hex: '#22d3ee' },
   'CTM':            { bg: 'bg-amber-500/10', color: 'text-amber-400', border: 'border-amber-400', hex: '#fbbf24' },
   'CTA':            { bg: 'bg-yellow-600/10', color: 'text-yellow-500', border: 'border-yellow-500', hex: '#eab308' },
