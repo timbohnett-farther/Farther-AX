@@ -216,15 +216,17 @@ export default function TransitionsPage() {
         <Link href="/command-center" style={{ fontSize: 13, color: C.slate, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
           ← Back to Pipeline
         </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 4px' }}>
-          <Image src="/images/farther-iw-cream.png" alt="Farther" width={140} height={36} style={{ objectFit: 'contain' }} />
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark }}>
-            Client Transition Dashboard
-          </h1>
+        <div style={{ position: 'relative', margin: '8px 0 4px' }}>
+          <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, marginBottom: 6 }}>
+              Client Transition Dashboard
+            </h1>
+            <p style={{ fontSize: 14, color: C.slate, margin: 0 }}>
+              Track client transitions, document statuses, and DocuSign progress by advisor
+            </p>
+          </div>
         </div>
-        <p style={{ fontSize: 14, color: C.slate, margin: 0 }}>
-          Track client transitions, document statuses, and DocuSign progress by advisor
-        </p>
       </div>
 
       {/* ── Summary Cards ───────────────────────────────────────────────────── */}

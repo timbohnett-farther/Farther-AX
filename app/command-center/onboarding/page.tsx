@@ -326,37 +326,37 @@ export default function OnboardingTracker() {
 
   return (
     <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <Image src="/images/farther-iw-cream.png" alt="Farther" width={140} height={36} style={{ objectFit: 'contain' }} />
-            <h1 className="text-3xl font-bold text-cream font-serif">
-              Active Onboarding
-            </h1>
-          </div>
+      <div className="relative mb-6">
+        <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} className="absolute top-0 right-0 opacity-50" />
+        <div className="text-center mb-4">
+          <h1 className="text-3xl font-bold text-cream font-serif mb-2">
+            Active Onboarding
+          </h1>
           <p className="text-slate text-sm">
             {onboardingDeals.length} advisor{onboardingDeals.length !== 1 ? 's' : ''} in onboarding · Team capacity tracking · 43-task checklist
           </p>
         </div>
 
         {/* Tab switcher */}
-        <div className="flex gap-1 glass-card rounded-lg p-1">
-          {[
-            { key: 'workload' as const, label: 'AXM Workload' },
-            { key: 'checklists' as const, label: 'Checklists' },
-          ].map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`px-3.5 py-1.5 rounded text-xs font-medium transition-smooth border-none cursor-pointer ${
-                activeTab === tab.key
-                  ? 'bg-teal text-white'
-                  : 'bg-transparent text-slate hover:text-cream'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="flex justify-center">
+          <div className="flex gap-1 glass-card rounded-lg p-1">
+            {[
+              { key: 'workload' as const, label: 'AXM Workload' },
+              { key: 'checklists' as const, label: 'Checklists' },
+            ].map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`px-3.5 py-1.5 rounded text-xs font-medium transition-smooth border-none cursor-pointer ${
+                  activeTab === tab.key
+                    ? 'bg-teal text-white'
+                    : 'bg-transparent text-slate hover:text-cream'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

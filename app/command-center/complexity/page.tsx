@@ -135,9 +135,9 @@ export default function ComplexityEducationPage() {
           <p className="text-xs tracking-widest uppercase mb-2 text-teal">
             Command Center — Education
           </p>
-          <div className="flex items-center gap-3 mb-3">
-            <Image src="/images/farther-iw-cream.png" alt="Farther" width={140} height={36} style={{ objectFit: 'contain' }} />
-            <h1 className="text-3xl font-light text-cream font-serif">
+          <div className="relative mb-3">
+            <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} className="absolute top-0 right-0 opacity-50" />
+            <h1 className="text-3xl font-light text-cream font-serif text-center">
               Transition Complexity Scoring
             </h1>
           </div>

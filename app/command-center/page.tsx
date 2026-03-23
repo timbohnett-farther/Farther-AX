@@ -1744,16 +1744,16 @@ export default function PipelineDashboard() {
   return (
     <div style={{ padding: '40px 40px', minHeight: '100vh', fontFamily: "'Fakt', system-ui, sans-serif" }}>
       {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-          <Image src="/images/farther-iw-cream.png" alt="Farther" width={140} height={36} style={{ objectFit: 'contain' }} />
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+      <div style={{ position: 'relative', marginBottom: 24 }}>
+        <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />
+        <div style={{ textAlign: 'center' }}>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 6 }}>
             Pipeline Dashboard
           </h1>
+          <p style={{ color: C.slate, fontSize: 14 }}>
+            Live HubSpot data · refreshes every 30s
+          </p>
         </div>
-        <p style={{ color: C.slate, fontSize: 14 }}>
-          Live HubSpot data · refreshes every 30s
-        </p>
       </div>
 
       {/* Tab Bar */}

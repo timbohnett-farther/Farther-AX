@@ -283,25 +283,25 @@ export default function TeamPage() {
   return (
     <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
       {/* Header */}
-      <div className="flex justify-between items-start mb-6">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <Image src="/images/farther-iw-cream.png" alt="Farther" width={140} height={36} style={{ objectFit: 'contain' }} />
-            <h1 className="text-3xl font-bold text-cream font-serif">
-              Team Management
-            </h1>
-          </div>
+      <div className="relative mb-6">
+        <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} className="absolute top-0 right-0 opacity-50" />
+        <div className="text-center mb-4">
+          <h1 className="text-3xl font-bold text-cream font-serif mb-2">
+            Team Management
+          </h1>
           <p className="text-slate text-sm">
             Manage AX team members · Assign to advisors
           </p>
         </div>
         {!showForm && !editMember && (
-          <button
-            onClick={() => { setShowForm(true); setEditMember(null); }}
-            className="px-5 py-2.5 rounded-md text-sm font-semibold bg-teal text-white border-none cursor-pointer hover:bg-teal-dark transition-smooth"
-          >
-            + Add Team Member
-          </button>
+          <div className="flex justify-center">
+            <button
+              onClick={() => { setShowForm(true); setEditMember(null); }}
+              className="px-5 py-2.5 rounded-md text-sm font-semibold bg-teal text-white border-none cursor-pointer hover:bg-teal-dark transition-smooth"
+            >
+              + Add Team Member
+            </button>
+          </div>
         )}
       </div>
 
