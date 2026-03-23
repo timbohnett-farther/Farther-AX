@@ -549,7 +549,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 
     // ── Cumulative YTD Launched AUM ──
     const currentMonth = now.getMonth();
-    const cumulativeYtd: { month: string; actual: number; target: number }[] = [];
+    const cumulativeYtd: { month: string; actual: number; target: number; abovePace: number | null; belowPace: number | null }[] = [];
     let runningAum = 0;
     for (let m = 0; m <= currentMonth; m++) {
       const mStart = new Date(year, m, 1);
@@ -561,10 +561,13 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
         return ld >= mStart && ld <= mEnd;
       });
       runningAum += mDeals.reduce((acc, dl) => acc + getAUM(dl), 0);
+      const target = ANNUAL_GOAL * ((m + 1) / 12);
       cumulativeYtd.push({
         month: monthNames[m],
         actual: runningAum,
-        target: ANNUAL_GOAL * ((m + 1) / 12),
+        target,
+        abovePace: runningAum >= target ? runningAum : null,
+        belowPace: runningAum < target ? runningAum : null,
       });
     }
 
@@ -923,17 +926,27 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                 cursor={{ stroke: 'rgba(250,247,242,0.08)', strokeWidth: 1 }}
                 contentStyle={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, color: C.dark }}
                 itemStyle={{ color: C.dark }}
-                formatter={(value: unknown, name: unknown) => [formatAUM(Number(value)), name === 'actual' ? 'Launched AUM' : 'Pace Target']}
+                formatter={(value: unknown, name: unknown) => {
+                  const v = Number(value);
+                  if (name === 'target') return [formatAUM(v), 'Pace Target'];
+                  if (name === 'abovePace' || name === 'belowPace') return [formatAUM(v), 'Launched AUM'];
+                  return [formatAUM(v), String(name)];
+                }}
                 labelStyle={{ color: C.slate, marginBottom: 4 }}
               />
               <defs>
-                <linearGradient id="aumGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={C.teal} stopOpacity={0.2} />
-                  <stop offset="95%" stopColor={C.teal} stopOpacity={0} />
+                <linearGradient id="aboveGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="belowGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <Area type="monotone" dataKey="actual" fill="url(#aumGradient)" stroke={C.teal} strokeWidth={2} />
-              <Line type="monotone" dataKey="target" stroke={C.slate} strokeWidth={1.5} strokeDasharray="6 3" dot={false} />
+              <Area type="monotone" dataKey="abovePace" fill="url(#aboveGradient)" stroke="#10b981" strokeWidth={2} connectNulls={false} dot={false} />
+              <Area type="monotone" dataKey="belowPace" fill="url(#belowGradient)" stroke="#ef4444" strokeWidth={2} connectNulls={false} dot={false} />
+              <Line type="monotone" dataKey="target" stroke="#10b981" strokeWidth={1.5} strokeDasharray="6 3" dot={false} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
