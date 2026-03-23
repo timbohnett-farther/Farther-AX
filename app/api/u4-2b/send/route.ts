@@ -205,7 +205,6 @@ If you have any questions while filling it out, don't hesitate to reach out — 
 
     // ── Build branded HTML email ────────────────────────────────────────────
     const emailHtml = buildBrandedEmail({
-      advisorFirstName,
       bodyText: emailBodyText,
       formLink,
       expiresDate,
