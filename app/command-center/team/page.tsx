@@ -7,17 +7,19 @@ import { DataCard, StatusBadge } from '@/components/ui';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
-const ROLES = ['AXM', 'AXA', 'CTM', 'CTA', 'CX Manager', 'Compliance', 'RIA Leadership', 'Director'] as const;
+const ROLES = ['AXM', 'AXA', 'CTM', 'CTA', 'Recruiter', 'CX Manager', 'Compliance', 'RIA Leadership', 'Director'] as const;
 
 const ROLE_COLORS: Record<string, { bg: string; color: string; border: string }> = {
   'AXM':            { bg: 'bg-teal/10', color: 'text-teal', border: 'border-teal' },
   'AXA':            { bg: 'bg-teal/10', color: 'text-teal', border: 'border-teal' },
   'CTM':            { bg: 'bg-amber/10', color: 'text-amber-700', border: 'border-amber-700' },
   'CTA':            { bg: 'bg-amber/10', color: 'text-amber-700', border: 'border-amber-700' },
+  'Recruiter':      { bg: 'bg-blue-500/10', color: 'text-blue-400', border: 'border-blue-400' },
   'CX Manager':     { bg: 'bg-emerald/10', color: 'text-emerald-700', border: 'border-emerald-700' },
   'Compliance':     { bg: 'bg-orange/10', color: 'text-orange-700', border: 'border-orange-700' },
   'RIA Leadership': { bg: 'bg-slate/10', color: 'text-slate', border: 'border-slate' },
   'Director':       { bg: 'bg-purple/10', color: 'text-purple-700', border: 'border-purple-700' },
+  'Unassigned':     { bg: 'bg-slate/10', color: 'text-slate', border: 'border-slate' },
 };
 
 const ROLE_DESCRIPTIONS: Record<string, string> = {
@@ -25,10 +27,12 @@ const ROLE_DESCRIPTIONS: Record<string, string> = {
   'AXA':            'Advisor Experience Associate – Supports AXM through onboarding',
   'CTM':            'Customer Transition Manager – Manages asset transfer process',
   'CTA':            'Customer Transition Associate – Supports CTM on transitions',
+  'Recruiter':      'Advisor Business Development – Recruiting pipeline management',
   'CX Manager':     'Customer Experience Manager – Post-launch advisor support',
   'Compliance':     'Compliance Officer – Regulatory and compliance oversight',
   'RIA Leadership': 'RIA Manager/Leader – Senior RIA oversight',
   'Director':       'AX Director – Team leadership and staffing oversight',
+  'Unassigned':     'No role assigned yet',
 };
 
 interface TeamMember {
@@ -202,10 +206,12 @@ export default function TeamPage() {
   const members: TeamMember[] = useMemo(() => data?.members ?? [], [data]);
 
   const filteredMembers = useMemo(() => {
+    const knownRoles = new Set(ROLES as readonly string[]);
     return members.filter(m => {
       if (!showInactive && !m.active) return false;
-      if (filterRole !== 'all' && m.role !== filterRole) return false;
-      return true;
+      if (filterRole === 'all') return true;
+      if (filterRole === 'Unassigned') return !m.role || !knownRoles.has(m.role);
+      return m.role === filterRole;
     });
   }, [members, filterRole, showInactive]);
 
@@ -214,7 +220,15 @@ export default function TeamPage() {
     const active = members.filter(m => m.active);
     const counts: Record<string, number> = {};
     for (const r of ROLES) counts[r] = 0;
-    for (const m of active) counts[m.role] = (counts[m.role] ?? 0) + 1;
+    counts['Unassigned'] = 0;
+    const knownRoles = new Set(ROLES as readonly string[]);
+    for (const m of active) {
+      if (m.role && knownRoles.has(m.role)) {
+        counts[m.role] = (counts[m.role] ?? 0) + 1;
+      } else {
+        counts['Unassigned'] = (counts['Unassigned'] ?? 0) + 1;
+      }
+    }
     return counts;
   }, [members]);
 
@@ -285,8 +299,8 @@ export default function TeamPage() {
       )}
 
       {/* Role Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2.5 mb-6">
-        {ROLES.map(role => {
+      <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-2.5 mb-6">
+        {[...ROLES, 'Unassigned' as const].map(role => {
           const style = ROLE_COLORS[role];
           const isActive = filterRole === role;
           return (
@@ -337,13 +351,19 @@ export default function TeamPage() {
       ) : (
         <div className="flex flex-col gap-5">
           {(() => {
-            // Group filtered members by role
+            // Group filtered members by role (including Unassigned for empty/unknown roles)
             const grouped: { role: string; members: TeamMember[] }[] = [];
+            const knownRoles = new Set(ROLES as readonly string[]);
             for (const role of ROLES) {
               const roleMembers = filteredMembers.filter(m => m.role === role);
               if (roleMembers.length > 0) {
                 grouped.push({ role, members: roleMembers });
               }
+            }
+            // Collect members with empty or unrecognized roles
+            const unassigned = filteredMembers.filter(m => !m.role || !knownRoles.has(m.role));
+            if (unassigned.length > 0) {
+              grouped.push({ role: 'Unassigned', members: unassigned });
             }
 
             return grouped.map(group => {
