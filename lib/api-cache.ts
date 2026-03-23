@@ -24,6 +24,11 @@ const EIGHT_HOURS_MS = 8 * 60 * 60 * 1000;
  * @param ttlMs  Cache TTL in milliseconds (default: 8 hours)
  * @returns      Cached or fresh data
  */
+/** Clear all cached entries (used by cache-bust endpoint) */
+export function clearCache() {
+  cache.clear();
+}
+
 export async function withCache<T>(
   key: string,
   fetcher: () => Promise<T>,
