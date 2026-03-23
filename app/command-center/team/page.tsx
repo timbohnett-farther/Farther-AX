@@ -9,18 +9,34 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 const ROLES = ['AXM', 'AXA', 'CTM', 'CTA', 'Recruiter', 'CX Manager', 'Compliance', 'RIA Leadership', 'Director'] as const;
 
-const ROLE_COLORS: Record<string, { bg: string; color: string; border: string }> = {
-  'AXM':            { bg: 'bg-teal/10', color: 'text-teal', border: 'border-teal' },
-  'AXA':            { bg: 'bg-teal/10', color: 'text-teal', border: 'border-teal' },
-  'CTM':            { bg: 'bg-amber/10', color: 'text-amber-700', border: 'border-amber-700' },
-  'CTA':            { bg: 'bg-amber/10', color: 'text-amber-700', border: 'border-amber-700' },
-  'Recruiter':      { bg: 'bg-blue-500/10', color: 'text-blue-400', border: 'border-blue-400' },
-  'CX Manager':     { bg: 'bg-emerald/10', color: 'text-emerald-700', border: 'border-emerald-700' },
-  'Compliance':     { bg: 'bg-orange/10', color: 'text-orange-700', border: 'border-orange-700' },
-  'RIA Leadership': { bg: 'bg-slate/10', color: 'text-slate', border: 'border-slate' },
-  'Director':       { bg: 'bg-purple/10', color: 'text-purple-700', border: 'border-purple-700' },
-  'Unassigned':     { bg: 'bg-slate/10', color: 'text-slate', border: 'border-slate' },
+const ROLE_COLORS: Record<string, { bg: string; color: string; border: string; hex: string }> = {
+  'AXM':            { bg: 'bg-teal/10', color: 'text-teal', border: 'border-teal', hex: '#1d7682' },
+  'AXA':            { bg: 'bg-cyan-500/10', color: 'text-cyan-400', border: 'border-cyan-400', hex: '#22d3ee' },
+  'CTM':            { bg: 'bg-amber-500/10', color: 'text-amber-400', border: 'border-amber-400', hex: '#fbbf24' },
+  'CTA':            { bg: 'bg-yellow-600/10', color: 'text-yellow-500', border: 'border-yellow-500', hex: '#eab308' },
+  'Recruiter':      { bg: 'bg-blue-500/10', color: 'text-blue-400', border: 'border-blue-400', hex: '#60a5fa' },
+  'CX Manager':     { bg: 'bg-pink-500/10', color: 'text-pink-400', border: 'border-pink-400', hex: '#f472b6' },
+  'Compliance':     { bg: 'bg-orange-500/10', color: 'text-orange-400', border: 'border-orange-400', hex: '#fb923c' },
+  'RIA Leadership': { bg: 'bg-emerald-500/10', color: 'text-emerald-400', border: 'border-emerald-400', hex: '#34d399' },
+  'Director':       { bg: 'bg-purple-500/10', color: 'text-purple-400', border: 'border-purple-400', hex: '#a78bfa' },
+  'Unassigned':     { bg: 'bg-slate/10', color: 'text-slate', border: 'border-slate', hex: '#94a3b8' },
 };
+
+// Unique colors for each team member name
+const NAME_PALETTE = [
+  '#5ec4cf', '#f59e0b', '#8b5cf6', '#ef4444', '#10b981', '#3b82f6',
+  '#ec4899', '#f97316', '#06b6d4', '#84cc16', '#a78bfa', '#fb923c',
+  '#14b8a6', '#e879f9', '#fbbf24', '#6366f1', '#22d3ee', '#f43f5e',
+  '#a3e635', '#c084fc', '#38bdf8', '#facc15', '#4ade80', '#f87171',
+];
+const nameColorMap: Record<string, string> = {};
+function getNameColor(name: string): string {
+  if (!name) return '#94a3b8';
+  if (nameColorMap[name]) return nameColorMap[name];
+  const idx = Object.keys(nameColorMap).length % NAME_PALETTE.length;
+  nameColorMap[name] = NAME_PALETTE[idx];
+  return nameColorMap[name];
+}
 
 const ROLE_DESCRIPTIONS: Record<string, string> = {
   'AXM':            'Advisor Experience Manager – Primary onboarding lead',
@@ -406,7 +422,7 @@ export default function TeamPage() {
                             key={member.id}
                             className={`border-b border-cream-border ${i % 2 === 0 ? 'glass-card' : 'bg-charcoal-700'} ${!member.active ? 'opacity-50' : ''}`}
                           >
-                            <td className="px-3.5 py-2.5 font-semibold text-cream">
+                            <td className="px-3.5 py-2.5 font-semibold" style={{ color: getNameColor(member.name) }}>
                               {member.name}
                             </td>
                             <td className="px-3.5 py-2.5">
