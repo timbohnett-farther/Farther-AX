@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     const role = searchParams.get('role');
     const active = searchParams.get('active');
 
-    let query = 'SELECT *, is_active as active FROM team_members';
+    let query = 'SELECT *, active FROM team_members';
     const conditions: string[] = [];
     const params: (string | boolean)[] = [];
 
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
       params.push(role);
     }
     if (active !== null) {
-      conditions.push(`is_active = $${conditions.length + 1}`);
+      conditions.push(`active = $${conditions.length + 1}`);
       params.push(active !== 'false');
     }
 
@@ -99,7 +99,7 @@ export async function PATCH(request: Request) {
     let idx = 1;
 
     for (const [key, value] of Object.entries(updates)) {
-      if (['name', 'email', 'role', 'phone', 'calendar_link', 'is_active'].includes(key)) {
+      if (['name', 'email', 'role', 'phone', 'calendar_link', 'active'].includes(key)) {
         fields.push(`${key} = $${idx}`);
         values.push(key === 'email' ? (value as string).toLowerCase().trim() : value);
         idx++;
@@ -141,7 +141,7 @@ export async function DELETE(request: Request) {
     }
 
     const result = await pool.query(
-      `UPDATE team_members SET is_active = FALSE, updated_at = NOW() WHERE id = $1 RETURNING *`,
+      `UPDATE team_members SET active = FALSE, updated_at = NOW() WHERE id = $1 RETURNING *`,
       [id]
     );
 
