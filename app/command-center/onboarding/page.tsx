@@ -4,24 +4,21 @@ import useSWR from 'swr';
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ONBOARDING_STAGE_IDS, STAGE_LABELS } from '@/lib/onboarding-tasks';
-import type { OnboardingTask, Phase } from '@/lib/onboarding-tasks';
+import { ONBOARDING_STAGE_IDS, STAGE_LABELS, PHASE_ORDER, PHASE_META } from '@/lib/onboarding-tasks';
+import type { OnboardingTask, Phase, TaskRole } from '@/lib/onboarding-tasks';
 import { StatCard, ProgressIndicator, DataCard, ScoreBadge } from '@/components/ui';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
-const PHASE_LABELS: Record<Phase, string> = {
-  pre_launch: 'Pre-Launch',
-  launch_day: 'Launch Day',
-  post_launch: 'Post-Launch',
-};
-
+// ── Task row type (definition + saved state + computed due date) ─────────────
 interface TaskRow extends OnboardingTask {
   completed: boolean;
   completed_by: string | null;
   completed_at: string | null;
+  due_date: string | null;
 }
 
+// ── Workload types ──────────────────────────────────────────────────────────
 interface WorkloadEntry {
   member_id: number;
   member_name: string;
@@ -46,7 +43,6 @@ const STATUS_COLORS = {
   red: 'red',
 } as const;
 
-// Static Tailwind class mappings (dynamic classes get purged at build)
 const BORDER_CLASSES: Record<string, string> = {
   emerald: 'border-emerald-400/30',
   amber: 'border-amber-400/30',
@@ -59,12 +55,48 @@ const BADGE_CLASSES: Record<string, string> = {
 };
 
 const CAPACITY_ROLES = ['AXM', 'AXA', 'CTM', 'CTA'] as const;
-const ROLE_LABELS: Record<string, string> = {
+const WORKLOAD_ROLE_LABELS: Record<string, string> = {
   AXM: 'Advisor Experience Managers',
   AXA: 'Advisor Experience Associates',
   CTM: 'Client Transition Managers',
   CTA: 'Client Transition Associates',
 };
+
+// ── Role badge colors ───────────────────────────────────────────────────────
+const ROLE_BADGE_COLORS: Record<string, string> = {
+  AXM: 'bg-teal/15 text-teal',
+  AXA: 'bg-cyan-400/15 text-cyan-400',
+  CTM: 'bg-amber-400/15 text-amber-400',
+  CTA: 'bg-yellow-500/15 text-yellow-500',
+  CXM: 'bg-purple-400/15 text-purple-400',
+  Recruiter: 'bg-emerald-400/15 text-emerald-400',
+  Director: 'bg-rose-400/15 text-rose-400',
+  IT: 'bg-blue-400/15 text-blue-400',
+  HR: 'bg-pink-400/15 text-pink-400',
+  Finance: 'bg-green-400/15 text-green-400',
+  Marketing: 'bg-orange-400/15 text-orange-400',
+  Compliance: 'bg-red-400/15 text-red-400',
+  'Investment Team': 'bg-indigo-400/15 text-indigo-400',
+  'FP Team': 'bg-violet-400/15 text-violet-400',
+  Advisor: 'bg-sky-400/15 text-sky-400',
+  'RIA Leadership': 'bg-fuchsia-400/15 text-fuchsia-400',
+};
+
+// Primary roles shown as buttons, the rest go in a dropdown
+const PRIMARY_ROLES: string[] = ['all', 'AXM', 'AXA', 'CTM', 'CTA', 'CXM'];
+const DROPDOWN_ROLES: TaskRole[] = ['Recruiter', 'Director', 'IT', 'HR', 'Finance', 'Marketing', 'Compliance', 'Investment Team', 'FP Team', 'Advisor', 'RIA Leadership'];
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+function isOverdue(dueDate: string | null): boolean {
+  if (!dueDate) return false;
+  return new Date(dueDate + 'T23:59:59') < new Date();
+}
+
+function formatDueDate(dueDate: string | null): string {
+  if (!dueDate) return '';
+  const d = new Date(dueDate + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
 
 // ── Capacity Planning Dashboard ─────────────────────────────────────────────
 function WorkloadDashboard() {
@@ -135,7 +167,7 @@ function WorkloadDashboard() {
       </div>
 
       {/* Role description */}
-      <p className="text-xs text-slate mb-4">{ROLE_LABELS[activeRole] ?? activeRole}</p>
+      <p className="text-xs text-slate mb-4">{WORKLOAD_ROLE_LABELS[activeRole] ?? activeRole}</p>
 
       {/* Member Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -221,15 +253,7 @@ function WorkloadDashboard() {
   );
 }
 
-// ── Role badge colors ────────────────────────────────────────────────────────
-const ROLE_BADGE_COLORS: Record<string, string> = {
-  AXM: 'bg-teal/15 text-teal',
-  AXA: 'bg-cyan-400/15 text-cyan-400',
-  CTM: 'bg-amber-400/15 text-amber-400',
-  CTA: 'bg-yellow-500/15 text-yellow-500',
-};
-
-// ── Phase Section ─────────────────────────────────────────────────────────────
+// ── Phase Section ───────────────────────────────────────────────────────────
 function PhaseSection({ phase, tasks, onToggle, roleFilter }: {
   phase: Phase;
   tasks: TaskRow[];
@@ -237,9 +261,12 @@ function PhaseSection({ phase, tasks, onToggle, roleFilter }: {
   roleFilter: string;
 }) {
   const [open, setOpen] = useState(true);
+  const meta = PHASE_META[phase];
   const allPhaseTasks = tasks.filter(t => t.phase === phase);
-  const phaseTasks = roleFilter === 'all' ? allPhaseTasks : allPhaseTasks.filter(t => t.role === roleFilter);
+  const phaseTasks = roleFilter === 'all' ? allPhaseTasks : allPhaseTasks.filter(t => t.owner === roleFilter);
   const completedCount = phaseTasks.filter(t => t.completed).length;
+  const hardGatesRemaining = phaseTasks.filter(t => t.is_hard_gate && !t.completed).length;
+  const overdueCount = phaseTasks.filter(t => !t.completed && isOverdue(t.due_date)).length;
 
   if (phaseTasks.length === 0) return null;
 
@@ -249,7 +276,20 @@ function PhaseSection({ phase, tasks, onToggle, roleFilter }: {
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-between px-4 py-3 bg-charcoal-700 border-none cursor-pointer hover:bg-charcoal-600 transition-smooth"
       >
-        <span className="font-semibold text-cream text-sm">{PHASE_LABELS[phase]}</span>
+        <div className="flex items-center gap-3">
+          <span className="font-semibold text-cream text-sm">{meta.label}</span>
+          <span className="text-[10px] text-slate">{meta.timing}</span>
+          {hardGatesRemaining > 0 && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-teal/15 text-teal font-bold">
+              {hardGatesRemaining} gate{hardGatesRemaining > 1 ? 's' : ''}
+            </span>
+          )}
+          {overdueCount > 0 && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/15 text-red-400 font-bold">
+              {overdueCount} overdue
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-4 flex-1 ml-5">
           <div className="flex-1">
             <div className="flex items-center gap-2">
@@ -267,52 +307,87 @@ function PhaseSection({ phase, tasks, onToggle, roleFilter }: {
       </button>
       {open && (
         <div>
-          {phaseTasks.map((task) => (
-            <div
-              key={task.key}
-              className={`flex items-start gap-3 px-4 py-2.5 border-t border-cream-border ${
-                task.completed ? 'bg-teal/5' : 'bg-charcoal-800'
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={task.completed}
-                onChange={e => onToggle(task.key, e.target.checked)}
-                className="mt-0.5 accent-teal w-4 h-4 cursor-pointer shrink-0"
-              />
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className={`text-sm ${task.completed ? 'text-slate line-through' : 'text-cream'}`}>
-                    {task.label}
-                    {task.optional && <span className="ml-1.5 text-[10px] text-slate italic">(opt)</span>}
-                  </span>
-                  {roleFilter === 'all' && task.role && (
-                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${ROLE_BADGE_COLORS[task.role] ?? 'bg-slate/15 text-slate'}`}>
-                      {task.role}
+          {phaseTasks.map((task) => {
+            const overdue = !task.completed && isOverdue(task.due_date);
+            return (
+              <div
+                key={task.key}
+                className={`flex items-start gap-3 px-4 py-2.5 border-t border-cream-border ${
+                  overdue
+                    ? 'bg-red-500/5 border-l-2 border-l-red-500'
+                    : task.completed
+                    ? 'bg-teal/5'
+                    : 'bg-charcoal-800'
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={task.completed}
+                  onChange={e => onToggle(task.key, e.target.checked)}
+                  className="mt-0.5 accent-teal w-4 h-4 cursor-pointer shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {task.is_hard_gate && (
+                      <span className="w-2 h-2 rounded-full bg-teal shrink-0" title="Hard gate" />
+                    )}
+                    <span className={`text-sm ${task.completed ? 'text-slate line-through' : 'text-cream'}`}>
+                      {task.label}
                     </span>
+                    {roleFilter === 'all' && (
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap ${ROLE_BADGE_COLORS[task.owner] ?? 'bg-slate/15 text-slate'}`}>
+                        {task.owner}
+                      </span>
+                    )}
+                    {task.due_date && !task.completed && (
+                      <span className={`text-[10px] whitespace-nowrap ${overdue ? 'text-red-400 font-bold' : 'text-slate'}`}>
+                        Due {formatDueDate(task.due_date)}
+                      </span>
+                    )}
+                  </div>
+                  {task.completed && task.completed_by && (
+                    <p className="text-xs text-teal mt-0.5">
+                      {task.completed_by.split('@')[0]}
+                      {task.completed_at && ` · ${new Date(task.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                    </p>
                   )}
                 </div>
-                {task.completed && task.completed_by && (
-                  <p className="text-xs text-teal mt-0.5">
-                    ✓ {task.completed_by.split('@')[0]}
-                    {task.completed_at && ` · ${new Date(task.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-                  </p>
-                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
 
-// ── Advisor Checklist ─────────────────────────────────────────────────────────
-function AdvisorChecklist({ deal, roleFilter }: { deal: { id: string; dealname: string; dealstage: string }; roleFilter: string }) {
-  const { data, mutate } = useSWR(`/api/command-center/checklist/${deal.id}`, fetcher, { refreshInterval: 43_200_000 });
+// ── Advisor Checklist ───────────────────────────────────────────────────────
+interface DealWithDates {
+  id: string;
+  dealname: string;
+  dealstage: string;
+  closedate?: string;
+  desired_start_date?: string;
+  actual_launch_date?: string;
+}
+
+function AdvisorChecklist({ deal, roleFilter }: { deal: DealWithDates; roleFilter: string }) {
+  const day0 = deal.closedate || null;
+  const launch = deal.actual_launch_date || deal.desired_start_date || null;
+  const qp = new URLSearchParams();
+  if (day0) qp.set('day0_date', day0);
+  if (launch) qp.set('launch_date', launch);
+
+  const { data, mutate } = useSWR(
+    `/api/command-center/checklist/${deal.id}${qp.toString() ? `?${qp}` : ''}`,
+    fetcher,
+    { refreshInterval: 43_200_000 }
+  );
   const tasks: TaskRow[] = data?.tasks ?? [];
-  const filteredTasks = roleFilter === 'all' ? tasks : tasks.filter(t => t.role === roleFilter);
+  const filteredTasks = roleFilter === 'all' ? tasks : tasks.filter(t => t.owner === roleFilter);
   const completedCount = filteredTasks.filter(t => t.completed).length;
+  const overdueCount = filteredTasks.filter(t => !t.completed && isOverdue(t.due_date)).length;
+  const hardGatesRemaining = filteredTasks.filter(t => t.is_hard_gate && !t.completed).length;
 
   async function handleToggle(taskKey: string, completed: boolean) {
     mutate({ ...data, tasks: tasks.map(t => t.key === taskKey ? { ...t, completed } : t) }, false);
@@ -330,25 +405,47 @@ function AdvisorChecklist({ deal, roleFilter }: { deal: { id: string; dealname: 
     <DataCard className="mb-6">
       <div className="flex items-center justify-between pb-4 border-b border-cream-border mb-4">
         <div>
-          <Link
-            href={`/command-center/advisor/${deal.id}`}
-            className="no-underline"
-          >
+          <Link href={`/command-center/advisor/${deal.id}`} className="no-underline">
             <h3 className="text-base font-bold text-cream font-serif mb-1 hover:text-teal cursor-pointer transition-smooth">
               {deal.dealname}
             </h3>
           </Link>
           <span className="text-xs text-teal font-medium">{STAGE_LABELS[deal.dealstage] ?? deal.dealstage}</span>
+          {day0 && (
+            <span className="text-[10px] text-slate ml-3">
+              Signed {new Date(day0 + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </span>
+          )}
+          {launch && (
+            <span className="text-[10px] text-slate ml-3">
+              Launch {new Date(launch + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </span>
+          )}
         </div>
-        <div className="text-center">
-          <div className={`w-14 h-14 rounded-full border-[3px] ${pct === 100 ? 'border-teal' : 'border-cream-border'} flex items-center justify-center flex-col`}>
-            <span className={`text-sm font-bold ${pct === 100 ? 'text-teal' : 'text-cream'}`}>{pct}%</span>
+        <div className="flex items-center gap-4">
+          {/* Summary stats */}
+          <div className="flex items-center gap-3 text-[10px]">
+            {overdueCount > 0 && (
+              <span className="px-2 py-0.5 rounded bg-red-500/15 text-red-400 font-bold">
+                {overdueCount} overdue
+              </span>
+            )}
+            {hardGatesRemaining > 0 && (
+              <span className="px-2 py-0.5 rounded bg-teal/15 text-teal font-bold">
+                {hardGatesRemaining} gate{hardGatesRemaining > 1 ? 's' : ''}
+              </span>
+            )}
           </div>
-          <p className="text-[10px] text-slate mt-1">{completedCount}/{filteredTasks.length}</p>
+          <div className="text-center">
+            <div className={`w-14 h-14 rounded-full border-[3px] ${pct === 100 ? 'border-teal' : 'border-cream-border'} flex items-center justify-center flex-col`}>
+              <span className={`text-sm font-bold ${pct === 100 ? 'text-teal' : 'text-cream'}`}>{pct}%</span>
+            </div>
+            <p className="text-[10px] text-slate mt-1">{completedCount}/{filteredTasks.length}</p>
+          </div>
         </div>
       </div>
       <div>
-        {(['pre_launch', 'launch_day', 'post_launch'] as Phase[]).map(phase => (
+        {PHASE_ORDER.map(phase => (
           <PhaseSection key={phase} phase={phase} tasks={tasks} onToggle={handleToggle} roleFilter={roleFilter} />
         ))}
       </div>
@@ -357,14 +454,13 @@ function AdvisorChecklist({ deal, roleFilter }: { deal: { id: string; dealname: 
 }
 
 /**
- * Onboarding Tracker - Workload dashboard and task checklists
- *
- * Migrated to Tremor components (removed all inline styles)
+ * Onboarding Tracker - Workload dashboard and 8-phase task checklists
  */
 export default function OnboardingTracker() {
   const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, { refreshInterval: 43_200_000 });
   const [activeTab, setActiveTab] = useState<'workload' | 'checklists'>('workload');
   const [checklistRoleFilter, setChecklistRoleFilter] = useState<string>('all');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   if (isLoading) {
     return <div className="px-10 py-16 text-slate">Loading…</div>;
@@ -378,13 +474,14 @@ export default function OnboardingTracker() {
     (d: { dealstage: string; dealname?: string; daysSinceLaunch?: number | null }) => {
       if (!ONBOARDING_STAGE_IDS.includes(d.dealstage)) return false;
       if (d.dealname?.toLowerCase().includes('test')) return false;
-      // For launched advisors, only include those within 90-day graduation window
       if (d.dealstage === '100411705') {
         return d.daysSinceLaunch == null || d.daysSinceLaunch <= 90;
       }
       return true;
     }
   );
+
+  const isDropdownRole = DROPDOWN_ROLES.includes(checklistRoleFilter as TaskRole);
 
   return (
     <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
@@ -395,7 +492,7 @@ export default function OnboardingTracker() {
             Active Onboarding
           </h1>
           <p className="text-slate text-sm">
-            {onboardingDeals.length} advisor{onboardingDeals.length !== 1 ? 's' : ''} in onboarding · Team capacity tracking · 43-task checklist
+            {onboardingDeals.length} advisor{onboardingDeals.length !== 1 ? 's' : ''} in onboarding · 8-phase checklist · Due-date tracking
           </p>
         </div>
 
@@ -429,14 +526,14 @@ export default function OnboardingTracker() {
       {activeTab === 'checklists' && (
         <>
           {/* Role filter */}
-          <div className="flex items-center gap-2 mb-5">
+          <div className="flex items-center gap-2 mb-5 flex-wrap">
             <span className="text-xs text-slate font-semibold uppercase tracking-wider mr-2">Filter by role:</span>
-            {['all', 'AXM', 'AXA', 'CTM', 'CTA'].map(role => {
+            {PRIMARY_ROLES.map(role => {
               const isActive = checklistRoleFilter === role;
               return (
                 <button
                   key={role}
-                  onClick={() => setChecklistRoleFilter(role)}
+                  onClick={() => { setChecklistRoleFilter(role); setDropdownOpen(false); }}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium border-none cursor-pointer transition-smooth ${
                     isActive
                       ? 'bg-teal text-white'
@@ -447,6 +544,36 @@ export default function OnboardingTracker() {
                 </button>
               );
             })}
+            {/* Dropdown for additional roles */}
+            <div className="relative">
+              <button
+                onClick={() => setDropdownOpen(o => !o)}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium border-none cursor-pointer transition-smooth ${
+                  isDropdownRole
+                    ? 'bg-teal text-white'
+                    : 'bg-charcoal-700 text-slate hover:text-cream'
+                }`}
+              >
+                {isDropdownRole ? checklistRoleFilter : 'More ▾'}
+              </button>
+              {dropdownOpen && (
+                <div className="absolute top-full left-0 mt-1 bg-charcoal-700 border border-cream-border rounded-lg shadow-xl z-50 min-w-[160px] py-1">
+                  {DROPDOWN_ROLES.map(role => (
+                    <button
+                      key={role}
+                      onClick={() => { setChecklistRoleFilter(role); setDropdownOpen(false); }}
+                      className={`w-full text-left px-3 py-2 text-xs border-none cursor-pointer transition-smooth ${
+                        checklistRoleFilter === role
+                          ? 'bg-teal/15 text-teal'
+                          : 'bg-transparent text-slate hover:text-cream hover:bg-white/5'
+                      }`}
+                    >
+                      {role}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {onboardingDeals.length === 0 ? (
@@ -456,7 +583,7 @@ export default function OnboardingTracker() {
               </p>
             </DataCard>
           ) : (
-            onboardingDeals.map((deal: { id: string; dealname: string; dealstage: string }) => (
+            onboardingDeals.map((deal: DealWithDates) => (
               <AdvisorChecklist key={deal.id} deal={deal} roleFilter={checklistRoleFilter} />
             ))
           )}

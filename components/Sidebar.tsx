@@ -12,6 +12,7 @@ import {
   SparklesIcon,
   ChartBarIcon,
   UserGroupIcon,
+  BellAlertIcon,
 } from "@heroicons/react/24/outline";
 
 const navItems = [
@@ -34,6 +35,7 @@ const coreOps = [
   { label: "Pipeline", href: "/command-center", icon: HomeIcon },
   { label: "Advisor Hub", href: "/command-center/advisor-hub", icon: DocumentPlusIcon },
   { label: "Onboarding", href: "/command-center/onboarding", icon: RectangleStackIcon },
+  { label: "Alerts", href: "/command-center/alerts", icon: BellAlertIcon },
   { label: "Transitions", href: "/command-center/transitions", icon: RectangleStackIcon },
   { label: "Team", href: "/command-center/team", icon: UserGroupIcon },
   { label: "Complexity", href: "/command-center/complexity", icon: ChartBarIcon },
