@@ -197,6 +197,7 @@ interface AdvisorGroup {
 
 interface TransitionsData {
   advisors: AdvisorGroup[];
+  lastSyncedAt: string | null;
   summary: {
     total_advisors: number;
     total_accounts: number;
@@ -235,6 +236,35 @@ export default function TransitionsPage() {
   const [docusignLoading, setDocusignLoading] = useState(false);
   const [docusignError, setDocusignError] = useState<string | null>(null);
   const [showUnmatched, setShowUnmatched] = useState(false);
+
+  // Auto-sync state
+  const [autoSyncing, setAutoSyncing] = useState(false);
+  const [autoSyncChecked, setAutoSyncChecked] = useState(false);
+
+  // ── Auto-sync: refresh from Google Drive if data is stale (> 1 hour) ────────
+  useEffect(() => {
+    if (!data || autoSyncChecked || autoSyncing) return;
+    setAutoSyncChecked(true);
+
+    const lastSynced = data.lastSyncedAt ? new Date(data.lastSyncedAt).getTime() : 0;
+    const ageMs = Date.now() - lastSynced;
+    const ONE_HOUR = 60 * 60 * 1000;
+
+    if (ageMs > ONE_HOUR) {
+      console.log(`[transitions] Data is ${Math.round(ageMs / 60000)}m old — auto-syncing...`);
+      setAutoSyncing(true);
+      fetch('/api/command-center/transitions/sync')
+        .then(res => res.json())
+        .then(result => {
+          if (result.summary) {
+            console.log(`[transitions] Auto-sync complete: ${result.summary.total_synced} rows from ${result.summary.total_workbooks} workbooks`);
+          }
+          mutate(); // Refresh page data from DB
+        })
+        .catch(err => console.error('[transitions] Auto-sync failed:', err))
+        .finally(() => setAutoSyncing(false));
+    }
+  }, [data, autoSyncChecked, autoSyncing, mutate]);
 
   // ── Check URL params for DocuSign callback ──────────────────────────────────
   useEffect(() => {
@@ -355,6 +385,19 @@ export default function TransitionsPage() {
 
   const summary = data?.summary;
 
+  // ── Format "last synced" relative time ──────────────────────────────────────
+  function formatSyncAge(isoDate: string | null | undefined): string {
+    if (!isoDate) return 'Never synced';
+    const ageMs = Date.now() - new Date(isoDate).getTime();
+    const mins = Math.floor(ageMs / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ${mins % 60}m ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  }
+
   return (
     <div style={{ padding: '32px 40px', maxWidth: 1400 }}>
       {/* ── Header ──────────────────────────────────────────────────────────── */}
@@ -372,6 +415,20 @@ export default function TransitionsPage() {
               Track client transitions, document statuses, and DocuSign progress by advisor
             </p>
           </div>
+        </div>
+
+        {/* ── Last synced indicator ──────────────────────────────────────────── */}
+        <div style={{ textAlign: 'center', marginTop: 10 }}>
+          <span style={{ fontSize: 12, color: C.slate }}>
+            Last synced: {formatSyncAge(data?.lastSyncedAt)}
+          </span>
+          {autoSyncing && (
+            <span style={{
+              fontSize: 12, color: C.teal, marginLeft: 10, fontWeight: 500,
+            }}>
+              ↻ Auto-syncing from Google Drive...
+            </span>
+          )}
         </div>
       </div>
 

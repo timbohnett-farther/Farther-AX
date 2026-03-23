@@ -480,4 +480,56 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// ── GET handler (cron-compatible) ────────────────────────────────────────────
+// GET triggers a full folder sync — can be called by Railway cron, external
+// cron services, or the client-side auto-sync logic.
+
+export async function GET() {
+  try {
+    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+    if (!folderId) {
+      return NextResponse.json(
+        { error: 'GOOGLE_DRIVE_FOLDER_ID env var is not set' },
+        { status: 500 },
+      );
+    }
+
+    const range = 'Transitions!A1:AQ';
+    const sheets: DriveFile[] = await listSheetsInFolder(folderId);
+
+    if (sheets.length === 0) {
+      return NextResponse.json({
+        workbooks: [],
+        summary: { total_workbooks: 0, total_synced: 0, total_rows: 0, errors: 0 },
+      });
+    }
+
+    const results: WorkbookResult[] = [];
+
+    for (const sheet of sheets) {
+      console.log(`[transitions/sync] Auto-syncing "${sheet.name}" (${sheet.id})…`);
+      const result = await syncWorkbook(sheet.id, sheet.name, range);
+      results.push(result);
+    }
+
+    const totalSynced = results.reduce((sum, r) => sum + r.synced, 0);
+    const totalRows = results.reduce((sum, r) => sum + r.total, 0);
+    const errors = results.filter(r => r.error).length;
+
+    return NextResponse.json({
+      workbooks: results,
+      summary: {
+        total_workbooks: sheets.length,
+        total_synced: totalSynced,
+        total_rows: totalRows,
+        errors,
+      },
+    });
+  } catch (err) {
+    console.error('[transitions/sync GET]', err);
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
 export const dynamic = 'force-dynamic';

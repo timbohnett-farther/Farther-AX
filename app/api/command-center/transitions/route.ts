@@ -119,8 +119,15 @@ export async function GET() {
         r.document_readiness !== 'Ready to Send Documents',
     ).length;
 
+    // ── Last synced timestamp ──────────────────────────────────────────────────
+    const syncTimeResult = await pool.query<{ last_synced: Date | null }>(
+      `SELECT MAX(synced_at) AS last_synced FROM transition_clients`
+    );
+    const lastSyncedAt = syncTimeResult.rows[0]?.last_synced?.toISOString() ?? null;
+
     return NextResponse.json({
       advisors,
+      lastSyncedAt,
       summary: {
         total_advisors: advisors.length,
         total_accounts: rows.length,
