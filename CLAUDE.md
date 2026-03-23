@@ -1,15 +1,23 @@
 # Farther AX - Claude Memory File
 
+## CRITICAL — Single Source of Truth
+- **This is the ONLY repo for the AX Command Center / Billing Portal**
+- **GitHub**: `https://github.com/timbohnett-farther/Farther-AX`
+- **Local path**: `/Users/tim.bohnett/ClaudeCode/Farther-AX`
+- **Railway deploys from**: `timbohnett-farther/Farther-AX` → `main` branch
+- **DO NOT push to or work in `farther-billing-portal` or any other repo for AX work**
+- **All code changes, builds, and deployments happen HERE and ONLY HERE**
+
 ## Project Overview
 - **App**: Farther AX Command Center — internal advisor management tool for Farther (RIA firm)
 - **Stack**: Next.js 14.2, React 18, TypeScript 5.9, SWR 2.4, Tailwind CSS 3.4, Tremor React 3.18, PostgreSQL, NextAuth 4.24
 - **Styling**: Tailwind utilities + design tokens (`lib/design-tokens.ts`) + Tremor components. NO inline styles, NO CSS modules.
 - **Fonts**: Headers use `font-serif` = `'ABC Arizona Text', Georgia, serif`; Body uses `font-sans` = `'Fakt', system-ui, sans-serif`
 - **All pages are `'use client'`** client components using SWR for data fetching
-- **Deploy**: Railway (Nixpacks, Node 18)
+- **Deploy**: Railway (Nixpacks, Node 18) — auto-deploys from `main` branch
 
 ## Branch
-- **Working branch**: `claude/connect-repository-zPuMu`
+- **Production branch**: `main` (Railway auto-deploys from this)
 
 ## Architecture (Post-Tremor Migration)
 
