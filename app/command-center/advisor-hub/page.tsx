@@ -539,19 +539,23 @@ export default function AdvisorHubPage() {
 
     const early = deals.filter(d => EARLY_STAGE_IDS.includes(d.dealstage));
 
+    // Launch to Graduation: Steps 5-6 (all), Step 7 only if launched within 90 days
     const launch = deals.filter(d => {
       if (!LAUNCH_STAGE_IDS.includes(d.dealstage)) return false;
       if (d.dealstage === LAUNCHED_STAGE_ID) {
-        return d.daysSinceLaunch === null || d.daysSinceLaunch <= GRADUATION_DAYS;
+        // Only keep launched advisors with a known date AND within 90 days
+        return d.daysSinceLaunch !== null && d.daysSinceLaunch <= GRADUATION_DAYS;
       }
       return true;
     });
 
-    const completed = deals.filter(d =>
-      d.dealstage === LAUNCHED_STAGE_ID &&
-      d.daysSinceLaunch !== null &&
-      d.daysSinceLaunch > GRADUATION_DAYS
-    );
+    // Completed Transitions: Launched advisors > 90 days, or launched with no date set
+    const completed = deals.filter(d => {
+      if (d.dealstage !== LAUNCHED_STAGE_ID) return false;
+      // No date set = can't track graduation, treat as completed
+      if (d.daysSinceLaunch === null) return true;
+      return d.daysSinceLaunch > GRADUATION_DAYS;
+    });
 
     return {
       launchDeals: sortByLastName(launch),
