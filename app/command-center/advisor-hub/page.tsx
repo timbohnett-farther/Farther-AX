@@ -7,6 +7,15 @@ import Link from 'next/link';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
+const SWR_OPTS = {
+  refreshInterval: 8 * 60 * 60 * 1000,
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,
+  dedupingInterval: 60 * 60 * 1000,
+  keepPreviousData: true,
+  errorRetryCount: 2,
+} as const;
+
 // ── Design tokens ────────────────────────────────────────────────────────────
 const C = {
   dark: '#FAF7F2', white: '#1a1a1a', slate: 'rgba(250,247,242,0.5)',
@@ -515,9 +524,9 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
 
 // ── Main Component ───────────────────────────────────────────────────────────
 export default function AdvisorHubPage() {
-  const { data, isLoading, error } = useSWR('/api/command-center/pipeline', fetcher);
-  const { data: sentimentData, mutate: mutateSentiment } = useSWR('/api/command-center/sentiment/scores', fetcher);
-  const { data: aumData, isLoading: aumLoading } = useSWR('/api/command-center/aum-tracker', fetcher);
+  const { data, isLoading, error } = useSWR('/api/command-center/pipeline', fetcher, SWR_OPTS);
+  const { data: sentimentData, mutate: mutateSentiment } = useSWR('/api/command-center/sentiment/scores', fetcher, SWR_OPTS);
+  const { data: aumData, isLoading: aumLoading } = useSWR('/api/command-center/aum-tracker', fetcher, SWR_OPTS);
   const [activeTab, setActiveTab] = useState<TabKey>('launch');
   const [search, setSearch] = useState('');
   const [scoring, setScoring] = useState<Record<string, boolean>>({});
