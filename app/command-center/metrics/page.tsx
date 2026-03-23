@@ -8,6 +8,9 @@ import {
   CurrencyDollarIcon,
   ChartBarIcon,
   ArrowTrendingUpIcon,
+  ClockIcon,
+  HomeModernIcon,
+  BanknotesIcon,
 } from '@heroicons/react/24/outline';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
@@ -56,7 +59,8 @@ export default function MetricsDashboard() {
 
   const m = data ?? {};
   const cap = m.capacity ?? {};
-  const avgAUMPerStaff = cap.totalAUM && cap.axmCount ? cap.totalAUM / cap.axmCount : 0;
+  const roles = m.teamRoles ?? {};
+  const stats = m.launchedStats ?? {};
 
   // Prepare transition data for MetricBar
   const transitionData = Object.entries(m.transitionBreakdown as Record<string, number> ?? {})
@@ -79,6 +83,15 @@ export default function MetricsDashboard() {
       color: stageId === '100411705' ? ('teal' as const) : ('blue' as const),
     }));
 
+  // Prepare firm type data for MetricBar
+  const firmTypeData = Object.entries(m.firmTypeBreakdown as Record<string, number> ?? {})
+    .sort((a, b) => b[1] - a[1])
+    .map(([type, count]) => ({
+      name: type || 'Not set',
+      value: count,
+      color: 'indigo' as const,
+    }));
+
   return (
     <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
       <div className="mb-8">
@@ -86,7 +99,7 @@ export default function MetricsDashboard() {
           AX Metrics
         </h1>
         <p className="text-slate text-sm">
-          Live pipeline metrics · refreshes every 30s
+          Live pipeline metrics · refreshes every 12 hours
         </p>
       </div>
 
@@ -96,30 +109,67 @@ export default function MetricsDashboard() {
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard
-          title="AXM/AXA Staff"
-          value={String(cap.axmCount ?? 9)}
-          subtitle="managing onboarding"
+          title="AX Staff"
+          value={String(cap.axStaff ?? 0)}
+          subtitle="AXM + AXA"
           icon={<UserGroupIcon className="h-6 w-6 text-teal" />}
         />
         <StatCard
-          title="Total AUM"
-          value={formatAUM(cap.totalAUM ?? 15e9)}
-          subtitle="under management"
+          title="Platform AUM"
+          value={formatAUM(cap.platformAUM ?? 0)}
+          subtitle="managed accounts"
           icon={<CurrencyDollarIcon className="h-6 w-6 text-white" />}
           className="bg-teal text-white"
         />
         <StatCard
-          title="Advisors"
-          value={String(cap.advisorCount ?? 240)}
-          subtitle="Farther platform"
+          title="Launched Advisors"
+          value={String(cap.launchedAdvisors ?? 0)}
+          subtitle="Step 7 – Launched"
           icon={<ChartBarIcon className="h-6 w-6 text-teal" />}
         />
         <StatCard
           title="AUM per Staff"
-          value={formatAUM(avgAUMPerStaff)}
-          subtitle="avg load"
+          value={formatAUM(cap.aumPerStaff ?? 0)}
+          subtitle="platform AUM / AX staff"
           icon={<ArrowTrendingUpIcon className="h-6 w-6 text-teal" />}
         />
+      </div>
+
+      {/* Launched Advisor Stats */}
+      <h2 className="text-xs font-semibold text-slate uppercase tracking-wider mb-4">
+        Launched Advisor Stats
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <StatCard
+          title="Total Revenue"
+          value={formatAUM(stats.totalRevenue ?? 0)}
+          subtitle="annual fee revenue"
+          icon={<BanknotesIcon className="h-6 w-6 text-teal" />}
+          className="bg-teal text-white"
+        />
+        <StatCard
+          title="Avg Days to Launch"
+          value={stats.avgDaysToLaunch != null ? `${stats.avgDaysToLaunch}d` : '—'}
+          subtitle="create → launch"
+          icon={<ClockIcon className="h-6 w-6 text-teal" />}
+        />
+        <StatCard
+          title="Total Households"
+          value={String(stats.totalHouseholds ?? 0)}
+          subtitle="launched advisors"
+          icon={<HomeModernIcon className="h-6 w-6 text-teal" />}
+        />
+      </div>
+
+      {/* Team Breakdown */}
+      <h2 className="text-xs font-semibold text-slate uppercase tracking-wider mb-4">
+        Team Breakdown
+      </h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <StatCard title="AXMs" value={String(roles['AXM'] ?? 0)} subtitle="Advisor Experience Managers" />
+        <StatCard title="AXAs" value={String(roles['AXA'] ?? 0)} subtitle="Advisor Experience Associates" />
+        <StatCard title="CTMs" value={String(roles['CTM'] ?? 0)} subtitle="Client Transition Managers" />
+        <StatCard title="CTAs" value={String(roles['CTA'] ?? 0)} subtitle="Client Transition Associates" />
       </div>
 
       {/* Onboarded AUM */}
@@ -181,6 +231,14 @@ export default function MetricsDashboard() {
           <MetricBar
             title="Pipeline by Stage"
             data={stageData}
+          />
+        )}
+
+        {/* Firm Type Breakdown */}
+        {firmTypeData.length > 0 && (
+          <MetricBar
+            title="Firm Type Breakdown"
+            data={firmTypeData}
           />
         )}
       </div>

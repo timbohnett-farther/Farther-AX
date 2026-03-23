@@ -1,23 +1,122 @@
 import { NextResponse } from 'next/server';
+import pool from '@/lib/db';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
 const LAUNCHED_STAGE = '100411705';
+const MANAGED_ACCOUNTS_OBJECT_TYPE = '2-13676628';
 
-export async function GET() {
-  try {
+interface DealResult {
+  properties: Record<string, string | null>;
+}
+
+// ── Fetch all pipeline deals (paginated) ────────────────────────────────────
+async function fetchPipelineDeals(): Promise<DealResult[]> {
+  const deals: DealResult[] = [];
+  let after: string | undefined;
+
+  do {
+    const body: Record<string, unknown> = {
+      filterGroups: [{ filters: [{ propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID }] }],
+      properties: [
+        'dealname', 'transferable_aum', 'dealstage', 'actual_launch_date',
+        'createdate', 'desired_start_date', 'transition_type', 'firm_type',
+        'client_households',
+      ],
+      limit: 200,
+    };
+    if (after) body.after = after;
+
     const res = await fetch('https://api.hubapi.com/crm/v3/objects/deals/search', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        filterGroups: [{ filters: [{ propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID }] }],
-        properties: ['dealname', 'transferable_aum', 'dealstage', 'actual_launch_date', 'desired_start_date', 'transition_type', 'firm_type'],
-        limit: 200,
-      }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) { const e = await res.text(); throw new Error(`HubSpot ${res.status}: ${e}`); }
     const data = await res.json();
-    const deals = data.results as Array<{ properties: Record<string, string | null> }>;
+    deals.push(...(data.results ?? []));
+    after = data.paging?.next?.after;
+  } while (after);
+
+  return deals;
+}
+
+// ── Fetch managed accounts totals ───────────────────────────────────────────
+async function fetchManagedAccountsTotals(): Promise<{ totalAUM: number; totalRevenue: number; advisorCount: number }> {
+  let totalAUM = 0;
+  let weightedBpsSum = 0;
+  const advisorNames = new Set<string>();
+  let after: string | undefined;
+
+  do {
+    const body: Record<string, unknown> = {
+      filterGroups: [
+        { filters: [{ propertyName: 'current_value', operator: 'HAS_PROPERTY' }] },
+        { filters: [{ propertyName: 'bd_market_value', operator: 'HAS_PROPERTY' }] },
+      ],
+      properties: ['advisor_name', 'current_value', 'bd_market_value', 'fee_rate_bps'],
+      limit: 100,
+    };
+    if (after) body.after = after;
+
+    const res = await fetch(
+      `https://api.hubapi.com/crm/v3/objects/${MANAGED_ACCOUNTS_OBJECT_TYPE}/search`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }
+    );
+    if (!res.ok) {
+      console.error('[metrics] Failed to fetch managed accounts:', res.status);
+      break;
+    }
+    const data = await res.json();
+
+    for (const acct of data.results ?? []) {
+      const advisorName = (acct.properties?.advisor_name ?? '').trim();
+      const mv = parseFloat(acct.properties?.current_value ?? '0')
+        || parseFloat(acct.properties?.bd_market_value ?? '0')
+        || 0;
+      const bps = parseFloat(acct.properties?.fee_rate_bps ?? '0') || 0;
+
+      if (!advisorName || mv <= 0) continue;
+
+      advisorNames.add(advisorName);
+      totalAUM += mv;
+      weightedBpsSum += mv * bps;
+    }
+
+    after = data.paging?.next?.after;
+  } while (after);
+
+  // Revenue = totalAUM * weighted avg bps / 10000
+  const weightedAvgBps = totalAUM > 0 ? weightedBpsSum / totalAUM : 0;
+  const totalRevenue = Math.round((totalAUM * weightedAvgBps) / 10000 * 100) / 100;
+
+  return { totalAUM, totalRevenue, advisorCount: advisorNames.size };
+}
+
+// ── Fetch team role counts from DB ──────────────────────────────────────────
+async function fetchTeamRoleCounts(): Promise<Record<string, number>> {
+  const result = await pool.query(
+    `SELECT role, COUNT(*)::int AS count FROM team_members WHERE active = TRUE GROUP BY role`
+  );
+  const map: Record<string, number> = {};
+  for (const row of result.rows) {
+    map[row.role] = row.count;
+  }
+  return map;
+}
+
+export async function GET() {
+  try {
+    // Parallel fetch: HubSpot deals, team DB, managed accounts
+    const [deals, teamRoles, managed] = await Promise.all([
+      fetchPipelineDeals(),
+      fetchTeamRoleCounts(),
+      fetchManagedAccountsTotals(),
+    ]);
 
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -45,14 +144,53 @@ export async function GET() {
         return date && date <= end && d.properties.dealstage !== LAUNCHED_STAGE;
       });
 
+    // Transition type breakdown
     const transitionBreakdown: Record<string, number> = {};
+    // Stage breakdown
     const stageBreakdown: Record<string, number> = {};
+    // Firm type breakdown
+    const firmTypeBreakdown: Record<string, number> = {};
+
     for (const deal of deals) {
       const t = deal.properties.transition_type ?? 'Not set';
       transitionBreakdown[t] = (transitionBreakdown[t] ?? 0) + 1;
+
       const s = deal.properties.dealstage ?? 'unknown';
       stageBreakdown[s] = (stageBreakdown[s] ?? 0) + 1;
+
+      const f = deal.properties.firm_type ?? 'Not set';
+      firmTypeBreakdown[f] = (firmTypeBreakdown[f] ?? 0) + 1;
     }
+
+    // Avg days to launch: mean of (actual_launch_date - createdate) for launched deals
+    let totalDaysToLaunch = 0;
+    let launchDayCount = 0;
+    for (const d of launched) {
+      const launchDate = d.properties.actual_launch_date;
+      const createDate = d.properties.createdate;
+      if (launchDate && createDate) {
+        const days = Math.floor(
+          (new Date(launchDate).getTime() - new Date(createDate).getTime()) / (1000 * 60 * 60 * 24)
+        );
+        if (days >= 0) {
+          totalDaysToLaunch += days;
+          launchDayCount++;
+        }
+      }
+    }
+    const avgDaysToLaunch = launchDayCount > 0 ? Math.round(totalDaysToLaunch / launchDayCount) : null;
+
+    // Total households from launched deals
+    const totalHouseholds = launched.reduce((sum, d) => {
+      const h = parseInt(d.properties.client_households ?? '0') || 0;
+      return sum + h;
+    }, 0);
+
+    // Total launched AUM (transferable_aum for launched deals)
+    const totalLaunchedAUM = sumAUM(launched);
+
+    // Team counts
+    const axStaff = (teamRoles['AXM'] ?? 0) + (teamRoles['AXA'] ?? 0);
 
     const onboardedThisMonth = launchedInWindow(startOfMonth);
     const onboardedThisQuarter = launchedInWindow(startOfQuarter);
@@ -73,7 +211,23 @@ export async function GET() {
       pipeline90: { count: pipeline90.length, aum: sumAUM(pipeline90) },
       transitionBreakdown,
       stageBreakdown,
-      capacity: { axmCount: 9, totalAUM: 15_000_000_000, advisorCount: 240 },
+      firmTypeBreakdown,
+      // Live capacity data
+      capacity: {
+        axStaff,
+        platformAUM: managed.totalAUM,
+        launchedAdvisors: launched.length,
+        aumPerStaff: axStaff > 0 ? managed.totalAUM / axStaff : 0,
+      },
+      // Team role breakdown
+      teamRoles,
+      // Launched advisor stats
+      launchedStats: {
+        totalRevenue: managed.totalRevenue,
+        avgDaysToLaunch,
+        totalHouseholds,
+        totalLaunchedAUM,
+      },
     });
   } catch (err) {
     console.error('[metrics]', err);
