@@ -99,8 +99,8 @@ function Badge({ label, color }: { label: string; color?: string }) {
   return (
     <span style={{
       display: 'inline-block', padding: '3px 10px', borderRadius: 6,
-      background: `${c}15`, color: c, fontSize: 12, fontWeight: 600,
-      marginRight: 6, marginBottom: 6, border: `1px solid ${c}25`,
+      background: `${c}28`, color: c, fontSize: 12, fontWeight: 600,
+      marginRight: 6, marginBottom: 6, border: `1px solid ${c}40`,
     }}>{label}</span>
   );
 }
@@ -110,8 +110,9 @@ function StageBadge({ stageId }: { stageId: string }) {
   return (
     <span style={{
       display: 'inline-block', padding: '4px 12px', borderRadius: 20,
-      background: isLate ? 'rgba(29,118,130,0.15)' : 'rgba(91,106,113,0.1)',
-      color: isLate ? C.teal : C.slate, fontSize: 12, fontWeight: 600,
+      background: isLate ? 'rgba(29,118,130,0.22)' : 'rgba(91,106,113,0.18)',
+      color: isLate ? '#5ec4cf' : C.dark, fontSize: 12, fontWeight: 600,
+      border: `1px solid ${isLate ? 'rgba(29,118,130,0.35)' : 'rgba(91,106,113,0.25)'}`,
     }}>
       {STAGE_LABELS[stageId] ?? stageId}
     </span>
@@ -755,25 +756,25 @@ function TeamContactsTab({ dealId, allContacts }: { dealId: string; allContacts:
 // ══════════════════════════════════════════════════════════════════════════════
 
 const PILL_COLORS: Record<string, { color: string; bg: string }> = {
-  completed: { color: '#4ade80', bg: 'rgba(74,222,128,0.12)' },
-  signed: { color: '#4ade80', bg: 'rgba(74,222,128,0.12)' },
-  sent: { color: '#fbbf24', bg: 'rgba(251,191,36,0.12)' },
-  delivered: { color: '#60a5fa', bg: 'rgba(96,165,250,0.12)' },
-  declined: { color: '#f87171', bg: 'rgba(248,113,113,0.12)' },
-  voided: { color: '#f87171', bg: 'rgba(248,113,113,0.12)' },
+  completed: { color: '#4ade80', bg: 'rgba(74,222,128,0.2)' },
+  signed: { color: '#4ade80', bg: 'rgba(74,222,128,0.2)' },
+  sent: { color: '#fbbf24', bg: 'rgba(251,191,36,0.2)' },
+  delivered: { color: '#60a5fa', bg: 'rgba(96,165,250,0.2)' },
+  declined: { color: '#f87171', bg: 'rgba(248,113,113,0.2)' },
+  voided: { color: '#f87171', bg: 'rgba(248,113,113,0.2)' },
 };
 
 function StatusPill({ status }: { status: string | null | undefined }) {
   const s = (status ?? '').toLowerCase().trim();
   const match = PILL_COLORS[s];
   const color = match?.color ?? '#94a3b8';
-  const bg = match?.bg ?? 'rgba(148,163,184,0.12)';
+  const bg = match?.bg ?? 'rgba(148,163,184,0.18)';
   const label = s || 'not sent';
   return (
     <span style={{
       display: 'inline-block', padding: '3px 10px', borderRadius: 6,
       background: bg, color, fontSize: 12, fontWeight: 600,
-      border: `1px solid ${color}25`, textTransform: 'capitalize',
+      border: `1px solid ${color}40`, textTransform: 'capitalize',
     }}>{label}</span>
   );
 }

@@ -11,19 +11,19 @@ const C = {
   dark: '#FAF7F2', white: '#1a1a1a', slate: 'rgba(250,247,242,0.5)',
   teal: '#1d7682', bg: '#111111',
   cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
-  green: '#10b981', greenBg: 'rgba(16,185,129,0.15)',
-  amber: '#f59e0b', amberBg: 'rgba(245,158,11,0.15)', amberBorder: 'rgba(245,158,11,0.3)',
-  red: '#ef4444', redBg: 'rgba(239,68,68,0.15)', redBorder: 'rgba(239,68,68,0.3)',
-  gold: '#f59e0b', goldBg: 'rgba(245,158,11,0.15)',
+  green: '#4ade80', greenBg: 'rgba(74,222,128,0.2)',
+  amber: '#fbbf24', amberBg: 'rgba(251,191,36,0.2)', amberBorder: 'rgba(251,191,36,0.35)',
+  red: '#f87171', redBg: 'rgba(248,113,113,0.2)', redBorder: 'rgba(248,113,113,0.35)',
+  gold: '#fbbf24', goldBg: 'rgba(251,191,36,0.2)',
 };
 
 // ── Sentiment tier config (mirrors lib/sentiment.ts) ─────────────────────────
 const TIER_CONFIG: Record<string, { color: string; bgColor: string; icon: string }> = {
-  'Advocate':  { color: '#27ae60', bgColor: 'rgba(39,174,96,0.10)',   icon: '★' },
-  'Positive':  { color: '#1d7682', bgColor: 'rgba(29,118,130,0.10)',  icon: '▲' },
-  'Neutral':   { color: '#b27d2e', bgColor: 'rgba(178,125,46,0.08)', icon: '●' },
-  'At Risk':   { color: '#e67e22', bgColor: 'rgba(230,126,34,0.10)', icon: '◈' },
-  'High Risk': { color: '#c0392b', bgColor: 'rgba(192,57,43,0.08)',  icon: '▼' },
+  'Advocate':  { color: '#4ade80', bgColor: 'rgba(74,222,128,0.2)',   icon: '★' },
+  'Positive':  { color: '#5ec4cf', bgColor: 'rgba(29,118,130,0.2)',  icon: '▲' },
+  'Neutral':   { color: '#fbbf24', bgColor: 'rgba(251,191,36,0.18)', icon: '●' },
+  'At Risk':   { color: '#fb923c', bgColor: 'rgba(251,146,60,0.2)', icon: '◈' },
+  'High Risk': { color: '#f87171', bgColor: 'rgba(248,113,113,0.2)',  icon: '▼' },
 };
 
 // ── Stage config ─────────────────────────────────────────────────────────────

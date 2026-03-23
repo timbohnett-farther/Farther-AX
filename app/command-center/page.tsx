@@ -125,16 +125,16 @@ function StageBadge({ stageId, label, isTerminal }: { stageId: string; label: st
   const isOfferAccepted = stageId === '2496936';
   const description = STAGE_DESCRIPTIONS[stageId];
 
-  let bg = 'rgba(91,106,113,0.1)';
-  let color = C.slate;
-  let borderColor = 'transparent';
+  let bg = 'rgba(91,106,113,0.18)';
+  let color = C.dark;
+  let borderColor = 'rgba(91,106,113,0.25)';
 
   if (isTerminal) {
-    bg = C.redBg; color = C.red; borderColor = C.redBorder;
+    bg = 'rgba(239,68,68,0.2)'; color = '#f87171'; borderColor = 'rgba(239,68,68,0.4)';
   } else if (isLaunched) {
-    bg = 'rgba(29,118,130,0.1)'; color = C.teal;
+    bg = 'rgba(29,118,130,0.2)'; color = '#5ec4cf'; borderColor = 'rgba(29,118,130,0.35)';
   } else if (isOfferAccepted) {
-    bg = C.goldBg; color = C.gold; borderColor = 'rgba(200,169,81,0.25)';
+    bg = 'rgba(245,158,11,0.2)'; color = '#fbbf24'; borderColor = 'rgba(245,158,11,0.35)';
   }
 
   return (
@@ -1137,8 +1137,8 @@ function RecruitingTab() {
           return (
             <button key={stageId} onClick={() => setStageFilter(isSelected ? 'all' : stageId)} style={{
               padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer',
-              background: isSelected ? C.teal : isLaunched ? 'rgba(29,118,130,0.15)' : isOfferAccepted ? C.goldBg : 'rgba(91,106,113,0.08)',
-              color: isSelected ? C.white : isLaunched ? C.teal : isOfferAccepted ? C.gold : C.slate,
+              background: isSelected ? C.teal : isLaunched ? 'rgba(29,118,130,0.22)' : isOfferAccepted ? 'rgba(245,158,11,0.2)' : 'rgba(91,106,113,0.15)',
+              color: isSelected ? '#ffffff' : isLaunched ? '#5ec4cf' : isOfferAccepted ? '#fbbf24' : C.dark,
               fontFamily: "'Fakt', system-ui, sans-serif",
             }}>
               {STAGE_LABELS[stageId]} · {count}

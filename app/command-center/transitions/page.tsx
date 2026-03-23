@@ -11,11 +11,11 @@ const C = {
   dark: '#FAF7F2', white: '#1a1a1a', slate: 'rgba(250,247,242,0.5)',
   teal: '#1d7682', bg: '#111111',
   cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
-  green: '#10b981', greenBg: 'rgba(16,185,129,0.15)',
-  amber: '#f59e0b', amberBg: 'rgba(245,158,11,0.15)', amberBorder: 'rgba(245,158,11,0.3)',
-  red: '#ef4444', redBg: 'rgba(239,68,68,0.15)', redBorder: 'rgba(239,68,68,0.3)',
-  gold: '#f59e0b', goldBg: 'rgba(245,158,11,0.15)',
-  blue: '#3b82f6', blueBg: 'rgba(59,130,246,0.15)', blueBorder: 'rgba(59,130,246,0.3)', greenBorder: 'rgba(16,185,129,0.3)',
+  green: '#4ade80', greenBg: 'rgba(74,222,128,0.2)',
+  amber: '#fbbf24', amberBg: 'rgba(251,191,36,0.2)', amberBorder: 'rgba(251,191,36,0.35)',
+  red: '#f87171', redBg: 'rgba(248,113,113,0.2)', redBorder: 'rgba(248,113,113,0.35)',
+  gold: '#fbbf24', goldBg: 'rgba(251,191,36,0.2)',
+  blue: '#60a5fa', blueBg: 'rgba(96,165,250,0.2)', blueBorder: 'rgba(96,165,250,0.35)', greenBorder: 'rgba(74,222,128,0.35)',
 };
 
 // ── Status color map ─────────────────────────────────────────────────────────
