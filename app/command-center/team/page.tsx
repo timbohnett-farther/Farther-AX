@@ -286,7 +286,7 @@ export default function TeamPage() {
       <div className="flex justify-between items-start mb-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={28} height={28} />
+            <Image src="/images/farther-iw-cream.png" alt="Farther" width={140} height={36} style={{ objectFit: 'contain' }} />
             <h1 className="text-3xl font-bold text-cream font-serif">
               Team Management
             </h1>

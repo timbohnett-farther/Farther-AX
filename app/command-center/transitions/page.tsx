@@ -217,7 +217,7 @@ export default function TransitionsPage() {
           ← Back to Pipeline
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 4px' }}>
-          <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={28} height={28} />
+          <Image src="/images/farther-iw-cream.png" alt="Farther" width={140} height={36} style={{ objectFit: 'contain' }} />
           <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark }}>
             Client Transition Dashboard
           </h1>

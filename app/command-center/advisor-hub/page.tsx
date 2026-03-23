@@ -653,7 +653,7 @@ export default function AdvisorHubPage() {
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-          <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={28} height={28} />
+          <Image src="/images/farther-iw-cream.png" alt="Farther" width={140} height={36} style={{ objectFit: 'contain' }} />
           <h1 style={{
             fontSize: 32, fontWeight: 700, color: C.dark,
             fontFamily: "'ABC Arizona Text', Georgia, serif",

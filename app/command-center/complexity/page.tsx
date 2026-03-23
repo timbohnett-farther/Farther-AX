@@ -136,7 +136,7 @@ export default function ComplexityEducationPage() {
             Command Center — Education
           </p>
           <div className="flex items-center gap-3 mb-3">
-            <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={28} height={28} />
+            <Image src="/images/farther-iw-cream.png" alt="Farther" width={140} height={36} style={{ objectFit: 'contain' }} />
             <h1 className="text-3xl font-light text-cream font-serif">
               Transition Complexity Scoring
             </h1>

@@ -107,14 +107,14 @@ export default function Sidebar() {
       {/* Logo / Brand */}
       <div className="px-6 pt-8 pb-5 border-b border-white/10">
         <Image
-          src="/images/farther-wordmark-cream.png"
+          src="/images/farther-iw-cream.png"
           alt="Farther"
-          width={120}
-          height={28}
+          width={160}
+          height={40}
           className="mb-2 object-contain object-left"
         />
         <p className="text-[10px] tracking-widest uppercase text-slate">
-          AX Command Center
+          Terminal AX
         </p>
       </div>
 
