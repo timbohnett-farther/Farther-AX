@@ -18,14 +18,24 @@ function getAuthClient(): GoogleAuth {
     rawKey = rawKey.slice(1, -1);
   }
 
-  // Convert literal \n sequences to real newlines
-  const privateKey = rawKey.replace(/\\n/g, '\n');
+  // Rebuild PEM from base64 content — handles any mix of literal \n,
+  // real newlines, or no newlines from dotenv parsing
+  const base64 = rawKey
+    .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+    .replace(/-----END PRIVATE KEY-----/g, '')
+    .replace(/\\n/g, '')
+    .replace(/[\n\r\s]/g, '');
 
-  if (!clientEmail || !privateKey) {
+  if (!clientEmail || !base64) {
     throw new Error(
       'Missing GOOGLE_SERVICE_ACCOUNT_EMAIL or GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY env vars',
     );
   }
+
+  const privateKey =
+    '-----BEGIN PRIVATE KEY-----\n' +
+    (base64.match(/.{1,64}/g) ?? []).join('\n') +
+    '\n-----END PRIVATE KEY-----\n';
 
   authClient = new GoogleAuth({
     credentials: {
