@@ -10,11 +10,11 @@ export const colors = {
   // Core 5
   charcoal: '#333333',
   white: '#ffffff',
-  slate: '#5b6a71',
+  slate: '#8a9aa2',
   ice: '#b6d0ed',
-  teal: '#1d7682',
-  tealDark: '#155961',
-  tealLight: '#28a1af',
+  teal: '#2bb8c4',
+  tealDark: '#1d7682',
+  tealLight: '#5dd8e4',
 
   // Background gradient stops
   bg600: '#2a2a2a',
@@ -28,32 +28,32 @@ export const colors = {
 
   // Text (cream-based)
   textPrimary: '#FAF7F2',
-  textSecondary: 'rgba(250, 247, 242, 0.6)',
-  textMuted: 'rgba(250, 247, 242, 0.4)',
-  textTertiary: 'rgba(250, 247, 242, 0.3)',
+  textSecondary: 'rgba(255, 255, 255, 0.7)',
+  textMuted: 'rgba(255, 255, 255, 0.5)',
+  textTertiary: 'rgba(255, 255, 255, 0.35)',
 
   // Market colors
-  bull: '#10b981',
-  bullDark: '#059669',
-  bear: '#ef4444',
-  bearDark: '#dc2626',
-  neutral: '#6b7280',
+  bull: '#34d399',
+  bullDark: '#10b981',
+  bear: '#f87171',
+  bearDark: '#ef4444',
+  neutral: '#94a3b8',
 
   // Tier/wealth colors
-  gold: '#f59e0b',
-  goldDark: '#d97706',
-  silver: '#94a3b8',
-  platinum: '#e0e7ff',
-  bronze: '#d97706',
+  gold: '#fbbf24',
+  goldDark: '#f59e0b',
+  silver: '#cbd5e1',
+  platinum: '#c7d2fe',
+  bronze: '#f59e0b',
 
   // Status colors
-  success: '#10b981',
-  warning: '#f59e0b',
-  danger: '#ef4444',
-  info: '#1d7682',
+  success: '#4ade80',
+  warning: '#fbbf24',
+  danger: '#f87171',
+  info: '#60a5fa',
 
   // Chart palette
-  chart: ['#1d7682', '#28a1af', '#b6d0ed', '#88cbd3', '#5b6a71', '#8a9aa2'],
+  chart: ['#2bb8c4', '#5dd8e4', '#b6d0ed', '#88cbd3', '#8a9aa2', '#a8b8c0', '#34d399', '#fbbf24'],
 } as const;
 
 // Tailwind utility class helpers
