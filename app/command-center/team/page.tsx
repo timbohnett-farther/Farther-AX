@@ -380,7 +380,7 @@ export default function TeamPage() {
                         {group.members.map((member, i) => (
                           <tr
                             key={member.id}
-                            className={`border-b border-cream-border ${i % 2 === 0 ? 'glass-card' : 'bg-cream'} ${!member.active ? 'opacity-50' : ''}`}
+                            className={`border-b border-cream-border ${i % 2 === 0 ? 'glass-card' : 'bg-charcoal-700'} ${!member.active ? 'opacity-50' : ''}`}
                           >
                             <td className="px-3.5 py-2.5 font-semibold text-cream">
                               {member.name}

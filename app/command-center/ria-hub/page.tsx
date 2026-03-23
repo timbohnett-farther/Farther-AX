@@ -360,7 +360,7 @@ function OverviewTab({ deal }: { deal: Deal }) {
         <DataCard title="Contacts">
           <div className="flex flex-col gap-2">
             {deal.contacts.map(c => (
-              <div key={c.id} className="flex items-center gap-3 p-3 bg-cream/50 rounded-lg hover:bg-charcoal-600 transition-smooth">
+              <div key={c.id} className="flex items-center gap-3 p-3 bg-charcoal-600/40 rounded-lg hover:bg-charcoal-600 transition-smooth">
                 <div className="w-8 h-8 rounded-full bg-teal text-white flex items-center justify-center text-xs font-bold shrink-0">
                   {(c.firstName || '?')[0]}
                 </div>
@@ -380,7 +380,7 @@ function OverviewTab({ deal }: { deal: Deal }) {
         <DataCard title={`Recent Notes (${deal.notes.length})`}>
           <div className="flex flex-col gap-2">
             {deal.notes.slice(0, 5).map(n => (
-              <div key={n.id} className="p-3 bg-cream/50 rounded-lg border-l-2 border-gray-200">
+              <div key={n.id} className="p-3 bg-charcoal-600/40 rounded-lg border-l-2 border-gray-200">
                 <p className="text-xs text-slate mb-1">{fmtDate(n.timestamp)}</p>
                 <p className="text-sm text-cream leading-relaxed">{n.body.slice(0, 400)}{n.body.length > 400 ? '…' : ''}</p>
               </div>

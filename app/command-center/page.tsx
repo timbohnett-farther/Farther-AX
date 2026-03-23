@@ -998,7 +998,7 @@ function RecruitingTab() {
           </div>
           <form
             onSubmit={e => { e.preventDefault(); sendAiMessage(aiInput); }}
-            style={{ display: 'flex', gap: 8, padding: '10px 16px', borderTop: `1px solid ${C.border}`, background: '#faf7f2' }}
+            style={{ display: 'flex', gap: 8, padding: '10px 16px', borderTop: `1px solid ${C.border}`, background: C.cardBg }}
           >
             <input
               value={aiInput}
