@@ -1148,8 +1148,8 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
                       textDecoration: task.completed ? 'line-through' : 'none',
                       textDecorationColor: 'rgba(250,247,242,0.3)',
                     }}>{task.label}</span>
-                    {/* Optional badge */}
-                    {task.optional && (
+                    {/* Optional badge (for non-hard-gate tasks) */}
+                    {!task.is_hard_gate && (
                       <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: 'rgba(91,106,113,0.08)', color: C.slate, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Optional</span>
                     )}
                     {/* Completed info */}
