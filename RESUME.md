@@ -1,4 +1,4 @@
-# Session Resume — Last Updated 2026-03-24
+# Session Resume — Last Updated 2026-03-24 (Evening Session)
 
 ## What We Just Finished
 
@@ -26,10 +26,48 @@
 - `CHANGELOG.md` — Created with all project history
 - `RESUME.md` — Created session resume
 
-**Commits Pushed:**
+**Commits Pushed (Morning):**
 1. `9b55f72` — Fix onboarding tasks display — update to 8-phase structure
 2. `be19768` — Add CHANGELOG.md and RESUME.md for session continuity
 3. `69ac472` — Fix TypeScript error — replace task.optional with !task.is_hard_gate
+4. `d533507` — Update RESUME.md with TypeScript error fix
+
+---
+
+**EVENING SESSION: PostgreSQL-Backed Cache + Fixed Tasks Schema**
+
+**Problems Identified:**
+1. ❌ **Tasks failing to load** — "Failed to load onboarding tasks" error
+2. ❌ **Slow data loads after Railway redeploy** — In-memory cache doesn't persist
+
+**Root Causes:**
+1. Missing `due_date` and `is_legacy` columns in `onboarding_tasks` table
+2. In-memory cache (`lib/api-cache.ts`) lost on every Railway redeploy/restart
+
+**Solutions Implemented:**
+- ✅ **Fixed database schema** — Added missing columns to `onboarding_tasks`
+- ✅ **Built PostgreSQL-backed cache** (`lib/pg-cache.ts`) — Persists across redeploys
+- ✅ **Added cache tables** — `api_cache`, `advisor_sentiment`, `advisor_sentiment_history`
+- ✅ **Updated pipeline API** — Switched from in-memory to PostgreSQL cache (2hr TTL)
+- ✅ **Created cache management API** — Admin endpoint for cache operations
+
+**New Features:**
+- **Persistent caching** — HubSpot data cached in PostgreSQL, survives redeploys
+- **Configurable TTL** — Different cache durations per data type
+- **Stale fallback** — Returns cached data when HubSpot API fails
+- **Cache management** — GET/POST `/api/command-center/cache` for stats & clearing
+- **Performance** — First load after deploy is fast (from database, not HubSpot)
+
+**Files Modified (Evening):**
+- `scripts/migrate.ts` — Added due_date, is_legacy columns + cache tables
+- `lib/pg-cache.ts` — New PostgreSQL-backed cache utility (224 lines)
+- `app/api/command-center/pipeline/route.ts` — Switched to PostgreSQL cache
+- `app/api/command-center/cache/route.ts` — New cache management endpoint
+- `RESUME.md` — This file
+
+**Commits Pushed (Evening):**
+5. `1aedf9b` — Add PostgreSQL-backed cache + fix onboarding tasks schema
+6. `6ca3532` — Add cache management API endpoint
 
 **Task Breakdown (Now Working):**
 - Phase 0: Sales Handoff — 5 tasks
@@ -47,10 +85,15 @@
 ## What Should Come Next
 
 ### Immediate Priorities
-- [ ] **Test the fix** — Open an advisor detail page and verify all 93 tasks load correctly
-- [ ] **Push to GitHub** — `git push origin main` to deploy fix to Railway
-- [ ] **Monitor deployment** — Check Railway logs for successful deployment
-- [ ] **Optional: Optimize phase display** — 8 phases in mini-stats might be cramped; consider showing only phases with tasks or just overall progress
+- [ ] **Test the fixes** — After Railway deploys:
+  - Open advisor detail page → Tasks tab → verify all 93 tasks load (should see all phases)
+  - Navigate around app → should feel faster on subsequent loads
+  - Check Railway logs for "Migration complete" message
+- [ ] **Monitor cache performance** — Use cache stats endpoint: `GET /api/command-center/cache`
+- [ ] **Optional: Apply cache to other API routes** — Currently only pipeline uses PostgreSQL cache
+  - `app/api/command-center/aum-tracker/route.ts` — AUM data (1 hour TTL recommended)
+  - `app/api/command-center/sentiment/scores/route.ts` — Sentiment scores (4 hours TTL)
+  - `app/api/command-center/advisor-hub/route.ts` — Advisor hub data (2 hours TTL)
 
 ### Feature Development
 - [ ] **Review open GitHub issues** — Check for any other reported bugs
