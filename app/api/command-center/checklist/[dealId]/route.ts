@@ -30,12 +30,17 @@ export async function GET(
     const dealDates = { day0_date, launch_date };
 
     const tasks = ONBOARDING_TASKS.map(task => ({
-      ...task,
+      key: task.key,
+      label: task.label,
+      phase: task.phase,
+      owner: task.owner,
+      timing: task.timing,
+      is_hard_gate: task.is_hard_gate,
+      due_date: calculateDueDate(task, dealDates),
       completed: saved[task.key]?.completed ?? false,
       completed_by: saved[task.key]?.completed_by ?? null,
       completed_at: saved[task.key]?.completed_at ?? null,
       notes: saved[task.key]?.notes ?? null,
-      due_date: calculateDueDate(task, dealDates),
     }));
 
     return NextResponse.json({ dealId, tasks, dealDates });
