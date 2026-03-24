@@ -423,7 +423,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const { sheetId, sheetRange } = body as { sheetId?: string; sheetRange?: string };
 
-    const range = sheetRange ?? 'Transitions!A1:AQ';
+    const range = sheetRange ?? 'Transition!A1:AQ';
 
     // ── Single workbook sync ────────────────────────────────────────────────
     if (sheetId) {
@@ -494,7 +494,7 @@ export async function GET() {
       );
     }
 
-    const range = 'Transitions!A1:AQ';
+    const range = 'Transition!A1:AQ';
     const sheets: DriveFile[] = await listSheetsInFolder(folderId);
 
     if (sheets.length === 0) {
