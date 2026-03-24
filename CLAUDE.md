@@ -1,85 +1,76 @@
-# Farther AX - Claude Memory File
+# Farther AX Command Center — Claude Project Guide
 
-## CRITICAL — Single Source of Truth
-- **This is the ONLY repo for the AX Command Center / Billing Portal**
-- **GitHub**: `https://github.com/timbohnett-farther/Farther-AX`
-- **Local path**: `/Users/tim.bohnett/Projects/Farther-AX`
-- **Railway deploys from**: `timbohnett-farther/Farther-AX` → `main` branch
-- **DO NOT push to or work in `farther-billing-portal` or any other repo for AX work**
-- **All code changes, builds, and deployments happen HERE and ONLY HERE**
+## CRITICAL: Repository Boundaries
 
-## Project Overview
-- **App**: Farther AX Command Center — internal advisor management tool for Farther (RIA firm)
-- **Stack**: Next.js 14.2, React 18, TypeScript 5.9, SWR 2.4, Tailwind CSS 3.4, Tremor React 3.18, PostgreSQL, NextAuth 4.24
-- **Styling**: Tailwind utilities + design tokens (`lib/design-tokens.ts`) + Tremor components. NO inline styles, NO CSS modules.
-- **Fonts**: Headers use `font-serif` = `'ABC Arizona Text', Georgia, serif`; Body uses `font-sans` = `'Fakt', system-ui, sans-serif`
-- **All pages are `'use client'`** client components using SWR for data fetching
-- **Deploy**: Railway (Nixpacks, Node 18) — auto-deploys from `main` branch
+**This repository is ONLY for the AX Command Center.**
 
-## Branch
-- **Production branch**: `main` (Railway auto-deploys from this)
+### What BELONGS in THIS Repo (Farther-AX)
+✅ Advisor pipeline management (recruiting, acquisitions)
+✅ Advisor onboarding workflows and task management
+✅ Advisor profiles (`/command-center/advisor/[id]`)
+✅ U4 & 2B intake forms (advisor compliance documents)
+✅ Client transition management (DocuSign integration)
+✅ RIA Hub (relationship intelligence & AI briefings)
+✅ Complexity scoring for advisor assignments
+✅ Team management and AXM workload balancing
+✅ Advisor sentiment tracking
+✅ Grok AI assistant for AX team
 
-## Architecture (Post-Tremor Migration)
+### What DOES NOT Belong Here
+❌ Billing data, fee analysis, AUM analytics → **farther-billing-portal**
+❌ Marketing content, social media, brand center → **Farther-Marketing**
+❌ Wealth planning, tax optimization, PRISM → **Farther-Intelligent-Wealth-Tools**
 
-### Design System
-- **`lib/design-tokens.ts`** — Centralized colors, typography, formatting helpers (`formatCompactCurrency`, `formatPercent`, etc.)
-- **`components/ui/`** — 9 Tremor-based components: `StatCard`, `StatusBadge`, `ProgressIndicator`, `MetricBar`, `ScoreBadge`, `DataCard`, `ChartContainer`, `FilterBar`, `TabGroup`
-- **`tailwind.config.ts`** — Extended with custom colors (`bg-charcoal`, `text-teal`, `bg-cream`), glass effects, animations
-- **`app/globals.css`** — Glass-morphism classes (`.glass-card`, `.stat-card`), shimmer loading, depth shadows
+---
 
-### Key Patterns
-- **NO inline styles** — Use Tailwind classes: `bg-cream`, `text-charcoal`, `text-slate`, `text-teal`, `transition-smooth`
-- **SWR fetcher**: `const fetcher = (url: string) => fetch(url).then(r => r.json())`
-- **Page header**: `<h1 className="text-3xl font-bold text-charcoal font-serif mb-2">Title</h1>`
-- **Loading**: `<div className="shimmer h-24 rounded-xl" />`
-- **Sidebar**: `/components/Sidebar.tsx` — `commandCenterItems` array with `{ label, href, icon }` format
-- **Heroicons**: Use `@heroicons/react/24/outline` for icons
+## GitHub & Deployment
 
-### Command Center Structure
-```
-app/command-center/
-  page.tsx              — Pipeline dashboard (Recruiting + Acquisitions tabs)
-  layout.tsx            — Shared layout with sidebar
-  advisor/[id]/page.tsx — Individual advisor detail (tabbed)
-  advisor-hub/page.tsx  — Advisor Hub with sentiment scoring
-  onboarding/page.tsx   — Onboarding tasks & workload
-  complexity/page.tsx   — Complexity scoring guide
-  transitions/page.tsx  — Client transition tracking + DocuSign
-  ai/page.tsx           — AI assistant (Grok)
-  team/page.tsx         — Team management
-  metrics/page.tsx      — Metrics dashboard
-  ria-hub/page.tsx      — RIA Hub (relationship intelligence)
-```
+| Field | Value |
+|-------|-------|
+| **GitHub** | https://github.com/timbohnett-farther/Farther-AX |
+| **Deploy** | Railway (Nixpacks, Node 18) — auto-deploys from `main` |
+| **Local Path** | `C:\Users\tim\Projects\Farther-AX` |
 
-### API Routes
-```
-app/api/command-center/
-  deals/route.ts             — HubSpot pipeline deals
-  deal/[id]/route.ts         — Single deal detail + notes
-  metrics/route.ts           — AUM & pipeline aggregations
-  checklist/route.ts         — Onboarding task CRUD
-  team/route.ts              — Team member management
-  complexity/batch/route.ts  — Complexity scoring
-  workload/route.ts          — AXM workload balancing
-  staff-recommendation/route.ts
-  advisor-hub/route.ts       — Advisor pipeline + sentiment
-  sentiment/score/route.ts   — Single sentiment scoring
-  sentiment/batch/route.ts   — Batch sentiment scoring
-  sentiment/scores/route.ts  — Pre-computed scores
-  aum-tracker/route.ts       — AUM via Managed Accounts
-  transitions/route.ts       — Transition status tracking
-  transitions/docusign/route.ts
-  transitions/sync/route.ts  — Google Sheets sync
-  ria-hub/route.ts           — Enriched deal data (Steps 6-7)
-  ria-hub/summary/route.ts   — AI summaries via Grok
-  ria-hub/email/route.ts     — Email templates + HubSpot send
-  ria-hub/drive-link/route.ts — Drive folder link CRUD
+---
+
+## Tech Stack
+
+Next.js 14.2, React 18, TypeScript 5.9, Tailwind CSS 3.4, Tremor React 3.18, SWR 2.4, NextAuth 4.24 (Google OAuth), Heroicons, HubSpot API, DocuSign API, Grok/xAI API.
+
+**NO local database** — all data via HubSpot API.
+
+---
+
+## Styling Approach
+
+- **Tailwind utilities** + design tokens (`lib/design-tokens.ts`)
+- **Tremor React** components (`components/ui/`)
+- **NO inline styles, NO CSS modules**
+- Fonts: `font-serif` (ABC Arizona Text) for headers, `font-sans` (Fakt) for body
+
+---
+
+## Key Patterns
+
+- All pages are `'use client'` components
+- Data fetching via SWR: `const { data } = useSWR('/api/...', fetcher)`
+- Sidebar navigation: `components/Sidebar.tsx` with `commandCenterItems` array
+- Loading states: `<div className="shimmer h-24 rounded-xl" />`
+- Page headers: `<h1 className="text-3xl font-bold text-charcoal font-serif mb-2">`
+
+---
+
+## Command to Return to Work
+
+```bash
+cd C:\Users\tim\Projects\Farther-AX
+git pull origin main
+npm install
+npm run dev
 ```
 
-### RIA Hub Feature
-- **Page**: `/command-center/ria-hub/page.tsx` — Relationship intelligence for advisors in onboarding
-- **Features**: Expandable advisor cards, AI briefings (4 types), email composer (6 templates), drive link manager
-- **Uses**: Tremor components (`Card`, `Badge`, `Text`, `Metric`), design tokens, shared UI components (`StatCard`, `DataCard`, `FilterBar`, `TabGroup`, `StatusBadge`)
+---
 
-### DB Migration
-`scripts/migrate.ts` includes `advisor_drive_links` table (used by RIA Hub drive link feature)
+## Reminder: Cross-Repo Communication
+
+If you need to work on billing, marketing, or wealth tools features, **STOP** and switch to the appropriate repository. Do NOT implement those features here.
