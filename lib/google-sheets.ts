@@ -6,8 +6,6 @@ const SCOPES = [
   'https://www.googleapis.com/auth/drive.readonly',
 ];
 
-let authClient: GoogleAuth | null = null;
-
 function buildPrivateKey(): string {
   let rawKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ?? '';
 
@@ -53,8 +51,6 @@ function buildPrivateKey(): string {
 }
 
 function getAuthClient(): GoogleAuth {
-  if (authClient) return authClient;
-
   const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const privateKey = buildPrivateKey();
 
@@ -62,15 +58,13 @@ function getAuthClient(): GoogleAuth {
     throw new Error('Missing GOOGLE_SERVICE_ACCOUNT_EMAIL env var');
   }
 
-  authClient = new GoogleAuth({
+  return new GoogleAuth({
     credentials: {
       client_email: clientEmail,
       private_key: privateKey,
     },
     scopes: SCOPES,
   });
-
-  return authClient;
 }
 
 async function getAccessToken(): Promise<string> {
