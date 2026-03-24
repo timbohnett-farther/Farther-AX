@@ -7,9 +7,9 @@ const SCOPES = [
   'https://www.googleapis.com/auth/drive.readonly',
 ];
 
-// ── Auth: JSON file locally, env var on Railway ─────────────────────────────
+// ── Auth: JSON file locally, JSON string env var on Railway ──────────────────
 // Local: GOOGLE_APPLICATION_CREDENTIALS=google-service-account.json
-// Railway: GOOGLE_SERVICE_ACCOUNT_EMAIL + GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
+// Railway: GOOGLE_SERVICE_ACCOUNT_JSON = entire JSON file contents as one env var
 
 function getAuthClient(): GoogleAuth {
   // Option 1: JSON credentials file (local dev)
@@ -21,12 +21,18 @@ function getAuthClient(): GoogleAuth {
     }
   }
 
-  // Option 2: Inline credentials from env vars (Railway production)
+  // Option 2: Full JSON credentials as a single env var (Railway)
+  const jsonCreds = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (jsonCreds) {
+    const credentials = JSON.parse(jsonCreds);
+    return new GoogleAuth({ credentials, scopes: SCOPES });
+  }
+
+  // Option 3: Separate email + key env vars (legacy fallback)
   const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const rawKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
   if (clientEmail && rawKey) {
-    // The key comes from Railway env with literal \n — replace with real newlines
-    const privateKey = rawKey.replace(/\\n/g, '\n');
+    const privateKey = rawKey.split('\\n').join('\n');
     return new GoogleAuth({
       credentials: { client_email: clientEmail, private_key: privateKey },
       scopes: SCOPES,
@@ -35,7 +41,7 @@ function getAuthClient(): GoogleAuth {
 
   throw new Error(
     'Google auth not configured. Set GOOGLE_APPLICATION_CREDENTIALS (local) ' +
-    'or GOOGLE_SERVICE_ACCOUNT_EMAIL + GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY (Railway).',
+    'or GOOGLE_SERVICE_ACCOUNT_JSON (Railway).',
   );
 }
 
