@@ -1,4 +1,5 @@
 import { GoogleAuth } from 'google-auth-library';
+import crypto from 'crypto';
 
 const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets.readonly',
@@ -7,35 +8,59 @@ const SCOPES = [
 
 let authClient: GoogleAuth | null = null;
 
+function buildPrivateKey(): string {
+  let rawKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ?? '';
+
+  // Strip wrapping quotes if present (some env parsers leave them)
+  if (
+    (rawKey.startsWith('"') && rawKey.endsWith('"')) ||
+    (rawKey.startsWith("'") && rawKey.endsWith("'"))
+  ) {
+    rawKey = rawKey.slice(1, -1);
+  }
+
+  // Extract only base64 characters — strip headers, any kind of whitespace,
+  // literal backslash-n sequences, and everything else non-base64
+  const base64 = rawKey
+    .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+    .replace(/-----END PRIVATE KEY-----/g, '')
+    .replace(/\\n/g, '')   // literal two-char \n from env
+    .replace(/\n/g, '')    // real newlines
+    .replace(/\r/g, '')    // carriage returns
+    .replace(/\s/g, '')    // any remaining whitespace
+    .trim();
+
+  if (!base64) {
+    throw new Error('GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY is empty or missing');
+  }
+
+  // Rebuild PEM with proper 64-char line breaks
+  const lines = base64.match(/.{1,64}/g) ?? [];
+  const pem =
+    '-----BEGIN PRIVATE KEY-----\n' +
+    lines.join('\n') +
+    '\n-----END PRIVATE KEY-----\n';
+
+  // Validate the key parses with Node's crypto before passing to GoogleAuth
+  try {
+    crypto.createPrivateKey(pem);
+  } catch (err) {
+    console.error('[google-sheets] PEM validation failed. Base64 length:', base64.length);
+    throw new Error('Private key is invalid: ' + (err instanceof Error ? err.message : String(err)));
+  }
+
+  return pem;
+}
+
 function getAuthClient(): GoogleAuth {
   if (authClient) return authClient;
 
   const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  let rawKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ?? '';
+  const privateKey = buildPrivateKey();
 
-  // Strip wrapping quotes if present (some env parsers leave them)
-  if ((rawKey.startsWith('"') && rawKey.endsWith('"')) || (rawKey.startsWith("'") && rawKey.endsWith("'"))) {
-    rawKey = rawKey.slice(1, -1);
+  if (!clientEmail) {
+    throw new Error('Missing GOOGLE_SERVICE_ACCOUNT_EMAIL env var');
   }
-
-  // Rebuild PEM from base64 content — handles any mix of literal \n,
-  // real newlines, or no newlines from dotenv parsing
-  const base64 = rawKey
-    .replace(/-----BEGIN PRIVATE KEY-----/g, '')
-    .replace(/-----END PRIVATE KEY-----/g, '')
-    .replace(/\\n/g, '')
-    .replace(/[\n\r\s]/g, '');
-
-  if (!clientEmail || !base64) {
-    throw new Error(
-      'Missing GOOGLE_SERVICE_ACCOUNT_EMAIL or GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY env vars',
-    );
-  }
-
-  const privateKey =
-    '-----BEGIN PRIVATE KEY-----\n' +
-    (base64.match(/.{1,64}/g) ?? []).join('\n') +
-    '\n-----END PRIVATE KEY-----\n';
 
   authClient = new GoogleAuth({
     credentials: {
