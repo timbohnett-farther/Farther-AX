@@ -2,6 +2,26 @@
 
 ## 🐛 **Current Fixes Needed**
 
+### **Fix #0: Tasks Section - Client-Side Exception**
+- **Status:** 🔴 Not Started
+- **Reported:** 2026-03-24 (Evening)
+- **Error:** `Application error: a client-side exception has occurred`
+- **Description:** Clicking on Tasks section in advisor detail page throws client-side error
+- **Priority:** 🚨 **CRITICAL** (blocking tasks functionality)
+- **Affected Page:** `app/command-center/advisor/[id]/page.tsx`
+- **Likely Causes:**
+  - [ ] ChecklistTask interface mismatch with API response
+  - [ ] Missing properties in task data (owner, timing, is_hard_gate, due_date)
+  - [ ] Phase type mismatch
+  - [ ] Frontend expecting different data shape than API returns
+- **Next Steps:**
+  - [ ] Check browser console for actual error message
+  - [ ] Verify API response matches ChecklistTask interface
+  - [ ] Check if API is returning all required fields
+  - [ ] Test with sample task data
+
+---
+
 ### **Fix #1: Alerts Page Not Loading Anything**
 - **Status:** 🔴 Not Started
 - **Reported:** 2026-03-24 (Evening)
