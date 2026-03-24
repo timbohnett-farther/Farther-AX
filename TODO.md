@@ -47,6 +47,20 @@
 
 ---
 
+### **Fix #4: AI Assistant Chat Window - White Background Unreadable**
+- **Status:** 🔴 Not Started
+- **Reported:** 2026-03-24 (Evening)
+- **Description:** Chat window in AI Assistant is pure white, making cream-colored font unreadable (accessibility issue)
+- **Priority:** Medium (UX/Accessibility)
+- **Affected Page:** `app/command-center/ai/page.tsx`
+- **Next Steps:**
+  - [ ] Change chat window background to dark color (match app theme)
+  - [ ] Ensure cream font (#FAF7F2) is readable against new background
+  - [ ] Apply consistent styling with rest of app (dark theme)
+  - [ ] Test text contrast ratio (WCAG AA compliance)
+
+---
+
 ### **Fix #2: Onboarding Tasks Not Loading**
 - **Status:** ✅ **FIXED** (2026-03-24)
 - **Solution:** Auto-run migrations on Railway deploy + added error handling
