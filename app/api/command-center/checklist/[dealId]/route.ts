@@ -8,21 +8,39 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { dealId: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const { dealId } = params;
-  const url = new URL(req.url);
-  const day0_date = url.searchParams.get('day0_date');
-  const launch_date = url.searchParams.get('launch_date');
-
   try {
+    console.log('[checklist] GET request started for dealId:', params?.dealId);
+
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      console.log('[checklist] Unauthorized - no session');
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { dealId } = params;
+    console.log('[checklist] Checking TASKS import...', { tasksCount: TASKS?.length });
+
+    if (!TASKS || !Array.isArray(TASKS)) {
+      console.error('[checklist] TASKS import failed or invalid!');
+      return NextResponse.json(
+        { error: 'Task definitions not loaded', tasks: [] },
+        { status: 500 }
+      );
+    }
+
+    const url = new URL(req.url);
+    const day0_date = url.searchParams.get('day0_date');
+    const launch_date = url.searchParams.get('launch_date');
+
+    console.log('[checklist] Querying database for dealId:', dealId);
     const result = await pool.query(
       `SELECT task_key, completed, completed_by, completed_at, notes
        FROM onboarding_tasks
        WHERE deal_id = $1 AND (is_legacy IS NULL OR is_legacy = FALSE)`,
       [dealId]
     );
+
+    console.log('[checklist] Database returned', result.rows.length, 'saved tasks');
 
     const saved: Record<string, typeof result.rows[0]> = {};
     for (const row of result.rows) saved[row.task_key] = row;
@@ -41,11 +59,17 @@ export async function GET(
       notes: saved[task.id]?.notes ?? null,
     }));
 
+    console.log('[checklist] Returning', tasks.length, 'tasks');
     return NextResponse.json({ dealId, tasks });
   } catch (error) {
-    console.error('[checklist] Database error:', error);
+    console.error('[checklist] FATAL ERROR:', error);
+    console.error('[checklist] Error stack:', error instanceof Error ? error.stack : 'No stack');
     return NextResponse.json(
-      { error: 'Failed to load tasks', details: error instanceof Error ? error.message : String(error) },
+      {
+        error: 'Failed to load tasks',
+        details: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
