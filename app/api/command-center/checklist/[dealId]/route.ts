@@ -16,28 +16,36 @@ export async function GET(
   const day0_date = url.searchParams.get('day0_date');
   const launch_date = url.searchParams.get('launch_date');
 
-  const result = await pool.query(
-    `SELECT task_key, completed, completed_by, completed_at, notes, due_date
-     FROM onboarding_tasks
-     WHERE deal_id = $1 AND (is_legacy IS NULL OR is_legacy = FALSE)`,
-    [dealId]
-  );
+  try {
+    const result = await pool.query(
+      `SELECT task_key, completed, completed_by, completed_at, notes, due_date
+       FROM onboarding_tasks
+       WHERE deal_id = $1 AND (is_legacy IS NULL OR is_legacy = FALSE)`,
+      [dealId]
+    );
 
-  const saved: Record<string, typeof result.rows[0]> = {};
-  for (const row of result.rows) saved[row.task_key] = row;
+    const saved: Record<string, typeof result.rows[0]> = {};
+    for (const row of result.rows) saved[row.task_key] = row;
 
-  const dealDates = { day0_date, launch_date };
+    const dealDates = { day0_date, launch_date };
 
-  const tasks = ONBOARDING_TASKS.map(task => ({
-    ...task,
-    completed: saved[task.key]?.completed ?? false,
-    completed_by: saved[task.key]?.completed_by ?? null,
-    completed_at: saved[task.key]?.completed_at ?? null,
-    notes: saved[task.key]?.notes ?? null,
-    due_date: calculateDueDate(task, dealDates),
-  }));
+    const tasks = ONBOARDING_TASKS.map(task => ({
+      ...task,
+      completed: saved[task.key]?.completed ?? false,
+      completed_by: saved[task.key]?.completed_by ?? null,
+      completed_at: saved[task.key]?.completed_at ?? null,
+      notes: saved[task.key]?.notes ?? null,
+      due_date: calculateDueDate(task, dealDates),
+    }));
 
-  return NextResponse.json({ dealId, tasks, dealDates });
+    return NextResponse.json({ dealId, tasks, dealDates });
+  } catch (error) {
+    console.error('[checklist] Database error:', error);
+    return NextResponse.json(
+      { error: 'Failed to load tasks', details: error instanceof Error ? error.message : String(error) },
+      { status: 500 }
+    );
+  }
 }
 
 export async function PATCH(
