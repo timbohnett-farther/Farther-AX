@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { PHASE_META, PHASE_ORDER, type Phase } from '@/lib/onboarding-tasks';
+import { PHASES, PHASE_ORDER, type Phase } from '@/lib/onboarding-tasks-v2';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -1003,18 +1003,18 @@ function TeamContactsTab({ dealId, allContacts }: { dealId: string; allContacts:
 // ══════════════════════════════════════════════════════════════════════════════
 
 const PHASE_CONFIG: Record<Phase, { label: string; color: string; bg: string; border: string }> = {
-  phase_0: { label: PHASE_META.phase_0.label, color: '#7c3aed', bg: 'rgba(124,58,237,0.08)', border: 'rgba(124,58,237,0.2)' }, // Purple - Sales Handoff
-  phase_1: { label: PHASE_META.phase_1.label, color: '#3b82f6', bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.2)' }, // Blue - Post-Signing Prep
-  phase_2: { label: PHASE_META.phase_2.label, color: '#0ea5e9', bg: 'rgba(14,165,233,0.08)', border: 'rgba(14,165,233,0.2)' }, // Cyan - Onboarding Kick-Off
-  phase_3: { label: PHASE_META.phase_3.label, color: '#06b6d4', bg: 'rgba(6,182,212,0.08)', border: 'rgba(6,182,212,0.2)' }, // Teal - Pre-Launch Build
-  phase_4: { label: PHASE_META.phase_4.label, color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)' }, // Amber - T-7 Final Countdown
-  phase_5: { label: PHASE_META.phase_5.label, color: '#ef4444', bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.2)' }, // Red - Launch Day
-  phase_6: { label: PHASE_META.phase_6.label, color: '#10b981', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)' }, // Green - Active Transition
-  phase_7: { label: PHASE_META.phase_7.label, color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)', border: 'rgba(139,92,246,0.2)' }, // Violet - Graduation
+  phase_0: { label: PHASES.phase_0.label, color: '#7c3aed', bg: 'rgba(124,58,237,0.08)', border: 'rgba(124,58,237,0.2)' }, // Purple - Sales Handoff
+  phase_1: { label: PHASES.phase_1.label, color: '#3b82f6', bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.2)' }, // Blue - Post-Signing Prep
+  phase_2: { label: PHASES.phase_2.label, color: '#0ea5e9', bg: 'rgba(14,165,233,0.08)', border: 'rgba(14,165,233,0.2)' }, // Cyan - Onboarding Kick-Off
+  phase_3: { label: PHASES.phase_3.label, color: '#06b6d4', bg: 'rgba(6,182,212,0.08)', border: 'rgba(6,182,212,0.2)' }, // Teal - Pre-Launch Build
+  phase_4: { label: PHASES.phase_4.label, color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)' }, // Amber - T-7 Final Countdown
+  phase_5: { label: PHASES.phase_5.label, color: '#ef4444', bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.2)' }, // Red - Launch Day
+  phase_6: { label: PHASES.phase_6.label, color: '#10b981', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)' }, // Green - Active Transition
+  phase_7: { label: PHASES.phase_7.label, color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)', border: 'rgba(139,92,246,0.2)' }, // Violet - Graduation
 };
 
 interface ChecklistTask {
-  key: string; label: string; phase: Phase; owner: string; timing: string; is_hard_gate: boolean; due_date: string | null;
+  id: string; label: string; phase: Phase; owner: string; timing: string; is_hard_gate: boolean; resources: string | null;
   completed: boolean; completed_by: string | null; completed_at: string | null; notes: string | null;
 }
 
@@ -1027,19 +1027,19 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
 
   const togglePhase = (phase: string) => setCollapsed(prev => ({ ...prev, [phase]: !prev[phase] }));
 
-  const handleToggle = useCallback(async (taskKey: string, currentCompleted: boolean) => {
+  const handleToggle = useCallback(async (taskId: string, currentCompleted: boolean) => {
     if (!data) return;
-    setToggling(taskKey);
+    setToggling(taskId);
     const newCompleted = !currentCompleted;
     // Optimistic update
     mutate(
-      { ...data, tasks: data.tasks.map(t => t.key === taskKey ? { ...t, completed: newCompleted, completed_by: newCompleted ? 'you' : null, completed_at: newCompleted ? new Date().toISOString() : null } : t) },
+      { ...data, tasks: data.tasks.map(t => t.id === taskId ? { ...t, completed: newCompleted, completed_by: newCompleted ? 'you' : null, completed_at: newCompleted ? new Date().toISOString() : null } : t) },
       false
     );
     try {
       await fetch(`/api/command-center/checklist/${dealId}`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ taskKey, completed: newCompleted }),
+        body: JSON.stringify({ taskId, completed: newCompleted }),
       });
       mutate();
     } catch { mutate(); }
@@ -1127,13 +1127,13 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
             {!isCollapsed && (
               <div style={{ padding: '8px 0' }}>
                 {p.tasks.map((task, ti) => (
-                  <div key={task.key} style={{
+                  <div key={task.id} style={{
                     display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px',
                     borderBottom: ti < p.tasks.length - 1 ? `1px solid ${C.border}` : 'none',
-                    opacity: toggling === task.key ? 0.6 : 1, transition: 'opacity 0.15s',
+                    opacity: toggling === task.id ? 0.6 : 1, transition: 'opacity 0.15s',
                   }}>
                     {/* Checkbox */}
-                    <button onClick={() => handleToggle(task.key, task.completed)} style={{
+                    <button onClick={() => handleToggle(task.id, task.completed)} style={{
                       width: 22, height: 22, borderRadius: 5, flexShrink: 0, cursor: 'pointer',
                       border: `2px solid ${task.completed ? cfg.color : 'rgba(250,247,242,0.2)'}`,
                       background: task.completed ? cfg.color : 'transparent',
