@@ -1,4 +1,5 @@
 import { NextAuthOptions } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions: NextAuthOptions = {
@@ -51,3 +52,12 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
 };
+
+/**
+ * Get the currently authenticated user from the server session
+ * Returns null if no user is authenticated
+ */
+export async function getCurrentUser() {
+  const session = await getServerSession(authOptions);
+  return session?.user ?? null;
+}
