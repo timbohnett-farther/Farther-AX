@@ -14,15 +14,22 @@
   - Updated `ChecklistTask` interface to use `Phase` type (type safety)
   - Fixed filtering logic to use `PHASE_ORDER.map()` for correct grouping
   - Added color-coded visual progression: Purple → Blue → Cyan → Teal → Amber → Red → Green → Violet
+  - **Fixed TypeScript error:** Replaced `task.optional` with `!task.is_hard_gate` for optional badge
 - ✅ Verified TypeScript compilation (no errors)
-- ✅ Committed fix to `main` branch
+- ✅ Railway build now passes ✅
+- ✅ Committed 3 fixes to `main` branch and pushed
 - ✅ Created `CHANGELOG.md` with complete project history
 - ✅ Created `RESUME.md` (this file)
 
 **Files Modified:**
-- `app/command-center/advisor/[id]/page.tsx` — Fixed OnboardingTasksTab component
+- `app/command-center/advisor/[id]/page.tsx` — Fixed OnboardingTasksTab component (3 commits)
 - `CHANGELOG.md` — Created with all project history
 - `RESUME.md` — Created session resume
+
+**Commits Pushed:**
+1. `9b55f72` — Fix onboarding tasks display — update to 8-phase structure
+2. `be19768` — Add CHANGELOG.md and RESUME.md for session continuity
+3. `69ac472` — Fix TypeScript error — replace task.optional with !task.is_hard_gate
 
 **Task Breakdown (Now Working):**
 - Phase 0: Sales Handoff — 5 tasks
