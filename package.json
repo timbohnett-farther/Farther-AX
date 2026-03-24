@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@react-pdf/renderer": "^4.3.2",
     "@tremor/react": "^3.18.7",
     "google-auth-library": "^10.6.2",
     "next": "14.2.35",
