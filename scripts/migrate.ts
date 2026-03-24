@@ -18,6 +18,8 @@ async function migrate() {
         completed_by VARCHAR(255),
         completed_at TIMESTAMPTZ,
         notes       TEXT,
+        due_date    DATE,
+        is_legacy   BOOLEAN DEFAULT FALSE,
         updated_at  TIMESTAMPTZ DEFAULT NOW(),
         CONSTRAINT onboarding_tasks_deal_task_unique UNIQUE(deal_id, task_key)
       );
@@ -68,6 +70,50 @@ async function migrate() {
 
       CREATE INDEX IF NOT EXISTS idx_advisor_drive_links_deal_id
         ON advisor_drive_links(deal_id);
+
+      -- HubSpot API cache table (persistent across redeploys)
+      CREATE TABLE IF NOT EXISTS api_cache (
+        cache_key   VARCHAR(255) PRIMARY KEY,
+        data        JSONB NOT NULL,
+        expires_at  TIMESTAMPTZ NOT NULL,
+        created_at  TIMESTAMPTZ DEFAULT NOW(),
+        updated_at  TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_api_cache_expires_at
+        ON api_cache(expires_at);
+
+      -- Advisor sentiment scores (computed data cache)
+      CREATE TABLE IF NOT EXISTS advisor_sentiment (
+        deal_id         VARCHAR(64) PRIMARY KEY,
+        deal_name       VARCHAR(255),
+        composite_score DECIMAL(5,2) NOT NULL,
+        tier            VARCHAR(32) NOT NULL,
+        activity_score  DECIMAL(5,2),
+        tone_score      DECIMAL(5,2),
+        milestone_score DECIMAL(5,2),
+        recency_score   DECIMAL(5,2),
+        computed_at     TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_advisor_sentiment_tier
+        ON advisor_sentiment(tier);
+      CREATE INDEX IF NOT EXISTS idx_advisor_sentiment_computed_at
+        ON advisor_sentiment(computed_at);
+
+      -- Sentiment history (for tracking changes over time)
+      CREATE TABLE IF NOT EXISTS advisor_sentiment_history (
+        id              SERIAL PRIMARY KEY,
+        deal_id         VARCHAR(64) NOT NULL,
+        composite_score DECIMAL(5,2) NOT NULL,
+        tier            VARCHAR(32) NOT NULL,
+        scored_at       TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_advisor_sentiment_history_deal_id
+        ON advisor_sentiment_history(deal_id);
+      CREATE INDEX IF NOT EXISTS idx_advisor_sentiment_history_scored_at
+        ON advisor_sentiment_history(scored_at);
     `);
     console.log('Migration complete.');
   } finally {

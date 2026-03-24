@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { withCache } from '@/lib/api-cache';
+import { withPgCache } from '@/lib/pg-cache';
 
 // Support both env var names so Railway config doesn't need to change
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
@@ -150,12 +150,18 @@ async function fetchPipelineData() {
   return { deals: enriched, total: enriched.length };
 }
 
-// ── GET handler (cached — refreshes 3x/day, stale fallback on HubSpot errors) ─
+// ── GET handler (PostgreSQL-cached — 2hr TTL, stale fallback on HubSpot errors) ─
 export async function GET() {
   try {
-    const { data, cached } = await withCache('pipeline', fetchPipelineData);
+    const { data, cached, stale } = await withPgCache(
+      'pipeline',
+      fetchPipelineData,
+      { ttlMs: 2 * 60 * 60 * 1000 } // 2 hours
+    );
     const res = NextResponse.json(data);
-    if (cached) res.headers.set('X-Cache', 'HIT');
+    if (cached) {
+      res.headers.set('X-Cache', stale ? 'STALE' : 'HIT');
+    }
     return res;
   } catch (err) {
     console.error('[pipeline]', err);
