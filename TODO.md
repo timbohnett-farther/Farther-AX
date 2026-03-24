@@ -16,6 +16,37 @@
 
 ---
 
+### **Fix #2: Google Sheets Error in Transitions**
+- **Status:** 🔴 Not Started
+- **Reported:** 2026-03-24 (Evening)
+- **Error:** `Bad control character in string literal in JSON at position 101 (line 1 column 102)`
+- **Description:** Error when trying to load all Google Sheets in Transitions page
+- **Priority:** High
+- **Affected Routes:**
+  - `app/api/command-center/transitions/sync/route.ts` (likely)
+  - `app/command-center/transitions/page.tsx`
+- **Next Steps:**
+  - [ ] Check Google Sheets API response
+  - [ ] Look for unescaped control characters in JSON
+  - [ ] Add JSON parsing error handling
+  - [ ] Sanitize response data
+
+---
+
+### **Fix #3: Metrics Cards Don't Show Detail on Click**
+- **Status:** 🔴 Not Started
+- **Reported:** 2026-03-24 (Evening)
+- **Description:** Cards in Metrics page don't show any detail when clicking on them
+- **Priority:** Medium
+- **Affected Page:** `app/command-center/metrics/page.tsx`
+- **Next Steps:**
+  - [ ] Check click handlers on metric cards
+  - [ ] Verify detail panel/modal implementation
+  - [ ] Check if detail data is being fetched
+  - [ ] Test card interaction
+
+---
+
 ### **Fix #2: Onboarding Tasks Not Loading**
 - **Status:** ✅ **FIXED** (2026-03-24)
 - **Solution:** Auto-run migrations on Railway deploy + added error handling
