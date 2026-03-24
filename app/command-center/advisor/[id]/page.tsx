@@ -1016,6 +1016,11 @@ const PHASE_CONFIG: Record<Phase, { label: string; color: string; bg: string; bo
 interface ChecklistTask {
   id: string; label: string; phase: Phase; owner: string; timing: string; is_hard_gate: boolean; resources: string | null;
   completed: boolean; completed_by: string | null; completed_at: string | null; notes: string | null;
+  due_date: string | null;
+  responsible_person: { name: string; email: string; role: string } | null;
+  countdown_display: string;
+  days_remaining: number | null;
+  status: 'upcoming' | 'due_soon' | 'overdue' | 'critical' | 'completed' | 'no_due_date';
 }
 
 function OnboardingTasksTab({ dealId }: { dealId: string }) {
@@ -1126,41 +1131,94 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
             {/* Task list */}
             {!isCollapsed && (
               <div style={{ padding: '8px 0' }}>
-                {p.tasks.map((task, ti) => (
-                  <div key={task.id} style={{
-                    display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px',
-                    borderBottom: ti < p.tasks.length - 1 ? `1px solid ${C.border}` : 'none',
-                    opacity: toggling === task.id ? 0.6 : 1, transition: 'opacity 0.15s',
-                  }}>
-                    {/* Checkbox */}
-                    <button onClick={() => handleToggle(task.id, task.completed)} style={{
-                      width: 22, height: 22, borderRadius: 5, flexShrink: 0, cursor: 'pointer',
-                      border: `2px solid ${task.completed ? cfg.color : 'rgba(250,247,242,0.2)'}`,
-                      background: task.completed ? cfg.color : 'transparent',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      transition: 'all 0.15s ease',
+                {p.tasks.map((task, ti) => {
+                  // Determine status color and styling
+                  const statusColors = {
+                    upcoming: { color: C.slate, bg: 'rgba(91,106,113,0.08)', border: 'rgba(91,106,113,0.15)' },
+                    due_soon: { color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.3)' },
+                    overdue: { color: '#ef4444', bg: 'rgba(239,68,68,0.15)', border: 'rgba(239,68,68,0.3)' },
+                    critical: { color: '#dc2626', bg: 'rgba(220,38,38,0.2)', border: 'rgba(220,38,38,0.4)' },
+                    completed: { color: '#10b981', bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.3)' },
+                    no_due_date: { color: C.slate, bg: 'rgba(91,106,113,0.08)', border: 'rgba(91,106,113,0.15)' },
+                  };
+                  const statusStyle = statusColors[task.status] || statusColors.no_due_date;
+
+                  return (
+                    <div key={task.id} style={{
+                      display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px',
+                      borderBottom: ti < p.tasks.length - 1 ? `1px solid ${C.border}` : 'none',
+                      opacity: toggling === task.id ? 0.6 : 1, transition: 'opacity 0.15s',
                     }}>
-                      {task.completed && <span style={{ fontSize: 13, color: '#fff', lineHeight: 1 }}>✓</span>}
-                    </button>
-                    {/* Label */}
-                    <span style={{
-                      fontSize: 13, color: task.completed ? C.slate : C.dark, flex: 1,
-                      textDecoration: task.completed ? 'line-through' : 'none',
-                      textDecorationColor: 'rgba(250,247,242,0.3)',
-                    }}>{task.label}</span>
-                    {/* Optional badge (for non-hard-gate tasks) */}
-                    {!task.is_hard_gate && (
-                      <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: 'rgba(91,106,113,0.08)', color: C.slate, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Optional</span>
-                    )}
-                    {/* Completed info */}
-                    {task.completed && task.completed_at && (
-                      <span style={{ fontSize: 11, color: C.slate, whiteSpace: 'nowrap' }}>
-                        {new Date(task.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        {task.completed_by && task.completed_by !== 'you' && ` · ${task.completed_by.split('@')[0]}`}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                      {/* Checkbox */}
+                      <button onClick={() => handleToggle(task.id, task.completed)} style={{
+                        width: 22, height: 22, borderRadius: 5, flexShrink: 0, cursor: 'pointer',
+                        border: `2px solid ${task.completed ? cfg.color : 'rgba(250,247,242,0.2)'}`,
+                        background: task.completed ? cfg.color : 'transparent',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'all 0.15s ease',
+                      }}>
+                        {task.completed && <span style={{ fontSize: 13, color: '#fff', lineHeight: 1 }}>✓</span>}
+                      </button>
+
+                      {/* Label and details */}
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <span style={{
+                          fontSize: 13, color: task.completed ? C.slate : C.dark,
+                          textDecoration: task.completed ? 'line-through' : 'none',
+                          textDecorationColor: 'rgba(250,247,242,0.3)',
+                        }}>{task.label}</span>
+
+                        {/* Responsible person and countdown */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: C.slate }}>
+                          {task.responsible_person && (
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <span style={{ opacity: 0.6 }}>👤</span>
+                              <span>{task.responsible_person.name}</span>
+                            </span>
+                          )}
+                          {task.due_date && (
+                            <>
+                              {task.responsible_person && <span style={{ opacity: 0.3 }}>•</span>}
+                              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <span style={{ opacity: 0.6 }}>📅</span>
+                                <span>{new Date(task.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Status badges */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {/* Countdown/status badge */}
+                        {!task.completed && task.status !== 'no_due_date' && (
+                          <span style={{
+                            fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 4,
+                            background: statusStyle.bg, color: statusStyle.color,
+                            border: `1px solid ${statusStyle.border}`,
+                            textTransform: 'uppercase', letterSpacing: '0.04em',
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {task.countdown_display}
+                          </span>
+                        )}
+
+                        {/* Optional badge (for non-hard-gate tasks) */}
+                        {!task.is_hard_gate && (
+                          <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: 'rgba(91,106,113,0.08)', color: C.slate, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Optional</span>
+                        )}
+
+                        {/* Completed info */}
+                        {task.completed && task.completed_at && (
+                          <span style={{ fontSize: 11, color: C.slate, whiteSpace: 'nowrap' }}>
+                            {new Date(task.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            {task.completed_by && task.completed_by !== 'you' && task.completed_by !== 'system-auto' && ` · ${task.completed_by.split('@')[0]}`}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

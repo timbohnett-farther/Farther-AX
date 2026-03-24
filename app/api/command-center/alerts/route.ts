@@ -1,8 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import pool from '@/lib/db';
-import { ONBOARDING_TASKS, PHASE_META, calculateDueDate } from '@/lib/onboarding-tasks';
+import { TASKS } from '@/lib/onboarding-tasks-v2';
+import { calculateDueDate, getDay0Date, getLaunchDate } from '@/lib/due-date-calculator';
+import { calculateTaskStatus, getTaskResponsiblePerson, formatTaskAlert, type TaskAlert as TaskAlertType, type ResponsiblePerson } from '@/lib/task-status';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
@@ -144,17 +146,19 @@ const TIER_RANK: Record<string, number> = {
 // ── Alert types ─────────────────────────────────────────────────────────────
 
 interface TaskAlert {
-  type: 'task_overdue';
+  type: 'task_overdue' | 'task_critical';
   deal_id: string;
   deal_name: string;
-  task_key: string;
+  task_id: string;
   task_label: string;
   phase: string;
-  phase_label: string;
   owner: string;
   due_date: string;
   days_overdue: number;
   is_hard_gate: boolean;
+  responsible_person: ResponsiblePerson | null;
+  countdown_display: string;
+  priority: 'normal' | 'high' | 'critical';
 }
 
 interface SentimentAlert {
@@ -185,20 +189,28 @@ interface AumAlert {
 
 type Alert = TaskAlert | SentimentAlert | AumAlert;
 
-export async function GET() {
+/**
+ * GET /api/command-center/alerts
+ *
+ * Query Parameters:
+ * - role: Filter alerts by team member role (e.g., "AXM", "Director")
+ * - email: Filter alerts by team member email
+ * - severity: Filter by severity ("overdue", "critical")
+ */
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  const url = new URL(req.url);
+  const roleFilter = url.searchParams.get('role');
+  const emailFilter = url.searchParams.get('email');
+  const severityFilter = url.searchParams.get('severity');
+
   const alerts: Alert[] = [];
-  const today = new Date().toISOString().slice(0, 10);
 
   // Run all data fetches in parallel
-  const [deals, completedResult, sentimentResult, managedAccounts] = await Promise.all([
+  const [deals, sentimentResult, managedAccounts] = await Promise.all([
     fetchOnboardingDeals(),
-    pool.query(
-      `SELECT deal_id, task_key FROM onboarding_tasks
-       WHERE (is_legacy IS NULL OR is_legacy = FALSE) AND completed = TRUE`
-    ),
     pool.query(
       `SELECT DISTINCT ON (h.deal_id)
          h.deal_id,
@@ -223,42 +235,110 @@ export async function GET() {
     fetchManagedAccountsByAdvisor(),
   ]);
 
-  // ── 1. Task overdue alerts ────────────────────────────────────────────────
-
-  const completedSet = new Set<string>();
-  for (const row of completedResult.rows) {
-    completedSet.add(`${row.deal_id}:${row.task_key}`);
-  }
+  // ── 1. Task overdue alerts (using v2 system) ──────────────────────────────
 
   for (const deal of deals) {
     const name = deal.properties.dealname ?? 'Unknown';
     if (name.toLowerCase().includes('test')) continue;
 
-    const day0_date = deal.properties.closedate || null;
-    const launch_date = deal.properties.actual_launch_date || deal.properties.desired_start_date || null;
+    const day0_date = getDay0Date({
+      closedate: deal.properties.closedate,
+      dealstage: deal.properties.dealstage,
+    });
 
-    for (const task of ONBOARDING_TASKS) {
-      const dueDate = calculateDueDate(task, { day0_date, launch_date });
-      if (!dueDate) continue;
-      if (dueDate >= today) continue;
-      if (completedSet.has(`${deal.id}:${task.key}`)) continue;
+    const launch_date = getLaunchDate({
+      actual_launch_date: deal.properties.actual_launch_date,
+      desired_start_date: deal.properties.desired_start_date,
+    });
 
-      const daysOverdue = Math.floor(
-        (new Date(today).getTime() - new Date(dueDate).getTime()) / (1000 * 60 * 60 * 24)
+    // Fetch team assignments
+    const assignmentsResult = await pool.query(
+      `SELECT aa.role, tm.name, tm.email
+       FROM advisor_assignments aa
+       JOIN team_members tm ON aa.member_id = tm.id
+       WHERE aa.deal_id = $1 AND tm.active = TRUE`,
+      [deal.id]
+    );
+
+    const assignments: Record<string, ResponsiblePerson> = {};
+    for (const row of assignmentsResult.rows) {
+      assignments[row.role] = {
+        name: row.name,
+        email: row.email,
+        role: row.role,
+      };
+    }
+
+    // Fetch saved task states
+    const tasksResult = await pool.query(
+      `SELECT task_key, completed, completed_at, due_date
+       FROM onboarding_tasks
+       WHERE deal_id = $1 AND (is_legacy IS NULL OR is_legacy = FALSE)`,
+      [deal.id]
+    );
+
+    const saved: Record<string, any> = {};
+    for (const row of tasksResult.rows) {
+      saved[row.task_key] = row;
+    }
+
+    // Check each task for alerts
+    for (const task of TASKS) {
+      const dueDateResult = calculateDueDate({
+        timing: task.timing,
+        day0_date,
+        launch_date,
+      });
+
+      const finalDueDate = saved[task.id]?.due_date || dueDateResult.due_date;
+      const taskStatus = calculateTaskStatus(
+        finalDueDate,
+        saved[task.id]?.completed ?? false,
+        saved[task.id]?.completed_at ?? null
       );
 
+      // Only include tasks that need alerts
+      if (!taskStatus.needsAlert && !taskStatus.needsDirectorAlert) {
+        continue;
+      }
+
+      const responsiblePerson = getTaskResponsiblePerson(task.owner, assignments);
+
+      // Apply filters
+      if (roleFilter && responsiblePerson?.role !== roleFilter) {
+        continue;
+      }
+
+      if (emailFilter && responsiblePerson?.email !== emailFilter) {
+        continue;
+      }
+
+      if (severityFilter === 'critical' && taskStatus.status !== 'critical') {
+        continue;
+      }
+
+      if (severityFilter === 'overdue' && taskStatus.status !== 'overdue' && taskStatus.status !== 'critical') {
+        continue;
+      }
+
+      if (!responsiblePerson || !finalDueDate) {
+        continue;
+      }
+
       alerts.push({
-        type: 'task_overdue',
+        type: taskStatus.status === 'critical' ? 'task_critical' : 'task_overdue',
         deal_id: deal.id,
         deal_name: name,
-        task_key: task.key,
+        task_id: task.id,
         task_label: task.label,
         phase: task.phase,
-        phase_label: PHASE_META[task.phase].label,
         owner: task.owner,
-        due_date: dueDate,
-        days_overdue: daysOverdue,
+        due_date: finalDueDate,
+        days_overdue: Math.abs(taskStatus.daysRemaining || 0),
         is_hard_gate: task.is_hard_gate,
+        responsible_person: responsiblePerson,
+        countdown_display: taskStatus.displayText,
+        priority: taskStatus.status === 'critical' ? 'critical' : 'high',
       });
     }
   }
@@ -327,14 +407,24 @@ export async function GET() {
 
   // ── Summary counts ────────────────────────────────────────────────────────
 
-  const taskAlerts = alerts.filter((a): a is TaskAlert => a.type === 'task_overdue');
+  const taskAlerts = alerts.filter((a): a is TaskAlert => a.type === 'task_overdue' || a.type === 'task_critical');
   const sentimentAlerts = alerts.filter((a): a is SentimentAlert => a.type === 'sentiment_drop');
   const aumAlerts = alerts.filter((a): a is AumAlert => a.type === 'aum_behind');
+
+  // Sort by priority
+  alerts.sort((a, b) => {
+    if (a.type === 'task_critical' && b.type !== 'task_critical') return -1;
+    if (a.type !== 'task_critical' && b.type === 'task_critical') return 1;
+    if (a.type === 'task_overdue' && b.type !== 'task_overdue' && b.type !== 'task_critical') return -1;
+    if (a.type !== 'task_overdue' && a.type !== 'task_critical' && b.type === 'task_overdue') return 1;
+    return 0;
+  });
 
   return NextResponse.json({
     total: alerts.length,
     counts: {
-      task_overdue: taskAlerts.length,
+      task_overdue: taskAlerts.filter(a => a.type === 'task_overdue').length,
+      task_critical: taskAlerts.filter(a => a.type === 'task_critical').length,
       hard_gates: taskAlerts.filter(a => a.is_hard_gate).length,
       sentiment_drop: sentimentAlerts.length,
       aum_behind: aumAlerts.length,
