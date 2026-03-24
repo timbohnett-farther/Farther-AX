@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { PHASE_META, PHASE_ORDER, type Phase } from '@/lib/onboarding-tasks';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -998,17 +999,22 @@ function TeamContactsTab({ dealId, allContacts }: { dealId: string; allContacts:
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// ONBOARDING TASKS TAB (43-task checklist)
+// ONBOARDING TASKS TAB (93-task checklist across 8 phases)
 // ══════════════════════════════════════════════════════════════════════════════
 
-const PHASE_CONFIG: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  pre_launch:  { label: 'Pre-Launch', color: '#3b82f6', bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.2)' },
-  launch_day:  { label: 'Launch Day', color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)' },
-  post_launch: { label: 'Post-Launch', color: '#10b981', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)' },
+const PHASE_CONFIG: Record<Phase, { label: string; color: string; bg: string; border: string }> = {
+  phase_0: { label: PHASE_META.phase_0.label, color: '#7c3aed', bg: 'rgba(124,58,237,0.08)', border: 'rgba(124,58,237,0.2)' }, // Purple - Sales Handoff
+  phase_1: { label: PHASE_META.phase_1.label, color: '#3b82f6', bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.2)' }, // Blue - Post-Signing Prep
+  phase_2: { label: PHASE_META.phase_2.label, color: '#0ea5e9', bg: 'rgba(14,165,233,0.08)', border: 'rgba(14,165,233,0.2)' }, // Cyan - Onboarding Kick-Off
+  phase_3: { label: PHASE_META.phase_3.label, color: '#06b6d4', bg: 'rgba(6,182,212,0.08)', border: 'rgba(6,182,212,0.2)' }, // Teal - Pre-Launch Build
+  phase_4: { label: PHASE_META.phase_4.label, color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)' }, // Amber - T-7 Final Countdown
+  phase_5: { label: PHASE_META.phase_5.label, color: '#ef4444', bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.2)' }, // Red - Launch Day
+  phase_6: { label: PHASE_META.phase_6.label, color: '#10b981', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)' }, // Green - Active Transition
+  phase_7: { label: PHASE_META.phase_7.label, color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)', border: 'rgba(139,92,246,0.2)' }, // Violet - Graduation
 };
 
 interface ChecklistTask {
-  key: string; label: string; phase: string; optional?: boolean;
+  key: string; label: string; phase: Phase; owner: string; timing: string; is_hard_gate: boolean; due_date: string | null;
   completed: boolean; completed_by: string | null; completed_at: string | null; notes: string | null;
 }
 
@@ -1054,11 +1060,11 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
   const totalTasks = tasks.length;
   const pctComplete = totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0;
 
-  const phases: { key: string; tasks: ChecklistTask[] }[] = [
-    { key: 'pre_launch', tasks: tasks.filter(t => t.phase === 'pre_launch') },
-    { key: 'launch_day', tasks: tasks.filter(t => t.phase === 'launch_day') },
-    { key: 'post_launch', tasks: tasks.filter(t => t.phase === 'post_launch') },
-  ];
+  // Group tasks by phase using the correct phase keys from lib/onboarding-tasks
+  const phases: { key: Phase; tasks: ChecklistTask[] }[] = PHASE_ORDER.map(phaseKey => ({
+    key: phaseKey,
+    tasks: tasks.filter(t => t.phase === phaseKey),
+  }));
 
   return (
     <>
