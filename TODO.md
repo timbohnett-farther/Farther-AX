@@ -3,22 +3,12 @@
 ## 🐛 **Current Fixes Needed**
 
 ### **Fix #0: Tasks Section - Client-Side Exception**
-- **Status:** 🔴 Not Started
-- **Reported:** 2026-03-24 (Evening)
-- **Error:** `Application error: a client-side exception has occurred`
-- **Description:** Clicking on Tasks section in advisor detail page throws client-side error
-- **Priority:** 🚨 **CRITICAL** (blocking tasks functionality)
-- **Affected Page:** `app/command-center/advisor/[id]/page.tsx`
-- **Likely Causes:**
-  - [ ] ChecklistTask interface mismatch with API response
-  - [ ] Missing properties in task data (owner, timing, is_hard_gate, due_date)
-  - [ ] Phase type mismatch
-  - [ ] Frontend expecting different data shape than API returns
-- **Next Steps:**
-  - [ ] Check browser console for actual error message
-  - [ ] Verify API response matches ChecklistTask interface
-  - [ ] Check if API is returning all required fields
-  - [ ] Test with sample task data
+- **Status:** ✅ **FIXED** (2026-03-24)
+- **Solution:** API was spreading extra properties not in ChecklistTask interface
+- **Root Cause:** API returned `due_offset_days`, `due_anchor`, `resource_link` from ONBOARDING_TASKS spread operator
+- **Fix:** Explicitly return only required properties (key, label, phase, owner, timing, is_hard_gate, due_date, completed, completed_by, completed_at, notes)
+- **Commit:** `9d9cba0`
+- **File Changed:** `app/api/command-center/checklist/[dealId]/route.ts`
 
 ---
 
@@ -119,6 +109,7 @@ When you report a fix:
 
 | Fix | Date | Commits | Summary |
 |-----|------|---------|---------|
+| Tasks section client-side exception | 2026-03-24 | `9d9cba0` | API returning extra properties not in ChecklistTask interface |
 | Onboarding tasks loading error | 2026-03-24 | `1aedf9b`, `6ca3532`, `6f5dc99` | Missing DB columns + auto-migrations |
 | Tasks display (8-phase structure) | 2026-03-24 | `9b55f72`, `69ac472` | Phase mismatch fix |
 | PostgreSQL cache implementation | 2026-03-24 | `1aedf9b` | Persistent cache across redeploys |
