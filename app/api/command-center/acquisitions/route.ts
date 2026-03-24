@@ -121,10 +121,16 @@ async function fetchAcquisitionsData() {
     fetchOwners(),
   ]);
 
-  const closedKeywords = ['closed', 'passed', 'lost', 'dead'];
+  // Terminal stages = failed/lost deals (NOT "Closed Won" which is success)
+  const terminalKeywords = ['passed', 'lost', 'dead', 'closed lost'];
   const terminalStageIds = new Set(
     Object.values(stages)
-      .filter(s => closedKeywords.some(kw => s.label.toLowerCase().includes(kw)))
+      .filter(s => {
+        const label = s.label.toLowerCase();
+        // Exclude "Closed Won" - it's a success state, not terminal
+        if (label.includes('closed won') || label.includes('closedwon')) return false;
+        return terminalKeywords.some(kw => label.includes(kw));
+      })
       .map(s => s.id),
   );
 

@@ -161,13 +161,18 @@ function SummaryCard({ label, value, sub, accent, icon, iconColor, onClick }: { 
 function StageBadge({ stageId, label, isTerminal }: { stageId: string; label: string; isTerminal?: boolean }) {
   const isLaunched = stageId === '100411705';
   const isOfferAccepted = stageId === '2496936';
+  const isClosedWon = label?.toLowerCase().includes('closed won') || label?.toLowerCase().includes('closedwon');
   const description = STAGE_DESCRIPTIONS[stageId];
 
   let bg = 'rgba(91,106,113,0.18)';
   let color = C.dark;
   let borderColor = 'rgba(91,106,113,0.25)';
 
-  if (isTerminal) {
+  if (isClosedWon) {
+    // Closed Won = SUCCESS = GREEN
+    bg = 'rgba(16,185,129,0.2)'; color = '#10b981'; borderColor = 'rgba(16,185,129,0.4)';
+  } else if (isTerminal) {
+    // Terminal = FAILED = RED
     bg = 'rgba(239,68,68,0.2)'; color = '#f87171'; borderColor = 'rgba(239,68,68,0.4)';
   } else if (isLaunched) {
     bg = 'rgba(29,118,130,0.2)'; color = '#5ec4cf'; borderColor = 'rgba(29,118,130,0.35)';
