@@ -1,5 +1,4 @@
 import { GoogleAuth } from 'google-auth-library';
-import crypto from 'crypto';
 
 const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets.readonly',
@@ -22,10 +21,10 @@ function buildPrivateKey(): string {
   const base64 = rawKey
     .replace(/-----BEGIN PRIVATE KEY-----/g, '')
     .replace(/-----END PRIVATE KEY-----/g, '')
-    .replace(/\\n/g, '')   // literal two-char \n from env
-    .replace(/\n/g, '')    // real newlines
-    .replace(/\r/g, '')    // carriage returns
-    .replace(/\s/g, '')    // any remaining whitespace
+    .split('\\n').join('')   // literal two-char \n from env (use split/join to avoid regex escaping issues)
+    .split('\n').join('')    // real newlines
+    .split('\r').join('')    // carriage returns
+    .replace(/\s/g, '')     // any remaining whitespace
     .trim();
 
   if (!base64) {
@@ -34,20 +33,11 @@ function buildPrivateKey(): string {
 
   // Rebuild PEM with proper 64-char line breaks
   const lines = base64.match(/.{1,64}/g) ?? [];
-  const pem =
+  return (
     '-----BEGIN PRIVATE KEY-----\n' +
     lines.join('\n') +
-    '\n-----END PRIVATE KEY-----\n';
-
-  // Validate the key parses with Node's crypto before passing to GoogleAuth
-  try {
-    crypto.createPrivateKey(pem);
-  } catch (err) {
-    console.error('[google-sheets] PEM validation failed. Base64 length:', base64.length);
-    throw new Error('Private key is invalid: ' + (err instanceof Error ? err.message : String(err)));
-  }
-
-  return pem;
+    '\n-----END PRIVATE KEY-----\n'
+  );
 }
 
 function getAuthClient(): GoogleAuth {
