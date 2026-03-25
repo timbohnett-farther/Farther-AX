@@ -242,13 +242,13 @@ export async function GET(req: NextRequest) {
     if (name.toLowerCase().includes('test')) continue;
 
     const day0_date = getDay0Date({
-      closedate: deal.properties.closedate,
-      dealstage: deal.properties.dealstage,
+      closedate: deal.properties.closedate ?? undefined,
+      dealstage: deal.properties.dealstage ?? undefined,
     });
 
     const launch_date = getLaunchDate({
-      actual_launch_date: deal.properties.actual_launch_date,
-      desired_start_date: deal.properties.desired_start_date,
+      actual_launch_date: deal.properties.actual_launch_date ?? undefined,
+      desired_start_date: deal.properties.desired_start_date ?? undefined,
     });
 
     // Fetch team assignments
