@@ -15,31 +15,8 @@ import { ChangeLogPanel } from '@/components/transitions/ChangeLogPanel';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
-// ── Design tokens (theme-aware) ──────────────────────────────────────────────
-const getThemeColors = (isDark: boolean) => ({
-  dark: isDark ? '#FFFEF4' : '#1a1a1a',
-  white: isDark ? '#1a1a1a' : '#FFFEF4',
-  slate: isDark ? 'rgba(212,223,229,0.5)' : 'rgba(102,102,102,0.6)',
-  teal: '#4E7082',
-  bg: isDark ? '#111111' : '#F8F4F0',
-  cardBg: isDark ? '#171f27' : '#FFFFFF',
-  border: isDark ? 'rgba(212,223,229,0.08)' : 'rgba(224,224,224,0.4)',
-  borderSubtle: isDark ? 'rgba(212,223,229,0.05)' : 'rgba(224,224,224,0.25)',
-  cream: isDark ? '#FFFEF4' : '#405C6A',
-  textSecondary: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(26,26,26,0.7)',
-  green: '#4ade80',
-  greenBg: isDark ? 'rgba(74,222,128,0.2)' : 'rgba(74,222,128,0.12)',
-  greenBorder: isDark ? 'rgba(74,222,128,0.35)' : 'rgba(74,222,128,0.25)',
-  amber: '#fbbf24',
-  amberBg: isDark ? 'rgba(251,191,36,0.2)' : 'rgba(251,191,36,0.12)',
-  amberBorder: isDark ? 'rgba(251,191,36,0.35)' : 'rgba(251,191,36,0.25)',
-  red: '#f87171',
-  redBg: isDark ? 'rgba(248,113,113,0.2)' : 'rgba(248,113,113,0.12)',
-  redBorder: isDark ? 'rgba(248,113,113,0.35)' : 'rgba(248,113,113,0.25)',
-  purple: '#a78bfa',
-  purpleBg: isDark ? 'rgba(167,139,250,0.15)' : 'rgba(167,139,250,0.1)',
-  purpleBorder: isDark ? 'rgba(167,139,250,0.35)' : 'rgba(167,139,250,0.25)',
-});
+// Using centralized theme colors
+import { getThemeColors } from '@/lib/theme-colors';
 
 type TabKey = 'accounts' | 'docusign' | 'summary' | 'changelog';
 
