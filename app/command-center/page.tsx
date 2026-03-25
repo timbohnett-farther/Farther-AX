@@ -21,10 +21,10 @@ const SWR_OPTS = {
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 const C = {
-  dark: '#FAF7F2', white: '#1a1a1a', slate: 'rgba(250,247,242,0.5)',
-  lightBlue: '#b6d0ed',
-  teal: '#2bb8c4', bg: '#111111',
-  cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
+  dark: '#FFFEF4', white: '#1a1a1a', slate: 'rgba(212,223,229,0.5)',
+  lightBlue: '#A8CED3',
+  teal: '#4E7082', bg: '#111111',
+  cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
   green: '#10b981', greenBg: 'rgba(16,185,129,0.15)',
   amber: '#f59e0b', amberBg: 'rgba(245,158,11,0.15)', amberBorder: 'rgba(245,158,11,0.3)',
   red: '#ef4444', redBg: 'rgba(239,68,68,0.15)', redBorder: 'rgba(239,68,68,0.3)',
@@ -750,7 +750,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           label="Total Pipeline AUM"
           value={formatAUM(a.totalActiveAUM)}
           sub={`${a.activeDeals.length} active deals`}
-          accent icon="◈" iconColor="#28a1af"
+          accent icon="◈" iconColor="#A8CED3"
           onClick={() => setDrillDown({ title: 'Total Pipeline AUM', deals: a.activeDeals })}
         />
         <SummaryCard
@@ -795,10 +795,10 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                 padding: '20px 24px', position: 'relative', cursor: sentimentDeals.length > 0 ? 'pointer' : 'default',
                 transition: 'border-color 150ms ease',
               }}
-              onMouseEnter={e => { if (sentimentDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = '#2bb8c4'; }}
+              onMouseEnter={e => { if (sentimentDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = '#4E7082'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
             >
-              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: '#2bb8c4' }}>✦</span>
+              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: '#4E7082' }}>✦</span>
               <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Sentiment Tracking</p>
               <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
                 {scores.length > 0 ? `${scores.length}` : '—'}
@@ -1933,7 +1933,7 @@ function AcquisitionsTab() {
     <>
       {/* Summary Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
-        <SummaryCard label="Total M&A Pipeline" value={formatAUM(totalAUM)} sub={`${activeDeals.length} active deals`} accent icon="◈" iconColor="#28a1af" />
+        <SummaryCard label="Total M&A Pipeline" value={formatAUM(totalAUM)} sub={`${activeDeals.length} active deals`} accent icon="◈" iconColor="#A8CED3" />
         <SummaryCard label="Total Deals" value={String(deals.length)} sub={`${activeDeals.length} active · ${terminalDeals.length} closed`} icon="▸" iconColor="#3b82f6" />
         <SummaryCard label="Active Stages" value={String(stages.filter(s => !s.isTerminal && s.count > 0).length)} sub="in progress" icon="▲" iconColor="#8b5cf6" />
         <SummaryCard

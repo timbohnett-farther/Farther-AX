@@ -1,12 +1,12 @@
 'use client';
 
 const C = {
-  dark: '#FAF7F2', slate: 'rgba(250,247,242,0.5)',
+  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
   green: '#4ade80', greenBg: 'rgba(74,222,128,0.2)', greenBorder: 'rgba(74,222,128,0.35)',
   amber: '#fbbf24', amberBg: 'rgba(251,191,36,0.2)', amberBorder: 'rgba(251,191,36,0.35)',
   red: '#f87171', redBg: 'rgba(248,113,113,0.2)', redBorder: 'rgba(248,113,113,0.35)',
   blue: '#60a5fa', blueBg: 'rgba(96,165,250,0.2)', blueBorder: 'rgba(96,165,250,0.35)',
-  teal: '#2bb8c4', tealBg: 'rgba(43,184,196,0.2)', tealBorder: 'rgba(43,184,196,0.35)',
+  teal: '#4E7082', tealBg: 'rgba(78,112,130,0.2)', tealBorder: 'rgba(78,112,130,0.35)',
 };
 
 export function statusStyle(status: string | null): React.CSSProperties {

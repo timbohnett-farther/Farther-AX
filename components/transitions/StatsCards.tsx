@@ -5,9 +5,9 @@ import useSWR from 'swr';
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 const C = {
-  dark: '#FAF7F2', slate: 'rgba(250,247,242,0.5)',
-  teal: '#2bb8c4', green: '#4ade80', amber: '#fbbf24', red: '#f87171', blue: '#60a5fa',
-  cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
+  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
+  teal: '#4E7082', green: '#4ade80', amber: '#fbbf24', red: '#f87171', blue: '#60a5fa',
+  cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
 };
 
 interface StatsCardsProps {

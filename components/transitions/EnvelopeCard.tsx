@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { StatusPill } from './StatusPill';
 
 const C = {
-  dark: '#FAF7F2', slate: 'rgba(250,247,242,0.5)',
-  teal: '#2bb8c4', border: 'rgba(250,247,242,0.08)',
+  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
+  teal: '#4E7082', border: 'rgba(212,223,229,0.08)',
   green: '#4ade80', amber: '#fbbf24',
 };
 

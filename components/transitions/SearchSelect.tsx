@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 
 const C = {
-  dark: '#FAF7F2', slate: 'rgba(250,247,242,0.5)',
-  teal: '#2bb8c4', cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
+  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
+  teal: '#4E7082', cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
   white: '#1a1a1a',
 };
 
@@ -92,13 +92,13 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
               onClick={() => { onChange(''); setOpen(false); }}
               style={{
                 width: '100%', padding: '8px 14px', border: 'none', textAlign: 'left',
-                background: !value ? 'rgba(43,184,196,0.08)' : 'transparent',
+                background: !value ? 'rgba(78,112,130,0.08)' : 'transparent',
                 color: !value ? C.teal : C.dark, fontSize: 13, cursor: 'pointer',
                 fontWeight: !value ? 600 : 400,
                 fontFamily: "'Fakt', system-ui, sans-serif",
               }}
-              onMouseEnter={e => { (e.target as HTMLButtonElement).style.background = 'rgba(43,184,196,0.06)'; }}
-              onMouseLeave={e => { (e.target as HTMLButtonElement).style.background = !value ? 'rgba(43,184,196,0.08)' : 'transparent'; }}
+              onMouseEnter={e => { (e.target as HTMLButtonElement).style.background = 'rgba(78,112,130,0.06)'; }}
+              onMouseLeave={e => { (e.target as HTMLButtonElement).style.background = !value ? 'rgba(78,112,130,0.08)' : 'transparent'; }}
             >
               {placeholder} ({options.length})
             </button>
@@ -108,13 +108,13 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
                 onClick={() => { onChange(opt.name); setOpen(false); }}
                 style={{
                   width: '100%', padding: '8px 14px', border: 'none', textAlign: 'left',
-                  background: value === opt.name ? 'rgba(43,184,196,0.08)' : 'transparent',
+                  background: value === opt.name ? 'rgba(78,112,130,0.08)' : 'transparent',
                   color: value === opt.name ? C.teal : C.dark, fontSize: 13, cursor: 'pointer',
                   fontWeight: value === opt.name ? 600 : 400,
                   fontFamily: "'Fakt', system-ui, sans-serif",
                 }}
-                onMouseEnter={e => { (e.target as HTMLButtonElement).style.background = 'rgba(43,184,196,0.06)'; }}
-                onMouseLeave={e => { (e.target as HTMLButtonElement).style.background = value === opt.name ? 'rgba(43,184,196,0.08)' : 'transparent'; }}
+                onMouseEnter={e => { (e.target as HTMLButtonElement).style.background = 'rgba(78,112,130,0.06)'; }}
+                onMouseLeave={e => { (e.target as HTMLButtonElement).style.background = value === opt.name ? 'rgba(78,112,130,0.08)' : 'transparent'; }}
               >
                 {opt.label}
               </button>

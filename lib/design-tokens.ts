@@ -10,11 +10,11 @@ export const colors = {
   // Core 5
   charcoal: '#333333',
   white: '#ffffff',
-  slate: '#8a9aa2',
-  ice: '#b6d0ed',
-  teal: '#2bb8c4',
-  tealDark: '#1d7682',
-  tealLight: '#5dd8e4',
+  slate: '#405B69',
+  ice: '#D4DFE5',
+  teal: '#4E7082',
+  tealDark: '#374E59',
+  tealLight: '#A8CED3',
 
   // Background gradient stops
   bg600: '#2a2a2a',
@@ -22,12 +22,12 @@ export const colors = {
   bg900: '#111111',
 
   // Surface
-  cardBg: '#2f2f2f',
+  cardBg: 'rgba(23, 31, 39, 0.80)',
   border: 'rgba(250, 247, 242, 0.08)',
   borderSubtle: 'rgba(250, 247, 242, 0.05)',
 
   // Text (cream-based)
-  textPrimary: '#FAF7F2',
+  textPrimary: '#FFFEF4',
   textSecondary: 'rgba(255, 255, 255, 0.7)',
   textMuted: 'rgba(255, 255, 255, 0.5)',
   textTertiary: 'rgba(255, 255, 255, 0.35)',
@@ -53,7 +53,7 @@ export const colors = {
   info: '#60a5fa',
 
   // Chart palette
-  chart: ['#2bb8c4', '#5dd8e4', '#b6d0ed', '#88cbd3', '#8a9aa2', '#a8b8c0', '#34d399', '#fbbf24'],
+  chart: ['#4E7082', '#A8CED3', '#99B6C3', '#D4DFE5', '#405B69', '#8A5C4F', '#34d399', '#fbbf24'],
 } as const;
 
 // Tailwind utility class helpers

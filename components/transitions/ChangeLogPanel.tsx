@@ -6,9 +6,9 @@ import useSWR from 'swr';
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 const C = {
-  dark: '#FAF7F2', slate: 'rgba(250,247,242,0.5)',
-  teal: '#2bb8c4', green: '#4ade80', amber: '#fbbf24', red: '#f87171', blue: '#60a5fa',
-  cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
+  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
+  teal: '#4E7082', green: '#4ade80', amber: '#fbbf24', red: '#f87171', blue: '#60a5fa',
+  cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
   greenBg: 'rgba(74,222,128,0.15)', amberBg: 'rgba(251,191,36,0.15)', redBg: 'rgba(248,113,113,0.15)',
   blueBg: 'rgba(96,165,250,0.15)',
 };

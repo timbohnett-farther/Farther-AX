@@ -7,8 +7,8 @@ import { SearchSelect } from './SearchSelect';
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 const C = {
-  dark: '#FAF7F2', slate: 'rgba(250,247,242,0.5)',
-  teal: '#2bb8c4', cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
+  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
+  teal: '#4E7082', cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
   white: '#1a1a1a',
 };
 

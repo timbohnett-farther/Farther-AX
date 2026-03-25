@@ -18,9 +18,9 @@ const SWR_OPTS = {
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 const C = {
-  dark: '#FAF7F2', white: '#1a1a1a', slate: 'rgba(250,247,242,0.5)',
-  teal: '#2bb8c4', bg: '#111111',
-  cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
+  dark: '#FFFEF4', white: '#1a1a1a', slate: 'rgba(212,223,229,0.5)',
+  teal: '#4E7082', bg: '#111111',
+  cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
   green: '#4ade80', greenBg: 'rgba(74,222,128,0.2)',
   amber: '#fbbf24', amberBg: 'rgba(251,191,36,0.2)', amberBorder: 'rgba(251,191,36,0.35)',
   red: '#f87171', redBg: 'rgba(248,113,113,0.2)', redBorder: 'rgba(248,113,113,0.35)',
@@ -30,7 +30,7 @@ const C = {
 // ── Sentiment tier config (mirrors lib/sentiment.ts) ─────────────────────────
 const TIER_CONFIG: Record<string, { color: string; bgColor: string; icon: string }> = {
   'Advocate':  { color: '#4ade80', bgColor: 'rgba(74,222,128,0.2)',   icon: '★' },
-  'Positive':  { color: '#5ec4cf', bgColor: 'rgba(29,118,130,0.2)',  icon: '▲' },
+  'Positive':  { color: '#5ec4cf', bgColor: 'rgba(78,112,130,0.2)',  icon: '▲' },
   'Neutral':   { color: '#fbbf24', bgColor: 'rgba(251,191,36,0.18)', icon: '●' },
   'At Risk':   { color: '#fb923c', bgColor: 'rgba(251,146,60,0.2)', icon: '◈' },
   'High Risk': { color: '#f87171', bgColor: 'rgba(248,113,113,0.2)',  icon: '▼' },
@@ -416,7 +416,7 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
           }}
             onMouseEnter={e => {
               e.currentTarget.style.borderColor = C.teal;
-              e.currentTarget.style.background = 'rgba(29,118,130,0.04)';
+              e.currentTarget.style.background = 'rgba(78,112,130,0.04)';
             }}
             onMouseLeave={e => {
               e.currentTarget.style.borderColor = pace.status === 'behind' ? 'rgba(192,57,43,0.2)' : C.border;
@@ -451,7 +451,7 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
                 <span style={{
                   display: 'inline-block', padding: '3px 8px', borderRadius: 4,
                   fontSize: 10, fontWeight: 600,
-                  background: 'rgba(29,118,130,0.08)', color: C.teal,
+                  background: 'rgba(78,112,130,0.08)', color: C.teal,
                   whiteSpace: 'nowrap',
                 }}>
                   {advisor.transition_type}
@@ -851,7 +851,7 @@ export default function AdvisorHubPage() {
                 <span style={{
                   marginLeft: 8, fontSize: 11, fontWeight: 600,
                   padding: '2px 8px', borderRadius: 10,
-                  background: isActive ? 'rgba(29,118,130,0.1)' : 'rgba(91,106,113,0.08)',
+                  background: isActive ? 'rgba(78,112,130,0.1)' : 'rgba(91,106,113,0.08)',
                   color: isActive ? C.teal : C.slate,
                 }}>
                   {count}
@@ -1052,7 +1052,7 @@ export default function AdvisorHubPage() {
               }}
                 onMouseEnter={e => {
                   e.currentTarget.style.borderColor = C.teal;
-                  e.currentTarget.style.background = 'rgba(29,118,130,0.04)';
+                  e.currentTarget.style.background = 'rgba(78,112,130,0.04)';
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.borderColor = C.border;
