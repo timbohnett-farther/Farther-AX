@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -41,8 +41,42 @@ interface AdvisorGroup {
 
 // ── GET handler ───────────────────────────────────────────────────────────────
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    // ── Parse filter params ────────────────────────────────────────────────
+    const { searchParams } = req.nextUrl;
+    const advisor = searchParams.get('advisor');
+    const iaaStatus = searchParams.get('iaa_status');
+    const pwStatus = searchParams.get('pw_status');
+    const portalStatus = searchParams.get('portal_status');
+    const household = searchParams.get('household');
+    const page = Math.max(1, parseInt(searchParams.get('page') ?? '1'));
+    const perPage = Math.min(200, Math.max(1, parseInt(searchParams.get('per_page') ?? '50')));
+
+    const filterParams: string[] = [];
+    const conditions: string[] = [];
+
+    if (advisor) { filterParams.push(advisor); conditions.push(`advisor_name = $${filterParams.length}`); }
+    if (iaaStatus) { filterParams.push(iaaStatus); conditions.push(`status_of_iaa = $${filterParams.length}`); }
+    if (pwStatus) { filterParams.push(pwStatus); conditions.push(`status_of_account_paperwork = $${filterParams.length}`); }
+    if (portalStatus) { filterParams.push(portalStatus); conditions.push(`portal_status = $${filterParams.length}`); }
+    if (household) { filterParams.push(`%${household}%`); conditions.push(`household_name ILIKE $${filterParams.length}`); }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    // ── Count total matching rows ──────────────────────────────────────────
+    const countResult = await pool.query(
+      `SELECT COUNT(*) as total FROM transition_clients ${whereClause}`,
+      filterParams,
+    );
+    const total = parseInt(countResult.rows[0].total);
+
+    // ── Fetch paginated rows ───────────────────────────────────────────────
+    const offset = (page - 1) * perPage;
+    const paginationParams = [...filterParams, perPage, offset];
+    const limitIdx = filterParams.length + 1;
+    const offsetIdx = filterParams.length + 2;
+
     const result = await pool.query<TransitionClientRow>(`
       SELECT
         id,
@@ -71,8 +105,10 @@ export async function GET() {
         welcome_gift_box,
         portal_invites
       FROM transition_clients
+      ${whereClause}
       ORDER BY advisor_name ASC, id ASC
-    `);
+      LIMIT $${limitIdx} OFFSET $${offsetIdx}
+    `, paginationParams);
 
     const rows = result.rows;
 
@@ -128,6 +164,9 @@ export async function GET() {
     return NextResponse.json({
       advisors,
       lastSyncedAt,
+      total,
+      page,
+      per_page: perPage,
       summary: {
         total_advisors: advisors.length,
         total_accounts: rows.length,

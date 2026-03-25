@@ -1,9 +1,16 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import Image from 'next/image';
 import Link from 'next/link';
+import { FilterPanel } from '@/components/transitions/FilterPanel';
+import { StatsCards } from '@/components/transitions/StatsCards';
+import { AccountsTable } from '@/components/transitions/AccountsTable';
+import { ExecutiveSummary } from '@/components/transitions/ExecutiveSummary';
+import { DocuSignDashboard } from '@/components/transitions/DocuSignDashboard';
+import { ChangeLogPanel } from '@/components/transitions/ChangeLogPanel';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -15,309 +22,123 @@ const C = {
   green: '#4ade80', greenBg: 'rgba(74,222,128,0.2)',
   amber: '#fbbf24', amberBg: 'rgba(251,191,36,0.2)', amberBorder: 'rgba(251,191,36,0.35)',
   red: '#f87171', redBg: 'rgba(248,113,113,0.2)', redBorder: 'rgba(248,113,113,0.35)',
-  gold: '#fbbf24', goldBg: 'rgba(251,191,36,0.2)',
-  blue: '#60a5fa', blueBg: 'rgba(96,165,250,0.2)', blueBorder: 'rgba(96,165,250,0.35)', greenBorder: 'rgba(74,222,128,0.35)',
   purple: '#a78bfa', purpleBg: 'rgba(167,139,250,0.15)', purpleBorder: 'rgba(167,139,250,0.35)',
+  greenBorder: 'rgba(74,222,128,0.35)',
 };
 
-// ── Status color map ─────────────────────────────────────────────────────────
-function statusStyle(status: string | null): React.CSSProperties {
-  if (!status) return { color: C.slate, fontStyle: 'italic' };
-  const s = status.toLowerCase();
-  if (s === 'completed' || s === 'signed' || s === 'done') {
-    return { color: C.green, fontWeight: 600 };
-  }
-  if (s === 'sent' || s === 'delivered' || s === 'in progress') {
-    return { color: C.amber, fontWeight: 500 };
-  }
-  if (s === 'not sent' || s === 'not ready' || s === 'declined' || s === 'voided') {
-    return { color: C.red, fontWeight: 500 };
-  }
-  if (s === 'ready to send documents' || s === 'ready') {
-    return { color: C.blue, fontWeight: 500 };
-  }
-  return { color: C.dark };
+type TabKey = 'accounts' | 'docusign' | 'summary' | 'changelog';
+
+const TABS: { key: TabKey; label: string; sub: string }[] = [
+  { key: 'accounts', label: 'Account View', sub: 'Filtered Accounts' },
+  { key: 'docusign', label: 'DocuSign Dashboard', sub: 'Household Progress' },
+  { key: 'summary', label: 'Executive Summary', sub: 'By Advisor' },
+  { key: 'changelog', label: 'Change Log', sub: 'Audit Trail' },
+];
+
+interface Filters {
+  advisor: string;
+  iaa_status: string;
+  pw_status: string;
+  portal_status: string;
+  household: string;
 }
 
-// ── DocuSign status pill ─────────────────────────────────────────────────────
-function DocuSignPill({ status }: { status: string | null }) {
-  if (!status) return <span style={{ color: C.slate, fontSize: 12 }}>—</span>;
-  const s = status.toLowerCase();
-  let bg = C.amberBg, border = C.amberBorder, color = C.amber;
-  if (s === 'completed' || s === 'signed') { bg = C.greenBg; border = C.greenBorder; color = C.green; }
-  if (s === 'sent' || s === 'delivered') { bg = C.blueBg; border = C.blueBorder; color = C.blue; }
-  if (s === 'voided' || s === 'declined') { bg = C.redBg; border = C.redBorder; color = C.red; }
-  return (
-    <span style={{
-      display: 'inline-block', padding: '2px 8px', borderRadius: 12,
-      fontSize: 11, fontWeight: 600, background: bg, border: `1px solid ${border}`, color,
-      textTransform: 'capitalize',
-    }}>
-      {status}
-    </span>
-  );
-}
+const EMPTY_FILTERS: Filters = { advisor: '', iaa_status: '', pw_status: '', portal_status: '', household: '' };
 
-// ── DocuSign Envelope Card ───────────────────────────────────────────────────
-interface DocuSignSigner {
-  name: string;
-  email: string;
-  status: string;
-  signedDateTime?: string;
-  deliveredDateTime?: string;
-  sentDateTime?: string;
-}
+function TransitionsPageInner() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-interface DocuSignEnvelope {
-  envelopeId: string;
-  status: string;
-  emailSubject: string;
-  sentDateTime?: string;
-  completedDateTime?: string;
-  signers: DocuSignSigner[];
-}
-
-function EnvelopeCard({ envelope }: { envelope: DocuSignEnvelope }) {
-  const [expanded, setExpanded] = useState(false);
-
-  const fmtDate = (d?: string) => {
-    if (!d) return '—';
-    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  // Read state from URL
+  const activeTab = (searchParams.get('tab') as TabKey) || 'accounts';
+  const page = parseInt(searchParams.get('page') ?? '1');
+  const filters: Filters = {
+    advisor: searchParams.get('advisor') ?? '',
+    iaa_status: searchParams.get('iaa_status') ?? '',
+    pw_status: searchParams.get('pw_status') ?? '',
+    portal_status: searchParams.get('portal_status') ?? '',
+    household: searchParams.get('household') ?? '',
   };
 
-  return (
-    <div style={{
-      background: 'rgba(0,0,0,0.2)', borderRadius: 8,
-      border: `1px solid ${C.border}`, marginBottom: 8, overflow: 'hidden',
-    }}>
-      {/* Envelope header — clickable */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        style={{
-          width: '100%', padding: '10px 14px', border: 'none', cursor: 'pointer',
-          background: expanded ? 'rgba(43,184,196,0.04)' : 'transparent',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          textAlign: 'left', gap: 12,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
-          <DocuSignPill status={envelope.status} />
-          <span style={{
-            fontSize: 13, color: C.dark, fontWeight: 500,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
-            {envelope.emailSubject || 'No subject'}
-          </span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
-          <span style={{ fontSize: 11, color: C.slate }}>
-            Sent {fmtDate(envelope.sentDateTime)}
-          </span>
-          {envelope.completedDateTime && (
-            <span style={{ fontSize: 11, color: C.green }}>
-              Done {fmtDate(envelope.completedDateTime)}
-            </span>
-          )}
-          <span style={{
-            fontSize: 14, color: C.slate,
-            transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 150ms ease', display: 'inline-block',
-          }}>
-            ▾
-          </span>
-        </div>
-      </button>
-
-      {/* Expanded signer detail */}
-      {expanded && (
-        <div style={{ padding: '0 14px 12px' }}>
-          <div style={{ fontSize: 11, color: C.slate, fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-            Signers
-          </div>
-          {envelope.signers.map((signer, i) => (
-            <div key={i} style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '6px 0', borderTop: i > 0 ? `1px solid ${C.border}` : 'none',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <DocuSignPill status={signer.status} />
-                <div>
-                  <div style={{ fontSize: 13, color: C.dark, fontWeight: 500 }}>{signer.name}</div>
-                  <div style={{ fontSize: 11, color: C.slate }}>{signer.email}</div>
-                </div>
-              </div>
-              <div style={{ fontSize: 11, color: C.slate, textAlign: 'right' }}>
-                {signer.signedDateTime ? (
-                  <span style={{ color: C.green }}>Signed {fmtDate(signer.signedDateTime)}</span>
-                ) : signer.deliveredDateTime ? (
-                  <span style={{ color: C.amber }}>Delivered {fmtDate(signer.deliveredDateTime)}</span>
-                ) : signer.sentDateTime ? (
-                  <span>Sent {fmtDate(signer.sentDateTime)}</span>
-                ) : '—'}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Types ────────────────────────────────────────────────────────────────────
-interface Account {
-  id: number;
-  household_name: string | null;
-  account_type: string | null;
-  account_name: string | null;
-  status_of_iaa: string | null;
-  status_of_account_paperwork: string | null;
-  portal_status: string | null;
-  document_readiness: string | null;
-  primary_first_name: string | null;
-  primary_last_name: string | null;
-  primary_email: string | null;
-  new_account_number: string | null;
-  contra_account_firm: string | null;
-  contra_account_numbers: string | null;
-  fee_schedule: string | null;
-  notes: string | null;
-  docusign_iaa_status: string | null;
-  docusign_paperwork_status: string | null;
-  billing_setup: string | null;
-  welcome_gift_box: string | null;
-  portal_invites: string | null;
-}
-
-interface AdvisorGroup {
-  advisor_name: string;
-  farther_contact: string | null;
-  total_accounts: number;
-  accounts: Account[];
-}
-
-interface TransitionsData {
-  advisors: AdvisorGroup[];
-  lastSyncedAt: string | null;
-  summary: {
-    total_advisors: number;
-    total_accounts: number;
-    iaa_signed: number;
-    paperwork_signed: number;
-    pending_documents: number;
-  };
-}
-
-interface DocuSignResponse {
-  connected: boolean;
-  totalEnvelopes: number;
-  matchedCount: number;
-  unmatchedCount: number;
-  advisors: Record<string, DocuSignEnvelope[]>;
-  unmatched: DocuSignEnvelope[];
-  error?: string;
-  authUrl?: string;
-}
-
-// ── Main Component ───────────────────────────────────────────────────────────
-export default function TransitionsPage() {
-  const { data, error, isLoading, mutate } = useSWR<TransitionsData>(
-    '/api/command-center/transitions', fetcher
-  );
-  const [searchTerm, setSearchTerm] = useState('');
-  const [expandedAdvisor, setExpandedAdvisor] = useState<string | null>(null);
+  // Sync + DocuSign state
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
-  const [sheetId, setSheetId] = useState('');
   const [showSyncPanel, setShowSyncPanel] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-
-  // DocuSign state
-  const [docusignData, setDocusignData] = useState<DocuSignResponse | null>(null);
+  const [sheetId, setSheetId] = useState('');
   const [docusignLoading, setDocusignLoading] = useState(false);
+  const [docusignConnected, setDocusignConnected] = useState(false);
   const [docusignError, setDocusignError] = useState<string | null>(null);
-  const [showUnmatched, setShowUnmatched] = useState(false);
-
-  // Auto-sync state
-  const [autoSyncing, setAutoSyncing] = useState(false);
   const [autoSyncChecked, setAutoSyncChecked] = useState(false);
 
-  // ── Auto-sync: refresh from Google Drive if data is stale (> 1 hour) ────────
-  useEffect(() => {
-    if (!data || autoSyncChecked || autoSyncing) return;
-    setAutoSyncChecked(true);
+  // ── URL update helper ──────────────────────────────────────────────────────
+  const updateUrl = useCallback((updates: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value) params.set(key, value);
+      else params.delete(key);
+    });
+    router.push(`/command-center/transitions?${params.toString()}`, { scroll: false });
+  }, [searchParams, router]);
 
+  const handleFilterChange = useCallback((updates: Partial<Filters>) => {
+    const newFilters = { ...filters, ...updates };
+    updateUrl({ ...newFilters, page: '1' });
+  }, [filters, updateUrl]);
+
+  const handleFilterReset = useCallback(() => {
+    updateUrl({ ...EMPTY_FILTERS, page: '' });
+  }, [updateUrl]);
+
+  const handleTabChange = useCallback((tab: TabKey) => {
+    updateUrl({ tab });
+  }, [updateUrl]);
+
+  const handlePageChange = useCallback((p: number) => {
+    updateUrl({ page: String(p) });
+  }, [updateUrl]);
+
+  // ── Build filter query params for API calls ───────────────────────────────
+  const filterParams = new URLSearchParams();
+  if (filters.advisor) filterParams.set('advisor', filters.advisor);
+  if (filters.iaa_status) filterParams.set('iaa_status', filters.iaa_status);
+  if (filters.pw_status) filterParams.set('pw_status', filters.pw_status);
+  if (filters.portal_status) filterParams.set('portal_status', filters.portal_status);
+  if (filters.household) filterParams.set('household', filters.household);
+  const filterParamStr = filterParams.toString();
+
+  // ── Fetch filtered transitions data ───────────────────────────────────────
+  const apiUrl = `/api/command-center/transitions?${filterParamStr}&page=${page}&per_page=50`;
+  const { data, error, isLoading, mutate } = useSWR(apiUrl, fetcher, {
+    keepPreviousData: true,
+    revalidateOnFocus: false,
+  });
+
+  // ── Auto-sync if data is stale (> 1 hour) ─────────────────────────────────
+  useEffect(() => {
+    if (!data || autoSyncChecked) return;
+    setAutoSyncChecked(true);
     const lastSynced = data.lastSyncedAt ? new Date(data.lastSyncedAt).getTime() : 0;
     const ageMs = Date.now() - lastSynced;
-    const ONE_HOUR = 60 * 60 * 1000;
-
-    if (ageMs > ONE_HOUR) {
-      console.log(`[transitions] Data is ${Math.round(ageMs / 60000)}m old — auto-syncing...`);
-      setAutoSyncing(true);
-      fetch('/api/command-center/transitions/sync')
-        .then(res => res.json())
-        .then(result => {
-          if (result.summary) {
-            console.log(`[transitions] Auto-sync complete: ${result.summary.total_synced} rows from ${result.summary.total_workbooks} workbooks`);
-          }
-          mutate(); // Refresh page data from DB
-        })
-        .catch(err => console.error('[transitions] Auto-sync failed:', err))
-        .finally(() => setAutoSyncing(false));
+    if (ageMs > 60 * 60 * 1000) {
+      fetch('/api/command-center/transitions/sync').then(() => mutate()).catch(() => {});
     }
-  }, [data, autoSyncChecked, autoSyncing, mutate]);
+  }, [data, autoSyncChecked, mutate]);
 
-  // ── Check URL params for DocuSign callback ──────────────────────────────────
+  // ── DocuSign callback detection ──────────────────────────────────────────
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const ds = params.get('docusign');
+    const ds = searchParams.get('docusign');
     if (ds === 'connected') {
-      window.history.replaceState({}, '', '/command-center/transitions');
-      // Auto-fetch DocuSign data after OAuth callback
+      window.history.replaceState({}, '', '/command-center/transitions?tab=docusign');
+      setDocusignConnected(true);
       handleDocuSignFetch();
     } else if (ds === 'error') {
-      setDocusignError('DocuSign connection failed: ' + (params.get('reason') ?? 'unknown'));
+      setDocusignError('DocuSign connection failed');
       window.history.replaceState({}, '', '/command-center/transitions');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Filtered advisors ──────────────────────────────────────────────────────
-  const filteredAdvisors = useMemo(() => {
-    if (!data?.advisors) return [];
-    let advisors = data.advisors;
-
-    // Search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      advisors = advisors.filter(a =>
-        a.advisor_name.toLowerCase().includes(term) ||
-        a.accounts.some(acc =>
-          acc.household_name?.toLowerCase().includes(term) ||
-          acc.primary_last_name?.toLowerCase().includes(term) ||
-          acc.primary_email?.toLowerCase().includes(term) ||
-          acc.account_name?.toLowerCase().includes(term)
-        )
-      );
-    }
-
-    // Status filter
-    if (statusFilter !== 'all') {
-      advisors = advisors.map(a => {
-        const filtered = a.accounts.filter(acc => {
-          if (statusFilter === 'iaa_pending') return acc.status_of_iaa !== 'Completed' && acc.docusign_iaa_status?.toLowerCase() !== 'completed';
-          if (statusFilter === 'paperwork_pending') return acc.status_of_account_paperwork !== 'Completed' && acc.docusign_paperwork_status?.toLowerCase() !== 'completed';
-          if (statusFilter === 'completed') return (acc.status_of_iaa === 'Completed' || acc.docusign_iaa_status?.toLowerCase() === 'completed') && (acc.status_of_account_paperwork === 'Completed' || acc.docusign_paperwork_status?.toLowerCase() === 'completed');
-          if (statusFilter === 'not_ready') return acc.document_readiness && acc.document_readiness !== 'Ready to Send Documents';
-          return true;
-        });
-        return { ...a, accounts: filtered, total_accounts: filtered.length };
-      }).filter(a => a.accounts.length > 0);
-    }
-
-    return advisors;
-  }, [data, searchTerm, statusFilter]);
-
-  // ── Google Sheets Sync ─────────────────────────────────────────────────────
+  // ── Sync handler ──────────────────────────────────────────────────────────
   async function handleSync() {
     setSyncing(true);
     setSyncResult(null);
@@ -329,15 +150,11 @@ export default function TransitionsPage() {
         body: JSON.stringify(body),
       });
       const result = await res.json();
-      if (res.ok) {
-        if (result.summary) {
-          setSyncResult(`Synced ${result.summary.total_synced} rows from ${result.summary.total_workbooks} workbooks${result.summary.errors > 0 ? ` (${result.summary.errors} errors)` : ''}`);
-        } else {
-          setSyncResult(`Synced ${result.synced} of ${result.total} rows`);
-        }
+      if (res.ok && result.summary) {
+        setSyncResult(`Synced ${result.summary.total_synced} rows from ${result.summary.total_workbooks} workbooks`);
         mutate();
       } else {
-        setSyncResult(`Error: ${result.error}`);
+        setSyncResult(`Error: ${result.error ?? 'Unknown'}`);
       }
     } catch (e) {
       setSyncResult(`Sync failed: ${e instanceof Error ? e.message : String(e)}`);
@@ -346,7 +163,7 @@ export default function TransitionsPage() {
     }
   }
 
-  // ── DocuSign Fetch ─────────────────────────────────────────────────────────
+  // ── DocuSign fetch ────────────────────────────────────────────────────────
   async function handleDocuSignFetch() {
     setDocusignLoading(true);
     setDocusignError(null);
@@ -357,19 +174,15 @@ export default function TransitionsPage() {
         body: JSON.stringify({}),
       });
       const result = await res.json();
-
       if (result.error === 'not_authenticated' && result.authUrl) {
         window.location.href = result.authUrl;
         return;
       }
-
       if (!res.ok) {
         setDocusignError(result.error || 'Unknown error');
         return;
       }
-
-      setDocusignData(result);
-      // Refresh transitions data since the POST wrote statuses back to DB
+      setDocusignConnected(true);
       mutate();
     } catch (e) {
       setDocusignError(e instanceof Error ? e.message : String(e));
@@ -378,523 +191,175 @@ export default function TransitionsPage() {
     }
   }
 
-  function handleDocuSignDisconnect() {
-    setDocusignData(null);
-    setDocusignError(null);
-  }
-
-  const summary = data?.summary;
-
-  // ── Format "last synced" relative time ──────────────────────────────────────
+  // ── Last synced format ────────────────────────────────────────────────────
   function formatSyncAge(isoDate: string | null | undefined): string {
     if (!isoDate) return 'Never synced';
-    const ageMs = Date.now() - new Date(isoDate).getTime();
-    const mins = Math.floor(ageMs / 60000);
+    const mins = Math.floor((Date.now() - new Date(isoDate).getTime()) / 60000);
     if (mins < 1) return 'Just now';
     if (mins < 60) return `${mins}m ago`;
     const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}h ${mins % 60}m ago`;
-    const days = Math.floor(hours / 24);
-    return `${days}d ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${Math.floor(hours / 24)}d ago`;
   }
 
+  const accounts = data?.accounts ?? data?.advisors?.flatMap((a: { accounts: unknown[] }) => a.accounts) ?? [];
+  const total = data?.total ?? accounts.length;
+
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 1400 }}>
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <div style={{ marginBottom: 24 }}>
+    <div style={{ padding: '32px 40px', maxWidth: '100vw', overflow: 'hidden' }}>
+      {/* ── Header ────────────────────────────────────────────────────────────── */}
+      <div style={{ marginBottom: 20 }}>
         <Link href="/command-center" style={{ fontSize: 13, color: C.slate, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-          ← Back to Pipeline
+          &larr; Back to Pipeline
         </Link>
         <div style={{ position: 'relative', margin: '8px 0 4px' }}>
           <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />
           <div style={{ textAlign: 'center' }}>
-            <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, marginBottom: 6 }}>
+            <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 6 }}>
               Client Transition Dashboard
             </h1>
             <p style={{ fontSize: 14, color: C.slate, margin: 0 }}>
-              Track client transitions, document statuses, and DocuSign progress by advisor
+              Last synced: {formatSyncAge(data?.lastSyncedAt)}
             </p>
           </div>
         </div>
-
-        {/* ── Last synced indicator ──────────────────────────────────────────── */}
-        <div style={{ textAlign: 'center', marginTop: 10 }}>
-          <span style={{ fontSize: 12, color: C.slate }}>
-            Last synced: {formatSyncAge(data?.lastSyncedAt)}
-          </span>
-          {autoSyncing && (
-            <span style={{
-              fontSize: 12, color: C.teal, marginLeft: 10, fontWeight: 500,
-            }}>
-              ↻ Auto-syncing from Google Drive...
-            </span>
-          )}
-        </div>
       </div>
 
-      {/* ── Summary Cards ───────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16, marginBottom: 24 }}>
-        {[
-          { label: 'Total Advisors', value: summary?.total_advisors ?? '—', color: C.teal },
-          { label: 'Total Accounts', value: summary?.total_accounts ?? '—', color: C.dark },
-          { label: 'IAA Signed', value: summary?.iaa_signed ?? '—', color: C.green },
-          { label: 'Paperwork Signed', value: summary?.paperwork_signed ?? '—', color: C.green },
-          { label: 'Pending Documents', value: summary?.pending_documents ?? '—', color: C.amber },
-        ].map(card => (
-          <div key={card.label} style={{
-            background: C.cardBg, borderRadius: 12, padding: '20px 20px 16px',
-            border: `1px solid ${C.border}`, boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-          }}>
-            <div style={{ fontSize: 12, color: C.slate, fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>
-              {card.label}
-            </div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: card.color }}>
-              {card.value}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Controls Row ────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20, alignItems: 'center', flexWrap: 'wrap' }}>
-        {/* Search */}
-        <input
-          type="text"
-          placeholder="Search advisors, households, clients..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          style={{
-            flex: 1, minWidth: 250, padding: '10px 14px', borderRadius: 8,
-            border: `1px solid ${C.border}`, fontSize: 14, outline: 'none',
-            background: C.white, color: C.dark,
-          }}
-        />
-
-        {/* Status Filter */}
-        <select
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-          style={{
-            padding: '10px 14px', borderRadius: 8, border: `1px solid ${C.border}`,
-            fontSize: 13, background: C.white, color: C.dark, cursor: 'pointer',
-          }}
-        >
-          <option value="all">All Statuses</option>
-          <option value="iaa_pending">IAA Pending</option>
-          <option value="paperwork_pending">Paperwork Pending</option>
-          <option value="completed">Fully Completed</option>
-          <option value="not_ready">Not Ready</option>
-        </select>
-
-        {/* Sync Button */}
-        <button
-          onClick={() => setShowSyncPanel(!showSyncPanel)}
-          style={{
-            padding: '10px 18px', borderRadius: 8, border: 'none',
-            background: C.teal, color: C.white, fontSize: 13, fontWeight: 600,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-          }}
-        >
-          ↻ Sync from Sheet
-        </button>
-
-        {/* DocuSign Button */}
-        <button
-          onClick={handleDocuSignFetch}
-          disabled={docusignLoading}
-          style={{
-            padding: '10px 18px', borderRadius: 8, border: `1px solid ${C.border}`,
-            background: docusignLoading ? C.cardBg : C.white, color: docusignLoading ? C.slate : C.dark,
-            fontSize: 13, fontWeight: 600,
-            cursor: docusignLoading ? 'not-allowed' : 'pointer',
-            display: 'flex', alignItems: 'center', gap: 6,
-          }}
-        >
-          {docusignLoading ? '↻ Loading...' : '✎ DocuSign Status'}
-        </button>
-      </div>
-
-      {/* ── Sync Panel ──────────────────────────────────────────────────────── */}
-      {showSyncPanel && (
-        <div style={{
-          background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12,
-          padding: 20, marginBottom: 20,
+      {/* ── Controls Row ──────────────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, justifyContent: 'flex-end' }}>
+        <button onClick={() => setShowSyncPanel(!showSyncPanel)} style={{
+          padding: '7px 14px', borderRadius: 6, border: 'none', background: C.teal,
+          color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer',
         }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: C.dark, marginBottom: 12 }}>
-            Sync Transition Data from Google Drive
-          </div>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
-            <button
-              onClick={() => { setSheetId(''); handleSync(); }}
-              disabled={syncing}
-              style={{
-                padding: '10px 20px', borderRadius: 8, border: 'none',
-                background: syncing ? C.slate : C.teal, color: C.white,
-                fontSize: 13, fontWeight: 600, cursor: syncing ? 'not-allowed' : 'pointer',
-              }}
-            >
-              {syncing ? 'Syncing...' : '↻ Sync All Advisor Folders'}
+          &darr; Sync from Sheet
+        </button>
+        <button onClick={handleDocuSignFetch} disabled={docusignLoading} style={{
+          padding: '7px 14px', borderRadius: 6, border: `1px solid ${C.border}`,
+          background: docusignLoading ? C.cardBg : 'transparent',
+          color: docusignLoading ? C.slate : C.dark, fontSize: 12, fontWeight: 600,
+          cursor: docusignLoading ? 'not-allowed' : 'pointer',
+        }}>
+          {docusignLoading ? 'Loading...' : docusignConnected ? '\u2713 DocuSign Connected' : '\u270E DocuSign Status'}
+        </button>
+      </div>
+
+      {/* ── Sync Panel ────────────────────────────────────────────────────────── */}
+      {showSyncPanel && (
+        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 16, marginBottom: 16 }}>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10 }}>
+            <button onClick={() => { setSheetId(''); handleSync(); }} disabled={syncing} style={{
+              padding: '8px 16px', borderRadius: 6, border: 'none', background: syncing ? C.slate : C.teal,
+              color: '#fff', fontSize: 12, fontWeight: 600, cursor: syncing ? 'not-allowed' : 'pointer',
+            }}>
+              {syncing ? 'Syncing...' : 'Sync All Folders'}
             </button>
-            <span style={{ fontSize: 12, color: C.slate }}>
-              Scans all advisor folders in the AX Shared Drive for transition spreadsheets
-            </span>
-          </div>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <input
-              type="text"
-              placeholder="Or enter a specific Google Sheet ID..."
-              value={sheetId}
-              onChange={e => setSheetId(e.target.value)}
-              style={{
-                flex: 1, padding: '10px 14px', borderRadius: 8,
-                border: `1px solid ${C.border}`, fontSize: 13, outline: 'none',
-                background: C.white, color: C.dark,
-              }}
-            />
-            <button
-              onClick={handleSync}
-              disabled={syncing || !sheetId.trim()}
-              style={{
-                padding: '10px 20px', borderRadius: 8, border: `1px solid ${C.border}`,
-                background: syncing || !sheetId.trim() ? C.cardBg : C.white, color: syncing || !sheetId.trim() ? C.slate : C.dark,
-                fontSize: 13, fontWeight: 600, cursor: syncing || !sheetId.trim() ? 'not-allowed' : 'pointer',
-              }}
-            >
-              Sync Single Sheet
+            <input type="text" placeholder="Or enter Sheet ID..." value={sheetId} onChange={e => setSheetId(e.target.value)} style={{
+              flex: 1, padding: '8px 12px', borderRadius: 6, border: `1px solid ${C.border}`,
+              fontSize: 12, background: C.white, color: C.dark, outline: 'none',
+            }} />
+            <button onClick={handleSync} disabled={syncing || !sheetId.trim()} style={{
+              padding: '8px 16px', borderRadius: 6, border: `1px solid ${C.border}`,
+              background: 'transparent', color: C.dark, fontSize: 12, fontWeight: 600,
+              cursor: syncing || !sheetId.trim() ? 'not-allowed' : 'pointer',
+              opacity: syncing || !sheetId.trim() ? 0.4 : 1,
+            }}>
+              Sync Sheet
             </button>
           </div>
           {syncResult && (
             <div style={{
-              marginTop: 10, fontSize: 13, padding: '8px 12px', borderRadius: 6,
-              background: syncResult.startsWith('Error') || syncResult.startsWith('Sync failed') ? C.redBg : C.greenBg,
-              color: syncResult.startsWith('Error') || syncResult.startsWith('Sync failed') ? C.red : C.green,
-            }}>
-              {syncResult}
-            </div>
+              fontSize: 12, padding: '6px 10px', borderRadius: 6,
+              background: syncResult.startsWith('Error') ? C.redBg : C.greenBg,
+              color: syncResult.startsWith('Error') ? C.red : C.green,
+            }}>{syncResult}</div>
           )}
-        </div>
-      )}
-
-      {/* ── DocuSign Summary Bar ──────────────────────────────────────────────── */}
-      {docusignData && (
-        <div style={{
-          background: C.purpleBg, border: `1px solid ${C.purpleBorder}`,
-          borderRadius: 8, padding: '10px 16px', marginBottom: 16, fontSize: 13,
-          color: C.purple,
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        }}>
-          <span>
-            DocuSign: Connected · {docusignData.totalEnvelopes} envelopes · {docusignData.matchedCount} matched · {docusignData.unmatchedCount} unmatched
-          </span>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              onClick={handleDocuSignFetch}
-              disabled={docusignLoading}
-              style={{
-                background: 'rgba(167,139,250,0.25)', border: `1px solid ${C.purpleBorder}`,
-                borderRadius: 6, padding: '4px 12px', fontSize: 12, fontWeight: 600,
-                color: C.purple, cursor: docusignLoading ? 'not-allowed' : 'pointer',
-              }}
-            >
-              ↻ Refresh
-            </button>
-            <button
-              onClick={handleDocuSignDisconnect}
-              style={{
-                background: 'none', border: `1px solid ${C.purpleBorder}`,
-                borderRadius: 6, padding: '4px 12px', fontSize: 12, fontWeight: 600,
-                color: C.purple, cursor: 'pointer',
-              }}
-            >
-              Disconnect
-            </button>
-          </div>
         </div>
       )}
 
       {/* ── DocuSign Error ────────────────────────────────────────────────────── */}
       {docusignError && (
-        <div style={{
-          background: C.redBg, border: `1px solid ${C.redBorder}`,
-          borderRadius: 8, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: C.red,
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        }}>
+        <div style={{ background: C.redBg, border: `1px solid ${C.redBorder}`, borderRadius: 8, padding: '8px 14px', marginBottom: 12, fontSize: 13, color: C.red, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           DocuSign Error: {docusignError}
-          <button onClick={() => setDocusignError(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'inherit' }}>×</button>
+          <button onClick={() => setDocusignError(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'inherit' }}>&times;</button>
         </div>
       )}
 
-      {/* ── Loading / Error States ──────────────────────────────────────────── */}
-      {isLoading && (
-        <div style={{ textAlign: 'center', padding: 60, color: C.slate }}>
-          Loading transition data...
-        </div>
-      )}
-
-      {error && (
-        <div style={{ textAlign: 'center', padding: 60, color: C.red }}>
-          Failed to load transition data. {data?.advisors?.length === 0 ? 'Sync a Google Sheet to get started.' : ''}
-        </div>
-      )}
-
-      {/* ── Empty State ─────────────────────────────────────────────────────── */}
-      {data && data.advisors.length === 0 && !isLoading && !error && (
-        <div style={{
-          textAlign: 'center', padding: '80px 40px',
-          background: C.cardBg, borderRadius: 16, border: `1px solid ${C.border}`,
-        }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
-          <div style={{ fontSize: 18, fontWeight: 600, color: C.dark, marginBottom: 8 }}>
-            No Transition Data Yet
-          </div>
-          <p style={{ fontSize: 14, color: C.slate, maxWidth: 400, margin: '0 auto 20px' }}>
-            Click &quot;Sync from Sheet&quot; above to import your transition spreadsheet from Google Sheets.
-          </p>
-        </div>
-      )}
-
-      {/* ── Advisor Accordion ───────────────────────────────────────────────── */}
-      {filteredAdvisors.map(advisor => {
-        const isExpanded = expandedAdvisor === advisor.advisor_name;
-
-        // Quick stats for this advisor
-        const iaaComplete = advisor.accounts.filter(a =>
-          a.status_of_iaa === 'Completed' || a.docusign_iaa_status?.toLowerCase() === 'completed'
-        ).length;
-        const pwComplete = advisor.accounts.filter(a =>
-          a.status_of_account_paperwork === 'Completed' || a.docusign_paperwork_status?.toLowerCase() === 'completed'
-        ).length;
-
-        // DocuSign envelopes for this advisor
-        const advisorEnvelopes = docusignData?.advisors?.[advisor.advisor_name] ?? [];
-
-        return (
-          <div key={advisor.advisor_name} style={{
-            background: C.cardBg, borderRadius: 12, border: `1px solid ${C.border}`,
-            marginBottom: 12, overflow: 'hidden',
-            boxShadow: isExpanded ? '0 2px 8px rgba(0,0,0,0.06)' : '0 1px 3px rgba(0,0,0,0.03)',
-          }}>
-            {/* ── Advisor Header ────────────────────────────────────────────── */}
+      {/* ── Tab Bar ───────────────────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${C.border}`, marginBottom: 20 }}>
+        {TABS.map(tab => {
+          const isActive = activeTab === tab.key;
+          return (
             <button
-              onClick={() => setExpandedAdvisor(isExpanded ? null : advisor.advisor_name)}
+              key={tab.key}
+              onClick={() => handleTabChange(tab.key)}
               style={{
-                width: '100%', padding: '16px 20px', border: 'none', cursor: 'pointer',
-                background: isExpanded ? 'rgba(29,118,130,0.04)' : 'transparent',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                textAlign: 'left',
+                padding: '10px 20px', background: 'none', border: 'none',
+                borderBottom: `2px solid ${isActive ? C.teal : 'transparent'}`,
+                marginBottom: -2, cursor: 'pointer', transition: 'all 150ms ease',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: '50%', background: C.teal,
-                  color: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, fontWeight: 700, flexShrink: 0,
-                }}>
-                  {advisor.advisor_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                </div>
-                <div>
-                  <div style={{ fontSize: 16, fontWeight: 600, color: C.dark }}>
-                    {advisor.advisor_name}
-                  </div>
-                  <div style={{ fontSize: 12, color: C.slate }}>
-                    {advisor.farther_contact && `Contact: ${advisor.farther_contact} · `}
-                    {advisor.total_accounts} account{advisor.total_accounts !== 1 ? 's' : ''}
-                    {advisorEnvelopes.length > 0 && ` · ${advisorEnvelopes.length} envelope${advisorEnvelopes.length !== 1 ? 's' : ''}`}
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                {/* Progress pills */}
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <span style={{
-                    padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600,
-                    background: iaaComplete === advisor.total_accounts ? C.greenBg : C.amberBg,
-                    color: iaaComplete === advisor.total_accounts ? C.green : C.amber,
-                    border: `1px solid ${iaaComplete === advisor.total_accounts ? C.greenBorder : C.amberBorder}`,
-                  }}>
-                    IAA {iaaComplete}/{advisor.total_accounts}
-                  </span>
-                  <span style={{
-                    padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600,
-                    background: pwComplete === advisor.total_accounts ? C.greenBg : C.amberBg,
-                    color: pwComplete === advisor.total_accounts ? C.green : C.amber,
-                    border: `1px solid ${pwComplete === advisor.total_accounts ? C.greenBorder : C.amberBorder}`,
-                  }}>
-                    Paperwork {pwComplete}/{advisor.total_accounts}
-                  </span>
-                </div>
-
-                <span style={{
-                  fontSize: 18, color: C.slate,
-                  transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                  transition: 'transform 200ms ease',
-                  display: 'inline-block',
-                }}>
-                  ▾
-                </span>
-              </div>
+              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? C.teal : C.slate, fontFamily: "'Fakt', system-ui, sans-serif" }}>
+                {tab.label}
+              </span>
+              <span style={{ display: 'block', fontSize: 11, color: isActive ? C.teal : C.slate, opacity: 0.6, marginTop: 2 }}>
+                {tab.sub}
+              </span>
             </button>
+          );
+        })}
+      </div>
 
-            {/* ── Expanded Content ──────────────────────────────────────────── */}
-            {isExpanded && (
-              <div style={{ padding: '0 20px 16px' }}>
-                {/* Accounts Table */}
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                    <thead>
-                      <tr style={{ borderBottom: `2px solid ${C.border}` }}>
-                        {[
-                          'Household', 'Account Type', 'Primary Holder', 'Readiness',
-                          'IAA Status', 'Paperwork', 'DocuSign IAA', 'DocuSign PW',
-                          'Portal', 'Contra Firm', 'New Acct #', 'Fee Schedule', 'Notes',
-                        ].map(h => (
-                          <th key={h} style={{
-                            padding: '10px 8px', textAlign: 'left', fontSize: 11,
-                            fontWeight: 600, color: C.slate, textTransform: 'uppercase',
-                            letterSpacing: 0.5, whiteSpace: 'nowrap',
-                          }}>
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {advisor.accounts.map(acc => (
-                        <tr key={acc.id} style={{ borderBottom: `1px solid ${C.border}`, transition: 'background 120ms ease' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'; }}
-                        >
-                          <td style={{ padding: '10px 8px', fontWeight: 500, color: C.dark, maxWidth: 160 }}>
-                            {acc.household_name || acc.account_name || '—'}
-                          </td>
-                          <td style={{ padding: '10px 8px', color: C.dark }}>
-                            {acc.account_type || '—'}
-                          </td>
-                          <td style={{ padding: '10px 8px', color: C.dark }}>
-                            <div>{[acc.primary_first_name, acc.primary_last_name].filter(Boolean).join(' ') || '—'}</div>
-                            {acc.primary_email && (
-                              <div style={{ fontSize: 11, color: C.slate }}>{acc.primary_email}</div>
-                            )}
-                          </td>
-                          <td style={{ padding: '10px 8px', ...statusStyle(acc.document_readiness) }}>
-                            {acc.document_readiness || '—'}
-                          </td>
-                          <td style={{ padding: '10px 8px', ...statusStyle(acc.status_of_iaa) }}>
-                            {acc.status_of_iaa || '—'}
-                          </td>
-                          <td style={{ padding: '10px 8px', ...statusStyle(acc.status_of_account_paperwork) }}>
-                            {acc.status_of_account_paperwork || '—'}
-                          </td>
-                          <td style={{ padding: '10px 8px' }}>
-                            <DocuSignPill status={acc.docusign_iaa_status} />
-                          </td>
-                          <td style={{ padding: '10px 8px' }}>
-                            <DocuSignPill status={acc.docusign_paperwork_status} />
-                          </td>
-                          <td style={{ padding: '10px 8px', ...statusStyle(acc.portal_status) }}>
-                            {acc.portal_status || '—'}
-                          </td>
-                          <td style={{ padding: '10px 8px', color: C.dark, fontSize: 12 }}>
-                            {acc.contra_account_firm || '—'}
-                          </td>
-                          <td style={{ padding: '10px 8px', color: C.dark, fontFamily: 'monospace', fontSize: 12 }}>
-                            {acc.new_account_number || '—'}
-                          </td>
-                          <td style={{ padding: '10px 8px', color: C.dark, fontSize: 12 }}>
-                            {acc.fee_schedule || '—'}
-                          </td>
-                          <td style={{ padding: '10px 8px', color: C.slate, fontSize: 12, maxWidth: 200 }}>
-                            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {acc.notes || '—'}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+      {/* ── Tab Content ───────────────────────────────────────────────────────── */}
+      {activeTab === 'accounts' && (
+        <>
+          {/* Stats Cards */}
+          <StatsCards filterParams={filterParamStr} />
 
-                {/* ── DocuSign Envelopes Section ──────────────────────────────── */}
-                {advisorEnvelopes.length > 0 && (
-                  <div style={{ marginTop: 16 }}>
-                    <div style={{
-                      fontSize: 13, fontWeight: 600, color: C.purple, marginBottom: 10,
-                      display: 'flex', alignItems: 'center', gap: 8,
-                    }}>
-                      <span style={{
-                        display: 'inline-block', width: 18, height: 18, borderRadius: 4,
-                        background: C.purpleBg, border: `1px solid ${C.purpleBorder}`,
-                        textAlign: 'center', lineHeight: '18px', fontSize: 11,
-                      }}>✎</span>
-                      DocuSign Envelopes ({advisorEnvelopes.length})
-                    </div>
-                    {advisorEnvelopes.map(env => (
-                      <EnvelopeCard key={env.envelopeId} envelope={env} />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        );
-      })}
+          {/* Filter Panel */}
+          <FilterPanel filters={filters} onChange={handleFilterChange} onReset={handleFilterReset} />
 
-      {/* ── Results count ───────────────────────────────────────────────────── */}
-      {data && filteredAdvisors.length > 0 && (
-        <div style={{ textAlign: 'center', padding: '16px 0', fontSize: 12, color: C.slate }}>
-          Showing {filteredAdvisors.length} advisor{filteredAdvisors.length !== 1 ? 's' : ''} · {filteredAdvisors.reduce((s, a) => s + a.total_accounts, 0)} accounts
-        </div>
+          {/* Loading */}
+          {isLoading && !data && <div style={{ padding: 40, color: C.slate, textAlign: 'center' }}>Loading transition data...</div>}
+          {error && <div style={{ padding: 40, color: C.red, textAlign: 'center' }}>Failed to load data.</div>}
+
+          {/* Accounts Table */}
+          {!isLoading || data ? (
+            <AccountsTable
+              accounts={accounts}
+              total={total}
+              page={page}
+              perPage={50}
+              onPageChange={handlePageChange}
+              showAdvisorColumn={!filters.advisor}
+            />
+          ) : null}
+        </>
       )}
 
-      {/* ── Unmatched Envelopes Section ───────────────────────────────────────── */}
-      {docusignData && docusignData.unmatched.length > 0 && (
-        <div style={{
-          background: C.cardBg, borderRadius: 12, border: `1px solid ${C.border}`,
-          marginTop: 8, overflow: 'hidden',
-        }}>
-          <button
-            onClick={() => setShowUnmatched(!showUnmatched)}
-            style={{
-              width: '100%', padding: '14px 20px', border: 'none', cursor: 'pointer',
-              background: showUnmatched ? 'rgba(251,191,36,0.04)' : 'transparent',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              textAlign: 'left',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{
-                display: 'inline-block', padding: '3px 10px', borderRadius: 12,
-                fontSize: 11, fontWeight: 600,
-                background: C.amberBg, border: `1px solid ${C.amberBorder}`, color: C.amber,
-              }}>
-                {docusignData.unmatched.length}
-              </span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: C.dark }}>
-                Unmatched DocuSign Envelopes
-              </span>
-              <span style={{ fontSize: 12, color: C.slate }}>
-                — Could not be auto-matched to any advisor
-              </span>
-            </div>
-            <span style={{
-              fontSize: 18, color: C.slate,
-              transform: showUnmatched ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform 200ms ease', display: 'inline-block',
-            }}>
-              ▾
-            </span>
-          </button>
+      {activeTab === 'docusign' && (
+        <DocuSignDashboard advisorFilter={filters.advisor || undefined} />
+      )}
 
-          {showUnmatched && (
-            <div style={{ padding: '0 20px 16px' }}>
-              {docusignData.unmatched.map(env => (
-                <EnvelopeCard key={env.envelopeId} envelope={env} />
-              ))}
-            </div>
-          )}
-        </div>
+      {activeTab === 'summary' && (
+        <ExecutiveSummary
+          onAdvisorClick={(advisor) => {
+            updateUrl({ tab: 'accounts', advisor, page: '1' });
+          }}
+        />
+      )}
+
+      {activeTab === 'changelog' && (
+        <ChangeLogPanel />
       )}
     </div>
+  );
+}
+
+// Wrap with Suspense for useSearchParams
+export default function TransitionsPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 60, textAlign: 'center', color: 'rgba(250,247,242,0.5)' }}>Loading...</div>}>
+      <TransitionsPageInner />
+    </Suspense>
   );
 }
