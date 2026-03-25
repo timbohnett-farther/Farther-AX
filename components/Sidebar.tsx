@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import useSWR from "swr";
 import {
   HomeIcon,
   DocumentPlusIcon,
@@ -14,6 +15,8 @@ import {
   UserGroupIcon,
   BellAlertIcon,
 } from "@heroicons/react/24/outline";
+
+const sidebarFetcher = (url: string) => fetch(url).then(r => r.json());
 
 const navItems = [
   { step: 1, label: "Introduction", href: "/introduction" },
@@ -50,6 +53,13 @@ const externalLinks = [
   { label: "AX Email Templates", href: "#" },
 ];
 
+interface NavItem {
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: number;
+}
+
 function NavGroup({
   label,
   items,
@@ -57,7 +67,7 @@ function NavGroup({
   labelClassName,
 }: {
   label: string;
-  items: { label: string; href: string; icon: React.ComponentType<{ className?: string }> }[];
+  items: NavItem[];
   pathname: string;
   labelClassName?: string;
 }) {
@@ -85,7 +95,12 @@ function NavGroup({
                 <span className={isActive ? "text-teal" : "text-cream-muted"}>
                   <Icon className="w-4 h-4 shrink-0" />
                 </span>
-                <span className="leading-snug">{item.label}</span>
+                <span className="leading-snug flex-1">{item.label}</span>
+                {item.badge != null && item.badge > 0 && (
+                  <span className="ml-auto min-w-[20px] h-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1.5">
+                    {item.badge > 99 ? "99+" : item.badge}
+                  </span>
+                )}
               </Link>
             </li>
           );
@@ -103,6 +118,19 @@ export default function Sidebar() {
 
   const [trainingOpen, setTrainingOpen] = useState(true);
   const [resourcesOpen, setResourcesOpen] = useState(true);
+
+  // Fetch alert count for sidebar badge
+  const { data: alertData } = useSWR<{ total?: number }>(
+    "/api/command-center/alerts",
+    sidebarFetcher,
+    { refreshInterval: 5 * 60 * 1000, revalidateOnFocus: false, errorRetryCount: 1 }
+  );
+  const alertCount = alertData?.total ?? 0;
+
+  // Inject alert badge into nav items
+  const opsWithBadges: NavItem[] = coreOps.map(item =>
+    item.label === "Alerts" ? { ...item, badge: alertCount } : item
+  );
 
   return (
     <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-charcoal">
@@ -125,7 +153,7 @@ export default function Sidebar() {
         {/* ── AX Operations ─────────────────── */}
         <NavGroup
           label="AX Operations"
-          items={coreOps}
+          items={opsWithBadges}
           pathname={pathname}
           labelClassName="text-teal"
         />
