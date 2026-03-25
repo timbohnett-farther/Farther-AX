@@ -534,7 +534,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 
     // ── Monthly Launches (last 6 months) ──
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const monthlyLaunches: { month: string; count: number; aum: number }[] = [];
+    const monthlyLaunches: { month: string; count: number; aum: number; names: string[] }[] = [];
     for (let i = 5; i >= 0; i--) {
       const d = new Date(year, now.getMonth() - i, 1);
       const mStart = new Date(d.getFullYear(), d.getMonth(), 1);
@@ -549,6 +549,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
         month: monthNames[d.getMonth()],
         count: mDeals.length,
         aum: mDeals.reduce((acc, dl) => acc + getAUM(dl), 0),
+        names: mDeals.map(dl => dl.dealname || 'Unknown'),
       });
     }
 
@@ -576,6 +577,24 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
       });
     }
 
+    // ── AUM by Month YTD (launched AUM per month, Jan → current) ──
+    const aumByMonthYtd: { month: string; aum: number; count: number }[] = [];
+    for (let m = 0; m <= currentMonth; m++) {
+      const mStart = new Date(year, m, 1);
+      const mEnd = new Date(year, m + 1, 0, 23, 59, 59);
+      const mDeals = allLaunchedDeals.filter(dl => {
+        const ls = getLaunchDate(dl);
+        if (!ls) return false;
+        const ld = new Date(ls);
+        return ld >= mStart && ld <= mEnd;
+      });
+      aumByMonthYtd.push({
+        month: monthNames[m],
+        aum: mDeals.reduce((acc, dl) => acc + getAUM(dl), 0),
+        count: mDeals.length,
+      });
+    }
+
     return {
       activeDeals, launchedDeals, preLaunchDeals,
       stageFunnel, totalActiveAUM, preLaunchAUM,
@@ -591,7 +610,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
       monthlyGoal, quarterlyGoal,
       quarterLabel, monthLabel,
       // Charts
-      monthlyLaunches, cumulativeYtd,
+      monthlyLaunches, cumulativeYtd, aumByMonthYtd,
     };
   }, [deals]);
 
@@ -902,14 +921,24 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
               <YAxis tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
                 cursor={{ fill: 'rgba(250,247,242,0.04)' }}
-                contentStyle={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, color: C.dark }}
-                itemStyle={{ color: C.dark }}
-                formatter={(value: unknown, name: unknown) => {
-                  const v = Number(value);
-                  if (name === 'count') return [v, 'Advisors'];
-                  return [formatAUM(v), 'AUM'];
+                content={({ active, payload, label }) => {
+                  if (!active || !payload?.length) return null;
+                  const entry = payload[0]?.payload as { count: number; aum: number; names: string[] } | undefined;
+                  if (!entry) return null;
+                  return (
+                    <div style={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, padding: '10px 14px', fontSize: 12, maxWidth: 260 }}>
+                      <div style={{ color: C.slate, marginBottom: 6, fontWeight: 600 }}>{label}</div>
+                      <div style={{ color: C.dark, marginBottom: 2 }}>{entry.count} Advisors · {formatAUM(entry.aum)}</div>
+                      {entry.names.length > 0 && (
+                        <div style={{ marginTop: 6, borderTop: `1px solid ${C.border}`, paddingTop: 6 }}>
+                          {entry.names.map((name, i) => (
+                            <div key={i} style={{ color: C.teal, fontSize: 11, lineHeight: 1.5 }}>{name}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
                 }}
-                labelStyle={{ color: C.slate, marginBottom: 4 }}
               />
               <Bar dataKey="count" fill={C.teal} radius={[4, 4, 0, 0]} maxBarSize={40} />
             </BarChart>
@@ -955,6 +984,40 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             </ComposedChart>
           </ResponsiveContainer>
         </div>
+      </div>
+
+      {/* ── AUM by Month YTD Line Graph ── */}
+      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24, marginBottom: 20 }}>
+        <SectionHeader title="Launched AUM by Month" subtitle="Monthly launched AUM — Year to date" />
+        <ResponsiveContainer width="100%" height={220}>
+          <ComposedChart data={a.aumByMonthYtd} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(250,247,242,0.06)" vertical={false} />
+            <XAxis dataKey="month" tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis
+              tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false}
+              tickFormatter={(v: number) => formatAUM(v)}
+            />
+            <Tooltip
+              cursor={{ stroke: 'rgba(250,247,242,0.08)', strokeWidth: 1 }}
+              contentStyle={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, color: C.dark }}
+              formatter={(value: unknown, name: unknown) => {
+                const v = Number(value);
+                if (name === 'aum') return [formatAUM(v), 'Launched AUM'];
+                if (name === 'count') return [v, 'Advisors'];
+                return [formatAUM(v), String(name)];
+              }}
+              labelStyle={{ color: C.slate, marginBottom: 4 }}
+            />
+            <defs>
+              <linearGradient id="aumMonthGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={C.teal} stopOpacity={0.2} />
+                <stop offset="95%" stopColor={C.teal} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <Area type="monotone" dataKey="aum" fill="url(#aumMonthGradient)" stroke={C.teal} strokeWidth={2} dot={{ fill: C.teal, r: 4 }} />
+            <Line type="monotone" dataKey="count" stroke={C.gold} strokeWidth={1.5} strokeDasharray="4 2" dot={{ fill: C.gold, r: 3 }} yAxisId={0} />
+          </ComposedChart>
+        </ResponsiveContainer>
       </div>
 
       {/* ── Row 1: Stage Funnel + Launch Countdown ── */}
@@ -1627,12 +1690,24 @@ function RecruitingTab() {
                   const vb = ((b as unknown as Record<string, unknown>)[sortCol] as string) ?? '';
                   return va.localeCompare(vb) * dir;
                 });
+                // Find separator index: last deal whose launch date is today or earlier
+                const today = new Date();
+                today.setHours(23, 59, 59, 999);
+                let separatorAfterIndex = -1;
+                for (let idx = 0; idx < displayed.length; idx++) {
+                  const ld = displayed[idx].desired_start_date ?? displayed[idx].actual_launch_date;
+                  if (ld && new Date(ld) <= today) separatorAfterIndex = idx;
+                }
+
                 return displayed.map((deal, i) => {
                   const cx = complexityScores[deal.id];
                   const launchDate = deal.desired_start_date ?? deal.actual_launch_date;
+                  const showSeparator = i === separatorAfterIndex && separatorAfterIndex < displayed.length - 1;
                   return (
                     <tr key={deal.id} style={{
-                      borderBottom: `1px solid ${C.border}`,
+                      borderBottom: showSeparator
+                        ? `3px solid ${C.teal}`
+                        : `1px solid ${C.border}`,
                       background: i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)',
                       transition: 'background 120ms ease',
                     }}
@@ -1730,8 +1805,35 @@ function RecruitingTab() {
                       <td style={{ padding: '10px 14px' }}>
                         {cx ? <ComplexityBadge score={cx.score} tier={cx.tier} tierColor={cx.tierColor} /> : <span style={{ color: C.slate, fontSize: 11 }}>…</span>}
                       </td>
-                      <td style={{ padding: '10px 14px', color: C.slate, whiteSpace: 'nowrap' }}>
-                        {launchDate ? formatDate(launchDate) : '—'}
+                      <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
+                        <input
+                          type="date"
+                          value={launchDate ? launchDate.split('T')[0] : ''}
+                          onChange={async (e) => {
+                            const newDate = e.target.value;
+                            if (!newDate) return;
+                            const el = e.target;
+                            el.style.opacity = '0.5';
+                            try {
+                              const res = await fetch(`/api/command-center/deal/${deal.id}/stage`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ desired_start_date: newDate }),
+                              });
+                              if (res.ok) mutatePipeline();
+                            } catch { /* silent */ }
+                            el.style.opacity = '1';
+                          }}
+                          style={{
+                            background: 'transparent', border: `1px solid transparent`,
+                            borderRadius: 4, padding: '2px 4px', fontSize: 12,
+                            color: C.slate, cursor: 'pointer', outline: 'none',
+                            fontFamily: "'Fakt', system-ui, sans-serif",
+                            width: 120,
+                          }}
+                          onFocus={e => { (e.target as HTMLInputElement).style.borderColor = C.teal; }}
+                          onBlur={e => { (e.target as HTMLInputElement).style.borderColor = 'transparent'; }}
+                        />
                       </td>
                       <td style={{ padding: '10px 14px' }}>
                         <LaunchTimer deal={deal} />
