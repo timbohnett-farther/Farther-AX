@@ -84,6 +84,10 @@ function TransitionsPageInner() {
     currentDeal: string | null;
   } | null>(null);
 
+  // TRAN AUM sync state
+  const [syncingTranAum, setSyncingTranAum] = useState(false);
+  const [tranAumResult, setTranAumResult] = useState<string | null>(null);
+
   // ── URL update helper ──────────────────────────────────────────────────────
   const updateUrl = useCallback((updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -270,6 +274,31 @@ function TransitionsPageInner() {
     }
   }
 
+  // ── TRAN AUM Sync ─────────────────────────────────────────────────────────
+  async function handleSyncTranAum() {
+    setSyncingTranAum(true);
+    setTranAumResult(null);
+    try {
+      const res = await fetch('/api/command-center/transitions/tran-aum', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const result = await res.json();
+
+      if (res.ok && result.success) {
+        setTranAumResult(`✓ ${result.message}`);
+        // Refresh the main data to show updated TRAN AUM
+        mutate();
+      } else {
+        setTranAumResult(`Error: ${result.error ?? 'Unknown'}`);
+      }
+    } catch (e) {
+      setTranAumResult(`Sync failed: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setSyncingTranAum(false);
+    }
+  }
+
   // ── Last synced format ────────────────────────────────────────────────────
   function formatSyncAge(isoDate: string | null | undefined): string {
     if (!isoDate) return 'Never synced';
@@ -319,6 +348,14 @@ function TransitionsPageInner() {
           cursor: syncingTeamMappings ? 'not-allowed' : 'pointer',
         }}>
           {syncingTeamMappings ? 'Syncing...' : '\u2728 Sync Team Mappings'}
+        </button>
+        <button onClick={handleSyncTranAum} disabled={syncingTranAum} style={{
+          padding: '7px 14px', borderRadius: 6, border: `1px solid ${C.border}`,
+          background: syncingTranAum ? C.cardBg : 'transparent',
+          color: syncingTranAum ? C.slate : C.dark, fontSize: 12, fontWeight: 600,
+          cursor: syncingTranAum ? 'not-allowed' : 'pointer',
+        }}>
+          {syncingTranAum ? 'Syncing...' : '💰 Sync TRAN AUM'}
         </button>
         <button onClick={handleDocuSignFetch} disabled={docusignLoading} style={{
           padding: '7px 14px', borderRadius: 6, border: `1px solid ${C.border}`,
@@ -450,6 +487,21 @@ function TransitionsPageInner() {
               <button onClick={() => { setTeamMappingsResult(null); setTeamMappingsProgress(null); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'inherit' }}>&times;</button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── TRAN AUM Sync Result ──────────────────────────────────────────────── */}
+      {tranAumResult && (
+        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 16, marginBottom: 16 }}>
+          <div style={{
+            fontSize: 12, padding: '6px 10px', borderRadius: 6,
+            background: tranAumResult.startsWith('Error') ? C.redBg : C.greenBg,
+            color: tranAumResult.startsWith('Error') ? C.red : C.green,
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+          }}>
+            {tranAumResult}
+            <button onClick={() => setTranAumResult(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'inherit' }}>&times;</button>
+          </div>
         </div>
       )}
 

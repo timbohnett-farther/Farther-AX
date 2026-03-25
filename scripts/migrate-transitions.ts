@@ -133,6 +133,21 @@ async function migrate() {
         ON advisor_team_mappings(team_name);
       CREATE INDEX IF NOT EXISTS idx_advisor_team_mappings_hubspot_deal
         ON advisor_team_mappings(hubspot_deal_id);
+
+      -- Advisor TRAN AUM & Revenue (aggregated from HubSpot custom object 2-13676628)
+      CREATE TABLE IF NOT EXISTS advisor_tran_aum (
+        id SERIAL PRIMARY KEY,
+        advisor_name VARCHAR(255) NOT NULL UNIQUE,
+        tran_aum NUMERIC(15, 2) DEFAULT 0,
+        revenue NUMERIC(15, 2) DEFAULT 0,
+        record_count INTEGER DEFAULT 0,
+        last_synced_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_advisor_tran_aum_advisor_name
+        ON advisor_tran_aum(advisor_name);
     `);
     console.log('Migration complete.');
   } finally {

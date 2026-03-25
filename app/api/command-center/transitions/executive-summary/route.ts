@@ -14,6 +14,8 @@ interface AdvisorSummary {
   portal_complete: number;
   portal_pct: number;
   overall_pct: number;
+  tran_aum: number | null;
+  revenue: number | null;
 }
 
 // ── GET handler ──────────────────────────────────────────────────────────────
@@ -49,6 +51,24 @@ export async function GET() {
       ORDER BY advisor_name ASC
     `);
 
+    // Fetch TRAN AUM & Revenue data
+    const tranAumResult = await pool.query<{
+      advisor_name: string;
+      tran_aum: string;
+      revenue: string;
+    }>(`
+      SELECT advisor_name, tran_aum, revenue
+      FROM advisor_tran_aum
+    `);
+
+    const tranAumMap = new Map<string, { tran_aum: number; revenue: number }>();
+    for (const row of tranAumResult.rows) {
+      tranAumMap.set(row.advisor_name, {
+        tran_aum: parseFloat(row.tran_aum) || 0,
+        revenue: parseFloat(row.revenue) || 0,
+      });
+    }
+
     const advisors: AdvisorSummary[] = result.rows.map((row) => {
       const total = parseInt(row.total_accounts, 10);
       const iaa = parseInt(row.iaa_complete, 10);
@@ -57,6 +77,8 @@ export async function GET() {
 
       const totalSteps = total * 3; // IAA + Paperwork + Portal per account
       const completedSteps = iaa + paperwork + portal;
+
+      const tranAumData = tranAumMap.get(row.advisor_name);
 
       return {
         advisor_name: row.advisor_name,
@@ -70,6 +92,8 @@ export async function GET() {
         portal_pct: total > 0 ? Math.round((portal / total) * 100) : 0,
         overall_pct:
           totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0,
+        tran_aum: tranAumData?.tran_aum ?? null,
+        revenue: tranAumData?.revenue ?? null,
       };
     });
 

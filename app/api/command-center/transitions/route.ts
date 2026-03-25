@@ -36,6 +36,8 @@ interface AdvisorGroup {
   farther_contact: string | null;
   sheet_url: string | null;
   total_accounts: number;
+  tran_aum: number | null;
+  revenue: number | null;
   accounts: TransitionClientRow[];
 }
 
@@ -112,17 +114,38 @@ export async function GET(req: NextRequest) {
 
     const rows = result.rows;
 
+    // ── Fetch TRAN AUM & Revenue data ────────────────────────────────────────
+    const tranAumResult = await pool.query<{
+      advisor_name: string;
+      tran_aum: string;
+      revenue: string;
+    }>(`
+      SELECT advisor_name, tran_aum, revenue
+      FROM advisor_tran_aum
+    `);
+
+    const tranAumMap = new Map<string, { tran_aum: number; revenue: number }>();
+    for (const row of tranAumResult.rows) {
+      tranAumMap.set(row.advisor_name, {
+        tran_aum: parseFloat(row.tran_aum) || 0,
+        revenue: parseFloat(row.revenue) || 0,
+      });
+    }
+
     // ── Group by advisor ─────────────────────────────────────────────────────
     const advisorMap = new Map<string, AdvisorGroup>();
 
     for (const row of rows) {
       const key = row.advisor_name ?? 'Unknown Advisor';
       if (!advisorMap.has(key)) {
+        const tranAumData = tranAumMap.get(key);
         advisorMap.set(key, {
           advisor_name: key,
           farther_contact: row.farther_contact,
           sheet_url: row.sheet_id ? `https://docs.google.com/spreadsheets/d/${row.sheet_id}` : null,
           total_accounts: 0,
+          tran_aum: tranAumData?.tran_aum ?? null,
+          revenue: tranAumData?.revenue ?? null,
           accounts: [],
         });
       }
