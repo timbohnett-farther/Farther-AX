@@ -1,8 +1,9 @@
 'use client';
 
 import useSWR from 'swr';
+import { useState } from 'react';
 import Image from 'next/image';
-import { StatCard, MetricBar } from '@/components/ui';
+import { StatCard, MetricBar, DataCard } from '@/components/ui';
 import { formatCompactCurrency } from '@/lib/design-tokens';
 import {
   UserGroupIcon,
@@ -12,6 +13,7 @@ import {
   ClockIcon,
   HomeModernIcon,
   BanknotesIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
@@ -41,6 +43,11 @@ function formatAUM(n: number): string {
  */
 export default function MetricsDashboard() {
   const { data, error, isLoading } = useSWR('/api/command-center/metrics', fetcher, { refreshInterval: 43_200_000 });
+  const [selectedMetric, setSelectedMetric] = useState<{
+    title: string;
+    category: string;
+    data: any;
+  } | null>(null);
 
   if (isLoading) {
     return (
@@ -117,6 +124,11 @@ export default function MetricsDashboard() {
           value={String(cap.axStaff ?? 0)}
           subtitle="AXM + AXA"
           icon={<UserGroupIcon className="h-6 w-6 text-teal" />}
+          onClick={() => setSelectedMetric({
+            title: 'AX Staff',
+            category: 'Team Capacity',
+            data: { 'Total AX Staff': cap.axStaff ?? 0, 'AXMs': roles['AXM'] ?? 0, 'AXAs': roles['AXA'] ?? 0 }
+          })}
         />
         <StatCard
           title="Platform AUM"
@@ -124,18 +136,33 @@ export default function MetricsDashboard() {
           subtitle="managed accounts"
           icon={<CurrencyDollarIcon className="h-6 w-6 text-white" />}
           className="bg-teal text-white"
+          onClick={() => setSelectedMetric({
+            title: 'Platform AUM',
+            category: 'Team Capacity',
+            data: { 'Total Platform AUM': cap.platformAUM ?? 0, 'Launched Advisors': cap.launchedAdvisors ?? 0 }
+          })}
         />
         <StatCard
           title="Launched Advisors"
           value={String(cap.launchedAdvisors ?? 0)}
           subtitle="Step 7 – Launched"
           icon={<ChartBarIcon className="h-6 w-6 text-teal" />}
+          onClick={() => setSelectedMetric({
+            title: 'Launched Advisors',
+            category: 'Team Capacity',
+            data: { 'Total Launched': cap.launchedAdvisors ?? 0, 'Platform AUM': cap.platformAUM ?? 0 }
+          })}
         />
         <StatCard
           title="AUM per Staff"
           value={formatAUM(cap.aumPerStaff ?? 0)}
           subtitle="platform AUM / AX staff"
           icon={<ArrowTrendingUpIcon className="h-6 w-6 text-teal" />}
+          onClick={() => setSelectedMetric({
+            title: 'AUM per Staff',
+            category: 'Team Capacity',
+            data: { 'AUM per Staff': cap.aumPerStaff ?? 0, 'Platform AUM': cap.platformAUM ?? 0, 'Total Staff': cap.axStaff ?? 0 }
+          })}
         />
       </div>
 
@@ -150,18 +177,33 @@ export default function MetricsDashboard() {
           subtitle="annual fee revenue"
           icon={<BanknotesIcon className="h-6 w-6 text-teal" />}
           className="bg-teal text-white"
+          onClick={() => setSelectedMetric({
+            title: 'Total Revenue',
+            category: 'Launched Advisor Stats',
+            data: { 'Annual Fee Revenue': stats.totalRevenue ?? 0, 'Total Households': stats.totalHouseholds ?? 0, 'Launched Advisors': cap.launchedAdvisors ?? 0 }
+          })}
         />
         <StatCard
           title="Avg Days to Launch"
           value={stats.avgDaysToLaunch != null ? `${stats.avgDaysToLaunch}d` : '—'}
           subtitle="create → launch"
           icon={<ClockIcon className="h-6 w-6 text-teal" />}
+          onClick={() => setSelectedMetric({
+            title: 'Avg Days to Launch',
+            category: 'Launched Advisor Stats',
+            data: { 'Average Days': stats.avgDaysToLaunch ?? 0, 'Launched Advisors': cap.launchedAdvisors ?? 0 }
+          })}
         />
         <StatCard
           title="Total Households"
           value={String(stats.totalHouseholds ?? 0)}
           subtitle="launched advisors"
           icon={<HomeModernIcon className="h-6 w-6 text-teal" />}
+          onClick={() => setSelectedMetric({
+            title: 'Total Households',
+            category: 'Launched Advisor Stats',
+            data: { 'Total Households': stats.totalHouseholds ?? 0, 'Launched Advisors': cap.launchedAdvisors ?? 0, 'Total Revenue': stats.totalRevenue ?? 0 }
+          })}
         />
       </div>
 
@@ -170,10 +212,46 @@ export default function MetricsDashboard() {
         Team Breakdown
       </h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <StatCard title="AXMs" value={String(roles['AXM'] ?? 0)} subtitle="Advisor Experience Managers" />
-        <StatCard title="AXAs" value={String(roles['AXA'] ?? 0)} subtitle="Advisor Experience Associates" />
-        <StatCard title="CTMs" value={String(roles['CTM'] ?? 0)} subtitle="Client Transition Managers" />
-        <StatCard title="CTAs" value={String(roles['CTA'] ?? 0)} subtitle="Client Transition Associates" />
+        <StatCard
+          title="AXMs"
+          value={String(roles['AXM'] ?? 0)}
+          subtitle="Advisor Experience Managers"
+          onClick={() => setSelectedMetric({
+            title: 'AXMs',
+            category: 'Team Breakdown',
+            data: { 'Total AXMs': roles['AXM'] ?? 0, 'Total AX Staff': cap.axStaff ?? 0 }
+          })}
+        />
+        <StatCard
+          title="AXAs"
+          value={String(roles['AXA'] ?? 0)}
+          subtitle="Advisor Experience Associates"
+          onClick={() => setSelectedMetric({
+            title: 'AXAs',
+            category: 'Team Breakdown',
+            data: { 'Total AXAs': roles['AXA'] ?? 0, 'Total AX Staff': cap.axStaff ?? 0 }
+          })}
+        />
+        <StatCard
+          title="CTMs"
+          value={String(roles['CTM'] ?? 0)}
+          subtitle="Client Transition Managers"
+          onClick={() => setSelectedMetric({
+            title: 'CTMs',
+            category: 'Team Breakdown',
+            data: { 'Total CTMs': roles['CTM'] ?? 0 }
+          })}
+        />
+        <StatCard
+          title="CTAs"
+          value={String(roles['CTA'] ?? 0)}
+          subtitle="Client Transition Associates"
+          onClick={() => setSelectedMetric({
+            title: 'CTAs',
+            category: 'Team Breakdown',
+            data: { 'Total CTAs': roles['CTA'] ?? 0 }
+          })}
+        />
       </div>
 
       {/* Onboarded AUM */}
@@ -185,17 +263,32 @@ export default function MetricsDashboard() {
           title="This Month"
           value={formatAUM(m.onboardedThisMonth?.aum ?? 0)}
           subtitle={`${m.onboardedThisMonth?.count ?? 0} advisors`}
+          onClick={() => setSelectedMetric({
+            title: 'This Month',
+            category: 'Onboarded AUM',
+            data: { 'AUM': m.onboardedThisMonth?.aum ?? 0, 'Advisors': m.onboardedThisMonth?.count ?? 0 }
+          })}
         />
         <StatCard
           title="This Quarter"
           value={formatAUM(m.onboardedThisQuarter?.aum ?? 0)}
           subtitle={`${m.onboardedThisQuarter?.count ?? 0} advisors`}
+          onClick={() => setSelectedMetric({
+            title: 'This Quarter',
+            category: 'Onboarded AUM',
+            data: { 'AUM': m.onboardedThisQuarter?.aum ?? 0, 'Advisors': m.onboardedThisQuarter?.count ?? 0 }
+          })}
         />
         <StatCard
           title="This Year"
           value={formatAUM(m.onboardedThisYear?.aum ?? 0)}
           subtitle={`${m.onboardedThisYear?.count ?? 0} advisors`}
           className="bg-teal text-white"
+          onClick={() => setSelectedMetric({
+            title: 'This Year',
+            category: 'Onboarded AUM',
+            data: { 'AUM': m.onboardedThisYear?.aum ?? 0, 'Advisors': m.onboardedThisYear?.count ?? 0 }
+          })}
         />
       </div>
 
@@ -208,16 +301,31 @@ export default function MetricsDashboard() {
           title="Next 30 Days"
           value={formatAUM(m.pipeline30?.aum ?? 0)}
           subtitle={`${m.pipeline30?.count ?? 0} expected`}
+          onClick={() => setSelectedMetric({
+            title: 'Next 30 Days',
+            category: 'Upcoming Pipeline AUM',
+            data: { 'Expected AUM': m.pipeline30?.aum ?? 0, 'Expected Advisors': m.pipeline30?.count ?? 0 }
+          })}
         />
         <StatCard
           title="Next 60 Days"
           value={formatAUM(m.pipeline60?.aum ?? 0)}
           subtitle={`${m.pipeline60?.count ?? 0} expected`}
+          onClick={() => setSelectedMetric({
+            title: 'Next 60 Days',
+            category: 'Upcoming Pipeline AUM',
+            data: { 'Expected AUM': m.pipeline60?.aum ?? 0, 'Expected Advisors': m.pipeline60?.count ?? 0 }
+          })}
         />
         <StatCard
           title="Next 90 Days"
           value={formatAUM(m.pipeline90?.aum ?? 0)}
           subtitle={`${m.pipeline90?.count ?? 0} expected`}
+          onClick={() => setSelectedMetric({
+            title: 'Next 90 Days',
+            category: 'Upcoming Pipeline AUM',
+            data: { 'Expected AUM': m.pipeline90?.aum ?? 0, 'Expected Advisors': m.pipeline90?.count ?? 0 }
+          })}
         />
       </div>
 
@@ -246,6 +354,110 @@ export default function MetricsDashboard() {
           />
         )}
       </div>
+
+      {/* Detail Panel - Slide in from right */}
+      {selectedMetric && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-charcoal/60 backdrop-blur-sm z-40"
+            onClick={() => setSelectedMetric(null)}
+          />
+
+          {/* Slide-in Panel */}
+          <div className="fixed top-0 right-0 h-full w-full md:w-2/3 lg:w-1/2 xl:w-1/3 bg-charcoal border-l border-slate/20 shadow-2xl z-50 overflow-y-auto">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-cream font-serif mb-1">
+                    {selectedMetric.title}
+                  </h2>
+                  <p className="text-slate text-sm">{selectedMetric.category}</p>
+                </div>
+                <button
+                  onClick={() => setSelectedMetric(null)}
+                  className="p-2 hover:bg-slate/10 rounded-lg transition-colors"
+                  aria-label="Close detail view"
+                >
+                  <XMarkIcon className="h-6 w-6 text-slate" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="space-y-4">
+                {selectedMetric.data && typeof selectedMetric.data === 'object' && (
+                  <>
+                    {Object.entries(selectedMetric.data).map(([key, value]) => (
+                      <DataCard key={key}>
+                        <dt className="text-sm text-slate mb-1 capitalize">
+                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                        </dt>
+                        <dd className="text-xl font-semibold text-cream">
+                          {typeof value === 'number' && key.toLowerCase().includes('aum')
+                            ? formatAUM(value)
+                            : typeof value === 'number' && key.toLowerCase().includes('revenue')
+                            ? formatAUM(value)
+                            : String(value ?? '—')}
+                        </dd>
+                      </DataCard>
+                    ))}
+                  </>
+                )}
+
+                {selectedMetric.category === 'Team Capacity' && (
+                  <div className="mt-6 p-4 bg-teal/10 border border-teal/20 rounded-lg">
+                    <p className="text-sm text-slate">
+                      <strong className="text-teal">Calculation:</strong>{' '}
+                      {selectedMetric.title === 'AUM per Staff'
+                        ? 'Platform AUM divided by total AX staff (AXM + AXA)'
+                        : selectedMetric.title === 'AX Staff'
+                        ? 'Total count of Advisor Experience Managers (AXM) and Advisor Experience Associates (AXA)'
+                        : selectedMetric.title === 'Platform AUM'
+                        ? 'Total AUM across all managed accounts'
+                        : selectedMetric.title === 'Launched Advisors'
+                        ? 'Count of advisors in Step 7 – Launched stage'
+                        : 'Calculated from team data'}
+                    </p>
+                  </div>
+                )}
+
+                {selectedMetric.category === 'Launched Advisor Stats' && (
+                  <div className="mt-6 p-4 bg-teal/10 border border-teal/20 rounded-lg">
+                    <p className="text-sm text-slate">
+                      <strong className="text-teal">About:</strong>{' '}
+                      {selectedMetric.title === 'Total Revenue'
+                        ? 'Annual fee revenue from all launched advisors'
+                        : selectedMetric.title === 'Avg Days to Launch'
+                        ? 'Average time from deal creation to launch date'
+                        : selectedMetric.title === 'Total Households'
+                        ? 'Total household count across all launched advisors'
+                        : 'Metric for launched advisors'}
+                    </p>
+                  </div>
+                )}
+
+                {selectedMetric.category === 'Team Breakdown' && (
+                  <div className="mt-6 p-4 bg-indigo/10 border border-indigo/20 rounded-lg">
+                    <p className="text-sm text-slate mb-3">
+                      <strong className="text-indigo">Role:</strong>{' '}
+                      {selectedMetric.title === 'AXMs'
+                        ? 'Advisor Experience Managers lead advisor relationships and oversee onboarding'
+                        : selectedMetric.title === 'AXAs'
+                        ? 'Advisor Experience Associates support advisors through operational tasks'
+                        : selectedMetric.title === 'CTMs'
+                        ? 'Client Transition Managers handle complex client transitions'
+                        : selectedMetric.title === 'CTAs'
+                        ? 'Client Transition Associates support client onboarding operations'
+                        : 'Team member role'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

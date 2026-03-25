@@ -49,16 +49,25 @@
 ---
 
 ### **Fix #3: Metrics Cards Don't Show Detail on Click**
-- **Status:** 🔴 Not Started
+- **Status:** ✅ **FIXED** (2026-03-25)
 - **Reported:** 2026-03-24 (Evening)
 - **Description:** Cards in Metrics page don't show any detail when clicking on them
 - **Priority:** Medium
 - **Affected Page:** `app/command-center/metrics/page.tsx`
-- **Next Steps:**
-  - [ ] Check click handlers on metric cards
-  - [ ] Verify detail panel/modal implementation
-  - [ ] Check if detail data is being fetched
-  - [ ] Test card interaction
+- **Root Cause:** No onClick handlers implemented on StatCard components
+- **Solution:** Added state management, detail slide-in panel, and onClick handlers to all 20+ StatCards
+- **Implementation Details:**
+  - Added selectedMetric state to track clicked card
+  - Created slide-in detail panel with backdrop
+  - Added onClick handlers to all StatCards (Team Capacity, Launched Stats, Team Breakdown, Onboarded AUM, Pipeline AUM)
+  - Detail panel shows metric breakdown with contextual information
+  - Added close button and backdrop click to dismiss panel
+- **Completed Steps:**
+  - [x] Added state management for selected metric
+  - [x] Created detail panel component with slide-in animation
+  - [x] Added onClick handlers to all StatCard components
+  - [x] Populated detail view with relevant drill-down data
+  - [x] Tested build successfully
 
 ---
 

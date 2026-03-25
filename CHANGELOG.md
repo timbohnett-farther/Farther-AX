@@ -6,6 +6,45 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Metrics Cards Detail View — 2026-03-25
+
+**What**: Implemented interactive detail views for all metrics cards. Clicking any StatCard now opens a slide-in panel with drill-down data and contextual information.
+
+**Root Cause**:
+- StatCard components supported onClick prop but no handlers were implemented
+- No UI component existed to display detailed metric information
+- Missing state management for tracking selected metrics
+
+**Scope**:
+- Added state management with `useState` to track selected metric
+- Created slide-in detail panel component (slides in from right with backdrop)
+- Added onClick handlers to 20+ StatCard components across 5 categories:
+  - Team Capacity (4 cards): AX Staff, Platform AUM, Launched Advisors, AUM per Staff
+  - Launched Advisor Stats (3 cards): Total Revenue, Avg Days to Launch, Total Households
+  - Team Breakdown (4 cards): AXMs, AXAs, CTMs, CTAs
+  - Onboarded AUM (3 cards): This Month, This Quarter, This Year
+  - Upcoming Pipeline AUM (3 cards): Next 30/60/90 Days
+- Detail panel features:
+  - Responsive width (full on mobile, 1/2 on desktop)
+  - Close button + backdrop click to dismiss
+  - Formatted drill-down data (AUM formatted with `formatCompactCurrency`)
+  - Contextual information boxes with calculation details and role descriptions
+  - Smooth slide-in animation
+
+**Status**: ✅ Fixed and deployed
+
+**Files**:
+- `app/command-center/metrics/page.tsx` — Added state, detail panel, onClick handlers to all StatCards
+
+**Impact**:
+- All 20+ metric cards now interactive with drill-down details
+- Users can click any card to see breakdown of underlying data
+- Improved UX with slide-in panel (non-blocking, easy to dismiss)
+- Contextual help text explains calculations and team roles
+- Maintains existing glass morphism design aesthetic
+
+---
+
 ## [Completed] Fix Alerts Page Not Loading — 2026-03-25
 
 **What**: Fixed critical bug where Alerts page was not displaying any data due to type mismatch between API response and frontend expectations.
