@@ -134,9 +134,9 @@ export default function Sidebar() {
   );
 
   return (
-    <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-white dark:bg-charcoal border-r border-gray-200 dark:border-white/10">
+    <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-charcoal-800 dark:bg-charcoal border-r border-charcoal-600 dark:border-white/10">
       {/* Logo / Brand */}
-      <div className="px-6 pt-8 pb-5 border-b border-gray-200 dark:border-white/10">
+      <div className="px-6 pt-8 pb-5 border-b border-charcoal-600 dark:border-white/10">
         <Image
           src="/images/farther-iw-cream.png"
           alt="Farther"
@@ -144,7 +144,7 @@ export default function Sidebar() {
           height={40}
           className="mb-2 object-contain object-left dark:filter-none invert dark:invert-0"
         />
-        <p className="text-[10px] tracking-widest uppercase text-teal dark:text-slate">
+        <p className="text-[10px] tracking-widest uppercase text-cream-dark dark:text-slate">
           Terminal AX
         </p>
       </div>
@@ -160,12 +160,12 @@ export default function Sidebar() {
         />
 
         {/* Divider */}
-        <div className="my-3 border-t border-white/10" />
+        <div className="my-3 border-t border-charcoal-600 dark:border-white/10" />
 
         {/* AX Training & Information — collapsible */}
         <button
           onClick={() => setTrainingOpen(!trainingOpen)}
-          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase text-cream-muted bg-transparent border-none cursor-pointer hover:text-slate transition-smooth"
+          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase text-gray-600 dark:text-cream-muted bg-transparent border-none cursor-pointer hover:text-gray-900 dark:hover:text-slate transition-smooth"
         >
           <span>AX Training &amp; Playbook</span>
           <span className={`text-[10px] transition-transform ${trainingOpen ? 'rotate-0' : '-rotate-90'}`}>
@@ -182,12 +182,12 @@ export default function Sidebar() {
                     href={item.href}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-smooth group ${
                       isActive
-                        ? "text-white bg-teal/20 border-l-2 border-teal"
-                        : "text-white/50 hover:text-white/80 hover:bg-white/5"
+                        ? "text-gray-900 dark:text-white bg-teal/20 border-l-2 border-teal"
+                        : "text-gray-600 dark:text-white/50 hover:text-gray-900 dark:hover:text-white/80 hover:bg-gray-100 dark:hover:bg-white/5"
                     }`}
                   >
                     <span className={`text-xs font-mono w-5 shrink-0 text-right ${
-                      isActive ? 'text-teal' : 'text-cream-muted'
+                      isActive ? 'text-teal' : 'text-gray-600 dark:text-cream-muted'
                     }`}>
                       {String(item.step).padStart(2, "0")}
                     </span>
@@ -200,12 +200,12 @@ export default function Sidebar() {
         )}
 
         {/* Divider */}
-        <div className="my-4 border-t border-white/10" />
+        <div className="my-4 border-t border-charcoal-600 dark:border-white/10" />
 
         {/* External Links — collapsible */}
         <button
           onClick={() => setResourcesOpen(!resourcesOpen)}
-          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase text-cream-muted bg-transparent border-none cursor-pointer hover:text-slate transition-smooth"
+          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase text-gray-600 dark:text-cream-muted bg-transparent border-none cursor-pointer hover:text-gray-900 dark:hover:text-slate transition-smooth"
         >
           <span>Resources</span>
           <span className={`text-[10px] transition-transform ${resourcesOpen ? 'rotate-0' : '-rotate-90'}`}>
@@ -220,9 +220,9 @@ export default function Sidebar() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/40 hover:text-white/70 hover:bg-white/5 transition-smooth"
+                  className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-500 dark:text-white/40 hover:text-gray-700 dark:hover:text-white/70 hover:bg-gray-100 dark:hover:bg-white/5 transition-smooth"
                 >
-                  <span className="text-xs text-cream-muted">↗</span>
+                  <span className="text-xs text-gray-600 dark:text-cream-muted">↗</span>
                   {link.label}
                 </a>
               </li>
@@ -233,7 +233,7 @@ export default function Sidebar() {
 
       {/* User / Sign Out */}
       {session?.user && (
-        <div className="px-4 py-4 border-t border-white/10">
+        <div className="px-4 py-4 border-t border-charcoal-600 dark:border-white/10">
           <div className="flex items-center gap-3 mb-3">
             {session.user.image ? (
               <Image
@@ -249,10 +249,10 @@ export default function Sidebar() {
               </div>
             )}
             <div className="min-w-0">
-              <p className="text-xs font-medium text-white truncate">
+              <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
                 {session.user.name}
               </p>
-              <p className="text-xs truncate text-slate">
+              <p className="text-xs truncate text-gray-600 dark:text-slate">
                 {session.user.email}
               </p>
             </div>
@@ -269,8 +269,8 @@ export default function Sidebar() {
 
       {/* Footer (shown when not signed in) */}
       {!session?.user && (
-        <div className="px-6 py-4 border-t border-white/10">
-          <p className="text-xs text-cream-muted">
+        <div className="px-6 py-4 border-t border-charcoal-600 dark:border-white/10">
+          <p className="text-xs text-gray-600 dark:text-cream-muted">
             Farther Wealth Management
           </p>
         </div>

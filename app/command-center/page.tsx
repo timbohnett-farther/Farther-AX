@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import Image from 'next/image';
 import Link from 'next/link';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, Area, Line } from 'recharts';
+import { useTheme } from '@/lib/theme-provider';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -19,17 +20,27 @@ const SWR_OPTS = {
   errorRetryCount: 2,
 } as const;
 
-// ── Design tokens ────────────────────────────────────────────────────────────
-const C = {
-  dark: '#FFFEF4', white: '#1a1a1a', slate: 'rgba(212,223,229,0.5)',
+// ── Design tokens (theme-aware) ──────────────────────────────────────────────
+const getThemeColors = (isDark: boolean) => ({
+  dark: isDark ? '#FFFEF4' : '#1a1a1a',
+  white: isDark ? '#1a1a1a' : '#FFFEF4',
+  slate: isDark ? 'rgba(212,223,229,0.5)' : 'rgba(102,102,102,0.6)',
   lightBlue: '#A8CED3',
-  teal: '#4E7082', bg: '#111111',
-  cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
-  green: '#10b981', greenBg: 'rgba(16,185,129,0.15)',
-  amber: '#f59e0b', amberBg: 'rgba(245,158,11,0.15)', amberBorder: 'rgba(245,158,11,0.3)',
-  red: '#ef4444', redBg: 'rgba(239,68,68,0.15)', redBorder: 'rgba(239,68,68,0.3)',
-  gold: '#f59e0b', goldBg: 'rgba(245,158,11,0.15)',
-};
+  teal: '#4E7082',
+  bg: isDark ? '#111111' : '#F8F4F0',
+  cardBg: isDark ? '#171f27' : '#FFFFFF',
+  border: isDark ? 'rgba(212,223,229,0.08)' : 'rgba(224,224,224,0.4)',
+  green: '#10b981',
+  greenBg: isDark ? 'rgba(16,185,129,0.15)' : 'rgba(16,185,129,0.08)',
+  amber: '#f59e0b',
+  amberBg: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.08)',
+  amberBorder: isDark ? 'rgba(245,158,11,0.3)' : 'rgba(245,158,11,0.2)',
+  red: '#ef4444',
+  redBg: isDark ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.08)',
+  redBorder: isDark ? 'rgba(239,68,68,0.3)' : 'rgba(239,68,68,0.2)',
+  gold: '#f59e0b',
+  goldBg: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.08)',
+});
 
 // ── Stage mappings for Advisor Recruiting ────────────────────────────────────
 const STAGE_LABELS: Record<string, string> = {
@@ -50,15 +61,15 @@ const STAGE_DESCRIPTIONS: Record<string, string> = {
 const ACTIVE_STAGE_IDS = ['2496931', '2496932', '2496934', '100409509', '2496935', '2496936', '100411705'];
 const FUNNEL_STAGE_ORDER = ['2496931', '2496932', '2496934', '100409509', '2496935', '2496936', '100411705'];
 // ── Stage colors ─────────────────────────────────────────────────────────────
-const STAGE_COLORS: Record<string, string> = {
+const getStageColors = (teal: string, gold: string): Record<string, string> => ({
   '2496931':   '#7fb3d8',
   '2496932':   '#6ba3cc',
   '2496934':   '#5793c0',
   '100409509': '#4383b4',
   '2496935':   '#2f73a8',
-  '2496936':   C.gold,
-  '100411705': C.teal,
-};
+  '2496936':   gold,
+  '100411705': teal,
+});
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 // ── Name-to-color mapper for recruiter/team members ─────────────────────────
@@ -68,8 +79,8 @@ const NAME_COLORS = [
   '#14b8a6', '#e879f9', '#fbbf24', '#6366f1',
 ];
 const nameColorCache: Record<string, string> = {};
-function getNameColor(name: string): string {
-  if (!name) return C.slate;
+function getNameColor(name: string, fallback: string): string {
+  if (!name) return fallback;
   if (nameColorCache[name]) return nameColorCache[name];
   const idx = Object.keys(nameColorCache).length % NAME_COLORS.length;
   nameColorCache[name] = NAME_COLORS[idx];
@@ -135,6 +146,8 @@ interface AcquisitionsStage {
 
 // ── Shared UI components ─────────────────────────────────────────────────────
 function SummaryCard({ label, value, sub, accent, icon, iconColor, onClick }: { label: string; value: string; sub?: string; accent?: boolean; icon?: string; iconColor?: string; onClick?: () => void }) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   return (
     <div
       onClick={onClick}
@@ -159,6 +172,8 @@ function SummaryCard({ label, value, sub, accent, icon, iconColor, onClick }: { 
 }
 
 function StageBadge({ stageId, label, isTerminal }: { stageId: string; label: string; isTerminal?: boolean }) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   const isLaunched = stageId === '100411705';
   const isOfferAccepted = stageId === '2496936';
   const isClosedWon = label?.toLowerCase().includes('closed won') || label?.toLowerCase().includes('closedwon');
@@ -196,6 +211,8 @@ function StageBadge({ stageId, label, isTerminal }: { stageId: string; label: st
 // ── Launch timer component ───────────────────────────────────────────────────
 // Step 6: countdown to launch. Step 7: days since launch + graduation progress.
 function LaunchTimer({ deal }: { deal: Deal }) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   const isOfferAccepted = deal.dealstage === '2496936';
   const isLaunched = deal.dealstage === '100411705';
 
@@ -292,6 +309,8 @@ function LaunchTimer({ deal }: { deal: Deal }) {
 }
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   return (
     <div style={{ marginBottom: 16 }}>
       <h3 style={{ fontSize: 15, fontWeight: 600, color: C.dark, fontFamily: "'Fakt', system-ui, sans-serif", marginBottom: subtitle ? 4 : 0 }}>{title}</h3>
@@ -323,6 +342,8 @@ function ComplexityBadge({ score, tier, tierColor }: { score: number; tier: stri
 
 // ── Horizontal bar component ─────────────────────────────────────────────────
 function HorizontalBar({ items, maxValue, perItemMax }: { items: { label: string; value: number; color: string; sub?: string; display?: string; onClick?: () => void }[]; maxValue: number; perItemMax?: number[] }) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {items.map((item, i) => {
@@ -357,6 +378,8 @@ function HorizontalBar({ items, maxValue, perItemMax }: { items: { label: string
 
 // ── Drill-Down Panel ─────────────────────────────────────────────────────────
 function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[]; onClose: () => void }) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   const getAUM = (d: Deal) => parseFloat(d.transferable_aum ?? '0') || 0;
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 999, display: 'flex', justifyContent: 'flex-end' }} onClick={onClose}>
@@ -417,6 +440,9 @@ function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[
 // COMMAND DASHBOARD (Analytics overlay for Recruiting tab)
 // ══════════════════════════════════════════════════════════════════════════════
 function CommandDashboard({ deals }: { deals: Deal[] }) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const STAGE_COLORS = useMemo(() => getStageColors(C.teal, C.gold), [C.teal, C.gold]);
   const { data: aumData } = useSWR('/api/command-center/aum-tracker', fetcher, SWR_OPTS);
   const { data: sentimentData } = useSWR('/api/command-center/sentiment/scores', fetcher, SWR_OPTS);
   const { data: complexityData } = useSWR('/api/command-center/complexity/scores', fetcher, SWR_OPTS);
@@ -1150,6 +1176,8 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 // ADVISOR RECRUITING TAB
 // ══════════════════════════════════════════════════════════════════════════════
 function RecruitingTab() {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   const { data, error, isLoading, mutate: mutatePipeline } = useSWR('/api/command-center/pipeline', fetcher, SWR_OPTS);
   const { data: teamData } = useSWR('/api/command-center/team?role=Recruiter', fetcher, SWR_OPTS);
   const { data: complexityData } = useSWR('/api/command-center/complexity/scores', fetcher, SWR_OPTS);
@@ -1652,7 +1680,7 @@ function RecruitingTab() {
                   onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.teal; }}
                   onMouseLeave={e => { if (selectedRecruiter !== name) (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
                 >
-                  <div style={{ fontSize: 13, fontWeight: 700, color: getNameColor(name), marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: getNameColor(name, C.slate), marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {name}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -2007,11 +2035,11 @@ function RecruitingTab() {
                       <td style={{ padding: '10px 14px' }}>
                         <LaunchTimer deal={deal} />
                       </td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXM ? getNameColor(teamAssignments[deal.id].AXM) : C.slate, fontWeight: teamAssignments[deal.id]?.AXM ? 600 : 400 }}>{teamAssignments[deal.id]?.AXM ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXA ? getNameColor(teamAssignments[deal.id].AXA) : C.slate, fontWeight: teamAssignments[deal.id]?.AXA ? 600 : 400 }}>{teamAssignments[deal.id]?.AXA ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTM ? getNameColor(teamAssignments[deal.id].CTM) : C.slate, fontWeight: teamAssignments[deal.id]?.CTM ? 600 : 400 }}>{teamAssignments[deal.id]?.CTM ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTA ? getNameColor(teamAssignments[deal.id].CTA) : C.slate, fontWeight: teamAssignments[deal.id]?.CTA ? 600 : 400 }}>{teamAssignments[deal.id]?.CTA ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: deal.ownerName ? getNameColor(deal.ownerName) : C.slate, fontWeight: deal.ownerName ? 600 : 400 }}>{deal.ownerName ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXM ? getNameColor(teamAssignments[deal.id].AXM, C.slate) : C.slate, fontWeight: teamAssignments[deal.id]?.AXM ? 600 : 400 }}>{teamAssignments[deal.id]?.AXM ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXA ? getNameColor(teamAssignments[deal.id].AXA, C.slate) : C.slate, fontWeight: teamAssignments[deal.id]?.AXA ? 600 : 400 }}>{teamAssignments[deal.id]?.AXA ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTM ? getNameColor(teamAssignments[deal.id].CTM, C.slate) : C.slate, fontWeight: teamAssignments[deal.id]?.CTM ? 600 : 400 }}>{teamAssignments[deal.id]?.CTM ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTA ? getNameColor(teamAssignments[deal.id].CTA, C.slate) : C.slate, fontWeight: teamAssignments[deal.id]?.CTA ? 600 : 400 }}>{teamAssignments[deal.id]?.CTA ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: deal.ownerName ? getNameColor(deal.ownerName, C.slate) : C.slate, fontWeight: deal.ownerName ? 600 : 400 }}>{deal.ownerName ?? '—'}</td>
                     </tr>
                   );
                 });
@@ -2028,6 +2056,8 @@ function RecruitingTab() {
 // ACQUISITIONS TAB
 // ══════════════════════════════════════════════════════════════════════════════
 function AcquisitionsTab() {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   const { data, error, isLoading } = useSWR('/api/command-center/acquisitions', fetcher, SWR_OPTS);
 
   if (isLoading) return <div style={{ padding: '60px 0', color: C.slate }}>Loading acquisitions…</div>;
@@ -2112,7 +2142,7 @@ function AcquisitionsTab() {
                     <td style={{ padding: '10px 14px', color: C.slate }}>
                       {formatDate(deal.desired_start_date)}
                     </td>
-                    <td style={{ padding: '10px 14px', color: deal.ownerName ? getNameColor(deal.ownerName) : C.slate, fontWeight: deal.ownerName ? 600 : 400 }}>{deal.ownerName ?? '—'}</td>
+                    <td style={{ padding: '10px 14px', color: deal.ownerName ? getNameColor(deal.ownerName, C.slate) : C.slate, fontWeight: deal.ownerName ? 600 : 400 }}>{deal.ownerName ?? '—'}</td>
                   </tr>
                 );
               })}
@@ -2130,6 +2160,8 @@ function AcquisitionsTab() {
 type TabKey = 'recruiting' | 'acquisitions';
 
 export default function PipelineDashboard() {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   const [activeTab, setActiveTab] = useState<TabKey>('recruiting');
 
   // Fire-and-forget: warm all caches in background on first load
