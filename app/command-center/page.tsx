@@ -1156,6 +1156,7 @@ function RecruitingTab() {
   const { data: sentimentData } = useSWR('/api/command-center/sentiment/scores', fetcher, SWR_OPTS);
   const [showDashboard, setShowDashboard] = useState(true);
   const [complexityScores, setComplexityScores] = useState<Record<string, { score: number; tier: string; tierColor: string }>>({});
+  const [sentimentScores, setSentimentScores] = useState<Record<string, { score: number; tier: string; color: string }>>({});
   const [advisorTab, setAdvisorTab] = useState<'launch_to_grad' | 'early' | 'completed'>('launch_to_grad');
   const [searchQuery, setSearchQuery] = useState('');
   const [stageFilter, setStageFilter] = useState<string>('all');
@@ -1198,6 +1199,27 @@ function RecruitingTab() {
       .then(d => { if (d.scores) setComplexityScores(d.scores); })
       .catch(() => {}); // Silent fail — scores are supplementary
   }, [dealIdKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Build sentiment scores map from sentiment data
+  useEffect(() => {
+    if (!sentimentData?.scores) return;
+    const TIER_COLORS: Record<string, string> = {
+      'Advocate': '#4ade80',
+      'Positive': '#5ec4cf',
+      'Neutral': '#fbbf24',
+      'At Risk': '#fb923c',
+      'High Risk': '#f87171',
+    };
+    const map: Record<string, { score: number; tier: string; color: string }> = {};
+    for (const s of sentimentData.scores) {
+      map[s.deal_id] = {
+        score: s.composite_score,
+        tier: s.tier,
+        color: TIER_COLORS[s.tier] || '#94a3b8',
+      };
+    }
+    setSentimentScores(map);
+  }, [sentimentData]);
 
   // Fetch team assignments from database after deals load
   useEffect(() => {
@@ -1588,10 +1610,10 @@ function RecruitingTab() {
           recruiterMap[name].deals += 1;
           recruiterMap[name].aum += parseFloat(deal.transferable_aum ?? '0') || 0;
 
-          // Track sentiment scores by category
-          const sentimentAdvisor = (sentimentData?.advisors ?? []).find((a: { deal_id: string }) => a.deal_id === deal.id);
-          if (sentimentAdvisor?.overall_score != null) {
-            const score = sentimentAdvisor.overall_score;
+          // Track sentiment scores by category (use composite_score from sentiment API)
+          const sentimentAdvisor = (sentimentData?.scores ?? []).find((s: { deal_id: string; composite_score: number }) => s.deal_id === deal.id);
+          if (sentimentAdvisor?.composite_score != null) {
+            const score = sentimentAdvisor.composite_score;
             if (score >= 0 && score <= 3) recruiterMap[name].sentimentCounts.highRisk++;
             else if (score >= 4 && score <= 5) recruiterMap[name].sentimentCounts.atRisk++;
             else if (score >= 6 && score <= 7) recruiterMap[name].sentimentCounts.neutral++;
@@ -1706,8 +1728,9 @@ function RecruitingTab() {
               <tr style={{ borderBottom: `1px solid ${C.border}`, background: '#2f2f2f' }}>
                 {[
                   { key: 'dealname', label: 'Advisor / Deal' },
+                  { key: 'sentiment', label: 'Sentiment' },
                   { key: 'current_firm__cloned_', label: 'Prior Firm' },
-                  { key: 'firm_type', label: 'Type' },
+                  { key: 'firm_type', label: 'Merge Type' },
                   { key: 'dealstage', label: 'Stage' },
                   { key: 'transferable_aum', label: 'Exp. AUM' },
                   { key: 'actual_aum', label: 'Tran AUM' },
@@ -1815,6 +1838,30 @@ function RecruitingTab() {
                         <Link href={`/command-center/advisor/${deal.id}`} style={{ fontWeight: 600, color: C.teal, textDecoration: 'none' }}>
                           {deal.dealname}
                         </Link>
+                      </td>
+                      <td style={{ padding: '10px 14px' }}>
+                        {(() => {
+                          const sentiment = sentimentScores[deal.id];
+                          if (!sentiment) return <span style={{ color: C.slate, fontSize: 11 }}>—</span>;
+                          return (
+                            <div style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 6,
+                              padding: '3px 10px',
+                              borderRadius: 4,
+                              background: `${sentiment.color}20`,
+                              border: `1px solid ${sentiment.color}40`,
+                            }}>
+                              <span style={{ fontSize: 16, color: sentiment.color }}>
+                                {sentiment.tier === 'Advocate' ? '★' : sentiment.tier === 'Positive' ? '▲' : sentiment.tier === 'Neutral' ? '●' : sentiment.tier === 'At Risk' ? '◈' : '▼'}
+                              </span>
+                              <span style={{ fontSize: 11, fontWeight: 600, color: sentiment.color }}>
+                                {sentiment.score}/10
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </td>
                       <td style={{ padding: '10px 14px', color: C.slate }}>{deal.current_firm__cloned_ ?? '—'}</td>
                       <td style={{ padding: '10px 14px', color: C.slate }}>{deal.firm_type ? deal.firm_type.replace(/_/g, ' ') : '—'}</td>
