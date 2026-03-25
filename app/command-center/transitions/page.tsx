@@ -63,6 +63,11 @@ function TransitionsPageInner() {
   // Sync + DocuSign state
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
+  const [syncProgress, setSyncProgress] = useState<{
+    totalWorkbooks: number;
+    completedWorkbooks: number;
+    currentWorkbook: string | null;
+  } | null>(null);
   const [showSyncPanel, setShowSyncPanel] = useState(false);
   const [sheetId, setSheetId] = useState('');
   const [docusignLoading, setDocusignLoading] = useState(false);
@@ -113,13 +118,13 @@ function TransitionsPageInner() {
     revalidateOnFocus: false,
   });
 
-  // ── Auto-sync if data is stale (> 1 hour) ─────────────────────────────────
+  // ── Auto-sync if data is stale (> 2 hours) ────────────────────────────────
   useEffect(() => {
     if (!data || autoSyncChecked) return;
     setAutoSyncChecked(true);
     const lastSynced = data.lastSyncedAt ? new Date(data.lastSyncedAt).getTime() : 0;
     const ageMs = Date.now() - lastSynced;
-    if (ageMs > 60 * 60 * 1000) {
+    if (ageMs > 2 * 60 * 60 * 1000) {  // 2 hours
       fetch('/api/command-center/transitions/sync').then(() => mutate()).catch(() => {});
     }
   }, [data, autoSyncChecked, mutate]);
@@ -142,22 +147,44 @@ function TransitionsPageInner() {
   async function handleSync() {
     setSyncing(true);
     setSyncResult(null);
+    setSyncProgress(null);
     try {
       const body = sheetId.trim() ? { sheetId: sheetId.trim() } : {};
+
+      // Show initial progress
+      setSyncProgress({
+        totalWorkbooks: 0,
+        completedWorkbooks: 0,
+        currentWorkbook: 'Preparing sync...',
+      });
+
       const res = await fetch('/api/command-center/transitions/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
       const result = await res.json();
+
       if (res.ok && result.summary) {
-        setSyncResult(`Synced ${result.summary.total_synced} rows from ${result.summary.total_workbooks} workbooks`);
+        // Show completion progress
+        setSyncProgress({
+          totalWorkbooks: result.summary.total_workbooks || 0,
+          completedWorkbooks: result.summary.total_workbooks || 0,
+          currentWorkbook: 'Complete',
+        });
+
+        setSyncResult(
+          `✓ Synced ${result.summary.total_synced} rows from ${result.summary.total_workbooks} workbook${result.summary.total_workbooks !== 1 ? 's' : ''}` +
+          (result.summary.errors > 0 ? ` (${result.summary.errors} error${result.summary.errors !== 1 ? 's' : ''})` : '')
+        );
         mutate();
       } else {
         setSyncResult(`Error: ${result.error ?? 'Unknown'}`);
+        setSyncProgress(null);
       }
     } catch (e) {
       setSyncResult(`Sync failed: ${e instanceof Error ? e.message : String(e)}`);
+      setSyncProgress(null);
     } finally {
       setSyncing(false);
     }
@@ -266,6 +293,43 @@ function TransitionsPageInner() {
               Sync Sheet
             </button>
           </div>
+
+          {/* Progress Bar */}
+          {syncProgress && (
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <span style={{ fontSize: 11, color: C.slate, fontWeight: 500 }}>
+                  {syncProgress.currentWorkbook}
+                </span>
+                <span style={{ fontSize: 11, color: C.slate, fontWeight: 600 }}>
+                  {syncProgress.totalWorkbooks > 0
+                    ? `${syncProgress.completedWorkbooks}/${syncProgress.totalWorkbooks} (${Math.round((syncProgress.completedWorkbooks / syncProgress.totalWorkbooks) * 100)}%)`
+                    : 'Preparing...'
+                  }
+                </span>
+              </div>
+              <div style={{
+                width: '100%',
+                height: 8,
+                background: C.border,
+                borderRadius: 4,
+                overflow: 'hidden',
+                position: 'relative',
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: syncProgress.totalWorkbooks > 0
+                    ? `${(syncProgress.completedWorkbooks / syncProgress.totalWorkbooks) * 100}%`
+                    : '30%',
+                  background: `linear-gradient(90deg, ${C.teal}, ${C.green})`,
+                  borderRadius: 4,
+                  transition: 'width 0.3s ease',
+                  animation: syncProgress.totalWorkbooks === 0 ? 'pulse 1.5s ease-in-out infinite' : 'none',
+                }} />
+              </div>
+            </div>
+          )}
+
           {syncResult && (
             <div style={{
               fontSize: 12, padding: '6px 10px', borderRadius: 6,

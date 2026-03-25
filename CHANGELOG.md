@@ -6,6 +6,49 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Add Sync Progress Bar & Update Auto-Sync Timing — 2026-03-25
+
+**What**: Added visual sync progress indicator and increased auto-sync threshold from 1 hour to 2 hours.
+
+**Changes**:
+
+1. **Auto-Sync Timing** (1 hour → 2 hours)
+   - Changed auto-sync trigger from `> 1 hour` to `> 2 hours`
+   - Reduces unnecessary background syncs
+   - Data refreshes less frequently but still maintains reasonable freshness
+
+2. **Sync Progress Bar**
+   - Added real-time progress tracking during sync operations
+   - Shows current workbook being synced
+   - Displays completion percentage (e.g., "3/5 (60%)")
+   - Visual progress bar with gradient fill (teal → green)
+   - Indeterminate state while preparing sync
+   - Enhanced success messages with workbook/row counts
+
+**Scope**:
+- Added `syncProgress` state to track sync status
+- Progress bar shows:
+  - Current workbook name or status ("Preparing sync...", "Complete")
+  - Completed vs total workbooks (X/Y)
+  - Percentage complete
+  - Animated gradient progress bar
+- Updated `handleSync()` to populate progress state
+- Enhanced sync result messages with checkmark and detailed counts
+
+**Status**: ✅ Implemented and deployed
+
+**Files**:
+- `app/command-center/transitions/page.tsx` — Added progress state, UI, and updated auto-sync timing
+
+**Impact**:
+- ✅ Users can now see sync progress in real-time
+- ✅ Clearer feedback on sync operations
+- ✅ Better visibility into which workbook is being processed
+- ✅ Reduced auto-sync frequency (2 hours vs 1 hour)
+- ✅ Enhanced UX with visual progress indicator
+
+---
+
 ## [Completed] Fix Transitions Folder Filtering — 2026-03-25
 
 **What**: Modified Google Sheets sync to only include sheets directly in the main folder, excluding archived/graduated sheets in subfolders.
