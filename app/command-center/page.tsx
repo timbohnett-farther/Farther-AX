@@ -534,7 +534,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 
     // ── Monthly Launches (last 6 months) ──
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const monthlyLaunches: { month: string; count: number; aum: number; names: string[] }[] = [];
+    const monthlyLaunches: { month: string; count: number; aum: number; names: string[]; aumGoal: number; advisorGoal: number }[] = [];
     for (let i = 5; i >= 0; i--) {
       const d = new Date(year, now.getMonth() - i, 1);
       const mStart = new Date(d.getFullYear(), d.getMonth(), 1);
@@ -550,6 +550,8 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
         count: mDeals.length,
         aum: mDeals.reduce((acc, dl) => acc + getAUM(dl), 0),
         names: mDeals.map(dl => dl.dealname || 'Unknown'),
+        aumGoal: 2_000_000_000,
+        advisorGoal: 12,
       });
     }
 
@@ -911,24 +913,37 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 
       {/* ── Rolling 6-Month Trend Charts ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
-        {/* Monthly Launches Bar Chart */}
+        {/* Monthly Launches Area Chart — 4 lines: AUM, Advisors, Goals */}
         <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24 }}>
-          <SectionHeader title="Monthly Launches" subtitle="Advisors launched per month (last 6 months)" />
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={a.monthlyLaunches} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+          <SectionHeader title="Monthly Launches" subtitle="AUM launched & advisor count vs goals (last 6 months)" />
+          <ResponsiveContainer width="100%" height={280}>
+            <ComposedChart data={a.monthlyLaunches} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(250,247,242,0.06)" vertical={false} />
               <XAxis dataKey="month" tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <YAxis
+                yAxisId="aum"
+                tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false}
+                tickFormatter={(v: number) => formatAUM(v)}
+              />
+              <YAxis
+                yAxisId="count"
+                orientation="right"
+                tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false}
+                allowDecimals={false}
+              />
               <Tooltip
-                cursor={{ fill: 'rgba(250,247,242,0.04)' }}
+                cursor={{ stroke: 'rgba(250,247,242,0.08)', strokeWidth: 1 }}
                 content={({ active, payload, label }) => {
                   if (!active || !payload?.length) return null;
-                  const entry = payload[0]?.payload as { count: number; aum: number; names: string[] } | undefined;
+                  const entry = payload[0]?.payload as { count: number; aum: number; names: string[]; aumGoal: number; advisorGoal: number } | undefined;
                   if (!entry) return null;
                   return (
-                    <div style={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, padding: '10px 14px', fontSize: 12, maxWidth: 260 }}>
+                    <div style={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, padding: '10px 14px', fontSize: 12, maxWidth: 280 }}>
                       <div style={{ color: C.slate, marginBottom: 6, fontWeight: 600 }}>{label}</div>
-                      <div style={{ color: C.dark, marginBottom: 2 }}>{entry.count} Advisors · {formatAUM(entry.aum)}</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                        <div><span style={{ color: C.teal, fontWeight: 600 }}>AUM Launched:</span> {formatAUM(entry.aum)} <span style={{ color: C.slate }}>(goal: {formatAUM(entry.aumGoal)})</span></div>
+                        <div><span style={{ color: C.gold, fontWeight: 600 }}>Advisors:</span> {entry.count} <span style={{ color: C.slate }}>(goal: {entry.advisorGoal})</span></div>
+                      </div>
                       {entry.names.length > 0 && (
                         <div style={{ marginTop: 6, borderTop: `1px solid ${C.border}`, paddingTop: 6 }}>
                           {entry.names.map((name, i) => (
@@ -940,8 +955,25 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                   );
                 }}
               />
-              <Bar dataKey="count" fill={C.teal} radius={[4, 4, 0, 0]} maxBarSize={40} />
-            </BarChart>
+              <defs>
+                <linearGradient id="aumLaunchedGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={C.teal} stopOpacity={0.25} />
+                  <stop offset="95%" stopColor={C.teal} stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="advisorCountGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={C.gold} stopOpacity={0.2} />
+                  <stop offset="95%" stopColor={C.gold} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              {/* AUM Launched (area) */}
+              <Area yAxisId="aum" type="monotone" dataKey="aum" name="AUM Launched" fill="url(#aumLaunchedGrad)" stroke={C.teal} strokeWidth={2} dot={{ fill: C.teal, r: 4 }} />
+              {/* AUM Goal (dashed line) */}
+              <Line yAxisId="aum" type="monotone" dataKey="aumGoal" name="AUM Goal ($2B)" stroke={C.teal} strokeWidth={1.5} strokeDasharray="6 3" dot={false} />
+              {/* Advisors Started (area) */}
+              <Area yAxisId="count" type="monotone" dataKey="count" name="Advisors Started" fill="url(#advisorCountGrad)" stroke={C.gold} strokeWidth={2} dot={{ fill: C.gold, r: 4 }} />
+              {/* Advisor Goal (dashed line) */}
+              <Line yAxisId="count" type="monotone" dataKey="advisorGoal" name="Advisor Goal (12)" stroke={C.gold} strokeWidth={1.5} strokeDasharray="6 3" dot={false} />
+            </ComposedChart>
           </ResponsiveContainer>
         </div>
 
@@ -1974,7 +2006,7 @@ export default function PipelineDashboard() {
   ];
 
   return (
-    <div style={{ padding: '40px 40px', minHeight: '100vh', fontFamily: "'Fakt', system-ui, sans-serif" }}>
+    <div style={{ padding: '40px 40px', minHeight: '100vh', fontFamily: "'Fakt', system-ui, sans-serif", maxWidth: '100vw', overflowX: 'hidden' }}>
       {/* Header */}
       <div style={{ position: 'relative', marginBottom: 24 }}>
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />

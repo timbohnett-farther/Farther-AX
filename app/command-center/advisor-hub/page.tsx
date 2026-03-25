@@ -704,7 +704,7 @@ export default function AdvisorHubPage() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div style={{ padding: '40px 48px', maxWidth: 1400, margin: '0 auto' }}>
+    <div style={{ padding: '40px 48px', maxWidth: '100vw', overflowX: 'hidden', margin: '0 auto' }}>
       {/* Header */}
       <div style={{ position: 'relative', marginBottom: 32 }}>
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />

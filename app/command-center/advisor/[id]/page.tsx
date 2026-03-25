@@ -1549,7 +1549,7 @@ export default function AdvisorProfilePage() {
   ];
 
   return (
-    <div style={{ padding: '32px 40px', minHeight: '100vh', fontFamily: "'Fakt', system-ui, sans-serif" }}>
+    <div style={{ padding: '32px 40px', minHeight: '100vh', fontFamily: "'Fakt', system-ui, sans-serif", maxWidth: '100vw', overflowX: 'hidden' }}>
       {/* Navigation: Back + Next Advisor */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <Link href="/command-center/advisor-hub" style={{ fontSize: 13, color: C.slate, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
