@@ -29,6 +29,7 @@ const getThemeColors = (isDark: boolean) => ({
   teal: '#4E7082',
   bg: isDark ? '#111111' : '#F8F4F0',
   cardBg: isDark ? '#171f27' : '#FFFFFF',
+  cardBgAlt: isDark ? 'rgba(250,247,242,0.03)' : '#F9F9F9', // Alternating row color
   border: isDark ? 'rgba(212,223,229,0.08)' : 'rgba(224,224,224,0.4)',
   green: '#10b981',
   greenBg: isDark ? 'rgba(16,185,129,0.15)' : 'rgba(16,185,129,0.08)',
@@ -40,6 +41,7 @@ const getThemeColors = (isDark: boolean) => ({
   redBorder: isDark ? 'rgba(239,68,68,0.3)' : 'rgba(239,68,68,0.2)',
   gold: '#f59e0b',
   goldBg: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.08)',
+  tableHeaderBg: isDark ? '#2f2f2f' : '#E8E8E8', // Table header background
 });
 
 // ── Stage mappings for Advisor Recruiting ────────────────────────────────────
@@ -1753,7 +1755,7 @@ function RecruitingTab() {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
-              <tr style={{ borderBottom: `1px solid ${C.border}`, background: '#2f2f2f' }}>
+              <tr style={{ borderBottom: `1px solid ${C.border}`, background: C.tableHeaderBg }}>
                 {[
                   { key: 'dealname', label: 'Advisor / Deal' },
                   { key: 'sentiment', label: 'Sentiment' },
@@ -1851,16 +1853,17 @@ function RecruitingTab() {
                   const cx = complexityScores[deal.id];
                   const launchDate = deal.desired_start_date ?? deal.actual_launch_date;
                   const showSeparator = i === separatorAfterIndex;
+                  const rowBg = i % 2 === 0 ? C.cardBg : C.cardBgAlt;
                   return (
                     <tr key={deal.id} style={{
                       borderBottom: showSeparator
                         ? `3px solid ${C.teal}`
                         : `1px solid ${C.border}`,
-                      background: i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)',
+                      background: rowBg,
                       transition: 'background 120ms ease',
                     }}
                       onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = rowBg; }}
                     >
                       <td style={{ padding: '10px 14px' }}>
                         <Link href={`/command-center/advisor/${deal.id}`} style={{ fontWeight: 600, color: C.teal, textDecoration: 'none' }}>
@@ -2101,7 +2104,7 @@ function AcquisitionsTab() {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
-              <tr style={{ borderBottom: `1px solid ${C.border}`, background: '#2f2f2f' }}>
+              <tr style={{ borderBottom: `1px solid ${C.border}`, background: C.tableHeaderBg }}>
                 {['Deal Name', 'Prior Firm', 'Type', 'Stage', 'Exp. AUM', 'Households', 'Target Date', 'Owner'].map(h => (
                   <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: C.slate, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
                     {h}
