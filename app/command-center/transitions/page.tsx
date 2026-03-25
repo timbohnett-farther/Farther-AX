@@ -78,6 +78,11 @@ function TransitionsPageInner() {
   // Team mappings state
   const [syncingTeamMappings, setSyncingTeamMappings] = useState(false);
   const [teamMappingsResult, setTeamMappingsResult] = useState<string | null>(null);
+  const [teamMappingsProgress, setTeamMappingsProgress] = useState<{
+    totalDeals: number;
+    completedDeals: number;
+    currentDeal: string | null;
+  } | null>(null);
 
   // ── URL update helper ──────────────────────────────────────────────────────
   const updateUrl = useCallback((updates: Record<string, string>) => {
@@ -226,22 +231,40 @@ function TransitionsPageInner() {
   async function handleSyncTeamMappings() {
     setSyncingTeamMappings(true);
     setTeamMappingsResult(null);
+    setTeamMappingsProgress(null);
     try {
+      // Show initial progress
+      setTeamMappingsProgress({
+        totalDeals: 0,
+        completedDeals: 0,
+        currentDeal: 'Fetching deals from HubSpot...',
+      });
+
       const res = await fetch('/api/command-center/transitions/team-mappings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
       const result = await res.json();
+
       if (res.ok && result.success) {
+        // Show completion progress
+        setTeamMappingsProgress({
+          totalDeals: result.totalMappings || 0,
+          completedDeals: result.totalMappings || 0,
+          currentDeal: 'Complete',
+        });
+
         setTeamMappingsResult(
           `✓ ${result.message}` ||
           `✓ Synced ${result.totalMappings} team mappings (${result.inserted} new, ${result.updated} updated)`
         );
       } else {
         setTeamMappingsResult(`Error: ${result.error ?? 'Unknown'}`);
+        setTeamMappingsProgress(null);
       }
     } catch (e) {
       setTeamMappingsResult(`Sync failed: ${e instanceof Error ? e.message : String(e)}`);
+      setTeamMappingsProgress(null);
     } finally {
       setSyncingTeamMappings(false);
     }
@@ -377,17 +400,56 @@ function TransitionsPageInner() {
         </div>
       )}
 
-      {/* ── Team Mappings Result ──────────────────────────────────────────────── */}
-      {teamMappingsResult && (
-        <div style={{
-          background: teamMappingsResult.startsWith('Error') ? C.redBg : C.greenBg,
-          border: `1px solid ${teamMappingsResult.startsWith('Error') ? C.redBorder : C.greenBorder}`,
-          borderRadius: 8, padding: '8px 14px', marginBottom: 12, fontSize: 13,
-          color: teamMappingsResult.startsWith('Error') ? C.red : C.green,
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-        }}>
-          {teamMappingsResult}
-          <button onClick={() => setTeamMappingsResult(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'inherit' }}>&times;</button>
+      {/* ── Team Mappings Progress & Result ───────────────────────────────────── */}
+      {(teamMappingsProgress || teamMappingsResult) && (
+        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 16, marginBottom: 16 }}>
+          {/* Progress Bar */}
+          {teamMappingsProgress && (
+            <div style={{ marginBottom: teamMappingsResult ? 10 : 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <span style={{ fontSize: 11, color: C.slate, fontWeight: 500 }}>
+                  {teamMappingsProgress.currentDeal}
+                </span>
+                <span style={{ fontSize: 11, color: C.slate, fontWeight: 600 }}>
+                  {teamMappingsProgress.totalDeals > 0
+                    ? `${teamMappingsProgress.completedDeals}/${teamMappingsProgress.totalDeals} (${Math.round((teamMappingsProgress.completedDeals / teamMappingsProgress.totalDeals) * 100)}%)`
+                    : 'Processing...'
+                  }
+                </span>
+              </div>
+              <div style={{
+                width: '100%',
+                height: 8,
+                background: C.border,
+                borderRadius: 4,
+                overflow: 'hidden',
+                position: 'relative',
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: teamMappingsProgress.totalDeals > 0
+                    ? `${(teamMappingsProgress.completedDeals / teamMappingsProgress.totalDeals) * 100}%`
+                    : '30%',
+                  background: `linear-gradient(90deg, ${C.purple}, ${C.teal})`,
+                  borderRadius: 4,
+                  transition: 'width 0.3s ease',
+                }} />
+              </div>
+            </div>
+          )}
+
+          {/* Result Message */}
+          {teamMappingsResult && (
+            <div style={{
+              fontSize: 12, padding: '6px 10px', borderRadius: 6,
+              background: teamMappingsResult.startsWith('Error') ? C.redBg : C.greenBg,
+              color: teamMappingsResult.startsWith('Error') ? C.red : C.green,
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+            }}>
+              {teamMappingsResult}
+              <button onClick={() => { setTeamMappingsResult(null); setTeamMappingsProgress(null); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'inherit' }}>&times;</button>
+            </div>
+          )}
         </div>
       )}
 
