@@ -419,6 +419,7 @@ function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[
 function CommandDashboard({ deals }: { deals: Deal[] }) {
   const { data: aumData } = useSWR('/api/command-center/aum-tracker', fetcher, SWR_OPTS);
   const { data: sentimentData } = useSWR('/api/command-center/sentiment/scores', fetcher, SWR_OPTS);
+  const { data: tranAumData } = useSWR('/api/command-center/transitions/tran-aum', fetcher, SWR_OPTS);
   const [drillDown, setDrillDown] = useState<{ title: string; deals: Deal[] } | null>(null);
 
   const analytics = useMemo(() => {
@@ -814,28 +815,36 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 
         {/* Current AUM vs Expected */}
         {(() => {
-          const aumDealIds = new Set((aumData?.advisors ?? []).map((a: { deal_id: string }) => a.deal_id));
-          const aumDeals = deals.filter(d => aumDealIds.has(d.id));
+          // Compare TRAN AUM (actual) vs Expected AUM (from deals) for Launched advisors
+          const launchedDeals = deals.filter(d => d.dealstage === '100411705');
+          const launchedAdvisors = (tranAumData?.advisors ?? []).filter((a: { advisor_name: string }) => {
+            return launchedDeals.some(d => d.dealname === a.advisor_name);
+          });
+
+          const totalTranAum = launchedAdvisors.reduce((sum: number, a: { tran_aum: number }) => sum + (a.tran_aum || 0), 0);
+          const totalExpectedAum = launchedDeals.reduce((sum, d) => sum + (parseFloat(d.transferable_aum || '0') || 0), 0);
+          const transferPct = totalExpectedAum > 0 ? Math.round((totalTranAum / totalExpectedAum) * 100) : 0;
+
           return (
             <div
-              onClick={() => aumDeals.length > 0 && setDrillDown({ title: 'Current vs Expected AUM', deals: aumDeals })}
+              onClick={() => launchedDeals.length > 0 && setDrillDown({ title: 'Current vs Expected AUM', deals: launchedDeals })}
               style={{
                 background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
-                padding: '20px 24px', position: 'relative', cursor: aumDeals.length > 0 ? 'pointer' : 'default',
+                padding: '20px 24px', position: 'relative', cursor: launchedDeals.length > 0 ? 'pointer' : 'default',
                 transition: 'border-color 150ms ease',
               }}
-              onMouseEnter={e => { if (aumDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = C.teal; }}
+              onMouseEnter={e => { if (launchedDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = C.teal; }}
               onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
             >
               <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: C.teal }}>◎</span>
               <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Current vs Expected AUM</p>
               <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
-                {aumData?.summary?.overall_transfer_pct != null ? `${aumData.summary.overall_transfer_pct}%` : '—'}
+                {totalExpectedAum > 0 ? `${transferPct}%` : '—'}
               </p>
               <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
-                {aumData?.summary
-                  ? `${formatAUM(aumData.summary.total_actual_aum)} of ${formatAUM(aumData.summary.total_expected_aum)}`
-                  : 'Loading...'}
+                {totalTranAum > 0 && totalExpectedAum > 0
+                  ? `${formatAUM(totalTranAum)} of ${formatAUM(totalExpectedAum)}`
+                  : 'Launched advisors'}
               </p>
             </div>
           );
@@ -843,30 +852,33 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 
         {/* On Book Revenue */}
         {(() => {
-          const revenueDeals = deals.filter(d => {
-            const aumAdvisor = (aumData?.advisors ?? []).find((a: { deal_id: string; current_revenue: number | null }) => a.deal_id === d.id);
-            return aumAdvisor?.current_revenue && aumAdvisor.current_revenue > 0;
+          // Sum revenue from all Launched advisors (stage '100411705') in tran_aum data
+          const launchedAdvisors = (tranAumData?.advisors ?? []).filter((a: { advisor_name: string }) => {
+            return deals.some(d => d.dealstage === '100411705' && d.dealname === a.advisor_name);
           });
+          const totalRevenue = launchedAdvisors.reduce((sum: number, a: { revenue: number }) => sum + (a.revenue || 0), 0);
+          const launchedDeals = deals.filter(d => d.dealstage === '100411705');
+
           return (
             <div
-              onClick={() => revenueDeals.length > 0 && setDrillDown({ title: 'On Book Revenue Advisors', deals: revenueDeals })}
+              onClick={() => launchedDeals.length > 0 && setDrillDown({ title: 'On Book Revenue Advisors', deals: launchedDeals })}
               style={{
                 background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
-                padding: '20px 24px', position: 'relative', cursor: revenueDeals.length > 0 ? 'pointer' : 'default',
+                padding: '20px 24px', position: 'relative', cursor: launchedDeals.length > 0 ? 'pointer' : 'default',
                 transition: 'border-color 150ms ease',
               }}
-              onMouseEnter={e => { if (revenueDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = C.green; }}
+              onMouseEnter={e => { if (launchedDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = C.green; }}
               onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
             >
               <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: C.green }}>$</span>
               <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>On Book Revenue</p>
               <p style={{ fontSize: 28, fontWeight: 700, color: C.green, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
-                {aumData?.summary?.total_current_revenue ? formatAUM(aumData.summary.total_current_revenue) : '—'}
+                {totalRevenue > 0 ? formatAUM(totalRevenue) : '—'}
               </p>
               <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
-                {aumData?.summary?.advisors_with_actual
-                  ? `${aumData.summary.advisors_with_actual} advisors with AUM on book`
-                  : 'Based on current AUM × fee rate'}
+                {launchedAdvisors.length > 0
+                  ? `${launchedAdvisors.length} launched advisors`
+                  : 'From launched advisors'}
               </p>
             </div>
           );
