@@ -20,29 +20,8 @@ const SWR_OPTS = {
   errorRetryCount: 2,
 } as const;
 
-// ── Design tokens (theme-aware) ──────────────────────────────────────────────
-const getThemeColors = (isDark: boolean) => ({
-  dark: isDark ? '#FFFEF4' : '#1a1a1a',
-  white: isDark ? '#1a1a1a' : '#FFFEF4',
-  slate: isDark ? 'rgba(212,223,229,0.5)' : 'rgba(102,102,102,0.6)',
-  lightBlue: '#A8CED3',
-  teal: '#4E7082',
-  bg: isDark ? '#111111' : '#F8F4F0',
-  cardBg: isDark ? '#171f27' : '#FFFFFF',
-  cardBgAlt: isDark ? 'rgba(250,247,242,0.03)' : '#F9F9F9', // Alternating row color
-  border: isDark ? 'rgba(212,223,229,0.08)' : 'rgba(224,224,224,0.4)',
-  green: '#10b981',
-  greenBg: isDark ? 'rgba(16,185,129,0.15)' : 'rgba(16,185,129,0.08)',
-  amber: '#f59e0b',
-  amberBg: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.08)',
-  amberBorder: isDark ? 'rgba(245,158,11,0.3)' : 'rgba(245,158,11,0.2)',
-  red: '#ef4444',
-  redBg: isDark ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.08)',
-  redBorder: isDark ? 'rgba(239,68,68,0.3)' : 'rgba(239,68,68,0.2)',
-  gold: '#f59e0b',
-  goldBg: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.08)',
-  tableHeaderBg: isDark ? '#2f2f2f' : '#E8E8E8', // Table header background
-});
+// Use centralized theme colors
+import { getThemeColors } from '@/lib/theme-colors';
 
 // ── Stage mappings for Advisor Recruiting ────────────────────────────────────
 const STAGE_LABELS: Record<string, string> = {
