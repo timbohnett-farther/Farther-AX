@@ -75,6 +75,10 @@ function TransitionsPageInner() {
   const [docusignError, setDocusignError] = useState<string | null>(null);
   const [autoSyncChecked, setAutoSyncChecked] = useState(false);
 
+  // Team mappings state
+  const [syncingTeamMappings, setSyncingTeamMappings] = useState(false);
+  const [teamMappingsResult, setTeamMappingsResult] = useState<string | null>(null);
+
   // ── URL update helper ──────────────────────────────────────────────────────
   const updateUrl = useCallback((updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -218,6 +222,31 @@ function TransitionsPageInner() {
     }
   }
 
+  // ── Team Mappings Sync ────────────────────────────────────────────────────
+  async function handleSyncTeamMappings() {
+    setSyncingTeamMappings(true);
+    setTeamMappingsResult(null);
+    try {
+      const res = await fetch('/api/command-center/transitions/team-mappings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        setTeamMappingsResult(
+          `✓ ${result.message}` ||
+          `✓ Synced ${result.totalMappings} team mappings (${result.inserted} new, ${result.updated} updated)`
+        );
+      } else {
+        setTeamMappingsResult(`Error: ${result.error ?? 'Unknown'}`);
+      }
+    } catch (e) {
+      setTeamMappingsResult(`Sync failed: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setSyncingTeamMappings(false);
+    }
+  }
+
   // ── Last synced format ────────────────────────────────────────────────────
   function formatSyncAge(isoDate: string | null | undefined): string {
     if (!isoDate) return 'Never synced';
@@ -253,12 +282,20 @@ function TransitionsPageInner() {
       </div>
 
       {/* ── Controls Row ──────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
         <button onClick={() => setShowSyncPanel(!showSyncPanel)} style={{
           padding: '7px 14px', borderRadius: 6, border: 'none', background: C.teal,
           color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer',
         }}>
           &darr; Sync from Sheet
+        </button>
+        <button onClick={handleSyncTeamMappings} disabled={syncingTeamMappings} style={{
+          padding: '7px 14px', borderRadius: 6, border: `1px solid ${C.border}`,
+          background: syncingTeamMappings ? C.cardBg : 'transparent',
+          color: syncingTeamMappings ? C.slate : C.dark, fontSize: 12, fontWeight: 600,
+          cursor: syncingTeamMappings ? 'not-allowed' : 'pointer',
+        }}>
+          {syncingTeamMappings ? 'Syncing...' : '\u2728 Sync Team Mappings'}
         </button>
         <button onClick={handleDocuSignFetch} disabled={docusignLoading} style={{
           padding: '7px 14px', borderRadius: 6, border: `1px solid ${C.border}`,
@@ -337,6 +374,20 @@ function TransitionsPageInner() {
               color: syncResult.startsWith('Error') ? C.red : C.green,
             }}>{syncResult}</div>
           )}
+        </div>
+      )}
+
+      {/* ── Team Mappings Result ──────────────────────────────────────────────── */}
+      {teamMappingsResult && (
+        <div style={{
+          background: teamMappingsResult.startsWith('Error') ? C.redBg : C.greenBg,
+          border: `1px solid ${teamMappingsResult.startsWith('Error') ? C.redBorder : C.greenBorder}`,
+          borderRadius: 8, padding: '8px 14px', marginBottom: 12, fontSize: 13,
+          color: teamMappingsResult.startsWith('Error') ? C.red : C.green,
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+        }}>
+          {teamMappingsResult}
+          <button onClick={() => setTeamMappingsResult(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'inherit' }}>&times;</button>
         </div>
       )}
 

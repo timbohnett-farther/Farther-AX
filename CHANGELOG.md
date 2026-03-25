@@ -57,13 +57,21 @@ Format: Each entry includes completion status, feature name, date, scope, status
 - `app/api/command-center/transitions/sync/route.ts` — Apply mappings during sync
 - `ADVISOR_TEAM_MAPPINGS.md` — Complete implementation guide
 
+**UI Enhancement** (2026-03-25 update):
+- Added "✨ Sync Team Mappings" button to Transitions page
+- Placed between "Sync from Sheet" and "DocuSign Status" buttons
+- Shows success message: "✓ Synced 15 team mappings (10 new, 5 updated)"
+- Error handling with dismissible alerts
+- Loading state during sync operation
+
 **Usage**:
 ```bash
 # 1. Run migration
 npx tsx scripts/migrate-transitions.ts
 
-# 2. Sync team mappings from HubSpot
-POST /api/command-center/transitions/team-mappings
+# 2. Sync team mappings from HubSpot (via UI button or API)
+UI: Click "✨ Sync Team Mappings" button
+API: POST /api/command-center/transitions/team-mappings
 
 # 3. Sync Transition sheets (mappings applied automatically)
 POST /api/command-center/transitions/sync
