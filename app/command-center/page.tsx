@@ -1015,7 +1015,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
               </linearGradient>
             </defs>
             <Area type="monotone" dataKey="aum" fill="url(#aumMonthGradient)" stroke={C.teal} strokeWidth={2} dot={{ fill: C.teal, r: 4 }} />
-            <Line type="monotone" dataKey="count" stroke={C.gold} strokeWidth={1.5} strokeDasharray="4 2" dot={{ fill: C.gold, r: 3 }} yAxisId={0} />
+            <Line type="monotone" dataKey="count" stroke={C.gold} strokeWidth={1.5} strokeDasharray="4 2" dot={{ fill: C.gold, r: 3 }} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
@@ -1217,7 +1217,7 @@ function RecruitingTab() {
   // Build managed accounts lookup: fuzzy match advisor_name → deal.dealname
   const managedMap = useMemo(() => {
     const map: Record<string, { total_aum: number; revenue: number; avg_fee_bps: number }> = {};
-    if (!managedData?.accounts) return map;
+    if (!managedData?.accounts || !Array.isArray(managedData.accounts)) return map;
     const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
     // Index managed accounts by normalized name
     const managedIndex: Record<string, { total_aum: number; revenue: number; avg_fee_bps: number }> = {};
