@@ -419,6 +419,7 @@ function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[
 function CommandDashboard({ deals }: { deals: Deal[] }) {
   const { data: aumData } = useSWR('/api/command-center/aum-tracker', fetcher, SWR_OPTS);
   const { data: sentimentData } = useSWR('/api/command-center/sentiment/scores', fetcher, SWR_OPTS);
+  const { data: complexityData } = useSWR('/api/command-center/complexity/scores', fetcher, SWR_OPTS);
   const { data: tranAumData } = useSWR('/api/command-center/transitions/tran-aum', fetcher, SWR_OPTS);
   const [drillDown, setDrillDown] = useState<{ title: string; deals: Deal[] } | null>(null);
 
@@ -1151,6 +1152,8 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 function RecruitingTab() {
   const { data, error, isLoading, mutate: mutatePipeline } = useSWR('/api/command-center/pipeline', fetcher, SWR_OPTS);
   const { data: teamData } = useSWR('/api/command-center/team?role=Recruiter', fetcher, SWR_OPTS);
+  const { data: complexityData } = useSWR('/api/command-center/complexity/scores', fetcher, SWR_OPTS);
+  const { data: sentimentData } = useSWR('/api/command-center/sentiment/scores', fetcher, SWR_OPTS);
   const [showDashboard, setShowDashboard] = useState(true);
   const [complexityScores, setComplexityScores] = useState<Record<string, { score: number; tier: string; tierColor: string }>>({});
   const [advisorTab, setAdvisorTab] = useState<'launch_to_grad' | 'early' | 'completed'>('launch_to_grad');
@@ -1546,19 +1549,56 @@ function RecruitingTab() {
 
       {/* Recruiter Scorecard */}
       {(() => {
-        // Count ALL unique deal owners (not filtered by team DB)
-        const recruiterMap: Record<string, { deals: number; aum: number; launched: number; launchedAum: number }> = {};
+        // Exclude these specific people from the scorecard
+        const EXCLUDED_NAMES = new Set([
+          'Taylor Matthews',
+          'Bryan D\'Alessandro',
+          'Daniel Gilham',
+          'Ryan Koenig',
+          'Nicholas Corvino',
+          'Shane Provost',
+          'Kamini Ramlakhan',
+        ]);
+
+        // Count ALL unique deal owners (not filtered by team DB), excluding specified names
+        const recruiterMap: Record<string, {
+          deals: number;
+          aum: number;
+          launched: number;
+          launchedAum: number;
+          complexityScores: number[];
+          sentimentScores: number[];
+        }> = {};
+
         for (const deal of allActiveDeals) {
           const name = deal.ownerName;
-          if (!name) continue;
-          if (!recruiterMap[name]) recruiterMap[name] = { deals: 0, aum: 0, launched: 0, launchedAum: 0 };
+          if (!name || EXCLUDED_NAMES.has(name)) continue;
+
+          if (!recruiterMap[name]) {
+            recruiterMap[name] = { deals: 0, aum: 0, launched: 0, launchedAum: 0, complexityScores: [], sentimentScores: [] };
+          }
+
           recruiterMap[name].deals += 1;
           recruiterMap[name].aum += parseFloat(deal.transferable_aum ?? '0') || 0;
+
+          // Track complexity scores (from complexity data)
+          const complexityAdvisor = (complexityData?.advisors ?? []).find((a: { deal_id: string }) => a.deal_id === deal.id);
+          if (complexityAdvisor?.total_score) {
+            recruiterMap[name].complexityScores.push(complexityAdvisor.total_score);
+          }
+
+          // Track sentiment scores
+          const sentimentAdvisor = (sentimentData?.advisors ?? []).find((a: { deal_id: string }) => a.deal_id === deal.id);
+          if (sentimentAdvisor?.overall_score != null) {
+            recruiterMap[name].sentimentScores.push(sentimentAdvisor.overall_score);
+          }
+
           if (deal.dealstage === '100411705') {
             recruiterMap[name].launched += 1;
             recruiterMap[name].launchedAum += parseFloat(deal.transferable_aum ?? '0') || 0;
           }
         }
+
         const recruiters = Object.entries(recruiterMap).sort((a, b) => b[1].aum - a[1].aum);
         if (recruiters.length === 0) return null;
         return (
@@ -1597,6 +1637,28 @@ function RecruitingTab() {
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ fontSize: 11, color: C.slate }}>Launched AUM</span>
                       <span style={{ fontSize: 12, fontWeight: 600, color: C.green }}>{formatAUM(stats.launchedAum)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 11, color: C.slate }}>Avg AUM/Deal</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: C.teal }}>
+                        {stats.deals > 0 ? formatAUM(Math.round(stats.aum / stats.deals)) : '—'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 11, color: C.slate }}>Avg Complexity</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: C.dark }}>
+                        {stats.complexityScores.length > 0
+                          ? Math.round(stats.complexityScores.reduce((a, b) => a + b, 0) / stats.complexityScores.length)
+                          : '—'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 11, color: C.slate }}>Avg Sentiment</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: stats.sentimentScores.length > 0 && stats.sentimentScores.reduce((a, b) => a + b, 0) / stats.sentimentScores.length >= 7 ? C.green : C.gold }}>
+                        {stats.sentimentScores.length > 0
+                          ? `${Math.round(stats.sentimentScores.reduce((a, b) => a + b, 0) / stats.sentimentScores.length)}/10`
+                          : '—'}
+                      </span>
                     </div>
                   </div>
                 </div>
