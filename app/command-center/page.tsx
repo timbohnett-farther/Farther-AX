@@ -1722,19 +1722,25 @@ function RecruitingTab() {
                   const vb = ((b as unknown as Record<string, unknown>)[sortCol] as string) ?? '';
                   return va.localeCompare(vb) * dir;
                 });
-                // Find separator index: last deal whose launch date is today or earlier
-                const today = new Date();
-                today.setHours(23, 59, 59, 999);
-                let separatorAfterIndex = -1;
+                // Find separator: thick teal line between past-dated and future-dated advisors
+                // "Above the line" = future launch dates, "Below the line" = past/today launch dates
+                const todayStr = new Date().toISOString().split('T')[0];
+                // Find the first deal whose launch date is strictly after today
+                let firstFutureIdx = -1;
                 for (let idx = 0; idx < displayed.length; idx++) {
                   const ld = displayed[idx].desired_start_date ?? displayed[idx].actual_launch_date;
-                  if (ld && new Date(ld) <= today) separatorAfterIndex = idx;
+                  if (ld && ld.split('T')[0] > todayStr) {
+                    firstFutureIdx = idx;
+                    break;
+                  }
                 }
+                // The separator goes BEFORE the first future deal (i.e. after the deal before it)
+                const separatorAfterIndex = firstFutureIdx > 0 ? firstFutureIdx - 1 : -1;
 
                 return displayed.map((deal, i) => {
                   const cx = complexityScores[deal.id];
                   const launchDate = deal.desired_start_date ?? deal.actual_launch_date;
-                  const showSeparator = i === separatorAfterIndex && separatorAfterIndex < displayed.length - 1;
+                  const showSeparator = i === separatorAfterIndex;
                   return (
                     <tr key={deal.id} style={{
                       borderBottom: showSeparator
@@ -1768,7 +1774,18 @@ function RecruitingTab() {
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({ dealstage: newStage }),
                                 });
-                                if (res.ok) mutatePipeline();
+                                if (res.ok) {
+                                  // Optimistic update — update SWR cache directly since HubSpot search lags ~30s
+                                  mutatePipeline((current: { deals?: Deal[] } | undefined) => {
+                                    if (!current?.deals) return current;
+                                    return {
+                                      ...current,
+                                      deals: current.deals.map((d: Deal) =>
+                                        d.id === deal.id ? { ...d, dealstage: newStage } : d
+                                      ),
+                                    };
+                                  }, { revalidate: false });
+                                }
                               } catch { /* silent */ }
                               el.style.opacity = '1';
                             }}
@@ -1852,7 +1869,17 @@ function RecruitingTab() {
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ desired_start_date: newDate }),
                               });
-                              if (res.ok) mutatePipeline();
+                              if (res.ok) {
+                                mutatePipeline((current: { deals?: Deal[] } | undefined) => {
+                                  if (!current?.deals) return current;
+                                  return {
+                                    ...current,
+                                    deals: current.deals.map((d: Deal) =>
+                                      d.id === deal.id ? { ...d, desired_start_date: newDate } : d
+                                    ),
+                                  };
+                                }, { revalidate: false });
+                              }
                             } catch { /* silent */ }
                             el.style.opacity = '1';
                           }}
