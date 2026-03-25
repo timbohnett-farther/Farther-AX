@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '@/lib/theme-provider';
+import { getThemeColors, getStageColors, type ThemeColors } from '@/lib/theme-colors';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -17,26 +18,7 @@ const SWR_OPTS = {
   errorRetryCount: 2,
 } as const;
 
-// ── Design tokens (theme-aware) ──────────────────────────────────────────────
-const getThemeColors = (isDark: boolean) => ({
-  dark: isDark ? '#FFFEF4' : '#1a1a1a',
-  white: isDark ? '#1a1a1a' : '#FFFEF4',
-  slate: isDark ? 'rgba(212,223,229,0.5)' : 'rgba(102,102,102,0.6)',
-  teal: '#4E7082',
-  bg: isDark ? '#111111' : '#F8F4F0',
-  cardBg: isDark ? '#171f27' : '#FFFFFF',
-  border: isDark ? 'rgba(212,223,229,0.08)' : 'rgba(224,224,224,0.4)',
-  green: '#4ade80',
-  greenBg: isDark ? 'rgba(74,222,128,0.2)' : 'rgba(74,222,128,0.12)',
-  amber: '#fbbf24',
-  amberBg: isDark ? 'rgba(251,191,36,0.2)' : 'rgba(251,191,36,0.12)',
-  amberBorder: isDark ? 'rgba(251,191,36,0.35)' : 'rgba(251,191,36,0.25)',
-  red: '#f87171',
-  redBg: isDark ? 'rgba(248,113,113,0.2)' : 'rgba(248,113,113,0.12)',
-  redBorder: isDark ? 'rgba(248,113,113,0.35)' : 'rgba(248,113,113,0.25)',
-  gold: '#fbbf24',
-  goldBg: isDark ? 'rgba(251,191,36,0.2)' : 'rgba(251,191,36,0.12)',
-});
+// Using centralized theme colors from lib/theme-colors.ts
 
 // ── Sentiment tier config (mirrors lib/sentiment.ts) ─────────────────────────
 const TIER_CONFIG: Record<string, { color: string; bgColor: string; icon: string }> = {
@@ -58,15 +40,7 @@ const STAGE_LABELS: Record<string, string> = {
   '100411705': 'Step 7 – Launched',
 };
 
-const getStageColors = (teal: string, gold: string): Record<string, string> => ({
-  '2496931':   '#7fb3d8',
-  '2496932':   '#6ba3cc',
-  '2496934':   '#5793c0',
-  '100409509': '#4383b4',
-  '2496935':   '#2f73a8',
-  '2496936':   gold,
-  '100411705': teal,
-});
+// Stage colors imported from lib/theme-colors.ts
 
 const EARLY_STAGE_IDS = ['2496931', '2496932', '2496934', '100409509'];
 const LAUNCH_STAGE_IDS = ['2496935', '2496936', '100411705'];
@@ -358,6 +332,9 @@ const PACE_STYLES: Record<PaceStatus, { color: string; bg: string; icon: string 
 
 // ── AUM Tracker Tab Component ───────────────────────────────────────────────
 function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading: boolean; search: string }) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: 60, color: C.slate, fontSize: 14 }}>
