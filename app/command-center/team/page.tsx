@@ -308,6 +308,7 @@ export default function TeamPage() {
       {/* Add/Edit Form */}
       {(showForm || editMember) && (
         <MemberForm
+          key={editMember?.id ?? 'new'}
           initial={editMember ?? undefined}
           onSave={handleSave}
           onCancel={() => { setShowForm(false); setEditMember(null); }}
