@@ -1566,8 +1566,8 @@ function RecruitingTab() {
           aum: number;
           launched: number;
           launchedAum: number;
-          complexityScores: number[];
-          sentimentScores: number[];
+          launchedComplexityScores: number[];
+          sentimentCounts: { highRisk: number; atRisk: number; neutral: number; good: number; excellent: number };
         }> = {};
 
         for (const deal of allActiveDeals) {
@@ -1575,27 +1575,39 @@ function RecruitingTab() {
           if (!name || EXCLUDED_NAMES.has(name)) continue;
 
           if (!recruiterMap[name]) {
-            recruiterMap[name] = { deals: 0, aum: 0, launched: 0, launchedAum: 0, complexityScores: [], sentimentScores: [] };
+            recruiterMap[name] = {
+              deals: 0,
+              aum: 0,
+              launched: 0,
+              launchedAum: 0,
+              launchedComplexityScores: [],
+              sentimentCounts: { highRisk: 0, atRisk: 0, neutral: 0, good: 0, excellent: 0 },
+            };
           }
 
           recruiterMap[name].deals += 1;
           recruiterMap[name].aum += parseFloat(deal.transferable_aum ?? '0') || 0;
 
-          // Track complexity scores (from complexity data)
-          const complexityAdvisor = (complexityData?.advisors ?? []).find((a: { deal_id: string }) => a.deal_id === deal.id);
-          if (complexityAdvisor?.total_score) {
-            recruiterMap[name].complexityScores.push(complexityAdvisor.total_score);
-          }
-
-          // Track sentiment scores
+          // Track sentiment scores by category
           const sentimentAdvisor = (sentimentData?.advisors ?? []).find((a: { deal_id: string }) => a.deal_id === deal.id);
           if (sentimentAdvisor?.overall_score != null) {
-            recruiterMap[name].sentimentScores.push(sentimentAdvisor.overall_score);
+            const score = sentimentAdvisor.overall_score;
+            if (score >= 0 && score <= 3) recruiterMap[name].sentimentCounts.highRisk++;
+            else if (score >= 4 && score <= 5) recruiterMap[name].sentimentCounts.atRisk++;
+            else if (score >= 6 && score <= 7) recruiterMap[name].sentimentCounts.neutral++;
+            else if (score >= 8 && score <= 9) recruiterMap[name].sentimentCounts.good++;
+            else if (score === 10) recruiterMap[name].sentimentCounts.excellent++;
           }
 
+          // Only track complexity for Launched deals (stage '100411705')
           if (deal.dealstage === '100411705') {
             recruiterMap[name].launched += 1;
             recruiterMap[name].launchedAum += parseFloat(deal.transferable_aum ?? '0') || 0;
+
+            const complexityAdvisor = (complexityData?.advisors ?? []).find((a: { deal_id: string }) => a.deal_id === deal.id);
+            if (complexityAdvisor?.total_score) {
+              recruiterMap[name].launchedComplexityScores.push(complexityAdvisor.total_score);
+            }
           }
         }
 
@@ -1647,17 +1659,23 @@ function RecruitingTab() {
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ fontSize: 11, color: C.slate }}>Avg Complexity</span>
                       <span style={{ fontSize: 12, fontWeight: 600, color: C.dark }}>
-                        {stats.complexityScores.length > 0
-                          ? Math.round(stats.complexityScores.reduce((a, b) => a + b, 0) / stats.complexityScores.length)
+                        {stats.launchedComplexityScores.length > 0
+                          ? Math.round(stats.launchedComplexityScores.reduce((a, b) => a + b, 0) / stats.launchedComplexityScores.length)
                           : '—'}
                       </span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 11, color: C.slate }}>Avg Sentiment</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: stats.sentimentScores.length > 0 && stats.sentimentScores.reduce((a, b) => a + b, 0) / stats.sentimentScores.length >= 7 ? C.green : C.gold }}>
-                        {stats.sentimentScores.length > 0
-                          ? `${Math.round(stats.sentimentScores.reduce((a, b) => a + b, 0) / stats.sentimentScores.length)}/10`
-                          : '—'}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 11, color: C.slate }}>Sentiment</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, display: 'flex', gap: 2 }}>
+                        <span style={{ color: '#ef4444' }}>{stats.sentimentCounts.highRisk}</span>
+                        <span style={{ color: C.slate }}>/</span>
+                        <span style={{ color: '#f97316' }}>{stats.sentimentCounts.atRisk}</span>
+                        <span style={{ color: C.slate }}>/</span>
+                        <span style={{ color: '#6b7280' }}>{stats.sentimentCounts.neutral}</span>
+                        <span style={{ color: C.slate }}>/</span>
+                        <span style={{ color: '#10b981' }}>{stats.sentimentCounts.good}</span>
+                        <span style={{ color: C.slate }}>/</span>
+                        <span style={{ color: '#059669' }}>{stats.sentimentCounts.excellent}</span>
                       </span>
                     </div>
                   </div>
