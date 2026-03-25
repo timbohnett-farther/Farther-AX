@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
 import Image from 'next/image';
 import { DataCard, StatusBadge } from '@/components/ui';
+import { useTheme } from '@/lib/theme-provider';
+import { getThemeColors } from '@/lib/theme-colors';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -73,6 +75,9 @@ function MemberForm({
   onSave: (data: Partial<TeamMember>) => Promise<void>;
   onCancel: () => void;
 }) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+
   const [name, setName] = useState(initial?.name ?? '');
   const [email, setEmail] = useState(initial?.email ?? '');
   const [role, setRole] = useState(initial?.role ?? 'AXM');
@@ -109,13 +114,16 @@ function MemberForm({
     <DataCard className="mb-6">
       <form onSubmit={handleSubmit}>
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-base font-semibold text-cream">
+          <h3 className="text-base font-semibold" style={{ color: C.cream }}>
             {initial ? 'Edit Team Member' : 'Add Team Member'}
           </h3>
           <button
             type="button"
             onClick={onCancel}
-            className="bg-transparent border-none text-lg text-slate cursor-pointer hover:text-cream"
+            className="bg-transparent border-none text-lg cursor-pointer"
+            style={{ color: C.slate }}
+            onMouseEnter={(e) => e.currentTarget.style.color = C.cream}
+            onMouseLeave={(e) => e.currentTarget.style.color = C.slate}
           >
             ×
           </button>
@@ -123,34 +131,49 @@ function MemberForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-[11px] font-semibold text-slate uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: C.slate }}>
               Full Name *
             </label>
             <input
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-charcoal-light text-cream focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              className="w-full px-3 py-2 rounded-md border text-sm focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              style={{
+                backgroundColor: C.cardBg,
+                color: C.cream,
+                borderColor: C.border
+              }}
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="Jane Smith"
             />
           </div>
           <div>
-            <label className="block text-[11px] font-semibold text-slate uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: C.slate }}>
               Email *
             </label>
             <input
               type="email"
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-charcoal-light text-cream focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              className="w-full px-3 py-2 rounded-md border text-sm focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              style={{
+                backgroundColor: C.cardBg,
+                color: C.cream,
+                borderColor: C.border
+              }}
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="jane@farther.com"
             />
           </div>
           <div>
-            <label className="block text-[11px] font-semibold text-slate uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: C.slate }}>
               Role *
             </label>
             <select
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-charcoal-light text-cream focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              className="w-full px-3 py-2 rounded-md border text-sm focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              style={{
+                backgroundColor: C.cardBg,
+                color: C.cream,
+                borderColor: C.border
+              }}
               value={role}
               onChange={e => setRole(e.target.value)}
             >
@@ -160,22 +183,32 @@ function MemberForm({
             </select>
           </div>
           <div>
-            <label className="block text-[11px] font-semibold text-slate uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: C.slate }}>
               Phone
             </label>
             <input
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-charcoal-light text-cream focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              className="w-full px-3 py-2 rounded-md border text-sm focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              style={{
+                backgroundColor: C.cardBg,
+                color: C.cream,
+                borderColor: C.border
+              }}
               value={phone}
               onChange={e => setPhone(e.target.value)}
               placeholder="(555) 123-4567"
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-[11px] font-semibold text-slate uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: C.slate }}>
               Calendar Link
             </label>
             <input
-              className="w-full px-3 py-2 rounded-md border border-cream-border text-sm bg-charcoal-light text-cream focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              className="w-full px-3 py-2 rounded-md border text-sm focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
+              style={{
+                backgroundColor: C.cardBg,
+                color: C.cream,
+                borderColor: C.border
+              }}
               value={calendarLink}
               onChange={e => setCalendarLink(e.target.value)}
               placeholder="https://calendar.google.com/..."
@@ -183,20 +216,29 @@ function MemberForm({
           </div>
         </div>
 
-        {error && <p className="text-red-600 text-xs mb-3">{error}</p>}
+        {error && <p style={{ color: C.red }} className="text-xs mb-3">{error}</p>}
 
         <div className="flex gap-2.5">
           <button
             type="submit"
             disabled={saving}
-            className="px-5 py-2 rounded-md text-sm font-semibold bg-teal text-white border-none cursor-pointer hover:bg-teal-dark transition-smooth disabled:opacity-70 disabled:cursor-wait"
+            className="px-5 py-2 rounded-md text-sm font-semibold border-none cursor-pointer hover:opacity-90 transition-smooth disabled:opacity-70 disabled:cursor-wait"
+            style={{
+              backgroundColor: C.teal,
+              color: C.white
+            }}
           >
             {saving ? 'Saving…' : initial ? 'Update' : 'Add Member'}
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="px-5 py-2 rounded-md text-sm font-medium bg-white text-slate border border-cream-border cursor-pointer hover:bg-charcoal-600 transition-smooth"
+            className="px-5 py-2 rounded-md text-sm font-medium border cursor-pointer hover:opacity-80 transition-smooth"
+            style={{
+              backgroundColor: C.cardBg,
+              color: C.slate,
+              borderColor: C.border
+            }}
           >
             Cancel
           </button>
@@ -212,6 +254,9 @@ function MemberForm({
  * Migrated to Tremor components and Tailwind utilities
  */
 export default function TeamPage() {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+
   const { data, error, isLoading } = useSWR('/api/command-center/team', fetcher, { refreshInterval: 43_200_000 });
 
   const [showForm, setShowForm] = useState(false);
@@ -277,8 +322,8 @@ export default function TeamPage() {
     mutate('/api/command-center/team');
   };
 
-  if (isLoading) return <div className="px-10 py-16 text-slate">Loading team…</div>;
-  if (error) return <div className="px-10 py-16 text-red-600">Failed to load team data.</div>;
+  if (isLoading) return <div className="px-10 py-16" style={{ color: C.slate }}>Loading team…</div>;
+  if (error) return <div className="px-10 py-16" style={{ color: C.red }}>Failed to load team data.</div>;
 
   return (
     <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
@@ -286,10 +331,10 @@ export default function TeamPage() {
       <div className="relative mb-6">
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} className="absolute top-0 right-0 opacity-50" />
         <div className="text-center mb-4">
-          <h1 className="text-3xl font-bold text-cream font-serif mb-2">
+          <h1 className="text-3xl font-bold font-serif mb-2" style={{ color: C.cream }}>
             Team Management
           </h1>
-          <p className="text-slate text-sm">
+          <p className="text-sm" style={{ color: C.slate }}>
             Manage AX team members · Assign to advisors
           </p>
         </div>
@@ -297,7 +342,11 @@ export default function TeamPage() {
           <div className="flex justify-center">
             <button
               onClick={() => { setShowForm(true); setEditMember(null); }}
-              className="px-5 py-2.5 rounded-md text-sm font-semibold bg-teal text-white border-none cursor-pointer hover:bg-teal-dark transition-smooth"
+              className="px-5 py-2.5 rounded-md text-sm font-semibold border-none cursor-pointer hover:opacity-90 transition-smooth"
+              style={{
+                backgroundColor: C.teal,
+                color: C.white
+              }}
             >
               + Add Team Member
             </button>
@@ -324,16 +373,22 @@ export default function TeamPage() {
             <button
               key={role}
               onClick={() => setFilterRole(isActive ? 'all' : role)}
-              className={`px-3 py-3.5 rounded-lg border text-center cursor-pointer transition-smooth ${
-                isActive
-                  ? `${style.bg} ${style.border}`
-                  : 'glass-card hover:bg-charcoal-600'
-              }`}
+              className="px-3 py-3.5 rounded-lg border text-center cursor-pointer transition-smooth"
+              style={{
+                backgroundColor: isActive ? style.bg.replace('bg-', '').replace('/10', '') + '10' : C.cardBg,
+                borderColor: isActive ? style.hex : C.border
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) e.currentTarget.style.backgroundColor = C.cardBgHover;
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) e.currentTarget.style.backgroundColor = C.cardBg;
+              }}
             >
-              <div className={`text-2xl font-bold font-serif ${style.color}`}>
+              <div className="text-2xl font-bold font-serif" style={{ color: style.hex }}>
                 {roleCounts[role]}
               </div>
-              <div className={`text-[11px] font-semibold mt-0.5 ${isActive ? style.color : 'text-slate'}`}>
+              <div className="text-[11px] font-semibold mt-0.5" style={{ color: isActive ? style.hex : C.slate }}>
                 {role}
               </div>
             </button>
@@ -343,11 +398,11 @@ export default function TeamPage() {
 
       {/* Filters */}
       <div className="flex justify-between items-center mb-4">
-        <div className="text-sm text-slate">
+        <div className="text-sm" style={{ color: C.slate }}>
           {filteredMembers.length} member{filteredMembers.length !== 1 ? 's' : ''}
           {filterRole !== 'all' && ` · filtered by ${filterRole}`}
         </div>
-        <label className="text-xs text-slate cursor-pointer flex items-center gap-1.5">
+        <label className="text-xs cursor-pointer flex items-center gap-1.5" style={{ color: C.slate }}>
           <input
             type="checkbox"
             checked={showInactive}
@@ -361,7 +416,7 @@ export default function TeamPage() {
       {/* Team Members */}
       {filteredMembers.length === 0 ? (
         <DataCard className="text-center py-10">
-          <p className="text-slate text-sm">
+          <p className="text-sm" style={{ color: C.slate }}>
             {members.length === 0 ? 'No team members yet. Click "Add Team Member" to get started.' : 'No members match the current filter.'}
           </p>
         </DataCard>
@@ -384,21 +439,33 @@ export default function TeamPage() {
             }
 
             return grouped.map(group => {
-              const roleStyle = ROLE_COLORS[group.role] ?? { bg: 'bg-slate/10', color: 'text-slate', border: 'border-slate' };
+              const roleStyle = ROLE_COLORS[group.role] ?? { bg: 'bg-slate/10', color: 'text-slate', border: 'border-slate', hex: '#94a3b8' };
               const roleDesc = ROLE_DESCRIPTIONS[group.role] ?? '';
               return (
                 <DataCard key={group.role} className="p-0 overflow-hidden">
                   {/* Role group header */}
-                  <div className={`px-5 py-3.5 ${roleStyle.bg} border-b border-cream-border flex items-center justify-between`}>
+                  <div
+                    className="px-5 py-3.5 border-b flex items-center justify-between"
+                    style={{
+                      backgroundColor: roleStyle.hex + '15',
+                      borderColor: C.border
+                    }}
+                  >
                     <div className="flex items-center gap-2.5">
-                      <span className={`text-base font-bold font-serif ${roleStyle.color}`}>
+                      <span className="text-base font-bold font-serif" style={{ color: roleStyle.hex }}>
                         {group.role}
                       </span>
-                      <span className="text-xs text-slate">
+                      <span className="text-xs" style={{ color: C.slate }}>
                         {roleDesc}
                       </span>
                     </div>
-                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#2f2f2f] ${roleStyle.color}`}>
+                    <span
+                      className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                      style={{
+                        backgroundColor: C.tableHeaderBg,
+                        color: roleStyle.hex
+                      }}
+                    >
                       {group.members.length}
                     </span>
                   </div>
@@ -406,11 +473,12 @@ export default function TeamPage() {
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-cream-border">
+                        <tr style={{ borderBottom: `1px solid ${C.border}` }}>
                           {['Name', 'Email', 'Phone', 'Calendar', 'Status', ''].map(h => (
                             <th
                               key={h}
-                              className="px-3.5 py-2 text-left text-slate text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap"
+                              className="px-3.5 py-2 text-left text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap"
+                              style={{ color: C.slate }}
                             >
                               {h}
                             </th>
@@ -418,63 +486,73 @@ export default function TeamPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {group.members.map((member, i) => (
-                          <tr
-                            key={member.id}
-                            className={`border-b border-cream-border ${i % 2 === 0 ? 'glass-card' : 'bg-charcoal-700'} ${!member.active ? 'opacity-50' : ''}`}
-                          >
-                            <td className="px-3.5 py-2.5 font-semibold" style={{ color: getNameColor(member.name) }}>
-                              {member.name}
-                            </td>
-                            <td className="px-3.5 py-2.5">
-                              <a href={`mailto:${member.email}`} className="text-teal no-underline hover:underline">
-                                {member.email}
-                              </a>
-                            </td>
-                            <td className="px-3.5 py-2.5 text-slate">
-                              {member.phone || '—'}
-                            </td>
-                            <td className="px-3.5 py-2.5">
-                              {member.calendar_link ? (
-                                <a href={member.calendar_link} target="_blank" rel="noopener noreferrer"
-                                  className="text-teal no-underline text-xs hover:underline">
-                                  View Calendar
+                        {group.members.map((member, i) => {
+                          const rowBg = i % 2 === 0 ? C.cardBg : C.cardBgAlt;
+                          return (
+                            <tr
+                              key={member.id}
+                              className={!member.active ? 'opacity-50' : ''}
+                              style={{
+                                borderBottom: `1px solid ${C.border}`,
+                                background: rowBg
+                              }}
+                            >
+                              <td className="px-3.5 py-2.5 font-semibold" style={{ color: getNameColor(member.name) }}>
+                                {member.name}
+                              </td>
+                              <td className="px-3.5 py-2.5">
+                                <a href={`mailto:${member.email}`} className="no-underline hover:underline" style={{ color: C.teal }}>
+                                  {member.email}
                                 </a>
-                              ) : (
-                                <span className="text-slate">—</span>
-                              )}
-                            </td>
-                            <td className="px-3.5 py-2.5">
-                              <StatusBadge
-                                status={member.active ? 'active' : 'inactive'}
-                                size="sm"
-                              />
-                            </td>
-                            <td className="px-3.5 py-2.5 whitespace-nowrap">
-                              <button
-                                onClick={() => { setEditMember(member); setShowForm(false); }}
-                                className="bg-transparent border-none text-teal text-xs font-medium cursor-pointer mr-3 hover:underline"
-                              >
-                                Edit
-                              </button>
-                              {member.active ? (
+                              </td>
+                              <td className="px-3.5 py-2.5" style={{ color: C.slate }}>
+                                {member.phone || '—'}
+                              </td>
+                              <td className="px-3.5 py-2.5">
+                                {member.calendar_link ? (
+                                  <a href={member.calendar_link} target="_blank" rel="noopener noreferrer"
+                                    className="no-underline text-xs hover:underline" style={{ color: C.teal }}>
+                                    View Calendar
+                                  </a>
+                                ) : (
+                                  <span style={{ color: C.slate }}>—</span>
+                                )}
+                              </td>
+                              <td className="px-3.5 py-2.5">
+                                <StatusBadge
+                                  status={member.active ? 'active' : 'inactive'}
+                                  size="sm"
+                                />
+                              </td>
+                              <td className="px-3.5 py-2.5 whitespace-nowrap">
                                 <button
-                                  onClick={() => handleDeactivate(member)}
-                                  className="bg-transparent border-none text-red-600 text-xs font-medium cursor-pointer hover:underline"
+                                  onClick={() => { setEditMember(member); setShowForm(false); }}
+                                  className="bg-transparent border-none text-xs font-medium cursor-pointer mr-3 hover:underline"
+                                  style={{ color: C.teal }}
                                 >
-                                  Deactivate
+                                  Edit
                                 </button>
-                              ) : (
-                                <button
-                                  onClick={() => handleReactivate(member)}
-                                  className="bg-transparent border-none text-emerald-600 text-xs font-medium cursor-pointer hover:underline"
-                                >
-                                  Reactivate
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
+                                {member.active ? (
+                                  <button
+                                    onClick={() => handleDeactivate(member)}
+                                    className="bg-transparent border-none text-xs font-medium cursor-pointer hover:underline"
+                                    style={{ color: C.red }}
+                                  >
+                                    Deactivate
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => handleReactivate(member)}
+                                    className="bg-transparent border-none text-xs font-medium cursor-pointer hover:underline"
+                                    style={{ color: C.green }}
+                                  >
+                                    Reactivate
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
