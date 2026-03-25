@@ -6,6 +6,85 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Advisor Team Mappings — 2026-03-25
+
+**What**: Implemented automatic mapping of individual advisor names to team names in Transition sheets, eliminating duplicate entries for team-based advisors.
+
+**Problem**:
+- HubSpot: Advisors organized as teams (e.g., "Golden Wealth Management" with 4 members)
+- Transition Sheets Column B: Individual names ("John Smith", "Jane Doe", etc.)
+- Result: 4 separate dashboard entries instead of 1 consolidated team entry
+- Data fragmentation and confusing analytics
+
+**Solution**:
+
+1. **Database Table**: `advisor_team_mappings`
+   - Maps individual advisor names → team names
+   - Synced from HubSpot deal associations
+   - Supports manual overrides
+
+2. **HubSpot Integration**:
+   - New API: `/api/command-center/transitions/team-mappings`
+   - Fetches all deals from AX Pipeline
+   - Extracts associated contacts for each deal
+   - Maps contact names → deal name (team name)
+   - Upserts to database with conflict resolution
+
+3. **Automatic Mapping During Sync**:
+   - Loads team mappings (cached for 5 minutes)
+   - When reading Transition sheet Column B
+   - Checks if individual name exists in mappings
+   - Replaces with team name before storing
+   - Tracks mapping count in sync results
+
+4. **Performance Optimizations**:
+   - In-memory cache (5-minute TTL)
+   - Single database load per sync session
+   - Fast Map lookups (O(1) complexity)
+
+**Scope**:
+- Created `advisor_team_mappings` table with indexes
+- Built sync endpoint to populate from HubSpot
+- Modified Transition sync logic to apply mappings
+- Added mapping count to sync results
+- Created comprehensive documentation (ADVISOR_TEAM_MAPPINGS.md)
+
+**Status**: ✅ Implemented and ready for deployment
+
+**Files**:
+- `scripts/migrate-transitions.ts` — Added advisor_team_mappings table
+- `app/api/command-center/transitions/team-mappings/route.ts` — New API endpoint (GET/POST)
+- `app/api/command-center/transitions/sync/route.ts` — Apply mappings during sync
+- `ADVISOR_TEAM_MAPPINGS.md` — Complete implementation guide
+
+**Usage**:
+```bash
+# 1. Run migration
+npx tsx scripts/migrate-transitions.ts
+
+# 2. Sync team mappings from HubSpot
+POST /api/command-center/transitions/team-mappings
+
+# 3. Sync Transition sheets (mappings applied automatically)
+POST /api/command-center/transitions/sync
+```
+
+**Impact**:
+- ✅ Eliminates duplicate entries for team-based advisors
+- ✅ Consolidated dashboard analytics
+- ✅ Accurate team-level reporting
+- ✅ Automatic sync from HubSpot
+- ✅ Manual override capability
+- ✅ 5-minute cache for performance
+
+**Example:**
+```
+Before: John Smith (4 accounts), Jane Doe (3 accounts), Mike Johnson (2 accounts)
+After:  Golden Wealth Management (9 accounts)
+```
+
+---
+
 ## [Completed] Add Sync Progress Bar & Update Auto-Sync Timing — 2026-03-25
 
 **What**: Added visual sync progress indicator and increased auto-sync threshold from 1 hour to 2 hours.

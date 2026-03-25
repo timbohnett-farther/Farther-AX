@@ -112,6 +112,27 @@ async function migrate() {
         created_at TIMESTAMPTZ DEFAULT NOW(),
         updated_at TIMESTAMPTZ DEFAULT NOW()
       );
+
+      -- Advisor Team Mappings (individual advisor names → team names)
+      -- Used to normalize Transition sheet data where individuals appear instead of team names
+      CREATE TABLE IF NOT EXISTS advisor_team_mappings (
+        id SERIAL PRIMARY KEY,
+        individual_name VARCHAR(255) NOT NULL UNIQUE,
+        team_name VARCHAR(255) NOT NULL,
+        hubspot_contact_id VARCHAR(128),
+        hubspot_deal_id VARCHAR(128),
+        source VARCHAR(50) DEFAULT 'hubspot',
+        notes TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_advisor_team_mappings_individual
+        ON advisor_team_mappings(individual_name);
+      CREATE INDEX IF NOT EXISTS idx_advisor_team_mappings_team
+        ON advisor_team_mappings(team_name);
+      CREATE INDEX IF NOT EXISTS idx_advisor_team_mappings_hubspot_deal
+        ON advisor_team_mappings(hubspot_deal_id);
     `);
     console.log('Migration complete.');
   } finally {

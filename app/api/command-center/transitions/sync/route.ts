@@ -167,6 +167,56 @@ function buildFieldIndex(headers: string[]): Map<keyof TransitionRecord, number>
   return index;
 }
 
+// ── Team Mappings Cache ──────────────────────────────────────────────────────
+
+let teamMappingsCache: Map<string, string> | null = null;
+let teamMappingsCacheTime = 0;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function loadTeamMappings(): Promise<Map<string, string>> {
+  const now = Date.now();
+
+  // Return cached if still fresh
+  if (teamMappingsCache && now - teamMappingsCacheTime < CACHE_TTL) {
+    return teamMappingsCache;
+  }
+
+  const result = await pool.query<{ individual_name: string; team_name: string }>(
+    `SELECT individual_name, team_name FROM advisor_team_mappings`
+  );
+
+  const mappings = new Map<string, string>();
+  for (const row of result.rows) {
+    mappings.set(row.individual_name.trim(), row.team_name.trim());
+  }
+
+  teamMappingsCache = mappings;
+  teamMappingsCacheTime = now;
+
+  console.log(`[transitions/sync] Loaded ${mappings.size} team mappings`);
+  return mappings;
+}
+
+/**
+ * Apply team mapping: individual name → team name
+ * Returns the team name if mapping exists, otherwise returns original name
+ */
+function applyTeamMapping(advisorName: string | null, mappings: Map<string, string>): string | null {
+  if (!advisorName) return null;
+
+  const trimmed = advisorName.trim();
+  if (!trimmed) return null;
+
+  // Check if this individual name maps to a team
+  const teamName = mappings.get(trimmed);
+  if (teamName) {
+    console.log(`[transitions/sync] Mapped "${trimmed}" → "${teamName}"`);
+    return teamName;
+  }
+
+  return trimmed;
+}
+
 // ── Sync a single workbook's Transitions tab ─────────────────────────────────
 
 interface WorkbookResult {
@@ -175,6 +225,7 @@ interface WorkbookResult {
   detectedAdvisor: string | null;
   synced: number;
   total: number;
+  mappedCount: number;
   error?: string;
 }
 
@@ -182,12 +233,13 @@ async function syncWorkbook(
   sheetId: string,
   workbookName: string,
   range: string,
+  teamMappings: Map<string, string>,
 ): Promise<WorkbookResult> {
   try {
     const allRows = await fetchSheetData(sheetId, range);
 
     if (allRows.length < 2) {
-      return { sheetId, workbookName, detectedAdvisor: null, synced: 0, total: 0 };
+      return { sheetId, workbookName, detectedAdvisor: null, synced: 0, total: 0, mappedCount: 0 };
     }
 
     const headers = allRows[0];
@@ -200,7 +252,11 @@ async function syncWorkbook(
     if (advisorColIdx !== undefined) {
       for (const row of dataRows) {
         const val = (row[advisorColIdx] ?? '').trim();
-        if (val) { detectedAdvisor = val; break; }
+        if (val) {
+          // Apply team mapping to detected advisor
+          detectedAdvisor = applyTeamMapping(val, teamMappings);
+          break;
+        }
       }
     }
 
@@ -218,6 +274,7 @@ async function syncWorkbook(
     );
 
     let synced = 0;
+    let mappedCount = 0;
 
     for (let i = 0; i < dataRows.length; i++) {
       const cells = dataRows[i];
@@ -225,6 +282,17 @@ async function syncWorkbook(
 
       const record = parseRow(cells, fieldIndex);
       const sheetRowIndex = i + 1;
+
+      // Apply team mapping to advisor_name field
+      const originalAdvisorName = record.advisor_name ?? null;
+      const mappedAdvisorName = applyTeamMapping(originalAdvisorName, teamMappings);
+
+      if (mappedAdvisorName !== originalAdvisorName && mappedAdvisorName !== null) {
+        mappedCount++;
+      }
+
+      // Replace advisor_name with mapped team name
+      record.advisor_name = mappedAdvisorName ?? record.advisor_name;
 
       await pool.query(
         `
@@ -406,11 +474,11 @@ async function syncWorkbook(
       synced += 1;
     }
 
-    return { sheetId, workbookName, detectedAdvisor, synced, total: dataRows.length };
+    return { sheetId, workbookName, detectedAdvisor, synced, total: dataRows.length, mappedCount };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`[transitions/sync] Error syncing "${workbookName}" (${sheetId}):`, message);
-    return { sheetId, workbookName, detectedAdvisor: null, synced: 0, total: 0, error: message };
+    return { sheetId, workbookName, detectedAdvisor: null, synced: 0, total: 0, mappedCount: 0, error: message };
   }
 }
 
@@ -425,9 +493,13 @@ export async function POST(req: NextRequest) {
 
     const range = sheetRange ?? 'Transition!A1:AQ';
 
+    // Load team mappings once
+    const teamMappings = await loadTeamMappings();
+    console.log(`[transitions/sync] Loaded ${teamMappings.size} team mappings for sync`);
+
     // ── Single workbook sync ────────────────────────────────────────────────
     if (sheetId) {
-      const result = await syncWorkbook(sheetId, '', range);
+      const result = await syncWorkbook(sheetId, '', range, teamMappings);
       if (result.error) {
         return NextResponse.json({ error: result.error }, { status: 502 });
       }
@@ -448,7 +520,7 @@ export async function POST(req: NextRequest) {
     if (sheets.length === 0) {
       return NextResponse.json({
         workbooks: [],
-        summary: { total_workbooks: 0, total_synced: 0, total_rows: 0, errors: 0 },
+        summary: { total_workbooks: 0, total_synced: 0, total_rows: 0, total_mapped: 0, errors: 0 },
       });
     }
 
@@ -456,12 +528,13 @@ export async function POST(req: NextRequest) {
 
     for (const sheet of sheets) {
       console.log(`[transitions/sync] Syncing "${sheet.name}" (${sheet.id})…`);
-      const result = await syncWorkbook(sheet.id, sheet.name, range);
+      const result = await syncWorkbook(sheet.id, sheet.name, range, teamMappings);
       results.push(result);
     }
 
     const totalSynced = results.reduce((sum, r) => sum + r.synced, 0);
     const totalRows = results.reduce((sum, r) => sum + r.total, 0);
+    const totalMapped = results.reduce((sum, r) => sum + r.mappedCount, 0);
     const errors = results.filter(r => r.error).length;
 
     return NextResponse.json({
@@ -470,6 +543,7 @@ export async function POST(req: NextRequest) {
         total_workbooks: sheets.length,
         total_synced: totalSynced,
         total_rows: totalRows,
+        total_mapped: totalMapped,
         errors,
       },
     });
@@ -495,12 +569,17 @@ export async function GET() {
     }
 
     const range = 'Transition!A1:AQ';
+
+    // Load team mappings once
+    const teamMappings = await loadTeamMappings();
+    console.log(`[transitions/sync] Loaded ${teamMappings.size} team mappings for auto-sync`);
+
     const sheets: DriveFile[] = await listSheetsInFolder(folderId);
 
     if (sheets.length === 0) {
       return NextResponse.json({
         workbooks: [],
-        summary: { total_workbooks: 0, total_synced: 0, total_rows: 0, errors: 0 },
+        summary: { total_workbooks: 0, total_synced: 0, total_rows: 0, total_mapped: 0, errors: 0 },
       });
     }
 
@@ -508,12 +587,13 @@ export async function GET() {
 
     for (const sheet of sheets) {
       console.log(`[transitions/sync] Auto-syncing "${sheet.name}" (${sheet.id})…`);
-      const result = await syncWorkbook(sheet.id, sheet.name, range);
+      const result = await syncWorkbook(sheet.id, sheet.name, range, teamMappings);
       results.push(result);
     }
 
     const totalSynced = results.reduce((sum, r) => sum + r.synced, 0);
     const totalRows = results.reduce((sum, r) => sum + r.total, 0);
+    const totalMapped = results.reduce((sum, r) => sum + r.mappedCount, 0);
     const errors = results.filter(r => r.error).length;
 
     return NextResponse.json({
@@ -522,6 +602,7 @@ export async function GET() {
         total_workbooks: sheets.length,
         total_synced: totalSynced,
         total_rows: totalRows,
+        total_mapped: totalMapped,
         errors,
       },
     });
