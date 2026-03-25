@@ -1488,6 +1488,7 @@ export default function AdvisorProfilePage() {
   const params = useParams();
   const id = params.id as string;
   const { data, error, isLoading } = useSWR(id ? `/api/command-center/advisor/${id}` : null, fetcher);
+  const { data: pipelineData } = useSWR('/api/command-center/pipeline', fetcher);
   const [activeTab, setActiveTab] = useState<ProfileTab>('overview');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [extracted, setExtracted] = useState<Record<string, any> | null>(null);
@@ -1549,9 +1550,27 @@ export default function AdvisorProfilePage() {
 
   return (
     <div style={{ padding: '32px 40px', minHeight: '100vh', fontFamily: "'Fakt', system-ui, sans-serif" }}>
-      <Link href="/command-center" style={{ fontSize: 13, color: C.slate, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 20 }}>
-        ← Back to Pipeline
-      </Link>
+      {/* Navigation: Back + Next Advisor */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <Link href="/command-center/advisor-hub" style={{ fontSize: 13, color: C.slate, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          &larr; Back to Advisor Hub
+        </Link>
+        {(() => {
+          if (!pipelineData?.deals) return null;
+          const sorted = [...pipelineData.deals]
+            .filter((d: { dealname?: string }) => d.dealname && !d.dealname.toLowerCase().includes('test'))
+            .sort((a: { dealname: string }, b: { dealname: string }) => a.dealname.localeCompare(b.dealname));
+          const idx = sorted.findIndex((d: { id: string }) => d.id === id);
+          const next = idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : sorted[0];
+          if (!next || next.id === id) return null;
+          return (
+            <Link href={`/command-center/advisor/${next.id}`} style={{ textDecoration: 'none', textAlign: 'right' }}>
+              <span style={{ fontSize: 12, color: C.slate, display: 'block' }}>Next Advisor &rarr;</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: C.teal }}>{next.dealname}</span>
+            </Link>
+          );
+        })()}
+      </div>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>

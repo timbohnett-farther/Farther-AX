@@ -530,6 +530,11 @@ export default function AdvisorHubPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('launch');
   const [search, setSearch] = useState('');
   const [scoring, setScoring] = useState<Record<string, boolean>>({});
+  const [sortCol, setSortCol] = useState<string>('dealname');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [transitionFilter, setTransitionFilter] = useState('all');
+  const [aumTierFilter, setAumTierFilter] = useState('all');
+  const [sentimentFilter, setSentimentFilter] = useState('all');
 
   // Build a map of deal_id → sentiment score
   const sentimentMap = useMemo(() => {
@@ -574,16 +579,66 @@ export default function AdvisorHubPage() {
   }, [data]);
 
   const currentDeals = useMemo(() => {
-    if (activeTab === 'aum') return []; // AUM tab uses its own data source
-    const pool = activeTab === 'launch' ? launchDeals : activeTab === 'early' ? earlyDeals : completedDeals;
-    if (!search.trim()) return pool;
-    const q = search.toLowerCase();
-    return pool.filter(d =>
-      d.dealname?.toLowerCase().includes(q) ||
-      d.current_firm__cloned_?.toLowerCase().includes(q) ||
-      d.ownerName?.toLowerCase().includes(q)
-    );
-  }, [activeTab, launchDeals, earlyDeals, completedDeals, search]);
+    if (activeTab === 'aum') return [];
+    let pool = activeTab === 'launch' ? launchDeals : activeTab === 'early' ? earlyDeals : completedDeals;
+
+    // Search filter
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      pool = pool.filter(d =>
+        d.dealname?.toLowerCase().includes(q) ||
+        d.current_firm__cloned_?.toLowerCase().includes(q) ||
+        d.ownerName?.toLowerCase().includes(q)
+      );
+    }
+
+    // Transition type filter
+    if (transitionFilter !== 'all') {
+      pool = pool.filter(d => d.transition_type === transitionFilter);
+    }
+
+    // AUM tier filter
+    if (aumTierFilter !== 'all') {
+      pool = pool.filter(d => {
+        const aum = parseFloat(d.transferable_aum ?? '0') || 0;
+        if (aumTierFilter === '0-50') return aum < 50_000_000;
+        if (aumTierFilter === '50-100') return aum >= 50_000_000 && aum < 100_000_000;
+        if (aumTierFilter === '100-200') return aum >= 100_000_000 && aum < 200_000_000;
+        if (aumTierFilter === '200+') return aum >= 200_000_000;
+        return true;
+      });
+    }
+
+    // Sentiment filter
+    if (sentimentFilter !== 'all') {
+      pool = pool.filter(d => {
+        const s = sentimentMap[d.id];
+        if (sentimentFilter === 'unscored') return !s;
+        return s?.tier === sentimentFilter;
+      });
+    }
+
+    // Sort
+    return [...pool].sort((a, b) => {
+      const dir = sortDir === 'asc' ? 1 : -1;
+      if (sortCol === 'dealname') return (a.dealname ?? '').localeCompare(b.dealname ?? '') * dir;
+      if (sortCol === 'firm') return (a.current_firm__cloned_ ?? '').localeCompare(b.current_firm__cloned_ ?? '') * dir;
+      if (sortCol === 'aum') return ((parseFloat(a.transferable_aum ?? '0') || 0) - (parseFloat(b.transferable_aum ?? '0') || 0)) * dir;
+      if (sortCol === 'stage') return (STAGE_LABELS[a.dealstage] ?? '').localeCompare(STAGE_LABELS[b.dealstage] ?? '') * dir;
+      if (sortCol === 'sentiment') {
+        const sa = sentimentMap[a.id]?.composite_score ?? -1;
+        const sb = sentimentMap[b.id]?.composite_score ?? -1;
+        return (sa - sb) * dir;
+      }
+      if (sortCol === 'date') {
+        const da = a.desired_start_date ?? a.actual_launch_date ?? '';
+        const db = b.desired_start_date ?? b.actual_launch_date ?? '';
+        return da.localeCompare(db) * dir;
+      }
+      if (sortCol === 'recruiter') return (a.ownerName ?? '').localeCompare(b.ownerName ?? '') * dir;
+      return 0;
+    });
+  }, [activeTab, launchDeals, earlyDeals, completedDeals, search, transitionFilter, aumTierFilter, sentimentFilter, sentimentMap, sortCol, sortDir]);
 
   // Filtered AUM advisors
   const filteredAumAdvisors = useMemo(() => {
@@ -803,6 +858,55 @@ export default function AdvisorHubPage() {
         </div>
       </div>
 
+      {/* ── Filter Dropdowns ───────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
+        {/* Transition Type */}
+        <select value={transitionFilter} onChange={e => setTransitionFilter(e.target.value)} style={{
+          padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
+          fontSize: 12, background: C.cardBg, color: C.dark, cursor: 'pointer', outline: 'none',
+        }}>
+          <option value="all">All Merge Types</option>
+          {(() => {
+            const pool = activeTab === 'launch' ? launchDeals : activeTab === 'early' ? earlyDeals : completedDeals;
+            const types = Array.from(new Set(pool.map(d => d.transition_type).filter(Boolean))) as string[];
+            return types.sort().map(t => <option key={t} value={t}>{t}</option>);
+          })()}
+        </select>
+
+        {/* AUM Tier */}
+        <select value={aumTierFilter} onChange={e => setAumTierFilter(e.target.value)} style={{
+          padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
+          fontSize: 12, background: C.cardBg, color: C.dark, cursor: 'pointer', outline: 'none',
+        }}>
+          <option value="all">All AUM Tiers</option>
+          <option value="0-50">$0 - $50M</option>
+          <option value="50-100">$50M - $100M</option>
+          <option value="100-200">$100M - $200M</option>
+          <option value="200+">$200M+</option>
+        </select>
+
+        {/* Sentiment */}
+        {showSentiment && (
+          <select value={sentimentFilter} onChange={e => setSentimentFilter(e.target.value)} style={{
+            padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
+            fontSize: 12, background: C.cardBg, color: C.dark, cursor: 'pointer', outline: 'none',
+          }}>
+            <option value="all">All Sentiment</option>
+            <option value="Advocate">Advocate</option>
+            <option value="Positive">Positive</option>
+            <option value="Neutral">Neutral</option>
+            <option value="At Risk">At Risk</option>
+            <option value="High Risk">High Risk</option>
+            <option value="unscored">Not Scored</option>
+          </select>
+        )}
+
+        {/* Result count */}
+        <span style={{ fontSize: 12, color: C.slate, padding: '8px 0', marginLeft: 'auto' }}>
+          {currentDeals.length} advisor{currentDeals.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+
       {/* Loading / Error */}
       {isLoading && activeTab !== 'aum' && (
         <div style={{ textAlign: 'center', padding: 60, color: C.slate, fontSize: 14 }}>
@@ -823,22 +927,41 @@ export default function AdvisorHubPage() {
       {/* ═══════ PIPELINE TABS (Launch / Early / Completed) ═══════ */}
       {activeTab !== 'aum' && !isLoading && !error && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {/* Table header */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: gridCols,
-            gap: 16, padding: '12px 20px',
-            fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em',
-            color: C.slate, borderBottom: `1px solid ${C.border}`,
-          }}>
-            <span>Advisor</span>
-            <span>Current Firm</span>
-            <span style={{ textAlign: 'right' }}>AUM</span>
-            <span>Stage</span>
-            {showSentiment && <span>Sentiment</span>}
-            <span>{activeTab === 'completed' ? 'Launched' : 'Target Date'}</span>
-            <span>Recruiter</span>
-          </div>
+          {/* Table header — sortable */}
+          {(() => {
+            const handleSort = (col: string) => {
+              if (sortCol === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+              else { setSortCol(col); setSortDir('asc'); }
+            };
+            const arrow = (col: string) => sortCol === col ? (sortDir === 'asc' ? ' \u25B2' : ' \u25BC') : '';
+            const cols = [
+              { key: 'dealname', label: 'Advisor' },
+              { key: 'firm', label: 'Current Firm' },
+              { key: 'aum', label: 'AUM', align: 'right' as const },
+              { key: 'stage', label: 'Stage' },
+              ...(showSentiment ? [{ key: 'sentiment', label: 'Sentiment' }] : []),
+              { key: 'date', label: activeTab === 'completed' ? 'Launched' : 'Target Date' },
+              { key: 'recruiter', label: 'Recruiter' },
+            ];
+            return (
+              <div style={{
+                display: 'grid', gridTemplateColumns: gridCols,
+                gap: 16, padding: '12px 20px',
+                fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em',
+                color: C.slate, borderBottom: `1px solid ${C.border}`,
+              }}>
+                {cols.map(col => (
+                  <span
+                    key={col.key}
+                    onClick={() => handleSort(col.key)}
+                    style={{ cursor: 'pointer', userSelect: 'none', textAlign: col.align }}
+                  >
+                    {col.label}{arrow(col.key)}
+                  </span>
+                ))}
+              </div>
+            );
+          })()}
 
           {currentDeals.length === 0 && (
             <div style={{ textAlign: 'center', padding: 40, color: C.slate, fontSize: 14 }}>
