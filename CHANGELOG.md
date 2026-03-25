@@ -6,6 +6,43 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Transitions Folder Filtering — 2026-03-25
+
+**What**: Modified Google Sheets sync to only include sheets directly in the main folder, excluding archived/graduated sheets in subfolders.
+
+**Problem**:
+- `listSheetsInFolder()` was recursively searching ALL subfolders
+- Sheets moved to "Graduated / Archived Transition Sheets" subfolder were still being synced
+- Archived data was appearing in the active transitions dashboard
+- Created confusion with stale/graduated advisor data
+
+**Scope**:
+- Simplified `listSheetsInFolder()` function to be non-recursive
+- Only searches the main folder (GOOGLE_DRIVE_FOLDER_ID)
+- Removes ~60 lines of complex subfolder recursion logic
+- Sheets moved to "Graduated / Archived Transition Sheets" are automatically excluded
+- Added clear JSDoc comment explaining non-recursive behavior
+
+**How Data Storage Works** (detailed explanation provided to user):
+1. **Sync Process**: Google Sheets → PostgreSQL tables (`transition_workbooks`, `transition_clients`)
+2. **Page Load**: Reads from PostgreSQL (fast), not Google Sheets API
+3. **Auto-Sync**: Triggers if data is >1 hour old
+4. **Benefits**: Fast page loads, no rate limits, persistent data, efficient filtering/pagination
+
+**Status**: ✅ Fixed and deployed
+
+**Files**:
+- `lib/google-sheets.ts` — Modified `listSheetsInFolder()` to be non-recursive (only main folder)
+
+**Impact**:
+- Only active transition sheets (in main folder) are synced
+- Archived/graduated sheets (in subfolders) are excluded
+- Cleaner dashboard with only relevant active data
+- Simpler codebase (removed complex recursive folder logic)
+- Faster sync operations (fewer sheets to process)
+
+---
+
 ## [Completed] Fix AI Assistant Chat Window Readability — 2026-03-25
 
 **What**: Fixed critical accessibility issue where chat input textarea had white text on white background, making it completely unreadable.
