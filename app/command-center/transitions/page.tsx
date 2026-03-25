@@ -86,7 +86,12 @@ function TransitionsPageInner() {
 
   // TRAN AUM sync state
   const [syncingTranAum, setSyncingTranAum] = useState(false);
-  const [tranAumResult, setTranAumResult] = useState<string | null>(null);
+  const [tranAumResult, setTranAumResult] = useState<{
+    message: string;
+    success: boolean;
+    sampleRecords?: Array<{ id: string; advisor_name: string; current_value: string; monthly_fee_amount: string }>;
+    sampleAggregations?: Array<{ advisor_name: string; tran_aum: number; revenue: number; record_count: number }>;
+  } | null>(null);
 
   // ── URL update helper ──────────────────────────────────────────────────────
   const updateUrl = useCallback((updates: Record<string, string>) => {
@@ -286,14 +291,25 @@ function TransitionsPageInner() {
       const result = await res.json();
 
       if (res.ok && result.success) {
-        setTranAumResult(`✓ ${result.message}`);
+        setTranAumResult({
+          message: `✓ ${result.message}`,
+          success: true,
+          sampleRecords: result.sampleRecords,
+          sampleAggregations: result.sampleAggregations,
+        });
         // Refresh the main data to show updated TRAN AUM
         mutate();
       } else {
-        setTranAumResult(`Error: ${result.error ?? 'Unknown'}`);
+        setTranAumResult({
+          message: `Error: ${result.error ?? 'Unknown'}`,
+          success: false,
+        });
       }
     } catch (e) {
-      setTranAumResult(`Sync failed: ${e instanceof Error ? e.message : String(e)}`);
+      setTranAumResult({
+        message: `Sync failed: ${e instanceof Error ? e.message : String(e)}`,
+        success: false,
+      });
     } finally {
       setSyncingTranAum(false);
     }
@@ -495,13 +511,80 @@ function TransitionsPageInner() {
         <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 16, marginBottom: 16 }}>
           <div style={{
             fontSize: 12, padding: '6px 10px', borderRadius: 6,
-            background: tranAumResult.startsWith('Error') ? C.redBg : C.greenBg,
-            color: tranAumResult.startsWith('Error') ? C.red : C.green,
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+            background: tranAumResult.success ? C.greenBg : C.redBg,
+            color: tranAumResult.success ? C.green : C.red,
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            marginBottom: tranAumResult.sampleRecords ? 12 : 0,
           }}>
-            {tranAumResult}
+            {tranAumResult.message}
             <button onClick={() => setTranAumResult(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'inherit' }}>&times;</button>
           </div>
+
+          {/* Sample HubSpot Records */}
+          {tranAumResult.sampleRecords && tranAumResult.sampleRecords.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              <p style={{ fontSize: 11, fontWeight: 600, color: C.slate, marginBottom: 6, textTransform: 'uppercase' }}>
+                Sample HubSpot Records (first 3):
+              </p>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', fontSize: 11, borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: 'rgba(250,247,242,0.03)', borderBottom: `1px solid ${C.border}` }}>
+                      <th style={{ padding: '6px 8px', textAlign: 'left', color: C.slate, fontWeight: 600 }}>Record ID</th>
+                      <th style={{ padding: '6px 8px', textAlign: 'left', color: C.slate, fontWeight: 600 }}>Advisor Name</th>
+                      <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>Current Value</th>
+                      <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>Monthly Fee</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tranAumResult.sampleRecords.map((rec, i) => (
+                      <tr key={rec.id} style={{ borderBottom: `1px solid ${C.borderSubtle}` }}>
+                        <td style={{ padding: '6px 8px', color: C.textSecondary }}>{rec.id}</td>
+                        <td style={{ padding: '6px 8px', color: C.cream }}>{rec.advisor_name || '—'}</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: C.textSecondary }}>{rec.current_value || '0'}</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: C.textSecondary }}>{rec.monthly_fee_amount || '0'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Sample Aggregations */}
+          {tranAumResult.sampleAggregations && tranAumResult.sampleAggregations.length > 0 && (
+            <div>
+              <p style={{ fontSize: 11, fontWeight: 600, color: C.slate, marginBottom: 6, textTransform: 'uppercase' }}>
+                Sample Aggregations (first 5 advisors):
+              </p>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', fontSize: 11, borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: 'rgba(250,247,242,0.03)', borderBottom: `1px solid ${C.border}` }}>
+                      <th style={{ padding: '6px 8px', textAlign: 'left', color: C.slate, fontWeight: 600 }}>Advisor Name</th>
+                      <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>TRAN AUM</th>
+                      <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>Revenue</th>
+                      <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>Record Count</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tranAumResult.sampleAggregations.map((agg, i) => (
+                      <tr key={i} style={{ borderBottom: `1px solid ${C.borderSubtle}` }}>
+                        <td style={{ padding: '6px 8px', color: C.cream }}>{agg.advisor_name}</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: C.teal, fontWeight: 600 }}>
+                          ${(agg.tran_aum / 1_000_000).toFixed(2)}M
+                        </td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: C.textSecondary }}>
+                          ${agg.revenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: C.textSecondary }}>{agg.record_count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

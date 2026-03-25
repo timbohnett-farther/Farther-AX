@@ -30,31 +30,34 @@ async function fetchAllRecords(): Promise<HubSpotRecord[]> {
   let after: string | undefined;
 
   do {
-    const body = {
-      properties: ['advisor_name', 'current_value', 'monthly_fee_amount'],
-      limit: 100,
-      ...(after ? { after } : {}),
-    };
+    // Build URL with query parameters
+    const params = new URLSearchParams({
+      properties: 'advisor_name,current_value,monthly_fee_amount',
+      limit: '100',
+    });
+    if (after) {
+      params.set('after', after);
+    }
 
-    const res = await fetch(
-      `https://api.hubapi.com/crm/v3/objects/${CUSTOM_OBJECT_TYPE}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${HUBSPOT_PAT}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      }
-    );
+    const url = `https://api.hubapi.com/crm/v3/objects/${CUSTOM_OBJECT_TYPE}?${params.toString()}`;
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${HUBSPOT_PAT}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
     if (!res.ok) {
       const errorText = await res.text();
       console.error(`[tran-aum] HubSpot API error ${res.status}: ${errorText}`);
+      console.error(`[tran-aum] Request URL: ${url}`);
       break;
     }
 
     const data = await res.json();
+    console.log(`[tran-aum] Fetched batch: ${data.results?.length ?? 0} records`);
     records.push(...(data.results ?? []));
 
     after = data.paging?.next?.after;
@@ -140,9 +143,35 @@ export async function POST(req: NextRequest) {
     const records = await fetchAllRecords();
     console.log(`[tran-aum] Fetched ${records.length} records from HubSpot`);
 
+    // Log first 3 records as sample
+    if (records.length > 0) {
+      console.log('[tran-aum] Sample records:');
+      records.slice(0, 3).forEach((rec, idx) => {
+        console.log(`  Record ${idx + 1}:`, {
+          id: rec.id,
+          advisor_name: rec.properties.advisor_name,
+          current_value: rec.properties.current_value,
+          monthly_fee_amount: rec.properties.monthly_fee_amount,
+        });
+      });
+    }
+
     // Aggregate by advisor
     const aggregations = aggregateByAdvisor(records);
     console.log(`[tran-aum] Aggregated data for ${aggregations.length} advisors`);
+
+    // Log first 3 aggregations as sample
+    if (aggregations.length > 0) {
+      console.log('[tran-aum] Sample aggregations:');
+      aggregations.slice(0, 3).forEach((agg, idx) => {
+        console.log(`  Advisor ${idx + 1}:`, {
+          advisor_name: agg.advisor_name,
+          tran_aum: agg.tran_aum,
+          revenue: agg.revenue,
+          record_count: agg.record_count,
+        });
+      });
+    }
 
     // Upsert to database
     let inserted = 0;
@@ -185,6 +214,18 @@ export async function POST(req: NextRequest) {
       inserted,
       updated,
       message: `Synced TRAN AUM for ${aggregations.length} advisors (${inserted} new, ${updated} updated)`,
+      sampleRecords: records.slice(0, 3).map(r => ({
+        id: r.id,
+        advisor_name: r.properties.advisor_name,
+        current_value: r.properties.current_value,
+        monthly_fee_amount: r.properties.monthly_fee_amount,
+      })),
+      sampleAggregations: aggregations.slice(0, 5).map(a => ({
+        advisor_name: a.advisor_name,
+        tran_aum: a.tran_aum,
+        revenue: a.revenue,
+        record_count: a.record_count,
+      })),
     });
   } catch (err) {
     console.error('[tran-aum POST]', err);

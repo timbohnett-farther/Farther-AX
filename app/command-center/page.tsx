@@ -1844,20 +1844,24 @@ function RecruitingTab() {
                           const sentiment = sentimentScores[deal.id];
                           if (!sentiment) return <span style={{ color: C.slate, fontSize: 11 }}>—</span>;
                           return (
-                            <div style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 6,
-                              padding: '3px 10px',
-                              borderRadius: 4,
-                              background: `${sentiment.color}20`,
-                              border: `1px solid ${sentiment.color}40`,
-                            }}>
+                            <div
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 6,
+                                padding: '3px 10px',
+                                borderRadius: 4,
+                                background: `${sentiment.color}20`,
+                                border: `1px solid ${sentiment.color}40`,
+                                cursor: 'default',
+                              }}
+                              title={`${Math.round(sentiment.score)}/10`}
+                            >
                               <span style={{ fontSize: 16, color: sentiment.color }}>
                                 {sentiment.tier === 'Advocate' ? '★' : sentiment.tier === 'Positive' ? '▲' : sentiment.tier === 'Neutral' ? '●' : sentiment.tier === 'At Risk' ? '◈' : '▼'}
                               </span>
                               <span style={{ fontSize: 11, fontWeight: 600, color: sentiment.color }}>
-                                {sentiment.score}/10
+                                {sentiment.tier}
                               </span>
                             </div>
                           );
