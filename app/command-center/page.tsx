@@ -1018,39 +1018,6 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
         </div>
       </div>
 
-      {/* ── AUM by Month YTD Line Graph ── */}
-      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24, marginBottom: 20 }}>
-        <SectionHeader title="Launched AUM by Month" subtitle="Monthly launched AUM — Year to date" />
-        <ResponsiveContainer width="100%" height={220}>
-          <ComposedChart data={a.aumByMonthYtd} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(250,247,242,0.06)" vertical={false} />
-            <XAxis dataKey="month" tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} />
-            <YAxis
-              tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false}
-              tickFormatter={(v: number) => formatAUM(v)}
-            />
-            <Tooltip
-              cursor={{ stroke: 'rgba(250,247,242,0.08)', strokeWidth: 1 }}
-              contentStyle={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, color: C.dark }}
-              formatter={(value: unknown, name: unknown) => {
-                const v = Number(value);
-                if (name === 'aum') return [formatAUM(v), 'Launched AUM'];
-                if (name === 'count') return [v, 'Advisors'];
-                return [formatAUM(v), String(name)];
-              }}
-              labelStyle={{ color: C.slate, marginBottom: 4 }}
-            />
-            <defs>
-              <linearGradient id="aumMonthGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={C.teal} stopOpacity={0.2} />
-                <stop offset="95%" stopColor={C.teal} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <Area type="monotone" dataKey="aum" fill="url(#aumMonthGradient)" stroke={C.teal} strokeWidth={2} dot={{ fill: C.teal, r: 4 }} />
-            <Line type="monotone" dataKey="count" stroke={C.gold} strokeWidth={1.5} strokeDasharray="4 2" dot={{ fill: C.gold, r: 3 }} />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
 
       {/* ── Row 1: Stage Funnel + Launch Countdown ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
