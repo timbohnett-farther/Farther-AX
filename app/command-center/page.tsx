@@ -1075,7 +1075,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 // ADVISOR RECRUITING TAB
 // ══════════════════════════════════════════════════════════════════════════════
 function RecruitingTab() {
-  const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, SWR_OPTS);
+  const { data, error, isLoading, mutate: mutatePipeline } = useSWR('/api/command-center/pipeline', fetcher, SWR_OPTS);
   const { data: teamData } = useSWR('/api/command-center/team?role=Recruiter', fetcher, SWR_OPTS);
   const [showDashboard, setShowDashboard] = useState(true);
   const [complexityScores, setComplexityScores] = useState<Record<string, { score: number; tier: string; tierColor: string }>>({});
@@ -1094,6 +1094,13 @@ function RecruitingTab() {
   const aiBottomRef = useRef<HTMLDivElement>(null);
   const [teamAssignments, setTeamAssignments] = useState<Record<string, Record<string, string>>>({});
   const { data: aumData } = useSWR('/api/command-center/aum-tracker?all=true', fetcher, SWR_OPTS);
+  const { data: managedData } = useSWR('/api/command-center/managed-accounts', fetcher, SWR_OPTS);
+  const [selectedRecruiter, setSelectedRecruiter] = useState<string | null>(null);
+
+  // Fire-and-forget: trigger managed accounts sync (endpoint checks 20hr cooldown)
+  useEffect(() => {
+    fetch('/api/command-center/managed-accounts/sync').catch(() => {});
+  }, []);
 
   const deals: Deal[] = useMemo(
     () => (data?.deals ?? []).filter((d: Deal) => !d.dealname?.toLowerCase().includes('test')),
@@ -1143,6 +1150,39 @@ function RecruitingTab() {
     }
     return map;
   }, [aumData]);
+
+  // Build managed accounts lookup: fuzzy match advisor_name → deal.dealname
+  const managedMap = useMemo(() => {
+    const map: Record<string, { total_aum: number; total_monthly_revenue: number }> = {};
+    if (!managedData?.accounts) return map;
+    const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    // Index managed accounts by normalized name
+    const managedIndex: Record<string, { total_aum: number; total_monthly_revenue: number }> = {};
+    for (const a of managedData.accounts) {
+      managedIndex[normalize(a.advisor_name)] = {
+        total_aum: parseFloat(a.total_aum) || 0,
+        total_monthly_revenue: parseFloat(a.total_monthly_revenue) || 0,
+      };
+    }
+    // Match deals to managed accounts
+    for (const deal of deals) {
+      if (!deal.dealname) continue;
+      const dealNorm = normalize(deal.dealname);
+      // Exact normalized match
+      if (managedIndex[dealNorm]) {
+        map[deal.id] = managedIndex[dealNorm];
+        continue;
+      }
+      // Partial match: deal name contains advisor name or vice versa
+      for (const [mNorm, mData] of Object.entries(managedIndex)) {
+        if (dealNorm.includes(mNorm) || mNorm.includes(dealNorm)) {
+          map[deal.id] = mData;
+          break;
+        }
+      }
+    }
+    return map;
+  }, [managedData, deals]);
 
   // Auto-scroll AI chat
   useEffect(() => {
@@ -1431,14 +1471,11 @@ function RecruitingTab() {
 
       {/* Recruiter Scorecard */}
       {(() => {
-        // Only count deal owners who are actual recruiters from the team database
-        const recruiterNames = new Set(
-          (teamData?.members ?? []).map((m: { name: string }) => m.name)
-        );
+        // Count ALL unique deal owners (not filtered by team DB)
         const recruiterMap: Record<string, { deals: number; aum: number; launched: number; launchedAum: number }> = {};
         for (const deal of allActiveDeals) {
           const name = deal.ownerName;
-          if (!name || !recruiterNames.has(name)) continue;
+          if (!name) continue;
           if (!recruiterMap[name]) recruiterMap[name] = { deals: 0, aum: 0, launched: 0, launchedAum: 0 };
           recruiterMap[name].deals += 1;
           recruiterMap[name].aum += parseFloat(deal.transferable_aum ?? '0') || 0;
@@ -1451,10 +1488,21 @@ function RecruitingTab() {
         if (recruiters.length === 0) return null;
         return (
           <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24, marginBottom: 20 }}>
-            <SectionHeader title="Recruiter Scorecard" subtitle="Pipeline contribution by recruiter" />
-            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(recruiters.length, 6)}, 1fr)`, gap: 12 }}>
-              {recruiters.slice(0, 6).map(([name, stats]) => (
-                <div key={name} style={{ padding: '14px 16px', borderRadius: 8, background: 'rgba(91,106,113,0.04)', border: `1px solid ${C.border}` }}>
+            <SectionHeader title="Recruiter Scorecard" subtitle="Pipeline contribution by deal owner — click to view deals" />
+            <div style={{ maxHeight: 320, overflowY: 'auto', display: 'grid', gridTemplateColumns: `repeat(${Math.min(recruiters.length, 4)}, 1fr)`, gap: 12 }}>
+              {recruiters.map(([name, stats]) => (
+                <div
+                  key={name}
+                  onClick={() => setSelectedRecruiter(name)}
+                  style={{
+                    padding: '14px 16px', borderRadius: 8, cursor: 'pointer',
+                    background: selectedRecruiter === name ? 'rgba(29,118,130,0.08)' : 'rgba(91,106,113,0.04)',
+                    border: `1px solid ${selectedRecruiter === name ? C.teal : C.border}`,
+                    transition: 'border-color 150ms ease, background 150ms ease',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.teal; }}
+                  onMouseLeave={e => { if (selectedRecruiter !== name) (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
+                >
                   <div style={{ fontSize: 13, fontWeight: 700, color: getNameColor(name), marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {name}
                   </div>
@@ -1480,6 +1528,18 @@ function RecruitingTab() {
               ))}
             </div>
           </div>
+        );
+      })()}
+
+      {/* Recruiter Drill-Down Panel */}
+      {selectedRecruiter && (() => {
+        const recruiterDeals = allActiveDeals.filter(d => d.ownerName === selectedRecruiter);
+        return (
+          <DrillDownPanel
+            title={`${selectedRecruiter}'s Deals`}
+            deals={recruiterDeals}
+            onClose={() => setSelectedRecruiter(null)}
+          />
         );
       })()}
 
@@ -1536,13 +1596,15 @@ function RecruitingTab() {
                     return ((parseFloat(a.transferable_aum ?? '0') || 0) - (parseFloat(b.transferable_aum ?? '0') || 0)) * dir;
                   }
                   if (sortCol === 'actual_aum') {
-                    const aVal = parseFloat(a.current_value ?? '0') || aumMap[a.id]?.actual_aum || 0;
-                    const bVal = parseFloat(b.current_value ?? '0') || aumMap[b.id]?.actual_aum || 0;
+                    const aVal = managedMap[a.id]?.total_aum || parseFloat(a.current_value ?? '0') || aumMap[a.id]?.actual_aum || 0;
+                    const bVal = managedMap[b.id]?.total_aum || parseFloat(b.current_value ?? '0') || aumMap[b.id]?.actual_aum || 0;
                     return (aVal - bVal) * dir;
                   }
                   if (sortCol === 'current_revenue') {
-                    const aVal = parseFloat(a.t12_revenue ?? '0') || parseFloat(a.fee_based_revenue ?? '0') || aumMap[a.id]?.current_revenue || 0;
-                    const bVal = parseFloat(b.t12_revenue ?? '0') || parseFloat(b.fee_based_revenue ?? '0') || aumMap[b.id]?.current_revenue || 0;
+                    const aMgd = managedMap[a.id]?.total_monthly_revenue ? managedMap[a.id].total_monthly_revenue * 12 : 0;
+                    const bMgd = managedMap[b.id]?.total_monthly_revenue ? managedMap[b.id].total_monthly_revenue * 12 : 0;
+                    const aVal = aMgd || parseFloat(a.t12_revenue ?? '0') || parseFloat(a.fee_based_revenue ?? '0') || aumMap[a.id]?.current_revenue || 0;
+                    const bVal = bMgd || parseFloat(b.t12_revenue ?? '0') || parseFloat(b.fee_based_revenue ?? '0') || aumMap[b.id]?.current_revenue || 0;
                     return (aVal - bVal) * dir;
                   }
                   if (sortCol === 'complexity') {
@@ -1586,13 +1648,71 @@ function RecruitingTab() {
                       <td style={{ padding: '10px 14px', color: C.slate }}>{deal.current_firm__cloned_ ?? '—'}</td>
                       <td style={{ padding: '10px 14px', color: C.slate }}>{deal.firm_type ? deal.firm_type.replace(/_/g, ' ') : '—'}</td>
                       <td style={{ padding: '10px 14px' }}>
-                        <StageBadge stageId={deal.dealstage} label={STAGE_LABELS[deal.dealstage] ?? deal.dealstage} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <select
+                            value={deal.dealstage}
+                            onChange={async (e) => {
+                              const newStage = e.target.value;
+                              if (newStage === deal.dealstage) return;
+                              const el = e.target;
+                              el.style.opacity = '0.5';
+                              try {
+                                const res = await fetch(`/api/command-center/deal/${deal.id}/stage`, {
+                                  method: 'PATCH',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ dealstage: newStage }),
+                                });
+                                if (res.ok) mutatePipeline();
+                              } catch { /* silent */ }
+                              el.style.opacity = '1';
+                            }}
+                            style={{
+                              appearance: 'none', WebkitAppearance: 'none',
+                              padding: '2px 20px 2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 500,
+                              background: `${(() => {
+                                const sid = deal.dealstage;
+                                if (sid === '100411705') return 'rgba(29,118,130,0.2)';
+                                if (sid === '2496936') return 'rgba(245,158,11,0.2)';
+                                return 'rgba(91,106,113,0.18)';
+                              })()} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") no-repeat right 6px center`,
+                              color: (() => {
+                                const sid = deal.dealstage;
+                                if (sid === '100411705') return '#5ec4cf';
+                                if (sid === '2496936') return '#fbbf24';
+                                return C.dark;
+                              })(),
+                              border: `1px solid ${(() => {
+                                const sid = deal.dealstage;
+                                if (sid === '100411705') return 'rgba(29,118,130,0.35)';
+                                if (sid === '2496936') return 'rgba(245,158,11,0.35)';
+                                return 'rgba(91,106,113,0.25)';
+                              })()}`,
+                              cursor: 'pointer', outline: 'none',
+                              fontFamily: "'Fakt', system-ui, sans-serif",
+                            }}
+                          >
+                            {ACTIVE_STAGE_IDS.map(sid => (
+                              <option key={sid} value={sid}>{STAGE_LABELS[sid]}</option>
+                            ))}
+                          </select>
+                          <a
+                            href={`https://app.hubspot.com/contacts/6481357/deal/${deal.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Open in HubSpot"
+                            style={{ color: C.slate, fontSize: 12, textDecoration: 'none', opacity: 0.6, flexShrink: 0 }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; (e.currentTarget as HTMLAnchorElement).style.color = C.teal; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.6'; (e.currentTarget as HTMLAnchorElement).style.color = C.slate; }}
+                          >
+                            ↗
+                          </a>
+                        </div>
                       </td>
                       <td style={{ padding: '10px 14px', color: C.teal, fontWeight: 600 }}>
                         {formatAUM(parseFloat(deal.transferable_aum ?? '0'))}
                       </td>
                       {(() => {
-                        const tranAum = parseFloat(deal.current_value ?? '0') || aumMap[deal.id]?.actual_aum || null;
+                        const tranAum = managedMap[deal.id]?.total_aum || parseFloat(deal.current_value ?? '0') || aumMap[deal.id]?.actual_aum || null;
                         return (
                           <td style={{ padding: '10px 14px', color: tranAum ? C.dark : C.slate, fontWeight: tranAum ? 600 : 400 }}>
                             {tranAum ? formatAUM(tranAum) : '—'}
@@ -1600,7 +1720,8 @@ function RecruitingTab() {
                         );
                       })()}
                       {(() => {
-                        const revenue = parseFloat(deal.t12_revenue ?? '0') || parseFloat(deal.fee_based_revenue ?? '0') || aumMap[deal.id]?.current_revenue || null;
+                        const managedRevenue = managedMap[deal.id]?.total_monthly_revenue ? managedMap[deal.id].total_monthly_revenue * 12 : null;
+                        const revenue = managedRevenue || parseFloat(deal.t12_revenue ?? '0') || parseFloat(deal.fee_based_revenue ?? '0') || aumMap[deal.id]?.current_revenue || null;
                         return (
                           <td style={{ padding: '10px 14px', color: revenue ? C.green : C.slate, fontWeight: revenue ? 600 : 400 }}>
                             {revenue ? formatAUM(revenue) : '—'}

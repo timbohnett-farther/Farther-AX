@@ -42,7 +42,7 @@ async function migrate() {
       CREATE INDEX IF NOT EXISTS idx_team_members_role
         ON team_members(role);
       CREATE INDEX IF NOT EXISTS idx_team_members_active
-        ON team_members(active);
+        ON team_members(is_active);
 
       CREATE TABLE IF NOT EXISTS advisor_assignments (
         id          SERIAL PRIMARY KEY,
@@ -114,6 +114,30 @@ async function migrate() {
         ON advisor_sentiment_history(deal_id);
       CREATE INDEX IF NOT EXISTS idx_advisor_sentiment_history_scored_at
         ON advisor_sentiment_history(scored_at);
+
+      -- Managed accounts (synced from HubSpot custom object 2-13676628)
+      CREATE TABLE IF NOT EXISTS managed_accounts (
+        id              SERIAL PRIMARY KEY,
+        advisor_name    VARCHAR(255) NOT NULL,
+        current_value   DECIMAL(18,2) DEFAULT 0,
+        fee_rate_bps    DECIMAL(8,4) DEFAULT 0,
+        monthly_fee_amount DECIMAL(14,2) DEFAULT 0,
+        hubspot_object_id VARCHAR(64),
+        synced_at       TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_managed_accounts_advisor_name
+        ON managed_accounts(advisor_name);
+
+      -- Aggregated view per advisor (for pipeline table)
+      CREATE TABLE IF NOT EXISTS managed_accounts_summary (
+        advisor_name    VARCHAR(255) PRIMARY KEY,
+        total_aum       DECIMAL(18,2) DEFAULT 0,
+        total_monthly_revenue DECIMAL(14,2) DEFAULT 0,
+        account_count   INTEGER DEFAULT 0,
+        weighted_fee_bps DECIMAL(8,4) DEFAULT 0,
+        synced_at       TIMESTAMPTZ DEFAULT NOW()
+      );
     `);
     console.log('Migration complete.');
   } finally {
