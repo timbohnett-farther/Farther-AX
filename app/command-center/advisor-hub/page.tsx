@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback } from 'react';
 import useSWR from 'swr';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTheme } from '@/lib/theme-provider';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -16,16 +17,26 @@ const SWR_OPTS = {
   errorRetryCount: 2,
 } as const;
 
-// ── Design tokens ────────────────────────────────────────────────────────────
-const C = {
-  dark: '#FFFEF4', white: '#1a1a1a', slate: 'rgba(212,223,229,0.5)',
-  teal: '#4E7082', bg: '#111111',
-  cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
-  green: '#4ade80', greenBg: 'rgba(74,222,128,0.2)',
-  amber: '#fbbf24', amberBg: 'rgba(251,191,36,0.2)', amberBorder: 'rgba(251,191,36,0.35)',
-  red: '#f87171', redBg: 'rgba(248,113,113,0.2)', redBorder: 'rgba(248,113,113,0.35)',
-  gold: '#fbbf24', goldBg: 'rgba(251,191,36,0.2)',
-};
+// ── Design tokens (theme-aware) ──────────────────────────────────────────────
+const getThemeColors = (isDark: boolean) => ({
+  dark: isDark ? '#FFFEF4' : '#1a1a1a',
+  white: isDark ? '#1a1a1a' : '#FFFEF4',
+  slate: isDark ? 'rgba(212,223,229,0.5)' : 'rgba(102,102,102,0.6)',
+  teal: '#4E7082',
+  bg: isDark ? '#111111' : '#F8F4F0',
+  cardBg: isDark ? '#171f27' : '#FFFFFF',
+  border: isDark ? 'rgba(212,223,229,0.08)' : 'rgba(224,224,224,0.4)',
+  green: '#4ade80',
+  greenBg: isDark ? 'rgba(74,222,128,0.2)' : 'rgba(74,222,128,0.12)',
+  amber: '#fbbf24',
+  amberBg: isDark ? 'rgba(251,191,36,0.2)' : 'rgba(251,191,36,0.12)',
+  amberBorder: isDark ? 'rgba(251,191,36,0.35)' : 'rgba(251,191,36,0.25)',
+  red: '#f87171',
+  redBg: isDark ? 'rgba(248,113,113,0.2)' : 'rgba(248,113,113,0.12)',
+  redBorder: isDark ? 'rgba(248,113,113,0.35)' : 'rgba(248,113,113,0.25)',
+  gold: '#fbbf24',
+  goldBg: isDark ? 'rgba(251,191,36,0.2)' : 'rgba(251,191,36,0.12)',
+});
 
 // ── Sentiment tier config (mirrors lib/sentiment.ts) ─────────────────────────
 const TIER_CONFIG: Record<string, { color: string; bgColor: string; icon: string }> = {
@@ -47,15 +58,15 @@ const STAGE_LABELS: Record<string, string> = {
   '100411705': 'Step 7 – Launched',
 };
 
-const STAGE_COLORS: Record<string, string> = {
+const getStageColors = (teal: string, gold: string): Record<string, string> => ({
   '2496931':   '#7fb3d8',
   '2496932':   '#6ba3cc',
   '2496934':   '#5793c0',
   '100409509': '#4383b4',
   '2496935':   '#2f73a8',
-  '2496936':   C.gold,
-  '100411705': C.teal,
-};
+  '2496936':   gold,
+  '100411705': teal,
+});
 
 const EARLY_STAGE_IDS = ['2496931', '2496932', '2496934', '100409509'];
 const LAUNCH_STAGE_IDS = ['2496935', '2496936', '100411705'];
@@ -124,6 +135,9 @@ const TABS: { key: TabKey; label: string; icon: string }[] = [
 
 // ── Sentiment Badge Component ────────────────────────────────────────────────
 function SentimentBadge({ score, tier }: { score: number | null; tier: string | null }) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+
   if (!tier || score === null) {
     return (
       <span style={{
@@ -158,6 +172,9 @@ function SentimentBadge({ score, tier }: { score: number | null; tier: string | 
 
 // ── AUM Progress Bar Component ───────────────────────────────────────────────
 function AumProgressBar({ expected, actual }: { expected: number | null; actual: number | null }) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+
   if (!expected || !actual) {
     return <span style={{ fontSize: 11, color: C.slate, fontStyle: 'italic' }}>—</span>;
   }
@@ -524,6 +541,9 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
 
 // ── Main Component ───────────────────────────────────────────────────────────
 export default function AdvisorHubPage() {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const STAGE_COLORS = useMemo(() => getStageColors(C.teal, C.gold), [C.teal, C.gold]);
   const { data, isLoading, error } = useSWR('/api/command-center/pipeline', fetcher, SWR_OPTS);
   const { data: sentimentData, mutate: mutateSentiment } = useSWR('/api/command-center/sentiment/scores', fetcher, SWR_OPTS);
   const { data: aumData, isLoading: aumLoading } = useSWR('/api/command-center/aum-tracker', fetcher, SWR_OPTS);
