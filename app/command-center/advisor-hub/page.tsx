@@ -527,6 +527,8 @@ export default function AdvisorHubPage() {
   const { data, isLoading, error } = useSWR('/api/command-center/pipeline', fetcher, SWR_OPTS);
   const { data: sentimentData, mutate: mutateSentiment } = useSWR('/api/command-center/sentiment/scores', fetcher, SWR_OPTS);
   const { data: aumData, isLoading: aumLoading } = useSWR('/api/command-center/aum-tracker', fetcher, SWR_OPTS);
+  const { data: taskSummaryData } = useSWR('/api/command-center/tasks/summary', fetcher, SWR_OPTS);
+  const { data: alertsData } = useSWR('/api/command-center/alerts', fetcher, SWR_OPTS);
   const [activeTab, setActiveTab] = useState<TabKey>('launch');
   const [search, setSearch] = useState('');
   const [scoring, setScoring] = useState<Record<string, boolean>>({});
@@ -535,6 +537,23 @@ export default function AdvisorHubPage() {
   const [transitionFilter, setTransitionFilter] = useState('all');
   const [aumTierFilter, setAumTierFilter] = useState('all');
   const [sentimentFilter, setSentimentFilter] = useState('all');
+  const [taskPhaseFilter, setTaskPhaseFilter] = useState('all');
+  const [alertFilter, setAlertFilter] = useState('all');
+
+  // Build maps for task summary + alerts per deal
+  const taskMap = useMemo(() => {
+    return (taskSummaryData?.summary ?? {}) as Record<string, { open_tasks: number; completed_tasks: number; total_tasks: number; current_phase: string | null }>;
+  }, [taskSummaryData]);
+
+  const alertMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    if (alertsData?.alerts) {
+      for (const a of alertsData.alerts) {
+        if (a.deal_id) map[a.deal_id] = (map[a.deal_id] ?? 0) + 1;
+      }
+    }
+    return map;
+  }, [alertsData]);
 
   // Build a map of deal_id → sentiment score
   const sentimentMap = useMemo(() => {
@@ -618,6 +637,19 @@ export default function AdvisorHubPage() {
       });
     }
 
+    // Task phase filter
+    if (taskPhaseFilter !== 'all') {
+      pool = pool.filter(d => taskMap[d.id]?.current_phase === taskPhaseFilter);
+    }
+
+    // Alert filter
+    if (alertFilter !== 'all') {
+      pool = pool.filter(d => {
+        const count = alertMap[d.id] ?? 0;
+        return alertFilter === 'has_alerts' ? count > 0 : count === 0;
+      });
+    }
+
     // Sort
     return [...pool].sort((a, b) => {
       const dir = sortDir === 'asc' ? 1 : -1;
@@ -635,6 +667,8 @@ export default function AdvisorHubPage() {
         const db = b.desired_start_date ?? b.actual_launch_date ?? '';
         return da.localeCompare(db) * dir;
       }
+      if (sortCol === 'tasks') return ((taskMap[a.id]?.open_tasks ?? 0) - (taskMap[b.id]?.open_tasks ?? 0)) * dir;
+      if (sortCol === 'alerts') return ((alertMap[a.id] ?? 0) - (alertMap[b.id] ?? 0)) * dir;
       if (sortCol === 'recruiter') return (a.ownerName ?? '').localeCompare(b.ownerName ?? '') * dir;
       return 0;
     });
@@ -699,8 +733,8 @@ export default function AdvisorHubPage() {
   // Show sentiment column for launch and completed tabs
   const showSentiment = activeTab === 'launch' || activeTab === 'completed';
   const gridCols = showSentiment
-    ? '1.8fr 1.2fr 0.8fr 1fr 0.9fr 0.9fr 0.9fr'
-    : '2fr 1.5fr 1fr 1fr 1fr 1fr';
+    ? '1.6fr 1fr 0.7fr 0.9fr 0.7fr 0.7fr 0.8fr 0.8fr 0.8fr'
+    : '1.8fr 1.2fr 0.8fr 1fr 0.7fr 0.7fr 0.9fr 0.9fr';
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -901,6 +935,32 @@ export default function AdvisorHubPage() {
           </select>
         )}
 
+        {/* Task Phase */}
+        <select value={taskPhaseFilter} onChange={e => setTaskPhaseFilter(e.target.value)} style={{
+          padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
+          fontSize: 12, background: C.cardBg, color: C.dark, cursor: 'pointer', outline: 'none',
+        }}>
+          <option value="all">All Task Phases</option>
+          <option value="phase_0">Phase 0 - Sales Handoff</option>
+          <option value="phase_1">Phase 1 - Post-Signing</option>
+          <option value="phase_2">Phase 2 - Kick-Off</option>
+          <option value="phase_3">Phase 3 - Pre-Launch</option>
+          <option value="phase_4">Phase 4 - Final Countdown</option>
+          <option value="phase_5">Phase 5 - Launch Day</option>
+          <option value="phase_6">Phase 6 - Active Transition</option>
+          <option value="phase_7">Phase 7 - Graduation</option>
+        </select>
+
+        {/* Open Alerts */}
+        <select value={alertFilter} onChange={e => setAlertFilter(e.target.value)} style={{
+          padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
+          fontSize: 12, background: C.cardBg, color: C.dark, cursor: 'pointer', outline: 'none',
+        }}>
+          <option value="all">All Alerts</option>
+          <option value="has_alerts">Has Alerts</option>
+          <option value="no_alerts">No Alerts</option>
+        </select>
+
         {/* Result count */}
         <span style={{ fontSize: 12, color: C.slate, padding: '8px 0', marginLeft: 'auto' }}>
           {currentDeals.length} advisor{currentDeals.length !== 1 ? 's' : ''}
@@ -940,6 +1000,8 @@ export default function AdvisorHubPage() {
               { key: 'aum', label: 'AUM', align: 'right' as const },
               { key: 'stage', label: 'Stage' },
               ...(showSentiment ? [{ key: 'sentiment', label: 'Sentiment' }] : []),
+              { key: 'tasks', label: 'Tasks' },
+              { key: 'alerts', label: 'Alerts' },
               { key: 'date', label: activeTab === 'completed' ? 'Launched' : 'Target Date' },
               { key: 'recruiter', label: 'Recruiter' },
             ];
@@ -1070,6 +1132,38 @@ export default function AdvisorHubPage() {
                     )}
                   </div>
                 )}
+
+                {/* Tasks */}
+                {(() => {
+                  const t = taskMap[deal.id];
+                  if (!t) return <span style={{ fontSize: 11, color: C.slate, fontStyle: 'italic' }}>—</span>;
+                  const phaseLabel = t.current_phase ? t.current_phase.replace('phase_', 'P') : '—';
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: t.open_tasks > 0 ? C.amber : C.green }}>
+                        {t.open_tasks} open
+                      </span>
+                      <span style={{ fontSize: 10, color: C.slate }}>
+                        {phaseLabel} · {t.completed_tasks}/{t.total_tasks}
+                      </span>
+                    </div>
+                  );
+                })()}
+
+                {/* Alerts */}
+                {(() => {
+                  const count = alertMap[deal.id] ?? 0;
+                  if (count === 0) return <span style={{ fontSize: 11, color: C.slate }}>—</span>;
+                  return (
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                      padding: '3px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600,
+                      background: C.redBg, color: C.red,
+                    }}>
+                      {count}
+                    </span>
+                  );
+                })()}
 
                 {/* Date */}
                 <p style={{ fontSize: 13, color: C.slate }}>
