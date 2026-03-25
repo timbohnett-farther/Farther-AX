@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withPgCache } from '@/lib/pg-cache';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const TEAMS_OBJECT_TYPE = '2-43222882';
@@ -210,34 +211,38 @@ async function fetchEngagements(contactId: string) {
   return results.slice(0, 20);
 }
 
-// ── Main GET handler ──────────────────────────────────────────────────────────
+// ── Fetch all advisor detail data (called by cache on miss) ──────────────────
+async function fetchAdvisorData(dealId: string) {
+  const [deal, notes, team] = await Promise.all([
+    fetchDeal(dealId),
+    fetchNotes(dealId),
+    fetchTeamsRecord(dealId),
+  ]);
+
+  const { contact, pinnedNote, allContacts } = await fetchAssociatedContact(dealId);
+
+  let engagements: Awaited<ReturnType<typeof fetchEngagements>> = [];
+  if (contact?.hs_object_id) {
+    engagements = await fetchEngagements(contact.hs_object_id);
+  }
+
+  return { deal, notes, team, contact, pinnedNote, allContacts, engagements };
+}
+
+// ── Main GET handler (PostgreSQL-cached — 12hr TTL) ──────────────────────────
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    // Fetch deal + existing data in parallel
-    const [deal, notes, team] = await Promise.all([
-      fetchDeal(params.id),
-      fetchNotes(params.id),
-      fetchTeamsRecord(params.id),
-    ]);
+    const { data, cached, stale } = await withPgCache(
+      `advisor-${params.id}`,
+      () => fetchAdvisorData(params.id),
+      { ttlMs: 12 * 60 * 60 * 1000 } // 12 hours
+    );
 
-    // Get associated contacts from deal
-    const { contact, pinnedNote, allContacts } = await fetchAssociatedContact(params.id);
-
-    // Fetch engagements if we have a contact
-    let engagements: Awaited<ReturnType<typeof fetchEngagements>> = [];
-    if (contact?.hs_object_id) {
-      engagements = await fetchEngagements(contact.hs_object_id);
+    const res = NextResponse.json(data);
+    if (cached) {
+      res.headers.set('X-Cache', stale ? 'STALE' : 'HIT');
     }
-
-    return NextResponse.json({
-      deal,
-      notes,
-      team,
-      contact,
-      pinnedNote,
-      allContacts,
-      engagements,
-    });
+    return res;
   } catch (err) {
     console.error('[advisor detail]', err);
     const message = err instanceof Error ? err.message : String(err);

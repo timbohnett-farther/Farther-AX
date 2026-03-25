@@ -14,7 +14,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { withCache } from '@/lib/api-cache';
+import { withPgCache } from '@/lib/pg-cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -218,15 +218,19 @@ async function fetchAumData(includeAll: boolean) {
   };
 }
 
-// ── GET handler (cached — refreshes 3x/day, stale fallback on HubSpot errors) ─
+// ── GET handler (PostgreSQL-cached — 12hr TTL, stale fallback on HubSpot errors) ─
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const includeAll = searchParams.get('all') === 'true';
   const cacheKey = includeAll ? 'aum-tracker-all' : 'aum-tracker';
   try {
-    const { data, cached } = await withCache(cacheKey, () => fetchAumData(includeAll));
+    const { data, cached, stale } = await withPgCache(
+      cacheKey,
+      () => fetchAumData(includeAll),
+      { ttlMs: 12 * 60 * 60 * 1000 } // 12 hours
+    );
     const res = NextResponse.json(data);
-    if (cached) res.headers.set('X-Cache', 'HIT');
+    if (cached) res.headers.set('X-Cache', stale ? 'STALE' : 'HIT');
     return res;
   } catch (err) {
     console.error('[aum-tracker]', err);

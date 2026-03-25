@@ -150,13 +150,13 @@ async function fetchPipelineData() {
   return { deals: enriched, total: enriched.length };
 }
 
-// ── GET handler (PostgreSQL-cached — 2hr TTL, stale fallback on HubSpot errors) ─
+// ── GET handler (PostgreSQL-cached — 12hr TTL, stale fallback on HubSpot errors) ─
 export async function GET() {
   try {
     const { data, cached, stale } = await withPgCache(
       'pipeline',
       fetchPipelineData,
-      { ttlMs: 2 * 60 * 60 * 1000 } // 2 hours
+      { ttlMs: 12 * 60 * 60 * 1000 } // 12 hours
     );
     const res = NextResponse.json(data);
     if (cached) {

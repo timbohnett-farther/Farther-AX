@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { withCache } from '@/lib/api-cache';
+import { withPgCache } from '@/lib/pg-cache';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const ACQUISITIONS_PIPELINE_ID = '668946996';
@@ -163,12 +163,16 @@ async function fetchAcquisitionsData() {
   return { deals: enriched, total: enriched.length, stages: stageSummary };
 }
 
-// ── GET handler (cached — refreshes 3x/day, stale fallback on HubSpot errors) ─
+// ── GET handler (PostgreSQL-cached — 12hr TTL, stale fallback on HubSpot errors) ─
 export async function GET() {
   try {
-    const { data, cached } = await withCache('acquisitions', fetchAcquisitionsData);
+    const { data, cached, stale } = await withPgCache(
+      'acquisitions',
+      fetchAcquisitionsData,
+      { ttlMs: 12 * 60 * 60 * 1000 } // 12 hours
+    );
     const res = NextResponse.json(data);
-    if (cached) res.headers.set('X-Cache', 'HIT');
+    if (cached) res.headers.set('X-Cache', stale ? 'STALE' : 'HIT');
     return res;
   } catch (err) {
     console.error('[acquisitions]', err);

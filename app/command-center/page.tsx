@@ -1741,6 +1741,11 @@ type TabKey = 'recruiting' | 'acquisitions';
 export default function PipelineDashboard() {
   const [activeTab, setActiveTab] = useState<TabKey>('recruiting');
 
+  // Fire-and-forget: warm all caches in background on first load
+  useEffect(() => {
+    fetch('/api/command-center/warm', { method: 'POST' }).catch(() => {});
+  }, []);
+
   const tabs: { key: TabKey; label: string; sublabel: string }[] = [
     { key: 'recruiting', label: 'Advisor Recruiting', sublabel: 'Advisor Pipeline' },
     { key: 'acquisitions', label: 'Acquisitions', sublabel: 'M&A Pipeline' },

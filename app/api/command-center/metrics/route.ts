@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { withCache } from '@/lib/api-cache';
+import { withPgCache } from '@/lib/pg-cache';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
@@ -215,9 +215,13 @@ async function fetchMetricsData() {
 
 export async function GET() {
   try {
-    const { data, cached } = await withCache('metrics', fetchMetricsData);
+    const { data, cached, stale } = await withPgCache(
+      'metrics',
+      fetchMetricsData,
+      { ttlMs: 12 * 60 * 60 * 1000 } // 12 hours
+    );
     const res = NextResponse.json(data);
-    if (cached) res.headers.set('X-Cache', 'HIT');
+    if (cached) res.headers.set('X-Cache', stale ? 'STALE' : 'HIT');
     return res;
   } catch (err) {
     console.error('[metrics]', err);
