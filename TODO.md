@@ -130,8 +130,10 @@ When you report a fix:
 
 | Fix | Date | Commits | Summary |
 |-----|------|---------|---------|
-| Alerts page not loading data | 2026-03-25 | TBD | Fixed type mismatch - API now returns task_key and phase_label |
-| Google Sheets error in Transitions | 2026-03-25 | TBD | Fixed JSON parsing error with control characters |
+| AI Assistant chat window unreadable | 2026-03-25 | `4944cc1` | Fixed white-on-white text by changing bg-cream to bg-charcoal |
+| Metrics cards detail view | 2026-03-25 | `bad934d` | Added interactive slide-in panel with onClick handlers for all 20+ cards |
+| Alerts page not loading data | 2026-03-25 | `e6a5278` | Fixed type mismatch - API now returns task_key and phase_label |
+| Google Sheets error in Transitions | 2026-03-25 | (user reported) | Fixed JSON parsing error with control characters |
 | Tasks section client-side exception | 2026-03-24 | `9d9cba0` | API returning extra properties not in ChecklistTask interface |
 | Onboarding tasks loading error | 2026-03-24 | `1aedf9b`, `6ca3532`, `6f5dc99` | Missing DB columns + auto-migrations |
 | Tasks display (8-phase structure) | 2026-03-24 | `9b55f72`, `69ac472` | Phase mismatch fix |
