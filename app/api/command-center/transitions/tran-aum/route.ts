@@ -27,42 +27,59 @@ interface AdvisorAggregation {
  */
 async function fetchAllRecords(): Promise<HubSpotRecord[]> {
   const records: HubSpotRecord[] = [];
-  let after: string | undefined;
+  let after = 0;
+  const limit = 100;
+
+  console.log(`[tran-aum] Fetching from HubSpot Custom Object: ${CUSTOM_OBJECT_TYPE}`);
+  console.log(`[tran-aum] Using token: ${HUBSPOT_PAT ? HUBSPOT_PAT.substring(0, 10) + '...' : 'NOT SET'}`);
 
   do {
-    // Build URL with query parameters
-    const params = new URLSearchParams({
-      properties: 'advisor_name,current_value,monthly_fee_amount',
-      limit: '100',
-    });
-    if (after) {
-      params.set('after', after);
-    }
+    const body = {
+      properties: ['advisor_name', 'current_value', 'monthly_fee_amount'],
+      limit,
+      after,
+    };
 
-    const url = `https://api.hubapi.com/crm/v3/objects/${CUSTOM_OBJECT_TYPE}?${params.toString()}`;
+    const url = `https://api.hubapi.com/crm/v3/objects/${CUSTOM_OBJECT_TYPE}/search`;
+
+    console.log(`[tran-aum] POST ${url} (offset: ${after})`);
 
     const res = await fetch(url, {
-      method: 'GET',
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${HUBSPOT_PAT}`,
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify(body),
     });
 
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(`[tran-aum] HubSpot API error ${res.status}: ${errorText}`);
-      console.error(`[tran-aum] Request URL: ${url}`);
+      console.error(`[tran-aum] HubSpot API error ${res.status}:`);
+      console.error(`[tran-aum] Response: ${errorText}`);
+      console.error(`[tran-aum] Request body:`, JSON.stringify(body, null, 2));
       break;
     }
 
     const data = await res.json();
-    console.log(`[tran-aum] Fetched batch: ${data.results?.length ?? 0} records`);
+    console.log(`[tran-aum] Fetched batch: ${data.results?.length ?? 0} records, total: ${data.total ?? 'unknown'}`);
+
+    if (!data.results || data.results.length === 0) {
+      console.log('[tran-aum] No more results, stopping pagination');
+      break;
+    }
+
     records.push(...(data.results ?? []));
 
-    after = data.paging?.next?.after;
-  } while (after);
+    // Check if there are more pages
+    if (data.paging?.next?.after) {
+      after = parseInt(data.paging.next.after);
+    } else {
+      break;
+    }
+  } while (true);
 
+  console.log(`[tran-aum] Total records fetched: ${records.length}`);
   return records;
 }
 
