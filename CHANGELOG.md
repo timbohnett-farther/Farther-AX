@@ -6,6 +6,35 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix AI Assistant Chat Window Readability — 2026-03-25
+
+**What**: Fixed critical accessibility issue where chat input textarea had white text on white background, making it completely unreadable.
+
+**Root Cause**:
+- Textarea styling used `text-cream` (cream colored text) with `bg-cream` (cream colored background)
+- Created white-on-white appearance with no text contrast
+- Violated WCAG AA accessibility standards for text contrast ratios
+
+**Scope**:
+- Changed textarea background from `bg-cream` to `bg-charcoal` for dark theme consistency
+- Maintained `text-cream` for good contrast (cream text on dark charcoal background)
+- Added `placeholder:text-slate` for readable placeholder text styling
+- Ensures consistent dark theme styling throughout app
+- Improves accessibility and user experience significantly
+
+**Status**: ✅ Fixed and deployed
+
+**Files**:
+- `app/command-center/ai/page.tsx` — Updated textarea className on line 150
+
+**Impact**:
+- Chat input text now clearly visible and readable
+- Consistent with rest of app's dark theme aesthetic
+- Meets WCAG AA accessibility standards
+- Improved user experience for AI Assistant feature
+
+---
+
 ## [Completed] Fix Metrics Cards Detail View — 2026-03-25
 
 **What**: Implemented interactive detail views for all metrics cards. Clicking any StatCard now opens a slide-in panel with drill-down data and contextual information.

@@ -147,7 +147,7 @@ export default function AIAssistant() {
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input); } }}
             placeholder="Ask about pipeline, advisors, onboarding status, risks…"
             rows={2}
-            className="flex-1 px-4 py-3 rounded-xl border border-cream-border text-sm resize-none text-cream bg-cream outline-hidden focus:border-teal focus:ring-1 focus:ring-teal transition-smooth"
+            className="flex-1 px-4 py-3 rounded-xl border border-cream-border text-sm resize-none text-cream bg-charcoal placeholder:text-slate outline-hidden focus:border-teal focus:ring-1 focus:ring-teal transition-smooth"
           />
           <button
             type="submit"
