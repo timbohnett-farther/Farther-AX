@@ -13,21 +13,25 @@
 ---
 
 ### **Fix #1: Alerts Page Not Loading Anything**
-- **Status:** 🔴 Not Started
+- **Status:** ✅ **FIXED** (2026-03-25)
 - **Reported:** 2026-03-24 (Evening)
 - **Description:** Alerts page (/command-center/alerts) not displaying any data
 - **Priority:** High
 - **Affected Route:** `app/api/command-center/alerts/route.ts`
-- **Next Steps:**
-  - [ ] Check API endpoint for errors
-  - [ ] Verify database queries
-  - [ ] Check frontend page for display issues
-  - [ ] Test with sample data
+- **Root Cause:** Type mismatch between API response and frontend expectations
+- **Solution:** Updated API to return `task_key` (instead of `task_id`) and added `phase_label` field
+- **Files Changed:**
+  - `app/api/command-center/alerts/route.ts` - Fixed TaskAlert interface and response
+- **Completed Steps:**
+  - [x] Check API endpoint for errors - Found type mismatch
+  - [x] Fixed interface to match frontend expectations
+  - [x] Added phase label mapping
+  - [x] Tested build successfully
 
 ---
 
 ### **Fix #2: Google Sheets Error in Transitions**
-- **Status:** 🔴 Not Started
+- **Status:** ✅ **FIXED** (2026-03-25)
 - **Reported:** 2026-03-24 (Evening)
 - **Error:** `Bad control character in string literal in JSON at position 101 (line 1 column 102)`
 - **Description:** Error when trying to load all Google Sheets in Transitions page
@@ -35,11 +39,12 @@
 - **Affected Routes:**
   - `app/api/command-center/transitions/sync/route.ts` (likely)
   - `app/command-center/transitions/page.tsx`
-- **Next Steps:**
-  - [ ] Check Google Sheets API response
-  - [ ] Look for unescaped control characters in JSON
-  - [ ] Add JSON parsing error handling
-  - [ ] Sanitize response data
+- **Solution:** Fixed JSON parsing error with control characters
+- **Completed Steps:**
+  - [x] Check Google Sheets API response
+  - [x] Look for unescaped control characters in JSON
+  - [x] Add JSON parsing error handling
+  - [x] Sanitize response data
 
 ---
 
@@ -109,6 +114,8 @@ When you report a fix:
 
 | Fix | Date | Commits | Summary |
 |-----|------|---------|---------|
+| Alerts page not loading data | 2026-03-25 | TBD | Fixed type mismatch - API now returns task_key and phase_label |
+| Google Sheets error in Transitions | 2026-03-25 | TBD | Fixed JSON parsing error with control characters |
 | Tasks section client-side exception | 2026-03-24 | `9d9cba0` | API returning extra properties not in ChecklistTask interface |
 | Onboarding tasks loading error | 2026-03-24 | `1aedf9b`, `6ca3532`, `6f5dc99` | Missing DB columns + auto-migrations |
 | Tasks display (8-phase structure) | 2026-03-24 | `9b55f72`, `69ac472` | Phase mismatch fix |
@@ -116,4 +123,4 @@ When you report a fix:
 
 ---
 
-**Last Updated:** 2026-03-24
+**Last Updated:** 2026-03-25

@@ -71,6 +71,76 @@ npm run dev
 
 ---
 
+## Development Workflow
+
+### 📋 TODO Management
+
+**File:** `TODO.md` — Active task queue
+
+**Rules:**
+1. **Check TODO.md first** — Always check for pending tasks before starting new work
+2. **Auto-proceed** — If tasks exist in TODO, work on them in order (highest priority first)
+3. **Update status** — Mark tasks as 🟡 In Progress → ✅ Fixed → 🔵 Deployed
+4. **Add new todos** — When user mentions "todo" or reports issues, add them to TODO.md immediately
+
+**Priority Order:**
+- 🚨 Critical (app broken)
+- High (major feature down)
+- Medium (minor issue, has workaround)
+- Low (nice-to-have)
+
+### 📝 CHANGELOG Updates
+
+**File:** `CHANGELOG.md` — Keep historical record
+
+**Rules:**
+1. **Update after EVERY push** to main branch
+2. **Format:** Date, What changed, Why, Files affected, Impact
+3. **Be specific** — Include file paths, API endpoints, component names
+4. **Link commits** — Reference commit SHAs for traceability
+
+**Example Entry:**
+```markdown
+## [Completed] Fix Alerts Page — 2026-03-25
+
+**What**: Fixed alerts API endpoint returning empty data
+
+**Scope**:
+- Updated API route to properly query database
+- Added error handling for missing data
+- Improved loading states
+
+**Status**: ✅ Fixed and deployed
+
+**Files**:
+- `app/api/command-center/alerts/route.ts`
+- `app/command-center/alerts/page.tsx`
+
+**Commit**: `abc1234`
+```
+
+### 🔄 Git Workflow
+
+1. Check TODO.md for pending tasks
+2. Work on highest priority task
+3. Test changes locally (`npm run dev`)
+4. Update TODO.md status (✅ Fixed)
+5. **Update CHANGELOG.md** with details
+6. Commit with descriptive message
+7. Push to main
+8. Verify Railway deployment
+9. Update TODO.md status (🔵 Deployed)
+10. Proceed to next task in TODO.md
+
+### ⚠️ Important Notes
+
+- **Always work in Farther-AX folder only**
+- **Never mix code from other projects**
+- **Check TODO.md before asking "what's next?"**
+- **Update CHANGELOG before pushing**
+
+---
+
 ## Reminder: Cross-Repo Communication
 
 If you need to work on billing, marketing, or wealth tools features, **STOP** and switch to the appropriate repository. Do NOT implement those features here.

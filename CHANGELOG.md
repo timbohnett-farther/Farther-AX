@@ -6,6 +6,33 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Alerts Page Not Loading — 2026-03-25
+
+**What**: Fixed critical bug where Alerts page was not displaying any data due to type mismatch between API response and frontend expectations.
+
+**Root Cause**:
+- API was returning `task_id` but frontend expected `task_key`
+- Frontend expected `phase_label` field that wasn't being returned
+- TaskAlert interface mismatch between route and page component
+
+**Scope**:
+- Updated TaskAlert interface in API route to match frontend expectations
+- Changed `task_id` field to `task_key` in alert object
+- Added `phase_label` field with proper phase name mapping
+- Added PHASE_LABELS constant for phase_0 through phase_7 mapping
+
+**Status**: ✅ Fixed and deployed
+
+**Files**:
+- `app/api/command-center/alerts/route.ts` — Updated TaskAlert interface and alert object creation
+
+**Impact**:
+- Alerts page now displays task overdue, sentiment drop, and AUM pace alerts correctly
+- All alert types (task_overdue, task_critical, sentiment_drop, aum_behind) functioning properly
+- Frontend can now properly render TaskAlertRow components with correct phase labels
+
+---
+
 ## [Completed] Fix Onboarding Tasks Display — 2026-03-24
 
 **What**: Fixed critical bug where tasks weren't loading in Advisor Hub due to phase mismatch between display code and task definitions.

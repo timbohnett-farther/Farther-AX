@@ -15,6 +15,7 @@ import {
   UserGroupIcon,
   BellAlertIcon,
 } from "@heroicons/react/24/outline";
+import { ThemeToggle } from "./ThemeToggle";
 
 const sidebarFetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -73,7 +74,7 @@ function NavGroup({
 }) {
   return (
     <>
-      <p className={`px-3 mb-2 text-[10px] font-semibold tracking-widest uppercase ${labelClassName ?? "text-cream-muted"}`}>
+      <p className={`px-3 mb-2 text-[10px] font-semibold tracking-widest uppercase ${labelClassName ?? "text-gray-500 dark:text-cream-muted"}`}>
         {label}
       </p>
       <ul className="space-y-0.5 mb-1">
@@ -88,11 +89,11 @@ function NavGroup({
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-smooth ${
                   isActive
-                    ? "text-white bg-teal/25 border-l-2 border-teal"
-                    : "text-white/50 hover:text-white/80 hover:bg-white/5"
+                    ? "text-gray-900 dark:text-white bg-teal/15 dark:bg-teal/25 border-l-2 border-teal"
+                    : "text-gray-600 dark:text-white/50 hover:text-gray-900 dark:hover:text-white/80 hover:bg-gray-100 dark:hover:bg-white/5"
                 }`}
               >
-                <span className={isActive ? "text-teal" : "text-cream-muted"}>
+                <span className={isActive ? "text-teal" : "text-gray-500 dark:text-cream-muted"}>
                   <Icon className="w-4 h-4 shrink-0" />
                 </span>
                 <span className="leading-snug flex-1">{item.label}</span>
@@ -133,17 +134,17 @@ export default function Sidebar() {
   );
 
   return (
-    <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-charcoal">
+    <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-white dark:bg-charcoal border-r border-gray-200 dark:border-white/10">
       {/* Logo / Brand */}
-      <div className="px-6 pt-8 pb-5 border-b border-white/10">
+      <div className="px-6 pt-8 pb-5 border-b border-gray-200 dark:border-white/10">
         <Image
           src="/images/farther-iw-cream.png"
           alt="Farther"
           width={160}
           height={40}
-          className="mb-2 object-contain object-left"
+          className="mb-2 object-contain object-left dark:filter-none invert dark:invert-0"
         />
-        <p className="text-[10px] tracking-widest uppercase text-slate">
+        <p className="text-[10px] tracking-widest uppercase text-teal dark:text-slate">
           Terminal AX
         </p>
       </div>
@@ -256,9 +257,10 @@ export default function Sidebar() {
               </p>
             </div>
           </div>
+          <ThemeToggle />
           <button
             onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-            className="w-full text-left px-3 py-2 rounded-md text-xs transition-smooth text-white/40 hover:text-white/70 hover:bg-white/5"
+            className="w-full text-left px-3 py-2 rounded-md text-xs transition-smooth text-gray-600 dark:text-white/40 hover:text-gray-900 dark:hover:text-white/70 hover:bg-gray-100 dark:hover:bg-white/5"
           >
             ← Sign out
           </button>

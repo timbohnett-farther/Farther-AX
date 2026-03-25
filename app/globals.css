@@ -129,6 +129,59 @@
   }
 }
 
+/* ── Light Mode Theme Overrides ─────────────── */
+@media (prefers-color-scheme: light) {
+  :root:not(.dark) {
+    --color-charcoal-900: #FFFFFF;
+    --color-charcoal-800: #F9FAFB;
+    --color-charcoal-700: #F3F4F6;
+    --color-charcoal-600: #E5E7EB;
+    --color-charcoal-500: #D1D5DB;
+
+    --color-cream: #111827;
+    --color-cream-dark: rgba(17, 24, 39, 0.8);
+    --color-cream-muted: rgba(17, 24, 39, 0.5);
+    --color-cream-border: rgba(229, 231, 235, 1);
+
+    --color-tremor-background-muted: #FFFFFF;
+    --color-tremor-background-subtle: #F9FAFB;
+    --color-tremor-background: #FFFFFF;
+
+    --color-tremor-content-subtle: rgba(17, 24, 39, 0.4);
+    --color-tremor-content: rgba(17, 24, 39, 0.7);
+    --color-tremor-content-emphasis: rgba(17, 24, 39, 0.9);
+    --color-tremor-content-strong: #111827;
+    --color-tremor-content-inverted: #FFFFFF;
+
+    --color-tremor-border: rgba(229, 231, 235, 1);
+  }
+}
+
+:root:not(.dark) {
+  --color-charcoal-900: #FFFFFF;
+  --color-charcoal-800: #F9FAFB;
+  --color-charcoal-700: #F3F4F6;
+  --color-charcoal-600: #E5E7EB;
+  --color-charcoal-500: #D1D5DB;
+
+  --color-cream: #111827;
+  --color-cream-dark: rgba(17, 24, 39, 0.8);
+  --color-cream-muted: rgba(17, 24, 39, 0.5);
+  --color-cream-border: rgba(229, 231, 235, 1);
+
+  --color-tremor-background-muted: #FFFFFF;
+  --color-tremor-background-subtle: #F9FAFB;
+  --color-tremor-background: #FFFFFF;
+
+  --color-tremor-content-subtle: rgba(17, 24, 39, 0.4);
+  --color-tremor-content: rgba(17, 24, 39, 0.7);
+  --color-tremor-content-emphasis: rgba(17, 24, 39, 0.9);
+  --color-tremor-content-strong: #111827;
+  --color-tremor-content-inverted: #FFFFFF;
+
+  --color-tremor-border: rgba(229, 231, 235, 1);
+}
+
 /* ── Tailwind v4 compat ──────────────────────── */
 @layer base {
   *,

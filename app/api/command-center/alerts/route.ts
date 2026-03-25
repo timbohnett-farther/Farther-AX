@@ -149,9 +149,10 @@ interface TaskAlert {
   type: 'task_overdue' | 'task_critical';
   deal_id: string;
   deal_name: string;
-  task_id: string;
+  task_key: string;  // Changed from task_id
   task_label: string;
   phase: string;
+  phase_label: string;  // Added
   owner: string;
   due_date: string;
   days_overdue: number;
@@ -325,13 +326,26 @@ export async function GET(req: NextRequest) {
         continue;
       }
 
+      // Get phase label
+      const PHASE_LABELS: Record<string, string> = {
+        'phase_0': 'Sales Handoff',
+        'phase_1': 'Post-Signing Prep',
+        'phase_2': 'Onboarding Kick-Off',
+        'phase_3': 'Pre-Launch Build',
+        'phase_4': 'T-7 Final Countdown',
+        'phase_5': 'Launch Day',
+        'phase_6': 'Active Transition',
+        'phase_7': 'Graduation & Handoff',
+      };
+
       alerts.push({
         type: taskStatus.status === 'critical' ? 'task_critical' : 'task_overdue',
         deal_id: deal.id,
         deal_name: name,
-        task_id: task.id,
+        task_key: task.id,  // Changed from task_id
         task_label: task.label,
         phase: task.phase,
+        phase_label: PHASE_LABELS[task.phase] || task.phase,  // Added
         owner: task.owner,
         due_date: finalDueDate,
         days_overdue: Math.abs(taskStatus.daysRemaining || 0),
