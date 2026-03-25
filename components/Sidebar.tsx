@@ -138,11 +138,18 @@ export default function Sidebar() {
       {/* Logo / Brand */}
       <div className="px-6 pt-8 pb-5 border-b border-charcoal-600 dark:border-white/10">
         <Image
-          src="/images/farther-iw-cream.png"
+          src="/logo-dark.png"
           alt="Farther"
           width={160}
           height={40}
-          className="mb-2 object-contain object-left dark:filter-none invert dark:invert-0"
+          className="mb-2 object-contain object-left hidden dark:block"
+        />
+        <Image
+          src="/logo-light.png"
+          alt="Farther"
+          width={160}
+          height={40}
+          className="mb-2 object-contain object-left block dark:hidden"
         />
         <p className="text-[10px] tracking-widest uppercase text-cream-dark dark:text-slate">
           Terminal AX

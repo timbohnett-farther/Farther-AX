@@ -284,15 +284,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Dark mode background - gradient */
+/* Dark mode background - gradient with pattern overlay */
 html.dark body {
-  background: linear-gradient(165deg, #111111 0%, #1A1A1A 40%, #202830 100%);
+  background-image: url('/pattern.png'), linear-gradient(165deg, #111111 0%, #1A1A1A 40%, #202830 100%);
+  background-size: 1200px auto, cover;
+  background-position: center, center;
   color: #FFFEF4;
 }
 
-/* Light mode background - warm cream */
+/* Light mode background - warm cream with subtle pattern */
 html:not(.dark) body {
-  background: #F8F4F0;
+  background-image: url('/pattern.png');
+  background-color: #F8F4F0;
+  background-size: 1200px auto;
   color: #1A1A1A;
 }
 
