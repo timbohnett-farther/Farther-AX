@@ -17,9 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className="antialiased bg-white dark:bg-gradient-to-b text-gray-900 dark:text-cream"
+        className="antialiased text-gray-900 dark:text-cream"
         style={{
           fontFamily: "'Fakt', system-ui, sans-serif",
+          background: "var(--color-charcoal-900)",
           backgroundAttachment: "fixed",
         }}
       >
