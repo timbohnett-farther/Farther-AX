@@ -1153,15 +1153,16 @@ function RecruitingTab() {
 
   // Build managed accounts lookup: fuzzy match advisor_name → deal.dealname
   const managedMap = useMemo(() => {
-    const map: Record<string, { total_aum: number; total_monthly_revenue: number }> = {};
+    const map: Record<string, { total_aum: number; revenue: number; avg_fee_bps: number }> = {};
     if (!managedData?.accounts) return map;
     const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
     // Index managed accounts by normalized name
-    const managedIndex: Record<string, { total_aum: number; total_monthly_revenue: number }> = {};
+    const managedIndex: Record<string, { total_aum: number; revenue: number; avg_fee_bps: number }> = {};
     for (const a of managedData.accounts) {
       managedIndex[normalize(a.advisor_name)] = {
         total_aum: parseFloat(a.total_aum) || 0,
-        total_monthly_revenue: parseFloat(a.total_monthly_revenue) || 0,
+        revenue: parseFloat(a.total_monthly_revenue) || 0,
+        avg_fee_bps: parseFloat(a.avg_fee_bps) || 0,
       };
     }
     // Match deals to managed accounts
@@ -1601,10 +1602,8 @@ function RecruitingTab() {
                     return (aVal - bVal) * dir;
                   }
                   if (sortCol === 'current_revenue') {
-                    const aMgd = managedMap[a.id]?.total_monthly_revenue ? managedMap[a.id].total_monthly_revenue * 12 : 0;
-                    const bMgd = managedMap[b.id]?.total_monthly_revenue ? managedMap[b.id].total_monthly_revenue * 12 : 0;
-                    const aVal = aMgd || parseFloat(a.t12_revenue ?? '0') || parseFloat(a.fee_based_revenue ?? '0') || aumMap[a.id]?.current_revenue || 0;
-                    const bVal = bMgd || parseFloat(b.t12_revenue ?? '0') || parseFloat(b.fee_based_revenue ?? '0') || aumMap[b.id]?.current_revenue || 0;
+                    const aVal = managedMap[a.id]?.revenue || parseFloat(a.t12_revenue ?? '0') || parseFloat(a.fee_based_revenue ?? '0') || aumMap[a.id]?.current_revenue || 0;
+                    const bVal = managedMap[b.id]?.revenue || parseFloat(b.t12_revenue ?? '0') || parseFloat(b.fee_based_revenue ?? '0') || aumMap[b.id]?.current_revenue || 0;
                     return (aVal - bVal) * dir;
                   }
                   if (sortCol === 'complexity') {
@@ -1720,7 +1719,7 @@ function RecruitingTab() {
                         );
                       })()}
                       {(() => {
-                        const managedRevenue = managedMap[deal.id]?.total_monthly_revenue ? managedMap[deal.id].total_monthly_revenue * 12 : null;
+                        const managedRevenue = managedMap[deal.id]?.revenue || null;
                         const revenue = managedRevenue || parseFloat(deal.t12_revenue ?? '0') || parseFloat(deal.fee_based_revenue ?? '0') || aumMap[deal.id]?.current_revenue || null;
                         return (
                           <td style={{ padding: '10px 14px', color: revenue ? C.green : C.slate, fontWeight: revenue ? 600 : 400 }}>

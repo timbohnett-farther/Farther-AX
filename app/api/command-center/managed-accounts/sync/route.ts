@@ -135,7 +135,7 @@ export async function GET() {
       );
     }
 
-    // Rebuild summary table
+    // Rebuild summary table: simple avg for fee_rate_bps (sum / count)
     await pool.query('TRUNCATE managed_accounts_summary');
     await pool.query(`
       INSERT INTO managed_accounts_summary (advisor_name, total_aum, total_monthly_revenue, account_count, weighted_fee_bps, synced_at)
@@ -145,10 +145,10 @@ export async function GET() {
         COALESCE(SUM(monthly_fee_amount), 0) as total_monthly_revenue,
         COUNT(*) as account_count,
         CASE
-          WHEN SUM(current_value) > 0
-          THEN SUM(current_value * fee_rate_bps) / SUM(current_value)
+          WHEN COUNT(*) > 0
+          THEN COALESCE(SUM(fee_rate_bps), 0) / COUNT(*)
           ELSE 0
-        END as weighted_fee_bps,
+        END as avg_fee_bps,
         NOW() as synced_at
       FROM managed_accounts
       WHERE advisor_name IS NOT NULL AND advisor_name != ''

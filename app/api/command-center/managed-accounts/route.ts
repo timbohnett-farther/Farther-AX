@@ -4,7 +4,8 @@ import pool from '@/lib/db';
 export async function GET() {
   try {
     const result = await pool.query(`
-      SELECT advisor_name, total_aum, total_monthly_revenue, account_count, weighted_fee_bps
+      SELECT advisor_name, total_aum, total_monthly_revenue, account_count,
+             weighted_fee_bps as avg_fee_bps
       FROM managed_accounts_summary
     `);
 
