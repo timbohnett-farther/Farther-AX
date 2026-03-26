@@ -72,7 +72,7 @@ const defaultFormData: FormData = {
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '10px 14px', borderRadius: 8,
   border: `1px solid ${C.border}`, background: C.cardBgAlt,
-  color: C.dark, fontSize: 14, fontFamily: "'Fakt', system-ui, sans-serif",
+  color: C.dark, fontSize: 14, fontFamily: "'Inter', system-ui, sans-serif",
   outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s',
 };
 
@@ -173,7 +173,7 @@ function SectionHeader({ title, subtitle, num }: { title: string; subtitle?: str
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           background: C.teal, color: '#fff',
         }}>{num}</span>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{title}</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>{title}</h2>
       </div>
       {subtitle && <p style={{ fontSize: 13, color: C.slate, marginLeft: 36 }}>{subtitle}</p>}
     </div>
@@ -270,7 +270,7 @@ export default function TechIntakePage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: C.bg }}>
         <div style={{ textAlign: 'center', maxWidth: 420, padding: 40 }}>
           <div style={{ width: 56, height: 56, borderRadius: '50%', background: C.redBg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>!</div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 12 }}>Unable to Load Form</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 12 }}>Unable to Load Form</h1>
           <p style={{ fontSize: 14, color: C.slate, lineHeight: 1.6 }}>{error}</p>
         </div>
       </div>
@@ -283,7 +283,7 @@ export default function TechIntakePage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: C.bg }}>
         <div style={{ textAlign: 'center', maxWidth: 480, padding: 40 }}>
           <div style={{ width: 56, height: 56, borderRadius: '50%', background: C.greenBg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24, color: C.green }}>&#10003;</div>
-          <h1 style={{ fontSize: 26, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 12 }}>You&apos;re All Set, {advisorName.split(' ')[0]}!</h1>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 12 }}>You&apos;re All Set, {advisorName.split(' ')[0]}!</h1>
           <p style={{ fontSize: 15, color: C.slate, lineHeight: 1.7, marginBottom: 24 }}>
             Your Technology Intake Form has been submitted successfully. Your AX team will get your equipment configured and shipped!
           </p>
@@ -299,12 +299,12 @@ export default function TechIntakePage() {
   return (
     <div style={{
       minHeight: '100vh', background: C.bg, padding: '32px 16px',
-      fontFamily: "'Fakt', system-ui, sans-serif",
+      fontFamily: "'Inter', system-ui, sans-serif",
     }}>
       {/* Header */}
       <div style={{ maxWidth: 720, margin: '0 auto 32px', textAlign: 'center' }}>
         <p style={{ fontSize: 13, fontWeight: 600, color: C.tealLight, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>Farther</p>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 8 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 8 }}>
           Technology Intake Form
         </h1>
         <p style={{ fontSize: 14, color: C.slate }}>

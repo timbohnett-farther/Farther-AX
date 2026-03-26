@@ -141,4 +141,83 @@ When you report a fix:
 
 ---
 
-**Last Updated:** 2026-03-25
+---
+
+## 🚨 **Active Tasks (2026-03-26)**
+
+### **Task #5: CRITICAL — Fix Data Loading & Caching Across All Pages**
+- **Status:** ✅ Fixed (2026-03-26)
+- **Priority:** 🚨 Critical
+- **What was done:**
+  - Global SWR Provider with localStorage persistence (`lib/swr-provider.tsx`)
+  - Background prefetcher fires 7 critical endpoints on app entry
+  - 1-hour deduplication interval prevents duplicate API calls
+  - Google Sheets auth hardened with 50-min token cache + exponential backoff retry
+
+### **Task #6: Fix Alerts Page Load Failures + Show Unfinished Launched Advisor Tasks**
+- **Status:** ✅ Fixed (2026-03-26)
+- **Priority:** 🚨 Critical
+- **What was done:**
+  - Promise.allSettled for error isolation
+  - Batch DB queries (2 total instead of 2 per deal)
+  - Unassigned tasks now show as alerts
+
+### **Task #7: Fix Transitions Dashboard — Permanent Solution**
+- **Status:** ✅ Fixed (2026-03-26)
+- **Priority:** 🚨 Critical
+- **What was done:**
+  - Google API auth with 50-min token cache + retry with backoff
+  - Incremental sync using Drive API `modifiedTime` — skips unchanged sheets
+  - Per-sheet error isolation (try/catch per workbook)
+  - Stores `drive_modified_time` in DB for comparison
+
+### **Task #10: Switch AI from Grok to OpenAI**
+- **Status:** ✅ Fixed (2026-03-26)
+- **Priority:** High
+- **What was done:**
+  - Created `lib/ai-router.ts` with auto model selection
+  - GPT-4.1-mini for chat, summaries, briefings (fast)
+  - GPT-4.1 for note parsing, sentiment analysis (precision)
+  - Auto-fallback from GPT-4.1 to mini on failure
+  - Removed Grok/xAI from all 4 API routes + UI
+
+### **Task #11: Advisor Hub DB-First Caching**
+- **Status:** ✅ Fixed (2026-03-26)
+- **Priority:** 🚨 Critical
+- **What was done:**
+  - Created `lib/advisor-store.ts` with structured DB tables (`advisor_profiles`, `advisor_activities`)
+  - First visit: full HubSpot fetch → write to DB → serve
+  - Return visits: serve from DB instantly → background sync fetches only new activities
+  - Background sync compares and upserts only changes since `last_synced_at`
+  - RIA Hub now uses `withPgCache` (2hr TTL)
+
+### **Task #8: Fix Onboarding Page Complexity Score Graph**
+- **Status:** 🔴 Not Started
+- **Priority:** High
+- **Description:** The onboarding page is not reading the complexity scores of advisors assigned to team members. It should sum those scores and display them on the 0/250 complexity points graph for each AXM.
+- **Sub-tasks:**
+  - [ ] Connect complexity scores to advisor-team assignments
+  - [ ] Sum complexity points per team member
+  - [ ] Update the graph to reflect actual summed scores vs 250 capacity
+
+### **Task #9: Brand Consistency — Strike Team PRISM Audit Fixes**
+- **Status:** 🟡 In Progress
+- **Priority:** Medium
+- **Description:** Strike Team audit found 2 P0 and 10 P1 brand consistency issues. See `Strike-Team.md` for full findings.
+- **Sub-tasks:**
+  - [x] P0: Resolve font conflict — migrated all files to Inter/DM Mono
+  - [x] P0: Remove duplicate light mode CSS in globals.css
+  - [ ] P1: Connect 13 playbook pages to design system (theme-colors, design tokens)
+  - [ ] P1: Bring Transitions page to 85%+ compliance
+  - [ ] P1: Bring AI Assistant page to 85%+ compliance
+  - [ ] P1: Bring RIA Hub page to 85%+ compliance
+  - [ ] P1: Add shimmer loading states to all command center pages
+  - [ ] P1: Add tabular-nums to all financial number displays
+  - [ ] P1: Fix Sidebar light mode colors
+  - [ ] P1: Replace hardcoded glass card colors with CSS variables
+  - [ ] P1: Consolidate 3 conflicting color systems into one
+  - [ ] P1: Add missing Tailwind color definitions (cream, teal variants)
+
+---
+
+**Last Updated:** 2026-03-26

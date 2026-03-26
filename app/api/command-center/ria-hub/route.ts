@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withPgCache } from '@/lib/pg-cache';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
@@ -197,65 +198,80 @@ async function fetchTeamRecord(dealId: string) {
   return { id: teamData.id, ...teamData.properties };
 }
 
+async function fetchRIAHubData() {
+  const deals = await fetchOnboardingDeals();
+
+  // Enrich each deal with contacts, notes, calls, emails, and team record
+  const enrichedDeals = await Promise.all(
+    deals.map(async (deal) => {
+      const [contacts, notes, calls, emails, team] = await Promise.all([
+        fetchContactsForDeal(deal.id),
+        fetchNotesForDeal(deal.id),
+        fetchCallsForDeal(deal.id),
+        fetchEmailsForDeal(deal.id),
+        fetchTeamRecord(deal.id),
+      ]);
+
+      return {
+        id: deal.id,
+        properties: deal.properties,
+        stageLabel: STAGE_LABELS[deal.properties.dealstage ?? ''] ?? deal.properties.dealstage,
+        contacts: contacts.map((c: HubSpotContact) => ({
+          id: c.id,
+          firstName: c.properties.firstname,
+          lastName: c.properties.lastname,
+          email: c.properties.email,
+          phone: c.properties.phone || c.properties.mobilephone,
+          jobTitle: c.properties.jobtitle,
+          company: c.properties.company,
+          city: c.properties.city,
+          state: c.properties.state,
+          yearsInIndustry: c.properties.years_in_industry,
+          licenses: c.properties.licenses,
+        })),
+        notes: notes.map((n: HubSpotNote) => ({
+          id: n.id,
+          body: n.properties.hs_note_body?.replace(/<[^>]+>/g, '') ?? '',
+          timestamp: n.properties.hs_timestamp,
+        })),
+        calls: calls.map((c: HubSpotEngagement) => ({
+          id: c.id,
+          title: c.properties.hs_call_title,
+          body: c.properties.hs_call_body?.replace(/<[^>]+>/g, '') ?? '',
+          status: c.properties.hs_call_status,
+          timestamp: c.properties.hs_timestamp,
+          duration: c.properties.hs_call_duration,
+          recordingUrl: c.properties.hs_call_recording_url,
+        })),
+        emails: emails.map((e: HubSpotEngagement) => ({
+          id: e.id,
+          subject: e.properties.hs_email_subject,
+          body: e.properties.hs_email_text?.replace(/<[^>]+>/g, '').slice(0, 300) ?? '',
+          direction: e.properties.hs_email_direction,
+          timestamp: e.properties.hs_timestamp,
+        })),
+        team,
+      };
+    })
+  );
+
+  return { deals: enrichedDeals };
+}
+
+// PostgreSQL-cached — 2hr TTL with stale fallback
 export async function GET() {
   try {
-    const deals = await fetchOnboardingDeals();
-
-    // Enrich each deal with contacts, notes, calls, emails, and team record
-    const enrichedDeals = await Promise.all(
-      deals.map(async (deal) => {
-        const [contacts, notes, calls, emails, team] = await Promise.all([
-          fetchContactsForDeal(deal.id),
-          fetchNotesForDeal(deal.id),
-          fetchCallsForDeal(deal.id),
-          fetchEmailsForDeal(deal.id),
-          fetchTeamRecord(deal.id),
-        ]);
-
-        return {
-          id: deal.id,
-          properties: deal.properties,
-          stageLabel: STAGE_LABELS[deal.properties.dealstage ?? ''] ?? deal.properties.dealstage,
-          contacts: contacts.map((c: HubSpotContact) => ({
-            id: c.id,
-            firstName: c.properties.firstname,
-            lastName: c.properties.lastname,
-            email: c.properties.email,
-            phone: c.properties.phone || c.properties.mobilephone,
-            jobTitle: c.properties.jobtitle,
-            company: c.properties.company,
-            city: c.properties.city,
-            state: c.properties.state,
-            yearsInIndustry: c.properties.years_in_industry,
-            licenses: c.properties.licenses,
-          })),
-          notes: notes.map((n: HubSpotNote) => ({
-            id: n.id,
-            body: n.properties.hs_note_body?.replace(/<[^>]+>/g, '') ?? '',
-            timestamp: n.properties.hs_timestamp,
-          })),
-          calls: calls.map((c: HubSpotEngagement) => ({
-            id: c.id,
-            title: c.properties.hs_call_title,
-            body: c.properties.hs_call_body?.replace(/<[^>]+>/g, '') ?? '',
-            status: c.properties.hs_call_status,
-            timestamp: c.properties.hs_timestamp,
-            duration: c.properties.hs_call_duration,
-            recordingUrl: c.properties.hs_call_recording_url,
-          })),
-          emails: emails.map((e: HubSpotEngagement) => ({
-            id: e.id,
-            subject: e.properties.hs_email_subject,
-            body: e.properties.hs_email_text?.replace(/<[^>]+>/g, '').slice(0, 300) ?? '',
-            direction: e.properties.hs_email_direction,
-            timestamp: e.properties.hs_timestamp,
-          })),
-          team,
-        };
-      })
+    const { data, cached, stale } = await withPgCache(
+      'ria-hub',
+      fetchRIAHubData,
+      { ttlMs: 2 * 60 * 60 * 1000 } // 2 hours
     );
 
-    return NextResponse.json({ deals: enrichedDeals });
+    const res = NextResponse.json(data);
+    if (cached) {
+      res.headers.set('X-Cache', stale ? 'STALE' : 'HIT');
+    }
+    return res;
   } catch (err) {
     console.error('[ria-hub]', err);
     const message = err instanceof Error ? err.message : String(err);

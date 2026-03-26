@@ -6,6 +6,146 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Google Sheets Incremental Sync — 2026-03-26
+
+**What**: Transitions sync now uses Google Drive `modifiedTime` to skip sheets that haven't changed since last sync. Dramatically reduces API calls and sync time.
+
+**Scope**:
+- Added `drive_modified_time` column to `transition_workbooks` table (auto-migrated)
+- Before syncing, loads last-known modifiedTime from DB for each sheet
+- Compares against Drive API's modifiedTime — skips unchanged sheets entirely
+- After successful sync, stores the new modifiedTime in DB
+- Both POST and GET sync handlers use incremental logic
+- Summary response now includes `skipped` count
+
+**Status**: ✅ Complete
+
+**Files**:
+- `app/api/command-center/transitions/sync/route.ts` — Incremental sync with modifiedTime comparison
+
+---
+
+## [Completed] Advisor Hub DB-First Caching with Background Sync — 2026-03-26
+
+**What**: HubSpot CRM data now written to PostgreSQL on first pull. Subsequent visits serve from DB instantly while background sync silently fetches new activities (notes, calls, emails, meetings, deal stage changes) and upserts only changes.
+
+**Scope**:
+- Created `lib/advisor-store.ts` — structured DB tables (`advisor_profiles`, `advisor_activities`) with incremental sync
+- Advisor detail API now: DB-first → instant serve → background HubSpot sync
+- First visit: full HubSpot fetch, write to DB, serve
+- Return visits: serve from DB immediately, background sync fetches only new items since `last_synced_at`
+- Stale fallback: if HubSpot fails, still serves from DB
+- RIA Hub API now uses `withPgCache` (2hr TTL) instead of fresh HubSpot fetch every load
+
+**Status**: ✅ Complete
+
+**Files**:
+- `lib/advisor-store.ts` — New: DB-backed advisor data store with incremental sync
+- `app/api/command-center/advisor/[id]/route.ts` — Rewritten GET handler: DB-first + background sync
+- `app/api/command-center/ria-hub/route.ts` — Added withPgCache (2hr TTL, stale fallback)
+
+---
+
+## [Completed] Switch AI from Grok to OpenAI with Auto Model Routing — 2026-03-26
+
+**What**: Replaced Grok/xAI with OpenAI models via AiZolo proxy. Added intelligent model routing that auto-selects GPT-4.1-mini (fast tasks) or GPT-4.1 (precision tasks) based on task type.
+
+**Scope**:
+- Created `lib/ai-router.ts` — centralized AI routing with auto model selection and fallback
+- Chat Q&A, briefings, summaries → GPT-4.1-mini (fast, cost-effective)
+- Note parsing, sentiment analysis → GPT-4.1 (high accuracy needed)
+- If GPT-4.1 fails, auto-falls back to mini
+- Removed all Grok/xAI OpenAI SDK client instantiation from 4 API routes
+- Updated AI assistant page to remove Grok branding
+
+**Status**: ✅ Complete
+
+**Files**:
+- `lib/ai-router.ts` — New: AI model router with task-based auto-selection
+- `app/api/command-center/ai/route.ts` — Switched from Grok to aiComplete()
+- `app/api/command-center/ria-hub/summary/route.ts` — Switched from Grok to aiComplete()
+- `app/api/command-center/advisor/parse-note/route.ts` — Switched from Grok to aiComplete()
+- `app/api/command-center/sentiment/score/route.ts` — Switched from Grok to aiComplete()
+- `app/command-center/ai/page.tsx` — Removed Grok branding
+
+---
+
+## [Completed] Font Migration — Inter + DM Mono — 2026-03-26
+
+**What**: Migrated entire codebase from ABC Arizona Text/Fakt to Inter/DM Mono per Font Gold Standard.
+
+**Scope**:
+- Replaced all `ABC Arizona Text` and `Fakt` font references with `Inter` across 24 files
+- Updated `globals.css`: removed old @font-face declarations, updated CSS custom properties, added global `tabular-nums` rule for financial data
+- Updated `lib/design-tokens.ts`: typography helpers now use Inter/DM Mono
+- Updated `lib/theme.ts`: mono font changed from SF Mono/Fira Code to DM Mono
+- Removed duplicate light mode CSS block in globals.css
+- Added Google Fonts preconnect + stylesheet links in layout.tsx (prior commit)
+
+**Status**: ✅ Complete
+
+**Files** (24 files):
+- `app/globals.css` — Font vars, @font-face cleanup, tabular-nums rule
+- `lib/design-tokens.ts` — Typography helpers updated
+- `lib/theme.ts` — Mono font updated to DM Mono
+- `app/command-center/page.tsx`, `app/command-center/advisor-hub/page.tsx`, `app/command-center/advisor/[id]/page.tsx`, `app/command-center/transitions/page.tsx` — Inline fontFamily refs
+- `app/auth/error/page.tsx`, `app/auth/signin/page.tsx` — Font refs
+- `app/breakaway-process/page.tsx`, `app/breakaway/page.tsx`, `app/calendar-generator/page.tsx` — Font refs
+- `app/forms/tech-intake/[token]/page.tsx`, `app/forms/u4-2b/[token]/page.tsx` — Font refs
+- `app/independent-ria/page.tsx`, `app/knowledge-check/page.tsx`, `app/lpoa/page.tsx`, `app/master-merge/page.tsx`, `app/no-to-low-aum/page.tsx`, `app/repaper-acat/page.tsx` — Font refs
+- `components/transitions/DocuSignDashboard.tsx`, `components/transitions/FilterPanel.tsx`, `components/transitions/SearchSelect.tsx`, `components/transitions/StatsCards.tsx` — Font refs
+
+---
+
+## [In Progress] Alerts Fix + Transitions SWAT Plan — 2026-03-26
+
+**What**: Fixed alerts API reliability and created Transitions SWAT plan.
+
+**Alerts Fix**:
+- `Promise.allSettled` for all data fetches — partial failures no longer crash the endpoint
+- Batch DB queries: 2 queries total instead of 2 per deal (bulk fetch with `ANY($1)`)
+- Unassigned overdue tasks now show as alerts with `responsible_person: {name: 'Unassigned'}`
+- Per-deal try/catch so one bad deal doesn't kill all alerts
+
+**Transitions SWAT Plan** (`TRANSITIONS-SWAT.md`):
+- 5 specialist team (ATLAS, FORGE, VAULT, SENTINEL, CHRONOS)
+- Incremental sync with change detection (modifiedTime + row checksums)
+- Google API hardening (auth caching, rate limiter, retry with backoff)
+- Batch upserts in transactions instead of per-row inserts
+- Cron-based auto-sync every 2 hours (no more page-load triggers)
+
+**Files**:
+- `app/api/command-center/alerts/route.ts` — Error isolation, batch queries, unassigned task alerts
+- `TRANSITIONS-SWAT.md` — Full implementation plan
+- `TODO.md` — Updated with new tasks
+
+---
+
+## [In Progress] Strike Team Audit & SWAT Plans — 2026-03-26
+
+**What**: Ran full Strike Team audit across the entire AX Command Center codebase. Added PRISM brand consistency specialist. Created DATA-LOADING-SWAT.md to fix critical caching/load issues.
+
+**Scope**:
+- Added PRISM (Brand Consistency) audit specialist to Strike-Team.md
+- Ran audit across all 9 command center pages and 13 playbook pages
+- Identified 2 P0 issues (font conflict, duplicate CSS) and 10 P1 issues (brand inconsistency)
+- Created page-by-page compliance scores (Pipeline=100%, Team=88%, down to Playbook pages at 20-45%)
+- Created DATA-LOADING-SWAT.md with 3-layer caching architecture plan (pg-cache tuning, global SWR provider with localStorage persistence, background prefetching)
+- Updated TODO.md with 4 new critical/high-priority tasks
+- Added Font-Gold-Standard.md branding guide
+- Updated CLAUDE.md with 5 non-negotiable rules
+
+**Status**: Audit complete. Fixes pending.
+
+**Files**:
+- `Strike-Team.md` — Full audit findings, PRISM scores, P0/P1/P2 issue log
+- `DATA-LOADING-SWAT.md` — 4-phase plan to fix data loading across all pages
+- `Font-Gold-Standard.md` — Typography single source of truth
+- `CLAUDE.md` — Non-negotiable rules added
+- `TODO.md` — Updated with prioritized task queue
+
+---
+
 ## [Completed] Advisor Team Mappings — 2026-03-25
 
 **What**: Implemented automatic mapping of individual advisor names to team names in Transition sheets, eliminating duplicate entries for team-based advisors.

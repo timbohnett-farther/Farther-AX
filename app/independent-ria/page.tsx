@@ -85,7 +85,7 @@ export default function IndependentRIAPage() {
         <section style={{ marginBottom: "2.5rem" }}>
           <h2
             style={{
-              fontFamily: "'ABC Arizona Text', Georgia, serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: "1.25rem",
               fontWeight: 700,
               color: COLORS.charcoal,
@@ -164,7 +164,7 @@ export default function IndependentRIAPage() {
         <section style={{ marginBottom: "2.5rem" }}>
           <h2
             style={{
-              fontFamily: "'ABC Arizona Text', Georgia, serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: "1.25rem",
               fontWeight: 700,
               color: COLORS.charcoal,
@@ -226,7 +226,7 @@ export default function IndependentRIAPage() {
         <section style={{ marginBottom: "2.5rem" }}>
           <h2
             style={{
-              fontFamily: "'ABC Arizona Text', Georgia, serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: "1.25rem",
               fontWeight: 700,
               color: COLORS.charcoal,
@@ -352,7 +352,7 @@ export default function IndependentRIAPage() {
         <section style={{ marginBottom: "1rem" }}>
           <h2
             style={{
-              fontFamily: "'ABC Arizona Text', Georgia, serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: "1.25rem",
               fontWeight: 700,
               color: COLORS.charcoal,

@@ -85,7 +85,7 @@ export default function BreakawayProcessPage() {
                 <h3
                   className="text-xl font-bold"
                   style={{
-                    fontFamily: "'ABC Arizona Text', Georgia, serif",
+                    fontFamily: "'Inter', system-ui, sans-serif",
                     color: "#FAF7F2",
                   }}
                 >

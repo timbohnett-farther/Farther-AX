@@ -150,7 +150,7 @@ function StatCard({ label, value, color }: { label: string; value: string | numb
       border: `1px solid ${C.border}`, textAlign: 'center',
     }}>
       <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</p>
-      <p style={{ fontSize: 24, fontWeight: 700, color: color ?? C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{value}</p>
+      <p style={{ fontSize: 24, fontWeight: 700, color: color ?? C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>{value}</p>
     </div>
   );
 }
@@ -172,7 +172,7 @@ function ComplexityPanel({ dealId }: { dealId: string }) {
       <div onClick={() => setExpanded(!expanded)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: expanded ? 16 : 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 12px', borderRadius: 20, background: `${tierColor}18`, border: `1px solid ${tierColor}30` }}>
-            <span style={{ fontSize: 20, fontWeight: 700, color: tierColor, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{score}</span>
+            <span style={{ fontSize: 20, fontWeight: 700, color: tierColor, fontFamily: "'Inter', system-ui, sans-serif" }}>{score}</span>
             <span style={{ fontSize: 12, fontWeight: 600, color: tierColor }}>{tier}</span>
           </div>
           <div style={{ width: 80, height: 6, background: 'rgba(91,106,113,0.08)', borderRadius: 3, overflow: 'hidden' }}>
@@ -871,7 +871,7 @@ function EngagementsTab({ engagements, extracted, notes }: { engagements: any[];
       <Section title="Activity Timeline" icon="◉">
         <div style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'center' }}>
           <div style={{ position: 'relative', flex: 1, maxWidth: 300 }}>
-            <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search activities..." style={{ width: '100%', padding: '8px 12px 8px 32px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, color: C.dark, background: C.cardBg, outline: 'none', fontFamily: "'Fakt', system-ui, sans-serif" }} />
+            <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search activities..." style={{ width: '100%', padding: '8px 12px 8px 32px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, color: C.dark, background: C.cardBg, outline: 'none', fontFamily: "'Inter', system-ui, sans-serif" }} />
             <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: C.slate }}>⌕</span>
           </div>
           <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 12, color: C.dark, background: C.cardBg, cursor: 'pointer' }}>
@@ -1086,7 +1086,7 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
           <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: '#f59e0b' }}>{pctComplete}%</span>
         </div>
         <div>
-          <p style={{ fontSize: 18, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{totalCompleted} / {totalTasks} Tasks Complete</p>
+          <p style={{ fontSize: 18, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>{totalCompleted} / {totalTasks} Tasks Complete</p>
           <p style={{ fontSize: 12, color: C.slate, marginTop: 2 }}>Advisor onboarding checklist progress</p>
         </div>
         {/* Phase mini stats */}
@@ -1549,7 +1549,7 @@ export default function AdvisorProfilePage() {
   ];
 
   return (
-    <div style={{ padding: '32px 40px', minHeight: '100vh', fontFamily: "'Fakt', system-ui, sans-serif", maxWidth: '100vw', overflowX: 'hidden' }}>
+    <div style={{ padding: '32px 40px', minHeight: '100vh', fontFamily: "'Inter', system-ui, sans-serif", maxWidth: '100vw', overflowX: 'hidden' }}>
       {/* Navigation: Back + Next Advisor */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <Link href="/command-center/advisor-hub" style={{ fontSize: 13, color: C.slate, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -1575,7 +1575,7 @@ export default function AdvisorProfilePage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
         <div>
-          <h1 style={{ fontSize: 30, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 8 }}>
+          <h1 style={{ fontSize: 30, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 8 }}>
             {deal.dealname ?? 'Advisor Profile'}
           </h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
@@ -1590,7 +1590,7 @@ export default function AdvisorProfilePage() {
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <p style={{ fontSize: 28, fontWeight: 700, color: C.teal, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+          <p style={{ fontSize: 28, fontWeight: 700, color: C.teal, fontFamily: "'Inter', system-ui, sans-serif" }}>
             {formatAUM(deal.transferable_aum || team?.transferable_aum)}
           </p>
           <p style={{ fontSize: 12, color: C.slate }}>Transferable AUM</p>
@@ -1627,7 +1627,7 @@ export default function AdvisorProfilePage() {
       {showRawNote && rawNoteText && (
         <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 10, padding: '20px 24px', marginBottom: 20, maxHeight: 500, overflowY: 'auto' }}>
           <h3 style={{ fontSize: 12, fontWeight: 700, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Pinned Note (Raw)</h3>
-          <pre style={{ fontSize: 13, color: C.dark, lineHeight: 1.6, whiteSpace: 'pre-wrap', fontFamily: "'Fakt', system-ui, sans-serif", margin: 0 }}>{rawNoteText}</pre>
+          <pre style={{ fontSize: 13, color: C.dark, lineHeight: 1.6, whiteSpace: 'pre-wrap', fontFamily: "'Inter', system-ui, sans-serif", margin: 0 }}>{rawNoteText}</pre>
         </div>
       )}
 
@@ -1643,7 +1643,7 @@ export default function AdvisorProfilePage() {
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
               <span style={{ fontSize: 14, color: tab.color, opacity: isActive ? 1 : 0.5 }}>{tab.icon}</span>
-              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? tab.color : C.slate, fontFamily: "'Fakt', system-ui, sans-serif" }}>{tab.label}</span>
+              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? tab.color : C.slate, fontFamily: "'Inter', system-ui, sans-serif" }}>{tab.label}</span>
             </button>
           );
         })}

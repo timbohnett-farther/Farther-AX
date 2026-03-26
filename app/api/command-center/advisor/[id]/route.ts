@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withPgCache } from '@/lib/pg-cache';
+import {
+  ensureAdvisorTables,
+  getAdvisorFromDB,
+  writeAdvisorToDB,
+  applyIncrementalUpdate,
+  formatDBDataForFrontend,
+} from '@/lib/advisor-store';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const TEAMS_OBJECT_TYPE = '2-43222882';
@@ -229,22 +235,164 @@ async function fetchAdvisorData(dealId: string) {
   return { deal, notes, team, contact, pinnedNote, allContacts, engagements };
 }
 
-// ── Main GET handler (PostgreSQL-cached — 12hr TTL) ──────────────────────────
+// ── Background sync: fetch only new activities since last sync ───────────────
+async function backgroundSync(dealId: string, lastSyncedAt: string) {
+  try {
+    // Fetch fresh deal properties (stage may have changed)
+    const deal = await fetchDeal(dealId);
+
+    // Fetch notes newer than last sync
+    const newNotes = await fetchNotesSince(dealId, lastSyncedAt);
+
+    // Fetch fresh contacts + engagements
+    const { allContacts } = await fetchAssociatedContact(dealId);
+    const contact = allContacts[0] as { hs_object_id?: string } | undefined;
+    let newEngagements: { type: string; id: string; timestamp: string; properties: Record<string, string> }[] = [];
+    if (contact?.hs_object_id) {
+      newEngagements = await fetchEngagementsSince(contact.hs_object_id, lastSyncedAt);
+    }
+
+    const changes = await applyIncrementalUpdate(dealId, {
+      dealProperties: deal.properties,
+      newNotes,
+      newEngagements,
+      newContacts: allContacts,
+    });
+
+    if (changes > 0) {
+      console.log(`[advisor-store] Background sync for ${dealId}: ${changes} changes applied`);
+    }
+  } catch (err) {
+    console.error(`[advisor-store] Background sync failed for ${dealId}:`, err);
+  }
+}
+
+// Fetch notes newer than a given timestamp
+async function fetchNotesSince(dealId: string, since: string) {
+  const res = await fetch('https://api.hubapi.com/crm/v3/objects/notes/search', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      filterGroups: [{
+        filters: [
+          { propertyName: 'associations.deal', operator: 'EQ', value: dealId },
+          { propertyName: 'hs_timestamp', operator: 'GTE', value: since },
+        ],
+      }],
+      properties: ['hs_note_body', 'hs_timestamp', 'hubspot_owner_id'],
+      sorts: [{ propertyName: 'hs_timestamp', direction: 'DESCENDING' }],
+      limit: 50,
+    }),
+  });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.results ?? [];
+}
+
+// Fetch engagements newer than a given timestamp
+async function fetchEngagementsSince(contactId: string, since: string) {
+  const engagementTypes = [
+    { type: 'emails', props: 'hs_email_subject,hs_email_direction,hs_email_status,hs_timestamp,hs_email_text' },
+    { type: 'calls', props: 'hs_call_title,hs_call_direction,hs_call_status,hs_call_duration,hs_timestamp,hs_call_body' },
+    { type: 'meetings', props: 'hs_meeting_title,hs_meeting_outcome,hs_timestamp,hs_meeting_start_time,hs_meeting_end_time,hs_meeting_body' },
+  ];
+
+  const results: { type: string; id: string; timestamp: string; properties: Record<string, string> }[] = [];
+
+  await Promise.all(engagementTypes.map(async ({ type, props }) => {
+    try {
+      const res = await fetch(`https://api.hubapi.com/crm/v3/objects/${type}/search`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filterGroups: [{
+            filters: [
+              { propertyName: 'associations.contact', operator: 'EQ', value: contactId },
+              { propertyName: 'hs_timestamp', operator: 'GTE', value: since },
+            ],
+          }],
+          properties: props.split(','),
+          sorts: [{ propertyName: 'hs_timestamp', direction: 'DESCENDING' }],
+          limit: 20,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        for (const item of (data.results ?? [])) {
+          results.push({
+            type: type.replace(/s$/, ''),
+            id: item.id,
+            timestamp: item.properties?.hs_timestamp ?? '',
+            properties: item.properties ?? {},
+          });
+        }
+      }
+    } catch {
+      // Silent — supplementary
+    }
+  }));
+
+  return results;
+}
+
+// ── Main GET handler ─────────────────────────────────────────────────────────
+// DB-first with background sync:
+//   1. Check DB for stored advisor data
+//   2. If found: return immediately, sync new activities in background
+//   3. If not found: full HubSpot fetch → write to DB → return
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { data, cached, stale } = await withPgCache(
-      `advisor-${params.id}`,
-      () => fetchAdvisorData(params.id),
-      { ttlMs: 12 * 60 * 60 * 1000 } // 12 hours
-    );
+    // Ensure tables exist (idempotent, fast after first call)
+    await ensureAdvisorTables();
+
+    // Try to serve from DB first
+    const snapshot = await getAdvisorFromDB(params.id);
+
+    if (snapshot.fromDB && snapshot.profile) {
+      // Serve from DB immediately
+      const formatted = formatDBDataForFrontend(snapshot);
+      const res = NextResponse.json(formatted);
+      res.headers.set('X-Data-Source', 'database');
+      res.headers.set('X-Last-Synced', snapshot.profile.last_synced_at);
+
+      // Fire background sync (don't await — user gets instant response)
+      backgroundSync(params.id, snapshot.profile.last_synced_at).catch(() => {});
+
+      return res;
+    }
+
+    // No DB data — full fetch from HubSpot (first visit)
+    const data = await fetchAdvisorData(params.id);
+
+    // Write to DB in background (don't block the response)
+    writeAdvisorToDB({
+      deal: data.deal,
+      allContacts: data.allContacts,
+      team: data.team,
+      pinnedNote: data.pinnedNote,
+      notes: data.notes,
+      engagements: data.engagements,
+    }).catch(err => console.error('[advisor-store] Initial write failed:', err));
 
     const res = NextResponse.json(data);
-    if (cached) {
-      res.headers.set('X-Cache', stale ? 'STALE' : 'HIT');
-    }
+    res.headers.set('X-Data-Source', 'hubspot');
     return res;
   } catch (err) {
     console.error('[advisor detail]', err);
+
+    // Last resort: try serving stale DB data even if HubSpot failed
+    try {
+      const snapshot = await getAdvisorFromDB(params.id);
+      if (snapshot.fromDB) {
+        const formatted = formatDBDataForFrontend(snapshot);
+        const res = NextResponse.json(formatted);
+        res.headers.set('X-Data-Source', 'database-fallback');
+        return res;
+      }
+    } catch {
+      // DB also failed
+    }
+
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: message }, { status: 500 });
   }

@@ -28,7 +28,7 @@ export default function MasterMergePage() {
               <p
                 className="text-xl font-bold"
                 style={{
-                  fontFamily: "'ABC Arizona Text', Georgia, serif",
+                  fontFamily: "'Inter', system-ui, sans-serif",
                   color: "#FAF7F2",
                 }}
               >
@@ -47,7 +47,7 @@ export default function MasterMergePage() {
           <h2
             className="text-2xl font-bold mb-3"
             style={{
-              fontFamily: "'ABC Arizona Text', Georgia, serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
               color: "#FAF7F2",
             }}
           >
@@ -68,7 +68,7 @@ export default function MasterMergePage() {
           <h3
             className="text-lg font-semibold mb-4"
             style={{
-              fontFamily: "'ABC Arizona Text', Georgia, serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
               color: "#FAF7F2",
             }}
           >

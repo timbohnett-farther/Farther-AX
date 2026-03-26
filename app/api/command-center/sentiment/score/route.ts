@@ -17,8 +17,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import pool from '@/lib/db';
+import { aiComplete } from '@/lib/ai-router';
 import {
   type Engagement,
   type SentimentSignals,
@@ -259,30 +259,24 @@ async function analyzeEngagementTone(
     };
   }
 
-  const xai = new OpenAI({
-    apiKey: process.env.GROK_API_KEY!,
-    baseURL: 'https://api.x.ai/v1',
-  });
-
   const userContent = `Analyze the sentiment of the following communications:\n\n${itemLines.join('\n\n')}`;
 
-  const completion = await xai.chat.completions.create({
-    model: 'grok-3-latest',
+  const result = await aiComplete({
+    task: 'sentiment',
     messages: [
       { role: 'system', content: TONE_SYSTEM_PROMPT },
       { role: 'user', content: userContent },
     ],
-    temperature: 0.1,
-    max_tokens: 2048,
+    maxTokens: 2048,
   });
 
-  const raw = completion.choices[0]?.message?.content ?? '';
+  const raw = result.content;
 
   try {
     const jsonStr = raw.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
     return JSON.parse(jsonStr) as GrokToneResponse;
   } catch {
-    console.error('[sentiment/score] Failed to parse Grok tone response:', raw.slice(0, 500));
+    console.error('[sentiment/score] Failed to parse AI tone response:', raw.slice(0, 500));
     // Return a neutral fallback so the pipeline continues
     return { overall_tone_score: 50, items: [] };
   }

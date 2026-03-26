@@ -65,7 +65,7 @@ export default function NoToLowAUMPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'Inter', system-ui, sans-serif" }}
             >
               When This Pathway Applies
             </h2>
@@ -104,7 +104,7 @@ export default function NoToLowAUMPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'Inter', system-ui, sans-serif" }}
             >
               Key Characteristics
             </h2>
@@ -126,7 +126,7 @@ export default function NoToLowAUMPage() {
                   </div>
                   <h3
                     className="font-serif text-lg leading-tight"
-                    style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+                    style={{ color: "#FAF7F2", fontFamily: "'Inter', system-ui, sans-serif" }}
                   >
                     {item.title}
                   </h3>
@@ -145,7 +145,7 @@ export default function NoToLowAUMPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'Inter', system-ui, sans-serif" }}
             >
               The Focus Team Review
             </h2>
@@ -186,7 +186,7 @@ export default function NoToLowAUMPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'Inter', system-ui, sans-serif" }}
             >
               Training Curriculum Priority
             </h2>

@@ -44,7 +44,7 @@ function ErrorContent() {
         <h1
           className="mb-3"
           style={{
-            fontFamily: "'ABC Arizona Text', Georgia, serif",
+            fontFamily: "'Inter', system-ui, sans-serif",
             fontSize: "1.5rem",
             fontWeight: 300,
             color: "#FAF7F2",
@@ -56,7 +56,7 @@ function ErrorContent() {
         <p
           className="mb-8 text-sm leading-relaxed"
           style={{
-            fontFamily: "'Fakt', system-ui, sans-serif",
+            fontFamily: "'Inter', system-ui, sans-serif",
             color: "rgba(250,247,242,0.5)",
           }}
         >
@@ -70,7 +70,7 @@ function ErrorContent() {
           className="inline-flex items-center justify-center px-6 py-3 rounded-lg text-white text-sm font-medium"
           style={{
             backgroundColor: "#1d7682",
-            fontFamily: "'Fakt', system-ui, sans-serif",
+            fontFamily: "'Inter', system-ui, sans-serif",
           }}
         >
           ← Back to Sign In

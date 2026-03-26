@@ -41,7 +41,7 @@ export function StatsCards({ filterParams }: StatsCardsProps) {
           <div style={{ fontSize: 11, color: C.slate, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
             {card.label}
           </div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: card.color, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: card.color, fontFamily: "'Inter', system-ui, sans-serif" }}>
             {card.value}
           </div>
         </div>

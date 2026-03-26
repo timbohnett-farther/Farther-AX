@@ -54,7 +54,7 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
           background: C.cardBg, color: value ? C.dark : C.slate,
           fontSize: 13, textAlign: 'left', cursor: 'pointer',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          fontFamily: "'Fakt', system-ui, sans-serif",
+          fontFamily: "'Inter', system-ui, sans-serif",
         }}
       >
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -82,7 +82,7 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
                 width: '100%', padding: '7px 10px', borderRadius: 6,
                 border: `1px solid ${C.border}`, background: C.white,
                 color: C.dark, fontSize: 13, outline: 'none',
-                fontFamily: "'Fakt', system-ui, sans-serif",
+                fontFamily: "'Inter', system-ui, sans-serif",
               }}
             />
           </div>
@@ -95,7 +95,7 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
                 background: !value ? 'rgba(78,112,130,0.08)' : 'transparent',
                 color: !value ? C.teal : C.dark, fontSize: 13, cursor: 'pointer',
                 fontWeight: !value ? 600 : 400,
-                fontFamily: "'Fakt', system-ui, sans-serif",
+                fontFamily: "'Inter', system-ui, sans-serif",
               }}
               onMouseEnter={e => { (e.target as HTMLButtonElement).style.background = 'rgba(78,112,130,0.06)'; }}
               onMouseLeave={e => { (e.target as HTMLButtonElement).style.background = !value ? 'rgba(78,112,130,0.08)' : 'transparent'; }}
@@ -111,7 +111,7 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
                   background: value === opt.name ? 'rgba(78,112,130,0.08)' : 'transparent',
                   color: value === opt.name ? C.teal : C.dark, fontSize: 13, cursor: 'pointer',
                   fontWeight: value === opt.name ? 600 : 400,
-                  fontFamily: "'Fakt', system-ui, sans-serif",
+                  fontFamily: "'Inter', system-ui, sans-serif",
                 }}
                 onMouseEnter={e => { (e.target as HTMLButtonElement).style.background = 'rgba(78,112,130,0.06)'; }}
                 onMouseLeave={e => { (e.target as HTMLButtonElement).style.background = value === opt.name ? 'rgba(78,112,130,0.08)' : 'transparent'; }}

@@ -23,6 +23,36 @@
 
 ---
 
+## NON-NEGOTIABLE RULES
+
+These rules are absolute and must be followed at all times without exception.
+
+### 1. AX Project Work Only — No Repo Switching
+This repo is exclusively for AX Command Center work. While working on AX items, you **cannot** switch to another repository. If a task does not belong to AX, refuse it and inform the user which repo it belongs in. Do not attempt cross-repo work from here under any circumstances.
+
+### 2. Update the CHANGELOG on Every Push
+Every single push must include an updated `CHANGELOG.md` entry. No exceptions. Document what changed, why, which files were affected, and the commit SHA. This is not optional — a push without a CHANGELOG update is an incomplete push.
+
+### 3. Maintain the TODO Log — Auto-Proceed Without Asking
+`TODO.md` is the active task queue. When the user adds items (by saying "todo" or listing tasks), add them to `TODO.md` immediately. After completing any task, check `TODO.md` and **automatically proceed to the next item without asking permission**. Work through the list in priority order. Never ask "what's next?" if there are items on the TODO list.
+
+### 4. Optimize End-User Experience at All Times
+Always prioritize the end-user experience. This means:
+- **Working connections** — every API call, link, and data source must function correctly
+- **Accurate calculations** — all numbers, scores, and metrics must compute properly
+- **Working pages** — no broken routes, no dead ends, no error states left unhandled
+- **Fast load times** — load times kill user engagement. Optimize data fetching, use proper loading states, leverage SWR caching, and minimize unnecessary re-renders. Slow pages are unacceptable.
+
+### 5. Follow the Brand Guide — Uniform Branding Everywhere
+All pages must follow the Farther brand guide consistently. This includes:
+- **Design tokens** from `lib/design-tokens.ts` — use them, don't hardcode colors or spacing
+- **Typography** — Follow `Font-Gold-Standard.md` exactly. **Inter** is the only approved sans-serif font. **DM Mono** is the only approved monospace font. All financial numbers must use `tabular-nums` and right-align. See the full guide for scale, weights, and component patterns.
+- **Tailwind utilities** only — no inline styles, no CSS modules
+- **Tremor React** components for data visualization and UI elements
+- **Consistent styling** across every page — no page should look different from the rest of the app
+
+---
+
 ## GitHub & Deployment
 
 | Field | Value |
@@ -46,7 +76,7 @@ Next.js 14.2, React 18, TypeScript 5.9, Tailwind CSS 3.4, Tremor React 3.18, SWR
 - **Tailwind utilities** + design tokens (`lib/design-tokens.ts`)
 - **Tremor React** components (`components/ui/`)
 - **NO inline styles, NO CSS modules**
-- Fonts: `font-serif` (ABC Arizona Text) for headers, `font-sans` (Fakt) for body
+- **Typography**: Follow `Font-Gold-Standard.md` — **Inter** (sans-serif), **DM Mono** (monospace). All financial numbers use `tabular-nums` + right-align. No other fonts permitted.
 
 ---
 

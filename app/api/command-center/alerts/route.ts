@@ -209,157 +209,199 @@ export async function GET(req: NextRequest) {
 
   const alerts: Alert[] = [];
 
-  // Run all data fetches in parallel
-  const [deals, sentimentResult, managedAccounts] = await Promise.all([
-    fetchOnboardingDeals(),
-    pool.query(
-      `SELECT DISTINCT ON (h.deal_id)
-         h.deal_id,
-         s.deal_name,
-         h.tier AS current_tier,
-         h.composite_score AS current_score,
-         h.scored_at AS changed_at,
-         prev.tier AS previous_tier,
-         prev.composite_score AS previous_score
-       FROM advisor_sentiment_history h
-       JOIN advisor_sentiment s ON s.deal_id = h.deal_id
-       LEFT JOIN LATERAL (
-         SELECT tier, composite_score
-         FROM advisor_sentiment_history
-         WHERE deal_id = h.deal_id AND scored_at < h.scored_at
-         ORDER BY scored_at DESC
-         LIMIT 1
-       ) prev ON TRUE
-       WHERE prev.tier IS NOT NULL
-       ORDER BY h.deal_id, h.scored_at DESC`
-    ),
-    fetchManagedAccountsByAdvisor(),
-  ]);
+  // Run all data fetches in parallel with error isolation
+  let deals: HubSpotDeal[] = [];
+  let sentimentRows: any[] = [];
+  let managedAccounts: Record<string, { totalMv: number; count: number }> = {};
+
+  try {
+    const [dealsResult, sentimentResult, managedResult] = await Promise.allSettled([
+      fetchOnboardingDeals(),
+      pool.query(
+        `SELECT DISTINCT ON (h.deal_id)
+           h.deal_id,
+           s.deal_name,
+           h.tier AS current_tier,
+           h.composite_score AS current_score,
+           h.scored_at AS changed_at,
+           prev.tier AS previous_tier,
+           prev.composite_score AS previous_score
+         FROM advisor_sentiment_history h
+         JOIN advisor_sentiment s ON s.deal_id = h.deal_id
+         LEFT JOIN LATERAL (
+           SELECT tier, composite_score
+           FROM advisor_sentiment_history
+           WHERE deal_id = h.deal_id AND scored_at < h.scored_at
+           ORDER BY scored_at DESC
+           LIMIT 1
+         ) prev ON TRUE
+         WHERE prev.tier IS NOT NULL
+         ORDER BY h.deal_id, h.scored_at DESC`
+      ),
+      fetchManagedAccountsByAdvisor(),
+    ]);
+
+    deals = dealsResult.status === 'fulfilled' ? dealsResult.value : [];
+    sentimentRows = sentimentResult.status === 'fulfilled' ? sentimentResult.value.rows : [];
+    managedAccounts = managedResult.status === 'fulfilled' ? managedResult.value : {};
+
+    if (dealsResult.status === 'rejected') {
+      console.error('[Alerts] Failed to fetch deals:', dealsResult.reason);
+    }
+    if (sentimentResult.status === 'rejected') {
+      console.error('[Alerts] Failed to fetch sentiment:', sentimentResult.reason);
+    }
+    if (managedResult.status === 'rejected') {
+      console.error('[Alerts] Failed to fetch managed accounts:', managedResult.reason);
+    }
+  } catch (err) {
+    console.error('[Alerts] Critical error in data fetch:', err);
+    return NextResponse.json({
+      total: 0,
+      counts: { task_overdue: 0, task_critical: 0, hard_gates: 0, sentiment_drop: 0, aum_behind: 0, aum_critical: 0 },
+      alerts: [],
+      error: 'Failed to fetch alert data',
+    });
+  }
+
+  // ── Phase labels ────────────────────────────────────────────────────────
+  const PHASE_LABELS: Record<string, string> = {
+    'phase_0': 'Sales Handoff',
+    'phase_1': 'Post-Signing Prep',
+    'phase_2': 'Onboarding Kick-Off',
+    'phase_3': 'Pre-Launch Build',
+    'phase_4': 'T-7 Final Countdown',
+    'phase_5': 'Launch Day',
+    'phase_6': 'Active Transition',
+    'phase_7': 'Graduation & Handoff',
+  };
 
   // ── 1. Task overdue alerts (using v2 system) ──────────────────────────────
 
+  // Batch-fetch ALL assignments and task states in 2 queries instead of 2 per deal
+  const dealIds = deals.filter(d => !d.properties.dealname?.toLowerCase().includes('test')).map(d => d.id);
+
+  let allAssignmentsMap: Record<string, Record<string, ResponsiblePerson>> = {};
+  let allTasksMap: Record<string, Record<string, any>> = {};
+
+  if (dealIds.length > 0) {
+    try {
+      const [allAssignments, allTasks] = await Promise.all([
+        pool.query(
+          `SELECT aa.deal_id, aa.role, tm.name, tm.email
+           FROM advisor_assignments aa
+           JOIN team_members tm ON aa.member_id = tm.id
+           WHERE aa.deal_id = ANY($1) AND tm.active = TRUE`,
+          [dealIds]
+        ),
+        pool.query(
+          `SELECT deal_id, task_key, completed, completed_at, due_date
+           FROM onboarding_tasks
+           WHERE deal_id = ANY($1) AND (is_legacy IS NULL OR is_legacy = FALSE)`,
+          [dealIds]
+        ),
+      ]);
+
+      for (const row of allAssignments.rows) {
+        if (!allAssignmentsMap[row.deal_id]) allAssignmentsMap[row.deal_id] = {};
+        allAssignmentsMap[row.deal_id][row.role] = { name: row.name, email: row.email, role: row.role };
+      }
+
+      for (const row of allTasks.rows) {
+        if (!allTasksMap[row.deal_id]) allTasksMap[row.deal_id] = {};
+        allTasksMap[row.deal_id][row.task_key] = row;
+      }
+    } catch (err) {
+      console.error('[Alerts] Failed to batch-fetch assignments/tasks:', err);
+    }
+  }
+
   for (const deal of deals) {
-    const name = deal.properties.dealname ?? 'Unknown';
-    if (name.toLowerCase().includes('test')) continue;
+    try {
+      const name = deal.properties.dealname ?? 'Unknown';
+      if (name.toLowerCase().includes('test')) continue;
 
-    const day0_date = getDay0Date({
-      closedate: deal.properties.closedate ?? undefined,
-      dealstage: deal.properties.dealstage ?? undefined,
-    });
-
-    const launch_date = getLaunchDate({
-      actual_launch_date: deal.properties.actual_launch_date ?? undefined,
-      desired_start_date: deal.properties.desired_start_date ?? undefined,
-    });
-
-    // Fetch team assignments
-    const assignmentsResult = await pool.query(
-      `SELECT aa.role, tm.name, tm.email
-       FROM advisor_assignments aa
-       JOIN team_members tm ON aa.member_id = tm.id
-       WHERE aa.deal_id = $1 AND tm.active = TRUE`,
-      [deal.id]
-    );
-
-    const assignments: Record<string, ResponsiblePerson> = {};
-    for (const row of assignmentsResult.rows) {
-      assignments[row.role] = {
-        name: row.name,
-        email: row.email,
-        role: row.role,
-      };
-    }
-
-    // Fetch saved task states
-    const tasksResult = await pool.query(
-      `SELECT task_key, completed, completed_at, due_date
-       FROM onboarding_tasks
-       WHERE deal_id = $1 AND (is_legacy IS NULL OR is_legacy = FALSE)`,
-      [deal.id]
-    );
-
-    const saved: Record<string, any> = {};
-    for (const row of tasksResult.rows) {
-      saved[row.task_key] = row;
-    }
-
-    // Check each task for alerts
-    for (const task of TASKS) {
-      const dueDateResult = calculateDueDate({
-        timing: task.timing,
-        day0_date,
-        launch_date,
+      const day0_date = getDay0Date({
+        closedate: deal.properties.closedate ?? undefined,
+        dealstage: deal.properties.dealstage ?? undefined,
       });
 
-      const finalDueDate = saved[task.id]?.due_date || dueDateResult.due_date;
-      const taskStatus = calculateTaskStatus(
-        finalDueDate,
-        saved[task.id]?.completed ?? false,
-        saved[task.id]?.completed_at ?? null
-      );
-
-      // Only include tasks that need alerts
-      if (!taskStatus.needsAlert && !taskStatus.needsDirectorAlert) {
-        continue;
-      }
-
-      const responsiblePerson = getTaskResponsiblePerson(task.owner, assignments);
-
-      // Apply filters
-      if (roleFilter && responsiblePerson?.role !== roleFilter) {
-        continue;
-      }
-
-      if (emailFilter && responsiblePerson?.email !== emailFilter) {
-        continue;
-      }
-
-      if (severityFilter === 'critical' && taskStatus.status !== 'critical') {
-        continue;
-      }
-
-      if (severityFilter === 'overdue' && taskStatus.status !== 'overdue' && taskStatus.status !== 'critical') {
-        continue;
-      }
-
-      if (!responsiblePerson || !finalDueDate) {
-        continue;
-      }
-
-      // Get phase label
-      const PHASE_LABELS: Record<string, string> = {
-        'phase_0': 'Sales Handoff',
-        'phase_1': 'Post-Signing Prep',
-        'phase_2': 'Onboarding Kick-Off',
-        'phase_3': 'Pre-Launch Build',
-        'phase_4': 'T-7 Final Countdown',
-        'phase_5': 'Launch Day',
-        'phase_6': 'Active Transition',
-        'phase_7': 'Graduation & Handoff',
-      };
-
-      alerts.push({
-        type: taskStatus.status === 'critical' ? 'task_critical' : 'task_overdue',
-        deal_id: deal.id,
-        deal_name: name,
-        task_key: task.id,  // Changed from task_id
-        task_label: task.label,
-        phase: task.phase,
-        phase_label: PHASE_LABELS[task.phase] || task.phase,  // Added
-        owner: task.owner,
-        due_date: finalDueDate,
-        days_overdue: Math.abs(taskStatus.daysRemaining || 0),
-        is_hard_gate: task.is_hard_gate,
-        responsible_person: responsiblePerson,
-        countdown_display: taskStatus.displayText,
-        priority: taskStatus.status === 'critical' ? 'critical' : 'high',
+      const launch_date = getLaunchDate({
+        actual_launch_date: deal.properties.actual_launch_date ?? undefined,
+        desired_start_date: deal.properties.desired_start_date ?? undefined,
       });
+
+      const assignments = allAssignmentsMap[deal.id] || {};
+      const saved = allTasksMap[deal.id] || {};
+
+      // Check each task for alerts
+      for (const task of TASKS) {
+        const dueDateResult = calculateDueDate({
+          timing: task.timing,
+          day0_date,
+          launch_date,
+        });
+
+        const finalDueDate = saved[task.id]?.due_date || dueDateResult.due_date;
+        const taskStatus = calculateTaskStatus(
+          finalDueDate,
+          saved[task.id]?.completed ?? false,
+          saved[task.id]?.completed_at ?? null
+        );
+
+        // Only include tasks that need alerts
+        if (!taskStatus.needsAlert && !taskStatus.needsDirectorAlert) {
+          continue;
+        }
+
+        const responsiblePerson = getTaskResponsiblePerson(task.owner, assignments);
+
+        // Apply filters — skip if filtering by role/email and no match
+        if (roleFilter && responsiblePerson?.role !== roleFilter) {
+          continue;
+        }
+        if (emailFilter && responsiblePerson?.email !== emailFilter) {
+          continue;
+        }
+        if (severityFilter === 'critical' && taskStatus.status !== 'critical') {
+          continue;
+        }
+        if (severityFilter === 'overdue' && taskStatus.status !== 'overdue' && taskStatus.status !== 'critical') {
+          continue;
+        }
+
+        // Still show alert even if no responsible person assigned —
+        // unassigned overdue tasks are MORE urgent, not less
+        if (!finalDueDate) {
+          continue;
+        }
+
+        alerts.push({
+          type: taskStatus.status === 'critical' ? 'task_critical' : 'task_overdue',
+          deal_id: deal.id,
+          deal_name: name,
+          task_key: task.id,
+          task_label: task.label,
+          phase: task.phase,
+          phase_label: PHASE_LABELS[task.phase] || task.phase,
+          owner: task.owner,
+          due_date: finalDueDate,
+          days_overdue: Math.abs(taskStatus.daysRemaining || 0),
+          is_hard_gate: task.is_hard_gate,
+          responsible_person: responsiblePerson ?? { name: 'Unassigned', email: '', role: task.owner },
+          countdown_display: taskStatus.displayText,
+          priority: taskStatus.status === 'critical' ? 'critical' : 'high',
+        });
+      }
+    } catch (err) {
+      console.error(`[Alerts] Error processing deal ${deal.id}:`, err);
+      // Continue processing other deals even if one fails
     }
   }
 
   // ── 2. Sentiment drop alerts ──────────────────────────────────────────────
 
-  for (const row of sentimentResult.rows) {
+  for (const row of sentimentRows) {
     const prevRank = TIER_RANK[row.previous_tier] ?? 3;
     const currRank = TIER_RANK[row.current_tier] ?? 3;
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { aiComplete } from '@/lib/ai-router';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
@@ -62,12 +62,6 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  // Lazy-initialize at request time so build doesn't fail without the env var
-  const xai = new OpenAI({
-    apiKey: process.env.GROK_API_KEY!,
-    baseURL: 'https://api.x.ai/v1',
-  });
-
   const { messages } = await req.json() as { messages: Array<{ role: string; content: string }> };
 
   // Fetch live pipeline data for context
@@ -108,20 +102,18 @@ ${upcoming.map(d => `- ${d.name}: target ${d.targetLaunch}, ${d.aum ?? 'AUM unkn
 Be concise, factual, and action-oriented. Format responses with markdown when helpful. Reference specific advisor names and data.`;
 
   try {
-    const completion = await xai.chat.completions.create({
-      model: 'grok-3-latest',
+    const result = await aiComplete({
+      task: 'chat',
       messages: [
         { role: 'system', content: systemPrompt },
         ...messages as Array<{ role: 'user' | 'assistant'; content: string }>,
       ],
-      max_tokens: 1500,
-      temperature: 0.3,
+      maxTokens: 1500,
     });
 
-    const reply = completion.choices[0]?.message?.content ?? 'No response generated.';
-    return NextResponse.json({ reply });
+    return NextResponse.json({ reply: result.content, model: result.model });
   } catch (err) {
-    console.error('[grok ai]', err);
+    console.error('[ai chat]', err);
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: message }, { status: 500 });
   }

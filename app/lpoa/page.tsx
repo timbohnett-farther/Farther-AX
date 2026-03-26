@@ -69,7 +69,7 @@ export default function LPOAPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'Inter', system-ui, sans-serif" }}
             >
               At a Glance
             </h2>
@@ -90,7 +90,7 @@ export default function LPOAPage() {
                 </p>
                 <p
                   className="font-serif text-xl leading-snug"
-                  style={{ color: "#1d7682", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+                  style={{ color: "#1d7682", fontFamily: "'Inter', system-ui, sans-serif" }}
                 >
                   {card.value}
                 </p>
@@ -105,7 +105,7 @@ export default function LPOAPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'Inter', system-ui, sans-serif" }}
             >
               How LPOA Works
             </h2>
@@ -166,7 +166,7 @@ export default function LPOAPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'Inter', system-ui, sans-serif" }}
             >
               Custodian Availability
             </h2>
@@ -188,7 +188,7 @@ export default function LPOAPage() {
                   </div>
                   <h3
                     className="font-serif text-lg"
-                    style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+                    style={{ color: "#FAF7F2", fontFamily: "'Inter', system-ui, sans-serif" }}
                   >
                     {c.name}
                   </h3>
@@ -207,7 +207,7 @@ export default function LPOAPage() {
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: "#1d7682" }} />
             <h2
               className="font-serif text-2xl"
-              style={{ color: "#FAF7F2", fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+              style={{ color: "#FAF7F2", fontFamily: "'Inter', system-ui, sans-serif" }}
             >
               Key Considerations
             </h2>

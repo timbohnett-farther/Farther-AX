@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { aiComplete } from '@/lib/ai-router';
 
 type SummaryType = 'briefing' | 'activities' | 'emails' | 'engagements';
 
@@ -120,29 +120,30 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const xai = new OpenAI({
-    apiKey: process.env.GROK_API_KEY!,
-    baseURL: 'https://api.x.ai/v1',
-  });
-
   const body = await req.json();
   const summaryType: SummaryType = body.summaryType || 'briefing';
   const systemPrompt = SYSTEM_PROMPTS[summaryType] || SYSTEM_PROMPTS.briefing;
   const context = buildContext(body, summaryType);
 
+  // Map summary types to AI task types for optimal model routing
+  const taskMap: Record<SummaryType, 'briefing' | 'activities' | 'emails' | 'engagements'> = {
+    briefing: 'briefing',
+    activities: 'activities',
+    emails: 'emails',
+    engagements: 'engagements',
+  };
+
   try {
-    const completion = await xai.chat.completions.create({
-      model: 'grok-3-latest',
+    const result = await aiComplete({
+      task: taskMap[summaryType] || 'briefing',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: context },
       ],
-      max_tokens: 800,
-      temperature: 0.3,
+      maxTokens: 800,
     });
 
-    const summary = completion.choices[0]?.message?.content ?? 'Unable to generate summary.';
-    return NextResponse.json({ summary, type: summaryType });
+    return NextResponse.json({ summary: result.content, type: summaryType, model: result.model });
   } catch (err) {
     console.error('[ria-hub summary]', err);
     const message = err instanceof Error ? err.message : String(err);

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { aiComplete } from '@/lib/ai-router';
 
 const EXTRACTION_PROMPT = `You are a data extraction assistant for Farther Wealth Management's advisor recruiting pipeline.
 You will be given the text of a recruiter's pinned note about a financial advisor candidate.
@@ -154,22 +154,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Note body is empty after cleaning' }, { status: 400 });
     }
 
-    const xai = new OpenAI({
-      apiKey: process.env.GROK_API_KEY!,
-      baseURL: 'https://api.x.ai/v1',
-    });
-
-    const completion = await xai.chat.completions.create({
-      model: 'grok-3-latest',
+    const result = await aiComplete({
+      task: 'note_parsing',
       messages: [
         { role: 'system', content: EXTRACTION_PROMPT },
         { role: 'user', content: `Extract all data from this recruiter pinned note:\n\n${cleanText}` },
       ],
-      temperature: 0.1,
-      max_tokens: 4096,
+      maxTokens: 4096,
     });
 
-    const raw = completion.choices[0]?.message?.content ?? '';
+    const raw = result.content;
 
     // Parse the JSON response — handle potential markdown wrapping
     let parsed;

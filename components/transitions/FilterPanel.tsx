@@ -50,7 +50,7 @@ export function FilterPanel({ filters, onChange, onReset }: FilterPanelProps) {
   const selectStyle: React.CSSProperties = {
     padding: '9px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
     fontSize: 13, background: C.cardBg, color: C.dark, cursor: 'pointer',
-    outline: 'none', fontFamily: "'Fakt', system-ui, sans-serif",
+    outline: 'none', fontFamily: "'Inter', system-ui, sans-serif",
     minWidth: 140,
   };
 
@@ -111,7 +111,7 @@ export function FilterPanel({ filters, onChange, onReset }: FilterPanelProps) {
         style={{
           padding: '9px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
           fontSize: 13, background: C.cardBg, color: C.dark, outline: 'none',
-          fontFamily: "'Fakt', system-ui, sans-serif", minWidth: 180,
+          fontFamily: "'Inter', system-ui, sans-serif", minWidth: 180,
         }}
       />
 
@@ -122,7 +122,7 @@ export function FilterPanel({ filters, onChange, onReset }: FilterPanelProps) {
           style={{
             padding: '9px 14px', borderRadius: 8, border: `1px solid ${C.border}`,
             background: 'transparent', color: C.slate, fontSize: 12, cursor: 'pointer',
-            fontFamily: "'Fakt', system-ui, sans-serif",
+            fontFamily: "'Inter', system-ui, sans-serif",
           }}
         >
           Reset Filters

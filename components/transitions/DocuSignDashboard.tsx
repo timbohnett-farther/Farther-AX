@@ -66,7 +66,7 @@ export function DocuSignDashboard({ advisorFilter }: DocuSignDashboardProps) {
         ].map(card => (
           <div key={card.label} style={{ background: C.cardBg, borderRadius: 10, padding: '16px 18px', border: `1px solid ${C.border}` }}>
             <div style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{card.label}</div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: card.color, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{card.value}</div>
+            <div style={{ fontSize: 24, fontWeight: 700, color: card.color, fontFamily: "'Inter', system-ui, sans-serif" }}>{card.value}</div>
           </div>
         ))}
       </div>
