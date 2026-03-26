@@ -6,6 +6,23 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Sidebar Light Mode Background — 2026-03-26
+
+**What**: Changed sidebar background from black to white in light mode.
+
+**Problem**: Sidebar was using `bg-charcoal-800` (black #1a1a1a) in light mode.
+
+**Solution**: Changed to `bg-white` for light mode, keeping `dark:bg-surface` for dark mode.
+
+**Status**: ✅ Complete
+
+**Files**:
+- `components/Sidebar.tsx` — Updated aside element light mode background class
+
+**Commit**: `af06d40`
+
+---
+
 ## [Completed] Fix Sidebar Dark Mode Background — 2026-03-26
 
 **What**: Changed sidebar background from grey to black in dark mode.
