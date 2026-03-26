@@ -255,24 +255,16 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Dark mode background - blue texture */
+/* Dark mode background */
 html.dark body {
-  background-image: url('/blue.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: repeat;
-  background-attachment: fixed;
+  background-color: var(--color-surface);
   font-family: var(--font-sans);
   color: var(--color-text-primary);
 }
 
-/* Light mode background - cream texture */
+/* Light mode background */
 html:not(.dark) body {
-  background-image: url('/cream.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: repeat;
-  background-attachment: fixed;
+  background-color: #F8F4F0;
   font-family: var(--font-sans);
   color: var(--color-text-primary);
 }
