@@ -114,6 +114,11 @@ const config: Config = {
           900: 'var(--color-neutral-900)',
           DEFAULT: 'var(--color-neutral-500)',
         },
+        accent: {
+          1: 'var(--color-accent-1)',  // Terracotta/brown
+          2: 'var(--color-accent-2)',  // Light blue/grey
+          3: 'var(--color-accent-3)',  // Beige/cream
+        },
 
         // ── LEGACY TOKENS (Backward Compatibility) ────────────────────
         charcoal: {

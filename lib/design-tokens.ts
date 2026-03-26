@@ -101,6 +101,11 @@ export const getThemeColors = (isDark: boolean) => ({
   teal: '#466F81',
   lightBlue: '#93B6C4',
 
+  // Accent colors
+  accent1: '#9B766A',  // Terracotta/brown
+  accent2: '#D2DFE6',  // Light blue/grey
+  accent3: '#E1D2C5',  // Beige/cream
+
   // Status colors with backgrounds
   green: '#10b981',
   greenBg: isDark ? 'rgba(16,185,129,0.15)' : 'rgba(16,185,129,0.08)',

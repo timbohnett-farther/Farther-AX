@@ -27,6 +27,11 @@
   --color-brand-800: #2d3e47;
   --color-brand-900: #1a2830;
 
+  /* ── Accent Colors ──────────────────────────────────────────────────── */
+  --color-accent-1: #9B766A;      /* Terracotta/brown */
+  --color-accent-2: #D2DFE6;      /* Light blue/grey */
+  --color-accent-3: #E1D2C5;      /* Beige/cream */
+
   /* ── Surface Colors (Backgrounds) ───────────────────────────────────── */
   --color-surface: #111111;              /* Main background */
   --color-surface-muted: #1a1a1a;        /* Secondary background */
