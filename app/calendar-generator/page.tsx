@@ -62,7 +62,7 @@ function AttendeeRow({
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
       <div style={{ width: 110, flexShrink: 0 }}>
-        <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(250,247,242,0.5)", fontFamily: "'Fakt', sans-serif" }}>
+        <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(250,247,242,0.5)", fontFamily: "'Inter', sans-serif" }}>
           {label}
           {required && <span style={{ color: "#c0392b" }}> *</span>}
         </span>
@@ -81,7 +81,7 @@ function AttendeeRow({
           color: "#FAF7F2",
           fontSize: 13,
           outline: "none",
-          fontFamily: "'Fakt', sans-serif",
+          fontFamily: "'Inter', sans-serif",
         }}
       />
       <input
@@ -98,7 +98,7 @@ function AttendeeRow({
           color: "#FAF7F2",
           fontSize: 13,
           outline: "none",
-          fontFamily: "'Fakt', sans-serif",
+          fontFamily: "'Inter', sans-serif",
         }}
       />
     </div>
@@ -218,7 +218,7 @@ export default function CalendarGeneratorPage() {
     letterSpacing: "0.07em",
     color: "#1d7682",
     marginBottom: 10,
-    fontFamily: "'Fakt', sans-serif",
+    fontFamily: "'Inter', sans-serif",
   };
 
   const addBtn: React.CSSProperties = {
@@ -230,7 +230,7 @@ export default function CalendarGeneratorPage() {
     border: "none",
     padding: 0,
     cursor: "pointer",
-    fontFamily: "'Fakt', sans-serif",
+    fontFamily: "'Inter', sans-serif",
   };
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -252,7 +252,7 @@ export default function CalendarGeneratorPage() {
         >
           <h2
             className="text-xl font-bold mb-5"
-            style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: "#FAF7F2" }}
+            style={{ fontFamily: "'Inter', system-ui, sans-serif", color: "#FAF7F2" }}
           >
             Advisor Details
           </h2>
@@ -308,7 +308,7 @@ export default function CalendarGeneratorPage() {
         >
           <h2
             className="text-xl font-bold mb-5"
-            style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: "#FAF7F2" }}
+            style={{ fontFamily: "'Inter', system-ui, sans-serif", color: "#FAF7F2" }}
           >
             Team &amp; Attendees
           </h2>
@@ -408,7 +408,7 @@ export default function CalendarGeneratorPage() {
             >
               <h2
                 className="text-xl font-bold"
-                style={{ fontFamily: "'ABC Arizona Text', Georgia, serif", color: "#FAF7F2" }}
+                style={{ fontFamily: "'Inter', system-ui, sans-serif", color: "#FAF7F2" }}
               >
                 {advisorName ? `${advisorName} — Meeting Schedule` : "Meeting Schedule"}
               </h2>

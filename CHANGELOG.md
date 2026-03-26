@@ -6,6 +6,33 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Font Migration — Inter + DM Mono — 2026-03-26
+
+**What**: Migrated entire codebase from ABC Arizona Text/Fakt to Inter/DM Mono per Font Gold Standard.
+
+**Scope**:
+- Replaced all `ABC Arizona Text` and `Fakt` font references with `Inter` across 24 files
+- Updated `globals.css`: removed old @font-face declarations, updated CSS custom properties, added global `tabular-nums` rule for financial data
+- Updated `lib/design-tokens.ts`: typography helpers now use Inter/DM Mono
+- Updated `lib/theme.ts`: mono font changed from SF Mono/Fira Code to DM Mono
+- Removed duplicate light mode CSS block in globals.css
+- Added Google Fonts preconnect + stylesheet links in layout.tsx (prior commit)
+
+**Status**: ✅ Complete
+
+**Files** (24 files):
+- `app/globals.css` — Font vars, @font-face cleanup, tabular-nums rule
+- `lib/design-tokens.ts` — Typography helpers updated
+- `lib/theme.ts` — Mono font updated to DM Mono
+- `app/command-center/page.tsx`, `app/command-center/advisor-hub/page.tsx`, `app/command-center/advisor/[id]/page.tsx`, `app/command-center/transitions/page.tsx` — Inline fontFamily refs
+- `app/auth/error/page.tsx`, `app/auth/signin/page.tsx` — Font refs
+- `app/breakaway-process/page.tsx`, `app/breakaway/page.tsx`, `app/calendar-generator/page.tsx` — Font refs
+- `app/forms/tech-intake/[token]/page.tsx`, `app/forms/u4-2b/[token]/page.tsx` — Font refs
+- `app/independent-ria/page.tsx`, `app/knowledge-check/page.tsx`, `app/lpoa/page.tsx`, `app/master-merge/page.tsx`, `app/no-to-low-aum/page.tsx`, `app/repaper-acat/page.tsx` — Font refs
+- `components/transitions/DocuSignDashboard.tsx`, `components/transitions/FilterPanel.tsx`, `components/transitions/SearchSelect.tsx`, `components/transitions/StatsCards.tsx` — Font refs
+
+---
+
 ## [In Progress] Alerts Fix + Transitions SWAT Plan — 2026-03-26
 
 **What**: Fixed alerts API reliability and created Transitions SWAT plan.

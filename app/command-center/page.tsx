@@ -146,7 +146,7 @@ function SummaryCard({ label, value, sub, accent, icon, iconColor, onClick }: { 
         <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: iconColor || (accent ? C.white : C.slate) }}>{icon}</span>
       )}
       <p style={{ fontSize: 11, color: accent ? 'rgba(255,255,255,0.7)' : C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{label}</p>
-      <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>{value}</p>
+      <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>{value}</p>
       {sub && <p style={{ fontSize: 12, color: accent ? 'rgba(255,255,255,0.6)' : C.slate, marginTop: 4 }}>{sub}</p>}
     </div>
   );
@@ -294,7 +294,7 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }
   const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   return (
     <div style={{ marginBottom: 16 }}>
-      <h3 style={{ fontSize: 15, fontWeight: 600, color: C.dark, fontFamily: "'Fakt', system-ui, sans-serif", marginBottom: subtitle ? 4 : 0 }}>{title}</h3>
+      <h3 style={{ fontSize: 15, fontWeight: 600, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: subtitle ? 4 : 0 }}>{title}</h3>
       {subtitle && <p style={{ fontSize: 12, color: C.slate }}>{subtitle}</p>}
     </div>
   );
@@ -306,7 +306,7 @@ function ComplexityBadge({ score, tier, tierColor }: { score: number; tier: stri
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }} title={`${tier} complexity — Score: ${score}/105`}>
       <span style={{
         fontSize: 12, fontWeight: 700, color: tierColor,
-        fontFamily: "'ABC Arizona Text', Georgia, serif",
+        fontFamily: "'Inter', system-ui, sans-serif",
       }}>
         {score}
       </span>
@@ -377,7 +377,7 @@ function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[
         {/* Header */}
         <div style={{ padding: '20px 24px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
           <div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 2 }}>{title}</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 2 }}>{title}</h3>
             <p style={{ fontSize: 12, color: C.slate }}>{deals.length} deals · {formatAUM(deals.reduce((s, d) => s + getAUM(d), 0))} total AUM</p>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.slate, fontSize: 20, cursor: 'pointer', padding: '4px 8px', borderRadius: 4 }}>✕</button>
@@ -639,7 +639,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           <span style={{ fontSize: 12, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
           <span style={{ fontSize: 11, color: C.slate }}>{count} launched</span>
         </div>
-        <div style={{ fontSize: 24, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 2 }}>
+        <div style={{ fontSize: 24, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 2 }}>
           {formatAUM(aum)}
         </div>
         <div style={{ fontSize: 11, color: C.slate, marginBottom: 10 }}>
@@ -686,7 +686,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
         {/* Header row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
           <div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 4 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 4 }}>
               2026 Launch Goal Tracker
             </h3>
             <p style={{ fontSize: 12, color: C.slate }}>
@@ -694,7 +694,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             </p>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 32, fontWeight: 700, color: a.ytdOnTrack ? C.teal : C.red, fontFamily: "'ABC Arizona Text', Georgia, serif", lineHeight: 1 }}>
+            <div style={{ fontSize: 32, fontWeight: 700, color: a.ytdOnTrack ? C.teal : C.red, fontFamily: "'Inter', system-ui, sans-serif", lineHeight: 1 }}>
               {formatAUM(a.ytdAUM)}
             </div>
             <div style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
@@ -809,7 +809,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             >
               <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: '#4E7082' }}>✦</span>
               <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Sentiment Tracking</p>
-              <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+              <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {scores.length > 0 ? `${scores.length}` : '—'}
               </p>
               <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
@@ -846,7 +846,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             >
               <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: C.teal }}>◎</span>
               <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Current vs Expected AUM</p>
-              <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+              <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {totalExpectedAum > 0 ? `${transferPct}%` : '—'}
               </p>
               <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
@@ -880,7 +880,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             >
               <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: C.green }}>$</span>
               <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>On Book Revenue</p>
-              <p style={{ fontSize: 28, fontWeight: 700, color: C.green, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+              <p style={{ fontSize: 28, fontWeight: 700, color: C.green, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {totalRevenue > 0 ? formatAUM(totalRevenue) : '—'}
               </p>
               <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
@@ -918,7 +918,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             >
               <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: C.gold }}>★</span>
               <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Expected Revenue</p>
-              <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+              <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {totalExpectedRevenue > 0 ? formatAUM(Math.round(totalExpectedRevenue)) : '—'}
               </p>
               <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
@@ -1084,7 +1084,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                 onMouseEnter={e => { if (item.deals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = item.color; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = `${item.color}30`; }}
               >
-                <div style={{ fontSize: 22, fontWeight: 700, color: item.color, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+                <div style={{ fontSize: 22, fontWeight: 700, color: item.color, fontFamily: "'Inter', system-ui, sans-serif" }}>
                   {item.count}
                 </div>
                 <div style={{ fontSize: 11, color: C.slate, marginTop: 2 }}>{item.label}</div>
@@ -1438,7 +1438,7 @@ function RecruitingTab() {
               style={{
                 flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
                 fontSize: 13, color: C.dark, background: C.white, outline: 'none',
-                fontFamily: "'Fakt', system-ui, sans-serif",
+                fontFamily: "'Inter', system-ui, sans-serif",
               }}
             />
             <button
@@ -1449,7 +1449,7 @@ function RecruitingTab() {
                 background: aiInput.trim() && !aiLoading ? C.teal : C.border,
                 color: aiInput.trim() && !aiLoading ? C.white : C.slate,
                 fontSize: 13, fontWeight: 600, cursor: aiInput.trim() && !aiLoading ? 'pointer' : 'default',
-                fontFamily: "'Fakt', system-ui, sans-serif",
+                fontFamily: "'Inter', system-ui, sans-serif",
               }}
             >
               Send
@@ -1486,7 +1486,7 @@ function RecruitingTab() {
                 marginBottom: -2, cursor: 'pointer', transition: 'all 150ms ease',
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? C.teal : C.slate, fontFamily: "'Fakt', system-ui, sans-serif" }}>
+              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? C.teal : C.slate, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {tab.label}
               </span>
               <span style={{
@@ -1513,7 +1513,7 @@ function RecruitingTab() {
             style={{
               width: '100%', padding: '8px 12px 8px 32px', borderRadius: 8,
               border: `1px solid ${C.border}`, fontSize: 13, color: C.dark,
-              background: C.cardBg, outline: 'none', fontFamily: "'Fakt', system-ui, sans-serif",
+              background: C.cardBg, outline: 'none', fontFamily: "'Inter', system-ui, sans-serif",
             }}
           />
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: C.slate }}>⌕</span>
@@ -1526,7 +1526,7 @@ function RecruitingTab() {
           style={{
             padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
             fontSize: 12, color: C.dark, background: C.cardBg, outline: 'none',
-            fontFamily: "'Fakt', system-ui, sans-serif", cursor: 'pointer',
+            fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer',
           }}
         >
           <option value="all">All Stages</option>
@@ -1542,7 +1542,7 @@ function RecruitingTab() {
           style={{
             padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
             fontSize: 12, color: C.dark, background: C.cardBg, outline: 'none',
-            fontFamily: "'Fakt', system-ui, sans-serif", cursor: 'pointer',
+            fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer',
           }}
         >
           <option value="all">All Firm Types</option>
@@ -1570,7 +1570,7 @@ function RecruitingTab() {
               padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer',
               background: isSelected ? C.teal : isLaunched ? 'rgba(29,118,130,0.22)' : isOfferAccepted ? 'rgba(245,158,11,0.2)' : 'rgba(91,106,113,0.15)',
               color: isSelected ? '#ffffff' : isLaunched ? '#5ec4cf' : isOfferAccepted ? '#fbbf24' : C.dark,
-              fontFamily: "'Fakt', system-ui, sans-serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
             }}>
               {STAGE_LABELS[stageId]} · {count}
             </button>
@@ -1931,7 +1931,7 @@ function RecruitingTab() {
                                 return 'rgba(91,106,113,0.25)';
                               })()}`,
                               cursor: 'pointer', outline: 'none',
-                              fontFamily: "'Fakt', system-ui, sans-serif",
+                              fontFamily: "'Inter', system-ui, sans-serif",
                             }}
                           >
                             {ACTIVE_STAGE_IDS.map(sid => (
@@ -2007,7 +2007,7 @@ function RecruitingTab() {
                             background: 'transparent', border: `1px solid transparent`,
                             borderRadius: 4, padding: '2px 4px', fontSize: 12,
                             color: C.slate, cursor: 'pointer', outline: 'none',
-                            fontFamily: "'Fakt', system-ui, sans-serif",
+                            fontFamily: "'Inter', system-ui, sans-serif",
                             width: 120,
                           }}
                           onFocus={e => { (e.target as HTMLInputElement).style.borderColor = C.teal; }}
@@ -2157,12 +2157,12 @@ export default function PipelineDashboard() {
   ];
 
   return (
-    <div style={{ padding: '40px 40px', minHeight: '100vh', fontFamily: "'Fakt', system-ui, sans-serif", maxWidth: '100vw', overflowX: 'hidden' }}>
+    <div style={{ padding: '40px 40px', minHeight: '100vh', fontFamily: "'Inter', system-ui, sans-serif", maxWidth: '100vw', overflowX: 'hidden' }}>
       {/* Header */}
       <div style={{ position: 'relative', marginBottom: 24 }}>
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />
         <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 6 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 6 }}>
             Pipeline Dashboard
           </h1>
           <p style={{ color: C.slate, fontSize: 14 }}>
@@ -2188,7 +2188,7 @@ export default function PipelineDashboard() {
               <span style={{
                 fontSize: 14, fontWeight: isActive ? 600 : 400,
                 color: isActive ? C.teal : C.slate,
-                fontFamily: "'Fakt', system-ui, sans-serif",
+                fontFamily: "'Inter', system-ui, sans-serif",
               }}>
                 {tab.label}
               </span>

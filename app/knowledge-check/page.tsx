@@ -174,7 +174,7 @@ export default function KnowledgeCheckPage() {
             >
               <span
                 className="text-white text-3xl font-bold"
-                style={{ fontFamily: "'ABC Arizona Text', Georgia, serif" }}
+                style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
               >
                 {score}/7
               </span>
@@ -183,7 +183,7 @@ export default function KnowledgeCheckPage() {
             <h2
               className="text-3xl font-bold mb-3"
               style={{
-                fontFamily: "'ABC Arizona Text', Georgia, serif",
+                fontFamily: "'Inter', system-ui, sans-serif",
                 color: "#FAF7F2",
               }}
             >
@@ -303,7 +303,7 @@ export default function KnowledgeCheckPage() {
               <h2
                 className="text-xl font-bold mb-6 leading-snug"
                 style={{
-                  fontFamily: "'ABC Arizona Text', Georgia, serif",
+                  fontFamily: "'Inter', system-ui, sans-serif",
                   color: "#FAF7F2",
                 }}
               >

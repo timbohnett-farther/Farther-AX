@@ -33,9 +33,9 @@ export const THEME = {
 
   typography: {
     fontFamily: {
-      serif: "'ABC Arizona Text', Georgia, serif",
-      sans: "'Fakt', system-ui, sans-serif",
-      mono: "'SF Mono', 'Fira Code', monospace",
+      serif: "'Inter', system-ui, sans-serif",
+      sans: "'Inter', system-ui, sans-serif",
+      mono: "'DM Mono', 'Courier New', Courier, monospace",
     },
     fontSize: {
       xs: '0.75rem',

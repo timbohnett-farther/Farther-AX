@@ -77,10 +77,10 @@ export const tw = {
   btnGhost: 'glass-btn-ghost',
 
   // Text styles (white at varying opacity)
-  heading1: 'text-4xl font-serif font-semibold text-white tracking-wide',
-  heading2: 'text-3xl font-serif font-semibold text-white tracking-wide',
-  heading3: 'text-2xl font-serif font-semibold text-white',
-  heading4: 'text-xl font-serif font-semibold text-white',
+  heading1: 'text-4xl font-bold text-white tracking-tight',
+  heading2: 'text-3xl font-bold text-white tracking-tight',
+  heading3: 'text-2xl font-semibold text-white',
+  heading4: 'text-xl font-semibold text-white',
   bodyLarge: 'text-lg text-white/60',
   bodyRegular: 'text-base text-white/60',
   bodySmall: 'text-sm text-white/60',
@@ -101,9 +101,9 @@ export const tw = {
 
 // Typography helpers
 export const typography = {
-  fontSerif: "'ABC Arizona Text', Georgia, serif",
-  fontSans: "'Fakt', system-ui, sans-serif",
-  fontMono: "'SF Mono', 'Fira Code', monospace",
+  fontSans: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+  fontMono: "'DM Mono', 'Courier New', Courier, monospace",
+  fontSerif: "'Inter', system-ui, sans-serif", // Inter is the only approved font
 } as const;
 
 // Spacing scale (matches Tailwind)

@@ -422,7 +422,7 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
               <div>
                 <p style={{
                   fontSize: 15, fontWeight: 600, color: C.dark,
-                  fontFamily: "'ABC Arizona Text', Georgia, serif", cursor: 'pointer',
+                  fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer',
                 }}>
                   {advisor.advisor_name}
                 </p>
@@ -458,7 +458,7 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
             {/* Expected AUM */}
             <p style={{
               fontSize: 14, fontWeight: 600, color: C.dark, textAlign: 'right',
-              fontFamily: "'ABC Arizona Text', Georgia, serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
             }}>
               {formatAUM(advisor.expected_aum)}
             </p>
@@ -487,7 +487,7 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
             {/* Current Revenue */}
             <p style={{
               fontSize: 13, fontWeight: 600, color: advisor.current_revenue ? C.green : C.slate,
-              textAlign: 'right', fontFamily: "'ABC Arizona Text', Georgia, serif",
+              textAlign: 'right', fontFamily: "'Inter', system-ui, sans-serif",
             }}>
               {advisor.current_revenue ? formatAUM(advisor.current_revenue) : '—'}
             </p>
@@ -740,7 +740,7 @@ export default function AdvisorHubPage() {
       <div style={{ position: 'relative', marginBottom: 32 }}>
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />
         <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: 32, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", marginBottom: 6 }}>
+          <h1 style={{ fontSize: 32, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 6 }}>
             Advisor Hub
           </h1>
           <p style={{ fontSize: 14, color: C.slate }}>
@@ -766,7 +766,7 @@ export default function AdvisorHubPage() {
             <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
               {card.label}
             </p>
-            <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+            <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>
               {card.value}
             </p>
             {card.sub && <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>{card.sub}</p>}
@@ -816,7 +816,7 @@ export default function AdvisorHubPage() {
             <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
               {card.label}
             </p>
-            <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+            <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>
               {card.value}
             </p>
             {card.sub && <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>{card.sub}</p>}
@@ -839,7 +839,7 @@ export default function AdvisorHubPage() {
                   color: isActive ? C.teal : C.slate, background: 'none', border: 'none',
                   borderBottom: isActive ? `2px solid ${C.teal}` : '2px solid transparent',
                   marginBottom: -2, cursor: 'pointer',
-                  fontFamily: "'Fakt', system-ui, sans-serif",
+                  fontFamily: "'Inter', system-ui, sans-serif",
                   transition: 'color 150ms ease, border-color 150ms ease',
                 }}
               >
@@ -867,7 +867,7 @@ export default function AdvisorHubPage() {
                 padding: '8px 16px', fontSize: 12, fontWeight: 600, borderRadius: 6,
                 background: batchScoring ? C.border : C.teal, color: C.white,
                 border: 'none', cursor: batchScoring ? 'not-allowed' : 'pointer',
-                fontFamily: "'Fakt', system-ui, sans-serif",
+                fontFamily: "'Inter', system-ui, sans-serif",
                 transition: 'background 150ms ease',
               }}
             >
@@ -882,7 +882,7 @@ export default function AdvisorHubPage() {
             style={{
               width: 240, padding: '10px 16px', fontSize: 13, borderRadius: 8,
               border: `1px solid ${C.border}`, background: C.cardBg, color: C.dark,
-              fontFamily: "'Fakt', system-ui, sans-serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
               outline: 'none',
             }}
           />
@@ -1059,7 +1059,7 @@ export default function AdvisorHubPage() {
                 {/* Name — clickable link */}
                 <Link href={`/command-center/advisor/${deal.id}`} style={{ textDecoration: 'none' }}>
                   <div>
-                    <p style={{ fontSize: 15, fontWeight: 600, color: C.dark, fontFamily: "'ABC Arizona Text', Georgia, serif", cursor: 'pointer' }}>
+                    <p style={{ fontSize: 15, fontWeight: 600, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer' }}>
                       {deal.dealname || '—'}
                     </p>
                     {deal.firm_type && (
@@ -1074,7 +1074,7 @@ export default function AdvisorHubPage() {
                 </p>
 
                 {/* AUM */}
-                <p style={{ fontSize: 14, fontWeight: 600, color: C.dark, textAlign: 'right', fontFamily: "'ABC Arizona Text', Georgia, serif" }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: C.dark, textAlign: 'right', fontFamily: "'Inter', system-ui, sans-serif" }}>
                   {formatAUM(aum)}
                 </p>
 
@@ -1118,7 +1118,7 @@ export default function AdvisorHubPage() {
                           padding: '4px 10px', fontSize: 10, fontWeight: 600,
                           borderRadius: 4, border: `1px solid ${C.border}`,
                           background: 'none', color: C.slate, cursor: 'pointer',
-                          fontFamily: "'Fakt', system-ui, sans-serif",
+                          fontFamily: "'Inter', system-ui, sans-serif",
                           transition: 'color 150ms ease, border-color 150ms ease',
                         }}
                         onMouseEnter={e => { e.currentTarget.style.color = C.teal; e.currentTarget.style.borderColor = C.teal; }}

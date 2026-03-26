@@ -49,7 +49,7 @@ function SignInContent() {
         <h1
           className="text-center mb-2"
           style={{
-            fontFamily: "'ABC Arizona Text', Georgia, serif",
+            fontFamily: "'Inter', system-ui, sans-serif",
             fontSize: "1.35rem",
             fontWeight: 300,
             color: "#FAF7F2",
@@ -61,7 +61,7 @@ function SignInContent() {
         <p
           className="text-center mb-8"
           style={{
-            fontFamily: "'Fakt', system-ui, sans-serif",
+            fontFamily: "'Inter', system-ui, sans-serif",
             fontSize: "0.9rem",
             color: "rgba(250,247,242,0.5)",
           }}
@@ -77,7 +77,7 @@ function SignInContent() {
               backgroundColor: "rgba(220,38,38,0.08)",
               border: "1px solid rgba(220,38,38,0.2)",
               color: "#b91c1c",
-              fontFamily: "'Fakt', system-ui, sans-serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
             }}
           >
             {errorMessage}
@@ -90,7 +90,7 @@ function SignInContent() {
           className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-lg text-white font-medium transition-all duration-150"
           style={{
             backgroundColor: "#1d7682",
-            fontFamily: "'Fakt', system-ui, sans-serif",
+            fontFamily: "'Inter', system-ui, sans-serif",
             fontSize: "0.95rem",
           }}
           onMouseEnter={(e) => {
@@ -114,7 +114,7 @@ function SignInContent() {
         <p
           className="mt-5 text-center text-xs"
           style={{
-            fontFamily: "'Fakt', system-ui, sans-serif",
+            fontFamily: "'Inter', system-ui, sans-serif",
             color: "rgba(250,247,242,0.5)",
           }}
         >
@@ -128,7 +128,7 @@ function SignInContent() {
       <p
         className="mt-8 text-xs"
         style={{
-          fontFamily: "'Fakt', system-ui, sans-serif",
+          fontFamily: "'Inter', system-ui, sans-serif",
           color: "rgba(250,247,242,0.5)",
         }}
       >
