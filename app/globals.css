@@ -242,13 +242,19 @@ th,
    GLASS-MORPHISM COMPONENTS
    ============================================ */
 
-/* Glass Card — base */
+/* Glass Card — base (theme-aware) */
 .glass-card {
   background: rgba(23, 31, 39, 0.80);
   border: 1px solid rgba(212, 223, 229, 0.16);
   border-radius: 16px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(212, 223, 229, 0.04);
   transition: all 0.3s ease;
+}
+
+html:not(.dark) .glass-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(224, 224, 224, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .glass-card:hover {
@@ -258,7 +264,13 @@ th,
   transform: translateY(-1px);
 }
 
-/* Glass Card Dark — deeper cards */
+html:not(.dark) .glass-card:hover {
+  background: #FAFAFA;
+  border-color: rgba(224, 224, 224, 0.6);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Glass Card Dark — deeper cards (theme-aware) */
 .glass-card-dark {
   background: linear-gradient(135deg, #1e1e1e 0%, #181818 100%);
   border: 1px solid rgba(78, 112, 130, 0.15);
@@ -266,7 +278,13 @@ th,
   border-radius: 16px;
 }
 
-/* Stat Card — KPI metrics */
+html:not(.dark) .glass-card-dark {
+  background: #FFFFFF;
+  border: 1px solid rgba(224, 224, 224, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Stat Card — KPI metrics (theme-aware) */
 .stat-card {
   background: rgba(23, 31, 39, 0.80);
   border: 1px solid rgba(212, 223, 229, 0.16);
@@ -276,6 +294,12 @@ th,
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+}
+
+html:not(.dark) .stat-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(224, 224, 224, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .stat-card::before {
@@ -301,7 +325,13 @@ th,
   transform: translateY(-2px);
 }
 
-/* Chart Card — data visualizations */
+html:not(.dark) .stat-card:hover {
+  background: #FAFAFA;
+  border-color: rgba(224, 224, 224, 0.6);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Chart Card — data visualizations (theme-aware) */
 .chart-card {
   background: rgba(23, 31, 39, 0.80);
   border: 1px solid rgba(212, 223, 229, 0.16);
@@ -311,10 +341,22 @@ th,
   transition: all 0.3s ease;
 }
 
+html:not(.dark) .chart-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(224, 224, 224, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
 .chart-card:hover {
   background: rgba(34, 48, 59, 0.90);
   border-color: rgba(78, 112, 130, 0.15);
   box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+}
+
+html:not(.dark) .chart-card:hover {
+  background: #FAFAFA;
+  border-color: rgba(224, 224, 224, 0.6);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 /* ============================================

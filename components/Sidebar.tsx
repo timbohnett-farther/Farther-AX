@@ -137,19 +137,19 @@ export default function Sidebar() {
     <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-charcoal-800 dark:bg-charcoal border-r border-charcoal-600 dark:border-white/10">
       {/* Logo / Brand */}
       <div className="px-6 pt-8 pb-5 border-b border-charcoal-600 dark:border-white/10">
-        <Image
-          src="/logo-dark.png"
-          alt="Farther"
-          width={160}
-          height={40}
-          className="mb-2 object-contain object-left hidden dark:block"
-        />
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/logo-light.png"
           alt="Farther"
-          width={160}
-          height={40}
+          className="mb-2 object-contain object-left hidden dark:block"
+          style={{ width: '160px', height: 'auto' }}
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo-dark.png"
+          alt="Farther"
           className="mb-2 object-contain object-left block dark:hidden"
+          style={{ width: '160px', height: 'auto' }}
         />
         <p className="text-[10px] tracking-widest uppercase text-cream-dark dark:text-slate">
           Terminal AX
