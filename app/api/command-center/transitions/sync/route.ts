@@ -226,7 +226,58 @@ interface WorkbookResult {
   synced: number;
   total: number;
   mappedCount: number;
+  skipped?: boolean;
   error?: string;
+}
+
+// ── Incremental sync: check modifiedTime before re-reading sheets ────────────
+
+/**
+ * Loads the last known modifiedTime for each workbook from the DB.
+ * Used to skip sheets that haven't changed since last sync.
+ */
+async function loadLastModifiedTimes(): Promise<Map<string, string>> {
+  try {
+    const result = await pool.query<{ sheet_id: string; drive_modified_time: string }>(
+      `SELECT sheet_id, drive_modified_time::text FROM transition_workbooks WHERE drive_modified_time IS NOT NULL`
+    );
+    const map = new Map<string, string>();
+    for (const row of result.rows) {
+      map.set(row.sheet_id, row.drive_modified_time);
+    }
+    return map;
+  } catch {
+    // Column may not exist yet — return empty map
+    return new Map();
+  }
+}
+
+/**
+ * Ensure the drive_modified_time column exists on transition_workbooks.
+ */
+async function ensureModifiedTimeColumn(): Promise<void> {
+  try {
+    await pool.query(`
+      ALTER TABLE transition_workbooks
+      ADD COLUMN IF NOT EXISTS drive_modified_time TIMESTAMPTZ
+    `);
+  } catch {
+    // Ignore — column may already exist or table may not exist
+  }
+}
+
+/**
+ * Store the Drive API modifiedTime after successful sync.
+ */
+async function updateWorkbookModifiedTime(sheetId: string, modifiedTime: string): Promise<void> {
+  try {
+    await pool.query(
+      `UPDATE transition_workbooks SET drive_modified_time = $2 WHERE sheet_id = $1`,
+      [sheetId, modifiedTime]
+    );
+  } catch {
+    // Non-critical
+  }
 }
 
 async function syncWorkbook(
@@ -506,7 +557,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(result);
     }
 
-    // ── Full folder sync ────────────────────────────────────────────────────
+    // ── Full folder sync (incremental: skip unchanged sheets) ──────────────
     const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
     if (!folderId) {
       return NextResponse.json(
@@ -515,21 +566,43 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const sheets: DriveFile[] = await listSheetsInFolder(folderId);
+    await ensureModifiedTimeColumn();
+    const [sheets, lastModifiedTimes] = await Promise.all([
+      listSheetsInFolder(folderId),
+      loadLastModifiedTimes(),
+    ]);
 
     if (sheets.length === 0) {
       return NextResponse.json({
         workbooks: [],
-        summary: { total_workbooks: 0, total_synced: 0, total_rows: 0, total_mapped: 0, errors: 0 },
+        summary: { total_workbooks: 0, total_synced: 0, total_rows: 0, total_mapped: 0, skipped: 0, errors: 0 },
       });
     }
 
     const results: WorkbookResult[] = [];
+    let skippedCount = 0;
 
     for (const sheet of sheets) {
+      // Skip sheets that haven't been modified since last sync
+      const lastKnown = lastModifiedTimes.get(sheet.id);
+      if (lastKnown && sheet.modifiedTime && new Date(sheet.modifiedTime) <= new Date(lastKnown)) {
+        console.log(`[transitions/sync] Skipping "${sheet.name}" (unchanged since ${lastKnown})`);
+        results.push({
+          sheetId: sheet.id, workbookName: sheet.name, detectedAdvisor: null,
+          synced: 0, total: 0, mappedCount: 0, skipped: true,
+        });
+        skippedCount++;
+        continue;
+      }
+
       console.log(`[transitions/sync] Syncing "${sheet.name}" (${sheet.id})…`);
       const result = await syncWorkbook(sheet.id, sheet.name, range, teamMappings);
       results.push(result);
+
+      // Store modifiedTime after successful sync
+      if (!result.error && sheet.modifiedTime) {
+        await updateWorkbookModifiedTime(sheet.id, sheet.modifiedTime);
+      }
     }
 
     const totalSynced = results.reduce((sum, r) => sum + r.synced, 0);
@@ -544,6 +617,7 @@ export async function POST(req: NextRequest) {
         total_synced: totalSynced,
         total_rows: totalRows,
         total_mapped: totalMapped,
+        skipped: skippedCount,
         errors,
       },
     });
@@ -570,25 +644,45 @@ export async function GET() {
 
     const range = 'Transition!A1:AQ';
 
-    // Load team mappings once
-    const teamMappings = await loadTeamMappings();
+    // Load team mappings and last-known modifiedTimes in parallel
+    await ensureModifiedTimeColumn();
+    const [teamMappings, lastModifiedTimes, sheets] = await Promise.all([
+      loadTeamMappings(),
+      loadLastModifiedTimes(),
+      listSheetsInFolder(folderId),
+    ]);
     console.log(`[transitions/sync] Loaded ${teamMappings.size} team mappings for auto-sync`);
-
-    const sheets: DriveFile[] = await listSheetsInFolder(folderId);
 
     if (sheets.length === 0) {
       return NextResponse.json({
         workbooks: [],
-        summary: { total_workbooks: 0, total_synced: 0, total_rows: 0, total_mapped: 0, errors: 0 },
+        summary: { total_workbooks: 0, total_synced: 0, total_rows: 0, total_mapped: 0, skipped: 0, errors: 0 },
       });
     }
 
     const results: WorkbookResult[] = [];
+    let skippedCount = 0;
 
     for (const sheet of sheets) {
+      // Skip sheets that haven't been modified since last sync
+      const lastKnown = lastModifiedTimes.get(sheet.id);
+      if (lastKnown && sheet.modifiedTime && new Date(sheet.modifiedTime) <= new Date(lastKnown)) {
+        console.log(`[transitions/sync] Skipping "${sheet.name}" (unchanged)`);
+        results.push({
+          sheetId: sheet.id, workbookName: sheet.name, detectedAdvisor: null,
+          synced: 0, total: 0, mappedCount: 0, skipped: true,
+        });
+        skippedCount++;
+        continue;
+      }
+
       console.log(`[transitions/sync] Auto-syncing "${sheet.name}" (${sheet.id})…`);
       const result = await syncWorkbook(sheet.id, sheet.name, range, teamMappings);
       results.push(result);
+
+      if (!result.error && sheet.modifiedTime) {
+        await updateWorkbookModifiedTime(sheet.id, sheet.modifiedTime);
+      }
     }
 
     const totalSynced = results.reduce((sum, r) => sum + r.synced, 0);
@@ -603,6 +697,7 @@ export async function GET() {
         total_synced: totalSynced,
         total_rows: totalRows,
         total_mapped: totalMapped,
+        skipped: skippedCount,
         errors,
       },
     });

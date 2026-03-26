@@ -6,6 +6,25 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Google Sheets Incremental Sync — 2026-03-26
+
+**What**: Transitions sync now uses Google Drive `modifiedTime` to skip sheets that haven't changed since last sync. Dramatically reduces API calls and sync time.
+
+**Scope**:
+- Added `drive_modified_time` column to `transition_workbooks` table (auto-migrated)
+- Before syncing, loads last-known modifiedTime from DB for each sheet
+- Compares against Drive API's modifiedTime — skips unchanged sheets entirely
+- After successful sync, stores the new modifiedTime in DB
+- Both POST and GET sync handlers use incremental logic
+- Summary response now includes `skipped` count
+
+**Status**: ✅ Complete
+
+**Files**:
+- `app/api/command-center/transitions/sync/route.ts` — Incremental sync with modifiedTime comparison
+
+---
+
 ## [Completed] Advisor Hub DB-First Caching with Background Sync — 2026-03-26
 
 **What**: HubSpot CRM data now written to PostgreSQL on first pull. Subsequent visits serve from DB instantly while background sync silently fetches new activities (notes, calls, emails, meetings, deal stage changes) and upserts only changes.
