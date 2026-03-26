@@ -80,25 +80,26 @@ export const colors = {
 
 export const getThemeColors = (isDark: boolean) => ({
   // Text colors
-  dark: isDark ? '#FFFEF4' : '#1a1a1a',
-  white: isDark ? '#1a1a1a' : '#FFFEF4',
-  slate: isDark ? 'rgba(212,223,229,0.5)' : 'rgba(102,102,102,0.6)',
-  cream: isDark ? '#FFFEF4' : '#405C6A',
-  textSecondary: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(26,26,26,0.7)',
+  dark: isDark ? '#FFFEF4' : '#595959',         // Light mode: medium grey
+  white: isDark ? '#1a1a1a' : '#F8F4F0',        // Light mode: cream
+  slate: isDark ? 'rgba(212,223,229,0.5)' : '#595959',
+  cream: isDark ? '#FFFEF4' : '#F8F4F0',
+  textSecondary: isDark ? 'rgba(255,255,255,0.7)' : '#595959',
+  textOnCard: isDark ? '#FFFEF4' : '#F8F4F0',   // Cream text on cards
 
   // Background colors
-  bg: isDark ? '#111111' : '#F8F4F0',
-  cardBg: isDark ? '#171f27' : '#FFFFFF',
-  cardBgAlt: isDark ? 'rgba(250,247,242,0.03)' : '#F9F9F9',
+  bg: isDark ? '#111111' : '#F8F4F0',           // Light mode: warm cream
+  cardBg: isDark ? '#171f27' : '#466F81',       // Light mode: teal blue
+  cardBgAlt: isDark ? 'rgba(250,247,242,0.03)' : '#93B6C4', // Light mode: light teal (for alternating rows)
 
   // Border colors
-  border: isDark ? 'rgba(212,223,229,0.08)' : 'rgba(224,224,224,0.4)',
-  borderSubtle: isDark ? 'rgba(212,223,229,0.05)' : 'rgba(224,224,224,0.25)',
-  borderStrong: isDark ? 'rgba(212,223,229,0.15)' : 'rgba(224,224,224,0.6)',
+  border: isDark ? 'rgba(212,223,229,0.08)' : '#466F81',
+  borderSubtle: isDark ? 'rgba(212,223,229,0.05)' : '#93B6C4',
+  borderStrong: isDark ? 'rgba(212,223,229,0.15)' : '#466F81',
 
   // Brand colors (consistent across themes)
-  teal: '#4E7082',
-  lightBlue: '#A8CED3',
+  teal: '#466F81',
+  lightBlue: '#93B6C4',
 
   // Status colors with backgrounds
   green: '#10b981',
@@ -121,8 +122,10 @@ export const getThemeColors = (isDark: boolean) => ({
   purpleBorder: isDark ? 'rgba(167,139,250,0.35)' : 'rgba(167,139,250,0.25)',
 
   // Component specific
-  tableHeaderBg: isDark ? '#2f2f2f' : '#E8E8E8',
-  cardBgHover: isDark ? 'rgba(29,118,130,0.06)' : 'rgba(78,112,130,0.08)',
+  tableHeaderBg: isDark ? '#2f2f2f' : '#466F81',
+  tableRowEven: isDark ? 'rgba(250,247,242,0.03)' : '#466F81',
+  tableRowOdd: isDark ? 'rgba(250,247,242,0.01)' : '#93B6C4',
+  cardBgHover: isDark ? 'rgba(29,118,130,0.06)' : 'rgba(70,111,129,0.15)',
 });
 
 export type ThemeColors = ReturnType<typeof getThemeColors>;
