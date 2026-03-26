@@ -6,6 +6,27 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Advisor Hub DB-First Caching with Background Sync — 2026-03-26
+
+**What**: HubSpot CRM data now written to PostgreSQL on first pull. Subsequent visits serve from DB instantly while background sync silently fetches new activities (notes, calls, emails, meetings, deal stage changes) and upserts only changes.
+
+**Scope**:
+- Created `lib/advisor-store.ts` — structured DB tables (`advisor_profiles`, `advisor_activities`) with incremental sync
+- Advisor detail API now: DB-first → instant serve → background HubSpot sync
+- First visit: full HubSpot fetch, write to DB, serve
+- Return visits: serve from DB immediately, background sync fetches only new items since `last_synced_at`
+- Stale fallback: if HubSpot fails, still serves from DB
+- RIA Hub API now uses `withPgCache` (2hr TTL) instead of fresh HubSpot fetch every load
+
+**Status**: ✅ Complete
+
+**Files**:
+- `lib/advisor-store.ts` — New: DB-backed advisor data store with incremental sync
+- `app/api/command-center/advisor/[id]/route.ts` — Rewritten GET handler: DB-first + background sync
+- `app/api/command-center/ria-hub/route.ts` — Added withPgCache (2hr TTL, stale fallback)
+
+---
+
 ## [Completed] Switch AI from Grok to OpenAI with Auto Model Routing — 2026-03-26
 
 **What**: Replaced Grok/xAI with OpenAI models via AiZolo proxy. Added intelligent model routing that auto-selects GPT-4.1-mini (fast tasks) or GPT-4.1 (precision tasks) based on task type.
