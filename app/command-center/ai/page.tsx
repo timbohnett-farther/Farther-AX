@@ -39,7 +39,7 @@ function MessageBubble({ message }: { message: Message }) {
 }
 
 /**
- * AI Assistant Page - Chat interface with Grok
+ * AI Assistant Page - Chat interface with OpenAI (auto model routing)
  *
  * Migrated to Tailwind utilities (removed all inline styles)
  */
@@ -47,7 +47,7 @@ export default function AIAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hi! I'm your AX Command Center AI, powered by Grok. I have live access to your full HubSpot pipeline — ask me about any advisor, deal status, upcoming launches, stalled deals, or pipeline insights.",
+      content: "Hi! I'm your AX Command Center AI assistant. I have live access to your full HubSpot pipeline — ask me about any advisor, deal status, upcoming launches, stalled deals, or pipeline insights.",
     },
   ]);
   const [input, setInput] = useState('');
@@ -94,7 +94,7 @@ export default function AIAssistant() {
               AX AI Assistant
             </h1>
             <p className="text-xs text-slate">
-              Powered by Grok · Live HubSpot pipeline access
+              AI Assistant · Live HubSpot pipeline access
             </p>
           </div>
         </div>

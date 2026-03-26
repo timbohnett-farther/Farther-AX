@@ -6,6 +6,30 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Switch AI from Grok to OpenAI with Auto Model Routing — 2026-03-26
+
+**What**: Replaced Grok/xAI with OpenAI models via AiZolo proxy. Added intelligent model routing that auto-selects GPT-4.1-mini (fast tasks) or GPT-4.1 (precision tasks) based on task type.
+
+**Scope**:
+- Created `lib/ai-router.ts` — centralized AI routing with auto model selection and fallback
+- Chat Q&A, briefings, summaries → GPT-4.1-mini (fast, cost-effective)
+- Note parsing, sentiment analysis → GPT-4.1 (high accuracy needed)
+- If GPT-4.1 fails, auto-falls back to mini
+- Removed all Grok/xAI OpenAI SDK client instantiation from 4 API routes
+- Updated AI assistant page to remove Grok branding
+
+**Status**: ✅ Complete
+
+**Files**:
+- `lib/ai-router.ts` — New: AI model router with task-based auto-selection
+- `app/api/command-center/ai/route.ts` — Switched from Grok to aiComplete()
+- `app/api/command-center/ria-hub/summary/route.ts` — Switched from Grok to aiComplete()
+- `app/api/command-center/advisor/parse-note/route.ts` — Switched from Grok to aiComplete()
+- `app/api/command-center/sentiment/score/route.ts` — Switched from Grok to aiComplete()
+- `app/command-center/ai/page.tsx` — Removed Grok branding
+
+---
+
 ## [Completed] Font Migration — Inter + DM Mono — 2026-03-26
 
 **What**: Migrated entire codebase from ABC Arizona Text/Fakt to Inter/DM Mono per Font Gold Standard.
