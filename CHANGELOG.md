@@ -6,6 +6,23 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Background Images Not Displaying — 2026-03-26
+
+**What**: Fixed background texture images not showing due to inline style override.
+
+**Problem**: Inline style in `app/layout.tsx` was setting `background: "var(--color-charcoal-900)"` which overrode the background-image CSS rules, preventing blue.png and cream.png textures from displaying.
+
+**Solution**: Removed inline background style from body element. All background properties now come from globals.css.
+
+**Status**: ✅ Complete
+
+**Files**:
+- `app/layout.tsx` — Removed inline style object blocking background images
+
+**Commit**: `c796767`
+
+---
+
 ## [Completed] Simplify Background Textures — 2026-03-26
 
 **What**: Removed overlay images, using only base texture backgrounds for cleaner appearance.
