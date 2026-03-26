@@ -1,4 +1,5 @@
 import PageLayout from "@/components/PageLayout";
+import QuizSection from "@/components/QuizSection";
 
 const phases = [
   { num: "1", name: "Initial Assessment", lead: "M&A Strategist", question: "Is this a strategic fit? Go/No-Go for full diligence?" },
@@ -88,38 +89,31 @@ function SectionHeader({ part, title }: { part: string; title: string }) {
 }
 
 function Callout({ children, color = "teal" }: { children: React.ReactNode; color?: "teal" | "amber" | "red" }) {
-  const colors = {
-    teal: { bg: "rgba(29,118,130,0.08)", border: "rgba(29,118,130,0.4)", text: "text-teal", glow: "rgba(29,118,130,0.15)" },
-    amber: { bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.4)", text: "text-amber-400", glow: "rgba(245,158,11,0.15)" },
-    red: { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.3)", text: "text-red-400", glow: "rgba(239,68,68,0.12)" },
+  const styles = {
+    teal: "bg-teal/[0.08] border-l-teal/40 shadow-[0_0_12px_rgba(78,112,130,0.15)] text-teal",
+    amber: "bg-amber-500/[0.08] border-l-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.15)] text-amber-400",
+    red: "bg-red-500/[0.08] border-l-red-500/30 shadow-[0_0_12px_rgba(239,68,68,0.12)] text-red-400",
   };
-  const c = colors[color];
   return (
-    <div
-      className="rounded-lg px-5 py-4 mb-6"
-      style={{ backgroundColor: c.bg, borderLeft: `4px solid ${c.border}`, boxShadow: `0 0 12px ${c.glow}` }}
-    >
-      <p className={`text-sm leading-relaxed ${c.text}`}>{children}</p>
+    <div className={`rounded-lg px-5 py-4 mb-6 border-l-4 ${styles[color]}`}>
+      <p className="text-sm leading-relaxed">{children}</p>
     </div>
   );
 }
 
-function FlagList({ title, badge, badgeColor, items }: { title: string; badge: string; badgeColor: string; items: string[] }) {
+function FlagList({ title, badge, badgeClass, dotClass, items }: { title: string; badge: string; badgeClass: string; dotClass: string; items: string[] }) {
   return (
     <div className="glass-card rounded-xl p-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)]">
       <div className="flex items-center gap-3 mb-4">
         <h4 className="font-serif text-base text-cream font-semibold">{title}</h4>
-        <span
-          className="text-[10px] font-semibold tracking-wider uppercase text-white px-3 py-1 rounded-full"
-          style={{ backgroundColor: badgeColor, boxShadow: `0 0 10px ${badgeColor}50` }}
-        >
+        <span className={`text-[10px] font-semibold tracking-wider uppercase text-white px-3 py-1 rounded-full ${badgeClass}`}>
           {badge}
         </span>
       </div>
       <ul className="space-y-2.5">
         {items.map((item, i) => (
           <li key={i} className="flex items-start gap-3 text-sm text-cream-muted leading-relaxed">
-            <span className="shrink-0 w-1.5 h-1.5 rounded-full mt-2" style={{ backgroundColor: badgeColor }} />
+            <span className={`shrink-0 w-1.5 h-1.5 rounded-full mt-2 ${dotClass}`} />
             {item}
           </li>
         ))}
@@ -298,7 +292,7 @@ export default function MAPage() {
                   {i + 1}
                 </div>
                 {i < complianceTimeline.length - 1 && (
-                  <div className="w-px flex-1 min-h-[1rem]" style={{ backgroundColor: "rgba(29,118,130,0.2)" }} />
+                  <div className="w-px flex-1 min-h-[1rem] bg-teal/20" />
                 )}
               </div>
               {/* Right: content */}
@@ -438,9 +432,9 @@ export default function MAPage() {
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-          <FlagList title="Financial" badge="Escalate" badgeColor="#DC2626" items={financialFlags} />
-          <FlagList title="Compliance" badge="Escalate" badgeColor="#D97706" items={complianceFlags} />
-          <FlagList title="Cultural" badge="Monitor" badgeColor="#7C3AED" items={culturalFlags} />
+          <FlagList title="Financial" badge="Escalate" badgeClass="bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.3)]" dotClass="bg-red-600" items={financialFlags} />
+          <FlagList title="Compliance" badge="Escalate" badgeClass="bg-amber-600 shadow-[0_0_10px_rgba(217,119,6,0.3)]" dotClass="bg-amber-600" items={complianceFlags} />
+          <FlagList title="Cultural" badge="Monitor" badgeClass="bg-violet-600 shadow-[0_0_10px_rgba(124,58,237,0.3)]" dotClass="bg-violet-600" items={culturalFlags} />
         </div>
 
         {/* ──────────────────────────────────────────────────────────── */}
@@ -479,6 +473,7 @@ export default function MAPage() {
             The deals are won in due diligence. The value is created &mdash; or destroyed &mdash; in onboarding.
           </p>
         </div>
+        <QuizSection topicSlug="ma" topicTitle="M&A Pathway" />
       </div>
     </PageLayout>
   );

@@ -138,6 +138,29 @@ async function migrate() {
         weighted_fee_bps DECIMAL(8,4) DEFAULT 0,
         synced_at       TIMESTAMPTZ DEFAULT NOW()
       );
+
+      -- Training quiz attempts (tracks user quiz results)
+      CREATE TABLE IF NOT EXISTS quiz_attempts (
+        id              SERIAL PRIMARY KEY,
+        user_email      VARCHAR(255) NOT NULL,
+        user_name       VARCHAR(255),
+        topic_slug      VARCHAR(128) NOT NULL,
+        attempt_number  INTEGER NOT NULL DEFAULT 1,
+        score           INTEGER NOT NULL,
+        total_questions  INTEGER NOT NULL DEFAULT 10,
+        passed          BOOLEAN NOT NULL DEFAULT FALSE,
+        questions_json  JSONB NOT NULL,
+        answers_json    JSONB NOT NULL,
+        completed_at    TIMESTAMPTZ DEFAULT NOW(),
+        CONSTRAINT quiz_attempts_user_topic_attempt UNIQUE(user_email, topic_slug, attempt_number)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_quiz_attempts_user_email
+        ON quiz_attempts(user_email);
+      CREATE INDEX IF NOT EXISTS idx_quiz_attempts_topic
+        ON quiz_attempts(topic_slug);
+      CREATE INDEX IF NOT EXISTS idx_quiz_attempts_completed
+        ON quiz_attempts(completed_at);
     `);
     console.log('Migration complete.');
   } finally {

@@ -1,459 +1,203 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 import PageLayout from "@/components/PageLayout";
 
-interface Question {
-  id: number;
-  question: string;
-  options: string[];
-  correctIndex: number;
-  explanation: string;
+interface QuizResult {
+  topic_slug: string;
+  attempt_number: number;
+  score: number;
+  total_questions: number;
+  passed: boolean;
+  completed_at: string;
 }
 
-const QUESTIONS: Question[] = [
-  {
-    id: 1,
-    question: "Which advisor pathway has the highest compliance sensitivity?",
-    options: ["Independent RIA", "No to Low AUM", "Breakaway", "M&A"],
-    correctIndex: 2,
-    explanation:
-      "Breakaway advisors are leaving captive firms with non-compete/non-solicitation agreements, requiring careful sequencing to protect both the advisor and Farther from legal action.",
-  },
-  {
-    id: 2,
-    question: "When must the U4 be submitted for a Breakaway advisor?",
-    options: [
-      "At kickoff meeting",
-      "When the deal is signed",
-      "30 days before resignation",
-      "After the advisor formally resigns",
-    ],
-    correctIndex: 3,
-    explanation:
-      "Submitting the U4 before resignation creates a trackable FINRA event that can alert the departing firm prematurely.",
-  },
-  {
-    id: 3,
-    question: "Which transition method is the fastest?",
-    options: [
-      "LPOA (6–8 weeks)",
-      "Repaper / ACAT (8–12 weeks)",
-      "Master Merge (4–6 weeks)",
-      "Direct Transfer",
-    ],
-    correctIndex: 2,
-    explanation:
-      "The Master Merge moves assets at the custodian level via a master account merge, making it the fastest of the three transition methods.",
-  },
-  {
-    id: 4,
-    question: "Who is the primary owner of the Transitions workstream?",
-    options: [
-      "AXM (Advisor Experience Manager)",
-      "AXA (Advisor Experience Associate)",
-      "CTM / CTA (Transitions team)",
-      "Compliance team",
-    ],
-    correctIndex: 2,
-    explanation:
-      "The Transitions team (CTM/CTA) owns the client asset transfer process. The AXM owns Onboarding, which runs in parallel.",
-  },
-  {
-    id: 5,
-    question:
-      "Within how many days must an Independent RIA file Form ADV-W after joining Farther?",
-    options: ["30 days", "60 days", "90 days", "180 days"],
-    correctIndex: 2,
-    explanation:
-      "Form ADV-W (withdrawal of investment adviser registration) must be filed within 90 days to formally dissolve the advisor's independent RIA status.",
-  },
-  {
-    id: 6,
-    question:
-      "Which transition method requires the advisor (not clients) to sign a single document to authorize asset transfers?",
-    options: ["Master Merge", "Repaper / ACAT", "Direct Transfer", "LPOA"],
-    correctIndex: 3,
-    explanation:
-      "LPOA (Limited Power of Attorney) allows the advisor to sign one document granting Farther authority to transfer client assets without requiring individual client signatures.",
-  },
-  {
-    id: 7,
-    question:
-      "What is the AXA's primary responsibility during the onboarding process?",
-    options: [
-      "Managing compliance filings and U4 submission",
-      "Day-to-day execution, scheduling, and logistics support",
-      "Conducting the Focus Team review",
-      "Owning the transitions workstream",
-    ],
-    correctIndex: 1,
-    explanation:
-      "The AXA handles day-to-day execution — scheduling meetings, tracking documents, maintaining the Transition Tracker, and supporting the AXM in logistics.",
-  },
+const QUIZ_TOPICS = [
+  { slug: "introduction", label: "Introduction", step: 1, href: "/introduction" },
+  { slug: "onboarding-vs-transitions", label: "Onboarding vs. Transitions", step: 2, href: "/onboarding-vs-transitions" },
+  { slug: "key-documents", label: "Key Documents", step: 3, href: "/key-documents" },
+  { slug: "breakaway", label: "Breakaway Pathway", step: 4, href: "/breakaway" },
+  { slug: "independent-ria", label: "Independent RIA", step: 5, href: "/independent-ria" },
+  { slug: "ma", label: "M&A Pathway", step: 6, href: "/ma" },
+  { slug: "no-to-low-aum", label: "No to Low AUM", step: 7, href: "/no-to-low-aum" },
+  { slug: "lpoa", label: "LPOA Transition", step: 8, href: "/lpoa" },
+  { slug: "breakaway-process", label: "Breakaway Process", step: 9, href: "/breakaway-process" },
 ];
 
-function getScoreMessage(score: number): string {
-  if (score === 7) {
-    return "Perfect score! You're ready to handle any onboarding scenario.";
-  } else if (score >= 5) {
-    return "Great work! Review the sections you missed to sharpen your knowledge.";
-  } else if (score >= 3) {
-    return "Good effort. We recommend revisiting the relevant sections before your next advisor onboarding.";
-  } else {
-    return "Let's review together. Work through the playbook sections and try again.";
-  }
-}
-
 export default function KnowledgeCheckPage() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [answers, setAnswers] = useState<(number | null)[]>(
-    Array(QUESTIONS.length).fill(null)
-  );
-  const [quizComplete, setQuizComplete] = useState(false);
+  const { data: session } = useSession();
+  const [results, setResults] = useState<QuizResult[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const currentQuestion = QUESTIONS[currentIndex];
-  const isAnswered = selectedAnswer !== null;
-  const isLastQuestion = currentIndex === QUESTIONS.length - 1;
+  useEffect(() => {
+    if (!session?.user?.email) return;
+    fetch(`/api/quiz/results?userEmail=${encodeURIComponent(session.user.email)}`)
+      .then(r => r.json())
+      .then(data => setResults(data.results || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [session?.user?.email]);
 
-  const score = answers.filter(
-    (ans, i) => ans === QUESTIONS[i].correctIndex
-  ).length;
+  const getTopicResults = (slug: string) =>
+    results.filter(r => r.topic_slug === slug);
 
-  function handleSelectAnswer(optionIndex: number) {
-    if (isAnswered) return;
-    setSelectedAnswer(optionIndex);
-    const updated = [...answers];
-    updated[currentIndex] = optionIndex;
-    setAnswers(updated);
-  }
+  const hasPassed = (slug: string) =>
+    getTopicResults(slug).some(r => r.passed);
 
-  function handleNext() {
-    if (isLastQuestion) {
-      setQuizComplete(true);
-    } else {
-      setCurrentIndex((prev) => prev + 1);
-      setSelectedAnswer(null);
-    }
-  }
+  const getBestScore = (slug: string) => {
+    const topicResults = getTopicResults(slug);
+    if (topicResults.length === 0) return null;
+    return Math.max(...topicResults.map(r => r.score));
+  };
 
-  function handleRetake() {
-    setCurrentIndex(0);
-    setSelectedAnswer(null);
-    setAnswers(Array(QUESTIONS.length).fill(null));
-    setQuizComplete(false);
-  }
-
-  const progressPercent = ((currentIndex + (isAnswered ? 1 : 0)) / QUESTIONS.length) * 100;
+  const passedCount = QUIZ_TOPICS.filter(t => hasPassed(t.slug)).length;
+  const totalTopics = QUIZ_TOPICS.length;
+  const completionPct = Math.round((passedCount / totalTopics) * 100);
 
   return (
     <PageLayout
       step={13}
       title="Knowledge Check"
-      subtitle="Test Your Onboarding & Transition Knowledge"
-      backHref="/breakaway-process"
+      subtitle="Training Logbook & Quiz Dashboard"
+      backHref="/calendar-generator"
     >
-      <div className="max-w-2xl mx-auto">
-        {quizComplete ? (
-          /* Score screen */
-          <div
-            className="rounded-xl border p-10 text-center"
-            style={{
-              backgroundColor: "#2a2a2a",
-              borderColor: "rgba(250,247,242,0.08)",
-            }}
-          >
-            {/* Trophy / score badge */}
-            <div
-              className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
-              style={{
-                backgroundColor: "#1d7682",
-                boxShadow: "0 0 24px rgba(29, 118, 130, 0.5)",
-              }}
-            >
-              <span
-                className="text-white text-3xl font-bold"
-                style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-              >
-                {score}/7
-              </span>
+      <div className="max-w-3xl mx-auto">
+        {/* Overall Progress */}
+        <div className="glass-card-dark rounded-xl p-8 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-white font-sans">
+                Training Progress
+              </h2>
+              <p className="text-sm text-white/50 mt-1 font-sans">
+                {session?.user?.name || "User"} &middot; {session?.user?.email}
+              </p>
             </div>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-3xl font-bold text-white font-mono tabular-nums">
+                  {passedCount}/{totalTopics}
+                </p>
+                <p className="text-xs text-white/40 font-sans">quizzes passed</p>
+              </div>
+            </div>
+          </div>
 
-            <h2
-              className="text-3xl font-bold mb-3"
-              style={{
-                fontFamily: "'Inter', system-ui, sans-serif",
-                color: "#FAF7F2",
-              }}
-            >
-              You scored {score} / 7
-            </h2>
+          {/* Progress bar */}
+          <div className="w-full h-3 rounded-full bg-white/10 overflow-hidden mb-2">
+            <div
+              className="h-full rounded-full bg-teal transition-all duration-500"
+              style={{ width: `${completionPct}%` }}
+            />
+          </div>
+          <p className="text-xs text-white/40 font-sans text-right">
+            {completionPct}% complete
+          </p>
 
-            <p
-              className="text-base mb-8 max-w-md mx-auto leading-relaxed"
-              style={{ color: "#FAF7F2" }}
-            >
-              {getScoreMessage(score)}
-            </p>
+          {passedCount === totalTopics && (
+            <div className="mt-6 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4 text-center">
+              <p className="text-sm text-emerald-400 font-sans font-medium">
+                All training quizzes completed. You are fully certified on the AX Playbook.
+              </p>
+            </div>
+          )}
+        </div>
 
-            {/* Per-question result summary */}
-            <div className="text-left mb-8 space-y-2">
-              {QUESTIONS.map((q, i) => {
-                const userAns = answers[i];
-                const correct = userAns === q.correctIndex;
-                return (
-                  <div
-                    key={q.id}
-                    className="flex items-start gap-3 px-4 py-3 rounded-lg border"
-                    style={{
-                      borderColor: correct ? "#86EFAC" : "#FCA5A5",
-                      backgroundColor: correct
-                        ? "rgba(134,239,172,0.12)"
-                        : "rgba(252,165,165,0.12)",
-                      boxShadow: correct
-                        ? "0 0 8px rgba(134, 239, 172, 0.15)"
-                        : "0 0 8px rgba(252, 165, 165, 0.15)",
-                    }}
-                  >
-                    <span
-                      className="text-base font-bold mt-0.5 shrink-0"
-                      style={{ color: correct ? "#16A34A" : "#DC2626" }}
-                    >
-                      {correct ? "✓" : "✗"}
+        {/* Quiz Status Grid */}
+        <div className="space-y-3">
+          {loading ? (
+            <>
+              {[...Array(9)].map((_, i) => (
+                <div key={i} className="shimmer h-20 rounded-xl" />
+              ))}
+            </>
+          ) : (
+            QUIZ_TOPICS.map((topic) => {
+              const topicResults = getTopicResults(topic.slug);
+              const passed = hasPassed(topic.slug);
+              const bestScore = getBestScore(topic.slug);
+              const attemptsUsed = topicResults.length;
+
+              return (
+                <div
+                  key={topic.slug}
+                  className={`rounded-xl border p-5 transition-colors ${
+                    passed
+                      ? "border-emerald-500/20 bg-emerald-500/5"
+                      : attemptsUsed > 0
+                      ? "border-amber-500/20 bg-amber-500/5"
+                      : "border-white/10 bg-white/[0.02]"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    {/* Step number */}
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10 text-sm font-mono font-bold text-teal">
+                      {String(topic.step).padStart(2, "0")}
                     </span>
-                    <div>
-                      <p
-                        className="text-sm font-medium"
-                        style={{ color: "#FAF7F2" }}
-                      >
-                        Q{q.id}: {q.question}
+
+                    {/* Topic info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-white font-sans truncate">
+                        {topic.label}
                       </p>
-                      {!correct && userAns !== null && (
-                        <p className="text-xs mt-0.5" style={{ color: "rgba(250,247,242,0.5)" }}>
-                          Correct answer: {q.options[q.correctIndex]}
-                        </p>
+                      <p className="text-xs text-white/40 font-sans mt-0.5">
+                        {attemptsUsed === 0
+                          ? "Not started"
+                          : `${attemptsUsed}/2 attempt${attemptsUsed !== 1 ? "s" : ""} used`}
+                        {bestScore !== null && ` · Best: ${bestScore}/10`}
+                      </p>
+                    </div>
+
+                    {/* Status badge */}
+                    <div className="shrink-0">
+                      {passed ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 text-xs font-medium text-emerald-400">
+                          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          </svg>
+                          Passed
+                        </span>
+                      ) : attemptsUsed >= 2 ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/15 border border-red-500/30 px-3 py-1 text-xs font-medium text-red-400">
+                          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          Review Needed
+                        </span>
+                      ) : (
+                        <Link
+                          href={topic.href}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-teal/15 border border-teal/30 px-3 py-1 text-xs font-medium text-teal hover:bg-teal/25 transition-colors"
+                        >
+                          {attemptsUsed > 0 ? "Retake" : "Take Quiz"} →
+                        </Link>
                       )}
                     </div>
                   </div>
-                );
-              })}
-            </div>
 
-            <button
-              onClick={handleRetake}
-              className="inline-flex items-center gap-2 px-7 py-3 rounded-md text-sm font-semibold text-white transition-all"
-              style={{
-                backgroundColor: "#1d7682",
-                boxShadow: "0 0 16px rgba(29, 118, 130, 0.3)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = "0 0 24px rgba(29, 118, 130, 0.5)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = "0 0 16px rgba(29, 118, 130, 0.3)";
-              }}
-            >
-              ↺ Retake Quiz
-            </button>
-          </div>
-        ) : (
-          /* Question screen */
-          <div>
-            {/* Progress header */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: "rgba(250,247,242,0.5)" }}
-                >
-                  Question {currentIndex + 1} of {QUESTIONS.length}
-                </span>
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: "#1d7682" }}
-                >
-                  {Math.round(progressPercent)}% complete
-                </span>
-              </div>
-              {/* Progress bar */}
-              <div
-                className="w-full rounded-full h-2"
-                style={{ backgroundColor: "rgba(250,247,242,0.08)" }}
-              >
-                <div
-                  className="h-2 rounded-full transition-all duration-500"
-                  style={{
-                    width: `${progressPercent}%`,
-                    backgroundColor: "#1d7682",
-                    boxShadow: "0 0 8px rgba(29, 118, 130, 0.4)",
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Question card */}
-            <div
-              className="rounded-xl border p-8"
-              style={{
-                backgroundColor: "#2a2a2a",
-                borderColor: "rgba(250,247,242,0.08)",
-              }}
-            >
-              <h2
-                className="text-xl font-bold mb-6 leading-snug"
-                style={{
-                  fontFamily: "'Inter', system-ui, sans-serif",
-                  color: "#FAF7F2",
-                }}
-              >
-                {currentQuestion.question}
-              </h2>
-
-              {/* Answer options */}
-              <div className="space-y-3 mb-6">
-                {currentQuestion.options.map((option, i) => {
-                  const isSelected = selectedAnswer === i;
-                  const isCorrect = i === currentQuestion.correctIndex;
-
-                  let borderColor = "rgba(250,247,242,0.08)";
-                  let bgColor = "#2f2f2f";
-                  let textColor = "#FAF7F2";
-
-                  if (isAnswered) {
-                    if (isCorrect) {
-                      borderColor = "#86EFAC";
-                      bgColor = "rgba(134,239,172,0.18)";
-                      textColor = "#15532B";
-                    } else if (isSelected && !isCorrect) {
-                      borderColor = "#FCA5A5";
-                      bgColor = "rgba(252,165,165,0.18)";
-                      textColor = "#7F1D1D";
-                    } else {
-                      bgColor = "#2f2f2f";
-                      borderColor = "rgba(250,247,242,0.08)";
-                      textColor = "rgba(250,247,242,0.5)";
-                    }
-                  }
-
-                  const optionLabels = ["A", "B", "C", "D"];
-
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => handleSelectAnswer(i)}
-                      disabled={isAnswered}
-                      className="w-full text-left flex items-start gap-3 px-5 py-4 rounded-lg border transition-all duration-200 hover:shadow-[0_0_12px_rgba(29,118,130,0.15)]"
-                      style={{
-                        borderColor,
-                        backgroundColor: bgColor,
-                        cursor: isAnswered ? "default" : "pointer",
-                      }}
-                    >
-                      <span
-                        className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mt-0.5"
-                        style={{
-                          backgroundColor: isAnswered
-                            ? isCorrect
-                              ? "#16A34A"
-                              : isSelected
-                              ? "#DC2626"
-                              : "rgba(250,247,242,0.08)"
-                            : "#1d7682",
-                          color: isAnswered
-                            ? isCorrect || isSelected
-                              ? "#fff"
-                              : "rgba(250,247,242,0.5)"
-                            : "#fff",
-                        }}
-                      >
-                        {optionLabels[i]}
-                      </span>
-                      <span
-                        className="text-sm font-medium leading-relaxed"
-                        style={{ color: textColor }}
-                      >
-                        {option}
-                      </span>
-                      {isAnswered && isCorrect && (
-                        <span
-                          className="ml-auto shrink-0 text-sm font-bold"
-                          style={{ color: "#16A34A" }}
-                        >
-                          ✓
-                        </span>
-                      )}
-                      {isAnswered && isSelected && !isCorrect && (
-                        <span
-                          className="ml-auto shrink-0 text-sm font-bold"
-                          style={{ color: "#DC2626" }}
-                        >
-                          ✗
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Explanation */}
-              {isAnswered && (
-                <div
-                  className="rounded-lg border px-5 py-4 mb-6"
-                  style={{
-                    borderColor:
-                      selectedAnswer === currentQuestion.correctIndex
-                        ? "#86EFAC"
-                        : "#FCA5A5",
-                    backgroundColor:
-                      selectedAnswer === currentQuestion.correctIndex
-                        ? "rgba(134,239,172,0.10)"
-                        : "rgba(252,165,165,0.10)",
-                  }}
-                >
-                  <p
-                    className="text-xs font-semibold uppercase tracking-wider mb-1"
-                    style={{
-                      color:
-                        selectedAnswer === currentQuestion.correctIndex
-                          ? "#16A34A"
-                          : "#DC2626",
-                    }}
-                  >
-                    {selectedAnswer === currentQuestion.correctIndex
-                      ? "Correct"
-                      : "Incorrect"}
-                  </p>
-                  <p className="text-sm leading-relaxed" style={{ color: "#FAF7F2" }}>
-                    {currentQuestion.explanation}
-                  </p>
+                  {/* Attempt details */}
+                  {topicResults.length > 0 && (
+                    <div className="mt-3 ml-14 space-y-1">
+                      {topicResults.map((r) => (
+                        <div key={`${r.topic_slug}-${r.attempt_number}`} className="flex items-center gap-2 text-xs text-white/40 font-sans">
+                          <span className="font-mono tabular-nums">
+                            Attempt {r.attempt_number}: {r.score}/{r.total_questions}
+                          </span>
+                          <span>·</span>
+                          <span>{r.passed ? "Passed" : "Failed"}</span>
+                          <span>·</span>
+                          <span>{new Date(r.completed_at).toLocaleDateString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-
-              {/* Next button */}
-              {isAnswered && (
-                <div className="flex justify-end">
-                  <button
-                    onClick={handleNext}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md text-sm font-semibold text-white transition-all"
-                    style={{
-                      backgroundColor: "#1d7682",
-                      boxShadow: "0 0 16px rgba(29, 118, 130, 0.3)",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = "0 0 24px rgba(29, 118, 130, 0.5)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = "0 0 16px rgba(29, 118, 130, 0.3)";
-                    }}
-                  >
-                    {isLastQuestion ? "See Results" : "Next Question"} →
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+              );
+            })
+          )}
+        </div>
       </div>
     </PageLayout>
   );

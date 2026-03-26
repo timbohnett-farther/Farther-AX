@@ -1,4 +1,5 @@
 import Link from "next/link";
+import QuizSection from "@/components/QuizSection";
 
 export default function OnboardingVsTransitions() {
   return (
@@ -345,6 +346,8 @@ export default function OnboardingVsTransitions() {
             <span className="group-hover:translate-x-0.5 transition-transform duration-200">→</span>
           </Link>
         </div>
+
+        <QuizSection topicSlug="onboarding-vs-transitions" topicTitle="Onboarding vs. Transitions" />
       </main>
     </div>
   );

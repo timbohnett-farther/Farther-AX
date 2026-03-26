@@ -1,4 +1,5 @@
 import Link from "next/link";
+import QuizSection from "@/components/QuizSection";
 
 const matrixData = [
   {
@@ -403,6 +404,7 @@ export default function KeyDocumentsPage() {
           </div>
         </div>
 
+        <QuizSection topicSlug="key-documents" topicTitle="Key Documents" />
       </div>
     </main>
   );

@@ -6,6 +6,64 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Training Quiz System with Database Logging — 2026-03-26
+
+**What**: Built a comprehensive training quiz system across all 9 playbook pages. 450-question bank (50 per topic), randomized 10-question quizzes, graded on submit with answer review, database logging of all attempts.
+
+**Scope**:
+- Created `quiz_attempts` database table for tracking user quiz results
+- Built 450-question bank covering: Introduction, Onboarding vs Transitions, Key Documents, Breakaway, Independent RIA, M&A, No to Low AUM, LPOA, Breakaway Process
+- API routes: GET (randomized questions with answer stripping), POST (grading + persistence), results endpoint
+- Reusable `QuizSection` component: dark glass theme, progress tracking, submit-to-grade flow, wrong answer review with explanations
+- Quiz rules: 10 questions per attempt, 90% pass threshold (9/10), max 2 attempts, one retake allowed
+- Knowledge Check page (Step 13) redesigned as training logbook dashboard showing all quiz statuses
+- Integrated QuizSection into all 9 playbook pages
+
+**Status**: ✅ Complete
+
+**Files**:
+- `lib/quiz-questions.ts` — 450-question bank (9 topics × 50 questions)
+- `app/api/quiz/route.ts` — GET questions + POST grading
+- `app/api/quiz/results/route.ts` — GET user results
+- `components/QuizSection.tsx` — Reusable quiz component
+- `scripts/migrate.ts` — Added quiz_attempts table
+- `app/knowledge-check/page.tsx` — Training logbook dashboard
+- `app/introduction/page.tsx` — Added QuizSection
+- `app/onboarding-vs-transitions/page.tsx` — Added QuizSection
+- `app/key-documents/page.tsx` — Added QuizSection
+- `app/breakaway/page.tsx` — Added QuizSection
+- `app/independent-ria/page.tsx` — Added QuizSection
+- `app/ma/page.tsx` — Added QuizSection
+- `app/no-to-low-aum/page.tsx` — Added QuizSection
+- `app/lpoa/page.tsx` — Added QuizSection
+- `app/breakaway-process/page.tsx` — Added QuizSection
+
+---
+
+## [Completed] Shimmer Loading States + Playbook Design System Migration — 2026-03-26
+
+**What**: Added animated shimmer loading skeletons to 6 command center pages. Migrated all 13 playbook pages from inline styles to Tailwind/design system classes.
+
+**Scope**:
+- Replaced text loading indicators with `.shimmer` animated skeletons on: metrics, onboarding, team, alerts, advisor-hub, pipeline pages
+- Removed local COLORS objects from 10 playbook pages
+- Replaced all inline `style={{}}` with Tailwind utility classes
+- Cards now use `glass-card` / `glass-card-dark` CSS classes
+- Colors standardized to design token classes (text-cream, bg-charcoal, etc.)
+
+**Status**: ✅ Complete
+
+**Files**:
+- `app/command-center/metrics/page.tsx` — Shimmer loading
+- `app/command-center/onboarding/page.tsx` — Shimmer loading
+- `app/command-center/team/page.tsx` — Shimmer loading
+- `app/command-center/alerts/page.tsx` — Shimmer loading
+- `app/command-center/advisor-hub/page.tsx` — Shimmer loading
+- `app/command-center/page.tsx` — Shimmer loading
+- 10 playbook pages — Design system migration
+
+---
+
 ## [Completed] Complexity Graph Fix + Sidebar Light Mode + Tailwind Colors — 2026-03-26
 
 **What**: Fixed complexity score graph showing 0/250 by calling `computeComplexityScore` directly instead of unreliable internal HTTP fetch. Fixed sidebar light mode. Added cream color scale to Tailwind.

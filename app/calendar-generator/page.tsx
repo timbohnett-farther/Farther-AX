@@ -3,12 +3,12 @@
 import { useState } from "react";
 import PageLayout from "@/components/PageLayout";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// --- Types ---
 
 type Attendee = { name: string; email: string };
 const emptyAttendee = (): Attendee => ({ name: "", email: "" });
 
-// ─── Meetings ────────────────────────────────────────────────────────────────
+// --- Meetings ---
 
 const MEETINGS = [
   { id: "internal_pre_sync",        label: "Internal Pre-Sync",          daysFromLaunch: -42, owner: "AXM", optional: false },
@@ -28,7 +28,7 @@ const MEETINGS = [
   { id: "intro_financial_planning", label: "Intro: Financial Planning",   daysFromLaunch: 28,  owner: "AXM", optional: false },
 ];
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// --- Helpers ---
 
 function addDays(date: Date, days: number): Date {
   const d = new Date(date);
@@ -44,7 +44,7 @@ function toGCalDate(d: Date): string {
   return d.toISOString().replace(/[-:]/g, "").split(".")[0].slice(0, 8);
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// --- Sub-components ---
 
 function AttendeeRow({
   label,
@@ -60,11 +60,11 @@ function AttendeeRow({
   required?: boolean;
 }) {
   return (
-    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-      <div style={{ width: 110, flexShrink: 0 }}>
-        <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(250,247,242,0.5)", fontFamily: "'Inter', sans-serif" }}>
+    <div className="flex gap-3 items-center">
+      <div className="w-[110px] shrink-0">
+        <span className="text-[11px] font-semibold text-cream-muted font-sans">
           {label}
-          {required && <span style={{ color: "#c0392b" }}> *</span>}
+          {required && <span className="text-red-600"> *</span>}
         </span>
       </div>
       <input
@@ -72,34 +72,14 @@ function AttendeeRow({
         value={value.name}
         onChange={(e) => onChange({ ...value, name: e.target.value })}
         placeholder="Name"
-        style={{
-          flex: 1,
-          padding: "7px 12px",
-          borderRadius: 6,
-          border: "1px solid rgba(250,247,242,0.08)",
-          backgroundColor: "#2f2f2f",
-          color: "#FAF7F2",
-          fontSize: 13,
-          outline: "none",
-          fontFamily: "'Inter', sans-serif",
-        }}
+        className="flex-1 px-3 py-[7px] rounded-md border border-cream-border bg-charcoal-500/50 text-cream text-[13px] outline-none font-sans"
       />
       <input
         type="email"
         value={value.email}
         onChange={(e) => onChange({ ...value, email: e.target.value })}
         placeholder={placeholder || "email@example.com"}
-        style={{
-          flex: 1,
-          padding: "7px 12px",
-          borderRadius: 6,
-          border: "1px solid rgba(250,247,242,0.08)",
-          backgroundColor: "#2f2f2f",
-          color: "#FAF7F2",
-          fontSize: 13,
-          outline: "none",
-          fontFamily: "'Inter', sans-serif",
-        }}
+        className="flex-1 px-3 py-[7px] rounded-md border border-cream-border bg-charcoal-500/50 text-cream text-[13px] outline-none font-sans"
       />
     </div>
   );
@@ -112,29 +92,14 @@ function AttendeeBadge({ attendee }: { attendee: Attendee }) {
   return (
     <span
       title={`${attendee.name || ""} <${attendee.email}>`}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: 24,
-        height: 24,
-        borderRadius: "50%",
-        backgroundColor: "#d4eaed",
-        color: "#155961",
-        fontSize: 9,
-        fontWeight: 700,
-        letterSpacing: "0.03em",
-        border: "1.5px solid #1d7682",
-        flexShrink: 0,
-        cursor: "default",
-      }}
+      className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-teal-100 text-teal-dark text-[9px] font-bold tracking-[0.03em] border-[1.5px] border-teal shrink-0 cursor-default"
     >
       {initials}
     </span>
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---
 
 export default function CalendarGeneratorPage() {
   const [advisorName, setAdvisorName] = useState("");
@@ -168,7 +133,7 @@ export default function CalendarGeneratorPage() {
   const toggle = (id: string) =>
     setIncluded((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  // ── Attendee resolver ───────────────────────────────────────────────────────
+  // -- Attendee resolver --
 
   const getMeetingAttendees = (meetingId: string): Attendee[] => {
     const allAdvisors = advisors.filter((a) => a.email);
@@ -195,7 +160,7 @@ export default function CalendarGeneratorPage() {
     return map[meetingId] ?? [];
   };
 
-  // ── Google Calendar link ────────────────────────────────────────────────────
+  // -- Google Calendar link --
 
   const gCalLink = (meeting: (typeof MEETINGS)[0]) => {
     if (!launch) return "#";
@@ -209,31 +174,7 @@ export default function CalendarGeneratorPage() {
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateStr}/${dateStr}&details=${encodeURIComponent(`Owner: ${meeting.owner}`)}&location=Zoom+Meeting${addParams}`;
   };
 
-  // ── Section label styles ────────────────────────────────────────────────────
-
-  const sectionLabel: React.CSSProperties = {
-    fontSize: 11,
-    fontWeight: 700,
-    textTransform: "uppercase",
-    letterSpacing: "0.07em",
-    color: "#1d7682",
-    marginBottom: 10,
-    fontFamily: "'Inter', sans-serif",
-  };
-
-  const addBtn: React.CSSProperties = {
-    marginTop: 8,
-    fontSize: 12,
-    fontWeight: 600,
-    color: "#1d7682",
-    background: "none",
-    border: "none",
-    padding: 0,
-    cursor: "pointer",
-    fontFamily: "'Inter', sans-serif",
-  };
-
-  // ── Render ──────────────────────────────────────────────────────────────────
+  // -- Render --
 
   return (
     <PageLayout
@@ -245,20 +186,14 @@ export default function CalendarGeneratorPage() {
     >
       <div className="max-w-3xl">
 
-        {/* ── Advisor Details ── */}
-        <div
-          className="rounded-xl border p-6 mb-6"
-          style={{ borderColor: "rgba(250,247,242,0.08)", backgroundColor: "#2f2f2f" }}
-        >
-          <h2
-            className="text-xl font-bold mb-5"
-            style={{ fontFamily: "'Inter', system-ui, sans-serif", color: "#FAF7F2" }}
-          >
+        {/* -- Advisor Details -- */}
+        <div className="glass-card rounded-xl p-6 mb-6">
+          <h2 className="text-xl font-bold font-sans text-cream mb-5">
             Advisor Details
           </h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "rgba(250,247,242,0.5)" }}>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-cream-muted">
                 Advisor Name
               </label>
               <input
@@ -266,19 +201,17 @@ export default function CalendarGeneratorPage() {
                 value={advisorName}
                 onChange={(e) => setAdvisorName(e.target.value)}
                 placeholder="e.g. Jane Smith"
-                className="w-full px-3 py-2 rounded-md border text-sm outline-hidden"
-                style={{ borderColor: "rgba(250,247,242,0.08)", backgroundColor: "#262626", color: "#FAF7F2" }}
+                className="w-full px-3 py-2 rounded-md border border-cream-border bg-charcoal-700 text-cream text-sm outline-hidden"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "rgba(250,247,242,0.5)" }}>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-cream-muted">
                 Pathway
               </label>
               <select
                 value={pathway}
                 onChange={(e) => setPathway(e.target.value)}
-                className="w-full px-3 py-2 rounded-md border text-sm outline-hidden"
-                style={{ borderColor: "rgba(250,247,242,0.08)", backgroundColor: "#262626", color: "#FAF7F2" }}
+                className="w-full px-3 py-2 rounded-md border border-cream-border bg-charcoal-700 text-cream text-sm outline-hidden"
               >
                 <option value="breakaway">Breakaway</option>
                 <option value="independent_ria">Independent RIA</option>
@@ -287,36 +220,29 @@ export default function CalendarGeneratorPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "rgba(250,247,242,0.5)" }}>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5 text-cream-muted">
                 Launch / Go Live Date
               </label>
               <input
                 type="date"
                 value={launchDate}
                 onChange={(e) => setLaunchDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-md border text-sm outline-hidden"
-                style={{ borderColor: "rgba(250,247,242,0.08)", backgroundColor: "#262626", color: "#FAF7F2" }}
+                className="w-full px-3 py-2 rounded-md border border-cream-border bg-charcoal-700 text-cream text-sm outline-hidden"
               />
             </div>
           </div>
         </div>
 
-        {/* ── Team & Attendees ── */}
-        <div
-          className="rounded-xl border p-6 mb-6"
-          style={{ borderColor: "rgba(250,247,242,0.08)", backgroundColor: "#2f2f2f" }}
-        >
-          <h2
-            className="text-xl font-bold mb-5"
-            style={{ fontFamily: "'Inter', system-ui, sans-serif", color: "#FAF7F2" }}
-          >
+        {/* -- Team & Attendees -- */}
+        <div className="glass-card rounded-xl p-6 mb-6">
+          <h2 className="text-xl font-bold font-sans text-cream mb-5">
             Team &amp; Attendees
           </h2>
 
           {/* Advisors */}
-          <div style={{ marginBottom: 20 }}>
-            <div style={sectionLabel}>Advisors</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div className="mb-5">
+            <div className="text-[11px] font-bold uppercase tracking-[0.07em] text-teal mb-2.5 font-sans">Advisors</div>
+            <div className="flex flex-col gap-2">
               {advisors.map((adv, i) => (
                 <AttendeeRow
                   key={i}
@@ -331,7 +257,7 @@ export default function CalendarGeneratorPage() {
             {advisors.length < 6 && (
               <button
                 type="button"
-                style={addBtn}
+                className="mt-2 text-xs font-semibold text-teal bg-transparent border-none p-0 cursor-pointer font-sans"
                 onClick={() => setAdvisors((prev) => [...prev, emptyAttendee()])}
               >
                 + Add Advisor
@@ -340,9 +266,9 @@ export default function CalendarGeneratorPage() {
           </div>
 
           {/* Internal Team */}
-          <div style={{ marginBottom: 20 }}>
-            <div style={sectionLabel}>Internal Team</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div className="mb-5">
+            <div className="text-[11px] font-bold uppercase tracking-[0.07em] text-teal mb-2.5 font-sans">Internal Team</div>
+            <div className="flex flex-col gap-2">
               <AttendeeRow label="AXM" value={axm} onChange={setAxm} placeholder="axm@farther.com" />
               <AttendeeRow label="AXA" value={axa} onChange={setAxa} placeholder="axa@farther.com" />
               <AttendeeRow label="CTM" value={ctm} onChange={setCtm} placeholder="ctm@farther.com" />
@@ -351,9 +277,9 @@ export default function CalendarGeneratorPage() {
           </div>
 
           {/* Advisor's Team */}
-          <div style={{ marginBottom: 20 }}>
-            <div style={sectionLabel}>Advisor&apos;s Team</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div className="mb-5">
+            <div className="text-[11px] font-bold uppercase tracking-[0.07em] text-teal mb-2.5 font-sans">Advisor&apos;s Team</div>
+            <div className="flex flex-col gap-2">
               {advisorTeam.map((member, i) => (
                 <AttendeeRow
                   key={i}
@@ -365,7 +291,7 @@ export default function CalendarGeneratorPage() {
             </div>
             <button
               type="button"
-              style={addBtn}
+              className="mt-2 text-xs font-semibold text-teal bg-transparent border-none p-0 cursor-pointer font-sans"
               onClick={() => setAdvisorTeam((prev) => [...prev, emptyAttendee()])}
             >
               + Add Team Member
@@ -374,8 +300,8 @@ export default function CalendarGeneratorPage() {
 
           {/* Other Stakeholders */}
           <div>
-            <div style={sectionLabel}>Other Stakeholders</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div className="text-[11px] font-bold uppercase tracking-[0.07em] text-teal mb-2.5 font-sans">Other Stakeholders</div>
+            <div className="flex flex-col gap-2">
               <AttendeeRow label="Compliance"     value={compliance}    onChange={setCompliance}    placeholder="compliance@farther.com" />
               <AttendeeRow label="RIA Leadership" value={riaLeadership} onChange={setRiaLeadership} placeholder="ria@farther.com" />
               <AttendeeRow label="CX Manager"     value={cxManager}     onChange={setCxManager}     placeholder="cx@farther.com" />
@@ -383,41 +309,28 @@ export default function CalendarGeneratorPage() {
           </div>
         </div>
 
-        {/* ── Generate button ── */}
+        {/* -- Generate button -- */}
         <button
           onClick={() => setGenerated(true)}
           disabled={!launchDate}
-          className="mb-6 px-6 py-2.5 rounded-md text-sm font-semibold text-white transition-opacity"
-          style={{
-            backgroundColor: launchDate ? "#1d7682" : "#3a3a3a",
-            cursor: launchDate ? "pointer" : "not-allowed",
-          }}
+          className={`mb-6 px-6 py-2.5 rounded-md text-sm font-semibold text-white transition-opacity ${launchDate ? "bg-teal cursor-pointer" : "bg-charcoal-400 cursor-not-allowed"}`}
         >
-          Generate Calendar →
+          Generate Calendar &rarr;
         </button>
 
-        {/* ── Meeting schedule ── */}
+        {/* -- Meeting schedule -- */}
         {generated && launch && (
-          <div
-            className="rounded-xl border overflow-hidden"
-            style={{ borderColor: "rgba(250,247,242,0.08)" }}
-          >
-            <div
-              className="px-6 py-4 flex items-center justify-between"
-              style={{ backgroundColor: "#2a2a2a" }}
-            >
-              <h2
-                className="text-xl font-bold"
-                style={{ fontFamily: "'Inter', system-ui, sans-serif", color: "#FAF7F2" }}
-              >
+          <div className="rounded-xl border border-cream-border overflow-hidden">
+            <div className="px-6 py-4 flex items-center justify-between bg-charcoal-600">
+              <h2 className="text-xl font-bold font-sans text-cream">
                 {advisorName ? `${advisorName} — Meeting Schedule` : "Meeting Schedule"}
               </h2>
-              <span className="text-sm" style={{ color: "rgba(250,247,242,0.5)" }}>
+              <span className="text-sm text-cream-muted">
                 Launch: {formatDate(launch)}
               </span>
             </div>
 
-            <div className="divide-y" style={{ borderColor: "rgba(250,247,242,0.08)" }}>
+            <div className="divide-y divide-cream-border">
               {MEETINGS.map((m) => {
                 const date = addDays(launch, m.daysFromLaunch);
                 const isLaunchDay = m.id === "launch_day";
@@ -425,11 +338,7 @@ export default function CalendarGeneratorPage() {
                 return (
                   <div
                     key={m.id}
-                    className="flex items-center gap-3 px-6 py-3"
-                    style={{
-                      backgroundColor: isLaunchDay ? "rgba(29,118,130,0.07)" : "transparent",
-                      opacity: included[m.id] ? 1 : 0.4,
-                    }}
+                    className={`flex items-center gap-3 px-6 py-3 ${isLaunchDay ? "bg-teal/[0.07]" : ""} ${!included[m.id] ? "opacity-40" : ""}`}
                   >
                     <input
                       type="checkbox"
@@ -441,39 +350,33 @@ export default function CalendarGeneratorPage() {
                     {/* Label + date */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-medium" style={{ color: "#FAF7F2" }}>
+                        <span className="text-sm font-medium text-cream">
                           {m.label}
                         </span>
                         {isLaunchDay && (
-                          <span
-                            className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                            style={{ backgroundColor: "#1d7682", color: "white" }}
-                          >
+                          <span className="text-xs px-2 py-0.5 rounded-full font-semibold bg-teal text-white">
                             Launch Day
                           </span>
                         )}
                         {m.optional && (
-                          <span
-                            className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                            style={{ backgroundColor: "rgba(250,247,242,0.06)", color: "rgba(250,247,242,0.5)", border: "1px solid rgba(250,247,242,0.08)" }}
-                          >
+                          <span className="text-xs px-2 py-0.5 rounded-full font-semibold bg-white/[0.06] text-cream-muted border border-cream-border">
                             optional
                           </span>
                         )}
                       </div>
-                      <div className="text-xs mt-0.5" style={{ color: "rgba(250,247,242,0.5)" }}>
-                        {formatDate(date)} · Owner: {m.owner}
+                      <div className="text-xs mt-0.5 text-cream-muted">
+                        {formatDate(date)} &middot; Owner: {m.owner}
                       </div>
                     </div>
 
                     {/* Attendee badges */}
                     {attendees.length > 0 && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 3, flexWrap: "wrap", maxWidth: 160 }}>
+                      <div className="flex items-center gap-[3px] flex-wrap max-w-[160px]">
                         {attendees.slice(0, 8).map((a, i) => (
                           <AttendeeBadge key={i} attendee={a} />
                         ))}
                         {attendees.length > 8 && (
-                          <span style={{ fontSize: 10, color: "#5b6a71" }}>
+                          <span className="text-[10px] text-slate">
                             +{attendees.length - 8}
                           </span>
                         )}
@@ -486,10 +389,9 @@ export default function CalendarGeneratorPage() {
                         href={gCalLink(m)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="shrink-0 px-3 py-1 rounded-sm text-xs font-medium border transition-colors"
-                        style={{ borderColor: "#1d7682", color: "#155961" }}
+                        className="shrink-0 px-3 py-1 rounded-sm text-xs font-medium border border-teal text-teal-dark transition-colors"
                       >
-                        Add to Calendar ↗
+                        Add to Calendar &nearr;
                       </a>
                     )}
                   </div>

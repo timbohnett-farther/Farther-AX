@@ -1,4 +1,5 @@
 import Link from "next/link";
+import QuizSection from "@/components/QuizSection";
 
 export default function IntroductionPage() {
   return (
@@ -261,6 +262,8 @@ export default function IntroductionPage() {
             <span className="transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
           </Link>
         </footer>
+
+        <QuizSection topicSlug="introduction" topicTitle="Introduction" />
 
       </div>
     </div>
