@@ -134,9 +134,9 @@ export default function Sidebar() {
   );
 
   return (
-    <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-charcoal-800 dark:bg-charcoal border-r border-charcoal-600 dark:border-white/10">
+    <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-white dark:bg-charcoal border-r border-gray-200 dark:border-white/10">
       {/* Logo / Brand */}
-      <div className="px-6 pt-8 pb-5 border-b border-charcoal-600 dark:border-white/10">
+      <div className="px-6 pt-8 pb-5 border-b border-gray-200 dark:border-white/10">
         <Image
           src="/logo-dark.png"
           alt="Farther"
@@ -151,7 +151,7 @@ export default function Sidebar() {
           height={40}
           className="mb-2 object-contain object-left block dark:hidden"
         />
-        <p className="text-[10px] tracking-widest uppercase text-cream-dark dark:text-slate">
+        <p className="text-[10px] tracking-widest uppercase text-slate dark:text-slate">
           Terminal AX
         </p>
       </div>
@@ -167,7 +167,7 @@ export default function Sidebar() {
         />
 
         {/* Divider */}
-        <div className="my-3 border-t border-charcoal-600 dark:border-white/10" />
+        <div className="my-3 border-t border-gray-200 dark:border-white/10" />
 
         {/* AX Training & Information — collapsible */}
         <button
@@ -207,7 +207,7 @@ export default function Sidebar() {
         )}
 
         {/* Divider */}
-        <div className="my-4 border-t border-charcoal-600 dark:border-white/10" />
+        <div className="my-4 border-t border-gray-200 dark:border-white/10" />
 
         {/* External Links — collapsible */}
         <button
@@ -240,7 +240,7 @@ export default function Sidebar() {
 
       {/* User / Sign Out */}
       {session?.user && (
-        <div className="px-4 py-4 border-t border-charcoal-600 dark:border-white/10">
+        <div className="px-4 py-4 border-t border-gray-200 dark:border-white/10">
           <div className="flex items-center gap-3 mb-3">
             {session.user.image ? (
               <Image
@@ -276,7 +276,7 @@ export default function Sidebar() {
 
       {/* Footer (shown when not signed in) */}
       {!session?.user && (
-        <div className="px-6 py-4 border-t border-charcoal-600 dark:border-white/10">
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-white/10">
           <p className="text-xs text-gray-600 dark:text-cream-muted">
             Farther Wealth Management
           </p>

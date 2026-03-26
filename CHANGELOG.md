@@ -6,6 +6,25 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Complexity Graph Fix + Sidebar Light Mode + Tailwind Colors — 2026-03-26
+
+**What**: Fixed complexity score graph showing 0/250 by calling `computeComplexityScore` directly instead of unreliable internal HTTP fetch. Fixed sidebar light mode. Added cream color scale to Tailwind.
+
+**Scope**:
+- Workload API now imports `computeComplexityScore` directly — eliminates origin detection failures
+- Fetches deal properties + team data from HubSpot, computes scores in-process
+- Sidebar light mode: bg from `charcoal-800` to `white`, borders from `charcoal-600` to `gray-200`
+- Added `cream` color scale (50-900 + DEFAULT/dark/muted) to Tailwind config
+
+**Status**: ✅ Complete
+
+**Files**:
+- `app/api/command-center/workload/route.ts` — Direct complexity scoring
+- `tailwind.config.ts` — Added cream color scale
+- `components/Sidebar.tsx` — Fixed light mode
+
+---
+
 ## [Completed] Google Sheets Incremental Sync — 2026-03-26
 
 **What**: Transitions sync now uses Google Drive `modifiedTime` to skip sheets that haven't changed since last sync. Dramatically reduces API calls and sync time.

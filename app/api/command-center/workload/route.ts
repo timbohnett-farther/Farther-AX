@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { computeComplexityScore } from '@/lib/complexity-score';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // WORKLOAD & CAPACITY API
@@ -20,6 +21,31 @@ import pool from '@/lib/db';
 const MAX_CAPACITY = 250;
 const AMBER_THRESHOLD = 150;
 const RED_THRESHOLD = 220;
+
+const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
+const TEAMS_OBJECT_TYPE = '2-43222882';
+
+const DEAL_PROPS = [
+  'dealname', 'dealstage', 'createdate', 'hs_lastmodifieddate',
+  'transferable_aum', 'aum', 'client_households', 'transferable_households',
+  'transition_type', 'transition_notes', 'prior_transitions', 'prior_transitions_notes',
+  'firm_type', 'n401k_aum', 'insurance_annuity_revenue', 'broker_dealer_revenue',
+  'crm_platform__cloned_', 'financial_planning_platform__cloned_',
+  'performance_platform__cloned_', 'technology_platforms_being_used__cloned_',
+  'people', 'description',
+].join(',');
+
+const TEAM_PROPS = [
+  'transferable_aum', 'n401k_aum', 'transferable_401k_aum',
+  'insurance_annuity_revenue', 'broker_dealer_revenue',
+  'client_households', 'transferable_households',
+  'people', 'support_staff', 'total_number_of_owners_or_partners',
+  'crm_platform', 'financial_planning_platform', 'performance_platform',
+  'technology_platforms_being_used', 'tamp', 'investment_products',
+  'alternative_assets__', 'firm_type', 'transition_type',
+  'obas__yes_no', 'outside_business_activities',
+  'restrictive_covenants',
+].join(',');
 
 export interface WorkloadEntry {
   member_id: number;
@@ -80,62 +106,90 @@ export async function GET(request: Request) {
 
     const dealScores: Record<string, { score: number; tier: string; deal_name: string; dealstage: string }> = {};
 
-    if (dealIds.length > 0) {
-      // Fetch deal info from HubSpot batch
-      const hubspotToken = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT;
-      if (hubspotToken) {
-        try {
+    if (dealIds.length > 0 && HUBSPOT_PAT) {
+      try {
+        // Batch fetch deal properties directly from HubSpot
+        for (let i = 0; i < dealIds.length; i += 100) {
+          const batch = dealIds.slice(i, i + 100);
           const batchRes = await fetch('https://api.hubapi.com/crm/v3/objects/deals/batch/read', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${hubspotToken}` },
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${HUBSPOT_PAT}` },
             body: JSON.stringify({
-              properties: ['dealname', 'dealstage'],
-              inputs: dealIds.map(id => ({ id })),
+              properties: DEAL_PROPS.split(','),
+              inputs: batch.map(id => ({ id })),
             }),
           });
-          const batchData = await batchRes.json();
-          if (batchData.results) {
-            for (const d of batchData.results) {
-              dealScores[d.id] = {
-                score: 0,
-                tier: 'Low',
-                deal_name: d.properties.dealname || 'Unknown',
-                dealstage: d.properties.dealstage || '',
-              };
-            }
-          }
-        } catch {
-          // Continue without HubSpot data
-        }
-      }
 
-      // Fetch complexity scores from our batch endpoint
-      try {
-        const origin = request.headers.get('host') ? `http://${request.headers.get('host')}` : 'http://localhost:3000';
-        const complexityRes = await fetch(`${origin}/api/command-center/complexity/batch`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ dealIds }),
-        });
-        const complexityData = await complexityRes.json();
-        if (complexityData.scores) {
-          for (const [dealId, scoreData] of Object.entries(complexityData.scores)) {
-            const sd = scoreData as { score: number; tier: string };
-            if (dealScores[dealId]) {
-              dealScores[dealId].score = sd.score;
-              dealScores[dealId].tier = sd.tier;
-            } else {
-              dealScores[dealId] = {
-                score: sd.score,
-                tier: sd.tier,
-                deal_name: 'Unknown',
-                dealstage: '',
-              };
+          if (!batchRes.ok) {
+            console.error(`[workload] HubSpot batch read failed: ${batchRes.status}`);
+            continue;
+          }
+
+          const batchData = await batchRes.json();
+          for (const d of (batchData.results ?? [])) {
+            dealScores[d.id] = {
+              score: 0,
+              tier: 'Low',
+              deal_name: d.properties?.dealname || 'Unknown',
+              dealstage: d.properties?.dealstage || '',
+              _props: d.properties, // Keep raw props for scoring
+            };
+          }
+        }
+
+        // Fetch team data for advanced-stage deals (Step 5+)
+        const advancedStages = ['2496935', '2496936', '100411705'];
+        const advancedDealIds = Object.entries(dealScores)
+          .filter(([, ds]) => advancedStages.includes(ds.dealstage))
+          .map(([id]) => id);
+
+        const teamData: Record<string, Record<string, string | null> | null> = {};
+        for (let i = 0; i < advancedDealIds.length; i += 10) {
+          const batch = advancedDealIds.slice(i, i + 10);
+          const results = await Promise.allSettled(
+            batch.map(async (dealId) => {
+              const assocRes = await fetch(
+                `https://api.hubapi.com/crm/v4/objects/deals/${dealId}/associations/${TEAMS_OBJECT_TYPE}`,
+                { headers: { Authorization: `Bearer ${HUBSPOT_PAT}` } }
+              );
+              if (!assocRes.ok) return { dealId, team: null };
+              const assocData = await assocRes.json();
+              const assocResults = assocData.results ?? [];
+              if (assocResults.length === 0) return { dealId, team: null };
+              const teamId = assocResults[0].toObjectId;
+              const teamRes = await fetch(
+                `https://api.hubapi.com/crm/v3/objects/${TEAMS_OBJECT_TYPE}/${teamId}?properties=${TEAM_PROPS}`,
+                { headers: { Authorization: `Bearer ${HUBSPOT_PAT}` } }
+              );
+              if (!teamRes.ok) return { dealId, team: null };
+              const teamObj = await teamRes.json();
+              return { dealId, team: teamObj.properties ?? null };
+            })
+          );
+          for (const r of results) {
+            if (r.status === 'fulfilled' && r.value) {
+              teamData[r.value.dealId] = r.value.team;
             }
           }
         }
-      } catch {
-        // Continue with zero scores
+
+        // Compute complexity scores directly (no internal HTTP call)
+        for (const [dealId, ds] of Object.entries(dealScores)) {
+          const props = (ds as Record<string, unknown>)._props as Record<string, string | null> | undefined;
+          if (!props) continue;
+          const team = teamData[dealId] ?? null;
+          const result = computeComplexityScore(props, team, []);
+          ds.score = result.score;
+          ds.tier = result.tier;
+        }
+
+        // Clean up internal _props field
+        for (const ds of Object.values(dealScores)) {
+          delete (ds as Record<string, unknown>)._props;
+        }
+      } catch (err) {
+        console.error('[workload] Complexity scoring failed:', err);
+        // Continue with zero scores — still show team members
       }
     }
 
