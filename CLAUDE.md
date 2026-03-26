@@ -46,7 +46,7 @@ Always prioritize the end-user experience. This means:
 ### 5. Follow the Brand Guide — Uniform Branding Everywhere
 All pages must follow the Farther brand guide consistently. This includes:
 - **Design tokens** from `lib/design-tokens.ts` — use them, don't hardcode colors or spacing
-- **Typography** — `font-serif` (ABC Arizona Text) for headers, `font-sans` (Fakt) for body text
+- **Typography** — Follow `Font-Gold-Standard.md` exactly. **Inter** is the only approved sans-serif font. **DM Mono** is the only approved monospace font. All financial numbers must use `tabular-nums` and right-align. See the full guide for scale, weights, and component patterns.
 - **Tailwind utilities** only — no inline styles, no CSS modules
 - **Tremor React** components for data visualization and UI elements
 - **Consistent styling** across every page — no page should look different from the rest of the app
@@ -76,7 +76,7 @@ Next.js 14.2, React 18, TypeScript 5.9, Tailwind CSS 3.4, Tremor React 3.18, SWR
 - **Tailwind utilities** + design tokens (`lib/design-tokens.ts`)
 - **Tremor React** components (`components/ui/`)
 - **NO inline styles, NO CSS modules**
-- Fonts: `font-serif` (ABC Arizona Text) for headers, `font-sans` (Fakt) for body
+- **Typography**: Follow `Font-Gold-Standard.md` — **Inter** (sans-serif), **DM Mono** (monospace). All financial numbers use `tabular-nums` + right-align. No other fonts permitted.
 
 ---
 
