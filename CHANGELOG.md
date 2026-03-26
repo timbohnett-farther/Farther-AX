@@ -6,6 +6,42 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Complete Color Scheme Overhaul — 2026-03-26
+
+**What**: Implemented new color scheme for both light and dark modes with reversed palettes.
+
+**Light Mode Colors**:
+- Background: #F8F4F0 (warm cream)
+- Text: #595959 (medium grey)
+- Cards/Tables: #466F81 (teal blue)
+- Card text: #F8F4F0 (cream)
+- Table alternating rows: #466F81 & #93B6C4
+- Chart axis: #F8F4F0
+
+**Dark Mode Colors (Reversed)**:
+- Background: #466F81 (teal blue)
+- Text: #F8F4F0 (cream)
+- Cards/Tables: #F8F4F0 (cream)
+- Card text: #595959 (grey)
+- Table alternating rows: #F8F4F0 & #93B6C4
+- Chart axis: #595959
+
+**Accent Colors Added**:
+- accent-1: #9B766A (terracotta/brown)
+- accent-2: #D2DFE6 (light blue/grey)
+- accent-3: #E1D2C5 (beige/cream)
+
+**Status**: ✅ Complete
+
+**Files**:
+- `app/globals.css` — Updated semantic tokens, table/chart/card styling for both modes
+- `lib/design-tokens.ts` — Updated getThemeColors with new palette and accent colors
+- `tailwind.config.ts` — Added accent color classes
+
+**Commits**: `157ee82` (light mode), `511fff0` (accents), `cbaea4f` (dark mode reversed)
+
+---
+
 ## [Completed] Fix Sidebar Light Mode Background — 2026-03-26
 
 **What**: Changed sidebar background from black to white in light mode.
