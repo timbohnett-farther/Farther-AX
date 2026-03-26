@@ -6,6 +6,30 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [In Progress] Alerts Fix + Transitions SWAT Plan — 2026-03-26
+
+**What**: Fixed alerts API reliability and created Transitions SWAT plan.
+
+**Alerts Fix**:
+- `Promise.allSettled` for all data fetches — partial failures no longer crash the endpoint
+- Batch DB queries: 2 queries total instead of 2 per deal (bulk fetch with `ANY($1)`)
+- Unassigned overdue tasks now show as alerts with `responsible_person: {name: 'Unassigned'}`
+- Per-deal try/catch so one bad deal doesn't kill all alerts
+
+**Transitions SWAT Plan** (`TRANSITIONS-SWAT.md`):
+- 5 specialist team (ATLAS, FORGE, VAULT, SENTINEL, CHRONOS)
+- Incremental sync with change detection (modifiedTime + row checksums)
+- Google API hardening (auth caching, rate limiter, retry with backoff)
+- Batch upserts in transactions instead of per-row inserts
+- Cron-based auto-sync every 2 hours (no more page-load triggers)
+
+**Files**:
+- `app/api/command-center/alerts/route.ts` — Error isolation, batch queries, unassigned task alerts
+- `TRANSITIONS-SWAT.md` — Full implementation plan
+- `TODO.md` — Updated with new tasks
+
+---
+
 ## [In Progress] Strike Team Audit & SWAT Plans — 2026-03-26
 
 **What**: Ran full Strike Team audit across the entire AX Command Center codebase. Added PRISM brand consistency specialist. Created DATA-LOADING-SWAT.md to fix critical caching/load issues.

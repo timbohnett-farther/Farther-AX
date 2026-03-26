@@ -161,7 +161,19 @@ When you report a fix:
   - [ ] Generate alerts for each unfinished task on launched advisors
   - [ ] Ensure alerts appear on first load without refresh
 
-### **Task #7: Fix Onboarding Page Complexity Score Graph**
+### **Task #7: Fix Transitions Dashboard — Permanent Solution**
+- **Status:** 🟡 In Progress
+- **Priority:** 🚨 Critical
+- **Description:** Transitions page stops working intermittently. Root causes: Google API auth expiry, no error isolation per sheet, rate limiting, full re-sync every time. Need incremental sync with change detection.
+- **SWAT Plan:** See `TRANSITIONS-SWAT.md`
+- **Sub-tasks:**
+  - [ ] Phase 1: Error isolation — try/catch per sheet, auth token caching, retry logic
+  - [ ] Phase 2: Incremental sync — check modifiedTime, row checksums, only update changes
+  - [ ] Phase 3: Google API hardening — rate limiter, timeouts, backoff
+  - [ ] Phase 4: DB optimization — batch upserts, transactions, pool monitoring
+  - [ ] Phase 5: Auto-sync scheduler — cron-based, distributed lock, no page-load trigger
+
+### **Task #8: Fix Onboarding Page Complexity Score Graph**
 - **Status:** 🔴 Not Started
 - **Priority:** High
 - **Description:** The onboarding page is not reading the complexity scores of advisors assigned to team members. It should sum those scores and display them on the 0/250 complexity points graph for each AXM.
