@@ -1,16 +1,9 @@
-import PageLayout from "@/components/PageLayout";
+'use client';
 
-const COLORS = {
-  charcoal: "#FAF7F2",
-  charcoalMuted: "rgba(250,247,242,0.5)",
-  gold: "#1d7682",
-  cream: "#1a1a1a",
-  creamDark: "#222222",
-  creamBorder: "rgba(250,247,242,0.08)",
-  blueBg: "rgba(59,130,246,0.15)",
-  blueBorder: "#3B82F6",
-  blueText: "#60a5fa",
-};
+import { useMemo } from 'react';
+import { useTheme } from '@/lib/theme-provider';
+import { getThemeColors } from '@/lib/design-tokens';
+import PageLayout from "@/components/PageLayout";
 
 const characteristics = [
   {
@@ -47,6 +40,9 @@ const transitionConsiderations = [
 ];
 
 export default function IndependentRIAPage() {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+
   return (
     <PageLayout
       step={5}
@@ -62,11 +58,11 @@ export default function IndependentRIAPage() {
         {/* Intro */}
         <p
           style={{
-            color: COLORS.charcoalMuted,
+            color: C.darkMuted,
             fontSize: "1rem",
             lineHeight: "1.75",
             marginBottom: "2.5rem",
-            borderLeft: `3px solid ${COLORS.gold}`,
+            borderLeft: `3px solid ${C.teal}`,
             paddingLeft: "1rem",
           }}
         >
@@ -74,7 +70,7 @@ export default function IndependentRIAPage() {
           operating as registered independent investment advisers — meaning they
           own their own book of business and have their own SEC or state RIA
           registration. This is typically the{" "}
-          <strong style={{ color: COLORS.charcoal }}>
+          <strong style={{ color: C.dark }}>
             lowest-risk pathway
           </strong>{" "}
           from a legal standpoint, but it has unique regulatory requirements
@@ -88,7 +84,7 @@ export default function IndependentRIAPage() {
               fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: "1.25rem",
               fontWeight: 700,
-              color: COLORS.charcoal,
+              color: C.dark,
               marginBottom: "1.25rem",
               letterSpacing: "0.01em",
             }}
@@ -108,7 +104,7 @@ export default function IndependentRIAPage() {
                 className="transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
                 style={{
                   backgroundColor: "#2f2f2f",
-                  border: `1px solid ${COLORS.creamBorder}`,
+                  border: `1px solid ${C.border}`,
                   borderRadius: "10px",
                   padding: "1.25rem",
                   display: "flex",
@@ -123,7 +119,7 @@ export default function IndependentRIAPage() {
                       fontWeight: 700,
                       letterSpacing: "0.08em",
                       textTransform: "uppercase",
-                      color: COLORS.charcoalMuted,
+                      color: C.darkMuted,
                     }}
                   >
                     {c.label}
@@ -148,7 +144,7 @@ export default function IndependentRIAPage() {
                 <p
                   style={{
                     fontSize: "0.85rem",
-                    color: COLORS.charcoalMuted,
+                    color: C.darkMuted,
                     lineHeight: "1.6",
                     margin: 0,
                   }}
@@ -167,7 +163,7 @@ export default function IndependentRIAPage() {
               fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: "1.25rem",
               fontWeight: 700,
-              color: COLORS.charcoal,
+              color: C.dark,
               marginBottom: "1.25rem",
               letterSpacing: "0.01em",
             }}
@@ -176,9 +172,9 @@ export default function IndependentRIAPage() {
           </h2>
           <div
             style={{
-              backgroundColor: COLORS.blueBg,
-              border: `1px solid ${COLORS.blueBorder}`,
-              borderLeft: `4px solid ${COLORS.blueBorder}`,
+              backgroundColor: C.purpleBg,
+              border: `1px solid ${C.purpleBorder}`,
+              borderLeft: `4px solid ${C.purpleBorder}`,
               borderRadius: "8px",
               padding: "1.25rem 1.5rem",
             }}
@@ -191,14 +187,14 @@ export default function IndependentRIAPage() {
                 marginBottom: "0.75rem",
               }}
             >
-              <span style={{ fontSize: "1.1rem", color: COLORS.blueBorder }}>&#8505;</span>
+              <span style={{ fontSize: "1.1rem", color: C.purpleBorder }}>&#8505;</span>
               <span
                 style={{
                   fontSize: "0.8rem",
                   fontWeight: 700,
                   letterSpacing: "0.07em",
                   textTransform: "uppercase",
-                  color: COLORS.blueText,
+                  color: C.purple,
                 }}
               >
                 90-Day Regulatory Deadline
@@ -207,7 +203,7 @@ export default function IndependentRIAPage() {
             <p
               style={{
                 fontSize: "0.875rem",
-                color: COLORS.blueText,
+                color: C.purple,
                 lineHeight: "1.7",
                 margin: 0,
               }}
@@ -229,7 +225,7 @@ export default function IndependentRIAPage() {
               fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: "1.25rem",
               fontWeight: 700,
-              color: COLORS.charcoal,
+              color: C.dark,
               marginBottom: "1.25rem",
               letterSpacing: "0.01em",
             }}
@@ -248,7 +244,7 @@ export default function IndependentRIAPage() {
               className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
               style={{
                 backgroundColor: "#2f2f2f",
-                border: `1px solid ${COLORS.creamBorder}`,
+                border: `1px solid ${C.border}`,
                 borderRadius: "10px",
                 padding: "1.25rem",
               }}
@@ -275,7 +271,7 @@ export default function IndependentRIAPage() {
                   style={{
                     fontWeight: 700,
                     fontSize: "0.95rem",
-                    color: COLORS.charcoal,
+                    color: C.dark,
                   }}
                 >
                   Dual Registration States
@@ -284,7 +280,7 @@ export default function IndependentRIAPage() {
               <p
                 style={{
                   fontSize: "0.875rem",
-                  color: COLORS.charcoalMuted,
+                  color: C.darkMuted,
                   lineHeight: "1.65",
                   margin: 0,
                 }}
@@ -300,7 +296,7 @@ export default function IndependentRIAPage() {
               className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
               style={{
                 backgroundColor: "#2f2f2f",
-                border: `1px solid ${COLORS.creamBorder}`,
+                border: `1px solid ${C.border}`,
                 borderRadius: "10px",
                 padding: "1.25rem",
               }}
@@ -327,7 +323,7 @@ export default function IndependentRIAPage() {
                   style={{
                     fontWeight: 700,
                     fontSize: "0.95rem",
-                    color: COLORS.charcoal,
+                    color: C.dark,
                   }}
                 >
                   Non-Dual Registration States
@@ -336,7 +332,7 @@ export default function IndependentRIAPage() {
               <p
                 style={{
                   fontSize: "0.875rem",
-                  color: COLORS.charcoalMuted,
+                  color: C.darkMuted,
                   lineHeight: "1.65",
                   margin: 0,
                 }}
@@ -355,7 +351,7 @@ export default function IndependentRIAPage() {
               fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: "1.25rem",
               fontWeight: 700,
-              color: COLORS.charcoal,
+              color: C.dark,
               marginBottom: "1.25rem",
               letterSpacing: "0.01em",
             }}
@@ -366,7 +362,7 @@ export default function IndependentRIAPage() {
             className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
             style={{
               backgroundColor: "#2f2f2f",
-              border: `1px solid ${COLORS.creamBorder}`,
+              border: `1px solid ${C.border}`,
               borderRadius: "10px",
               padding: "1.25rem 1.5rem",
             }}
@@ -389,7 +385,7 @@ export default function IndependentRIAPage() {
                     alignItems: "flex-start",
                     gap: "0.625rem",
                     fontSize: "0.875rem",
-                    color: COLORS.charcoalMuted,
+                    color: C.darkMuted,
                     lineHeight: "1.6",
                   }}
                 >
@@ -399,7 +395,7 @@ export default function IndependentRIAPage() {
                       width: "6px",
                       height: "6px",
                       borderRadius: "50%",
-                      backgroundColor: COLORS.gold,
+                      backgroundColor: C.teal,
                       marginTop: "0.55rem",
                       boxShadow: "0 0 12px rgba(29, 118, 130, 0.4)",
                     }}

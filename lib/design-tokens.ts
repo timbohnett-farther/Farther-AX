@@ -1,32 +1,38 @@
 /**
- * Farther Design Tokens — Dark Glass Theme
+ * Farther AX Design Tokens — Unified Design System
  *
- * Centralized color palette and Tailwind class helpers.
- * Matches the Farther Marketing Command Center Brand Spec.
+ * Single source of truth for all colors, typography, spacing, and theming.
+ * Brand colors: Cream (#FFFEF4) & Teal (#4E7082)
  */
 
-// Core brand colors
+// ============================================================================
+// CORE BRAND COLORS (Cream & Teal)
+// ============================================================================
+
 export const colors = {
-  // Core 5
-  charcoal: '#333333',
-  white: '#ffffff',
-  slate: '#405B69',
-  ice: '#D4DFE5',
+  // Primary brand colors
+  cream: '#FFFEF4',
   teal: '#4E7082',
   tealDark: '#374E59',
   tealLight: '#A8CED3',
 
-  // Background gradient stops
+  // Neutrals
+  charcoal: '#333333',
+  white: '#ffffff',
+  slate: '#405B69',
+  ice: '#D4DFE5',
+
+  // Background gradient stops (dark mode)
   bg600: '#2a2a2a',
   bg800: '#1a1a1a',
   bg900: '#111111',
 
-  // Surface
+  // Surface colors (dark mode default)
   cardBg: 'rgba(23, 31, 39, 0.80)',
   border: 'rgba(250, 247, 242, 0.08)',
   borderSubtle: 'rgba(250, 247, 242, 0.05)',
 
-  // Text (cream-based)
+  // Text colors (cream-based for dark mode)
   textPrimary: '#FFFEF4',
   textSecondary: 'rgba(255, 255, 255, 0.7)',
   textMuted: 'rgba(255, 255, 255, 0.5)',
@@ -48,15 +54,83 @@ export const colors = {
 
   // Status colors
   success: '#4ade80',
+  successDark: '#10b981',
   warning: '#fbbf24',
+  warningDark: '#f59e0b',
   danger: '#f87171',
+  dangerDark: '#ef4444',
   info: '#60a5fa',
 
-  // Chart palette
-  chart: ['#4E7082', '#A8CED3', '#99B6C3', '#D4DFE5', '#405B69', '#8A5C4F', '#34d399', '#fbbf24'],
+  // Chart palette (teal-based)
+  chart: [
+    '#4E7082', // Teal
+    '#A8CED3', // Teal Light
+    '#99B6C3', // Teal Muted
+    '#D4DFE5', // Ice
+    '#405B69', // Slate
+    '#8A5C4F', // Terra
+    '#34d399', // Bull
+    '#fbbf24', // Gold
+  ],
 } as const;
 
-// Tailwind utility class helpers
+// ============================================================================
+// LIGHT/DARK MODE THEME COLORS
+// ============================================================================
+
+export const getThemeColors = (isDark: boolean) => ({
+  // Text colors
+  dark: isDark ? '#FFFEF4' : '#1a1a1a',
+  white: isDark ? '#1a1a1a' : '#FFFEF4',
+  slate: isDark ? 'rgba(212,223,229,0.5)' : 'rgba(102,102,102,0.6)',
+  cream: isDark ? '#FFFEF4' : '#405C6A',
+  textSecondary: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(26,26,26,0.7)',
+
+  // Background colors
+  bg: isDark ? '#111111' : '#F8F4F0',
+  cardBg: isDark ? '#171f27' : '#FFFFFF',
+  cardBgAlt: isDark ? 'rgba(250,247,242,0.03)' : '#F9F9F9',
+
+  // Border colors
+  border: isDark ? 'rgba(212,223,229,0.08)' : 'rgba(224,224,224,0.4)',
+  borderSubtle: isDark ? 'rgba(212,223,229,0.05)' : 'rgba(224,224,224,0.25)',
+  borderStrong: isDark ? 'rgba(212,223,229,0.15)' : 'rgba(224,224,224,0.6)',
+
+  // Brand colors (consistent across themes)
+  teal: '#4E7082',
+  lightBlue: '#A8CED3',
+
+  // Status colors with backgrounds
+  green: '#10b981',
+  greenBg: isDark ? 'rgba(16,185,129,0.15)' : 'rgba(16,185,129,0.08)',
+  greenBorder: isDark ? 'rgba(16,185,129,0.35)' : 'rgba(16,185,129,0.25)',
+
+  amber: '#f59e0b',
+  amberBg: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.08)',
+  amberBorder: isDark ? 'rgba(245,158,11,0.3)' : 'rgba(245,158,11,0.2)',
+
+  red: '#ef4444',
+  redBg: isDark ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.08)',
+  redBorder: isDark ? 'rgba(239,68,68,0.3)' : 'rgba(239,68,68,0.2)',
+
+  gold: '#fbbf24',
+  goldBg: isDark ? 'rgba(251,191,36,0.15)' : 'rgba(251,191,36,0.08)',
+
+  purple: '#a78bfa',
+  purpleBg: isDark ? 'rgba(167,139,250,0.15)' : 'rgba(167,139,250,0.1)',
+  purpleBorder: isDark ? 'rgba(167,139,250,0.35)' : 'rgba(167,139,250,0.25)',
+
+  // Component specific
+  tableHeaderBg: isDark ? '#2f2f2f' : '#E8E8E8',
+  cardBgHover: isDark ? 'rgba(29,118,130,0.06)' : 'rgba(78,112,130,0.08)',
+});
+
+export type ThemeColors = ReturnType<typeof getThemeColors>;
+
+// ============================================================================
+// TAILWIND CLASS HELPERS
+// ============================================================================
+
 export const tw = {
   // Card styles
   card: 'glass-card',
@@ -76,7 +150,7 @@ export const tw = {
   btnSecondary: 'glass-btn-secondary',
   btnGhost: 'glass-btn-ghost',
 
-  // Text styles (white at varying opacity)
+  // Text styles
   heading1: 'text-4xl font-bold text-white tracking-tight',
   heading2: 'text-3xl font-bold text-white tracking-tight',
   heading3: 'text-2xl font-semibold text-white',
@@ -99,14 +173,40 @@ export const tw = {
   shadow: 'shadow-glass hover:shadow-glass-hover',
 } as const;
 
-// Typography helpers
+// ============================================================================
+// TYPOGRAPHY
+// ============================================================================
+
 export const typography = {
-  fontSans: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-  fontMono: "'DM Mono', 'Courier New', Courier, monospace",
-  fontSerif: "'Inter', system-ui, sans-serif", // Inter is the only approved font
+  fontFamily: {
+    sans: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+    serif: "'Inter', system-ui, sans-serif", // Inter is the only approved font
+    mono: "'DM Mono', 'Courier New', Courier, monospace",
+  },
+  fontSize: {
+    xs: '0.75rem',
+    sm: '0.875rem',
+    base: '1rem',
+    lg: '1.125rem',
+    xl: '1.25rem',
+    '2xl': '1.5rem',
+    '3xl': '1.875rem',
+    '4xl': '2.25rem',
+  },
+  fontWeight: {
+    light: 300,
+    regular: 400,
+    medium: 500,
+    semibold: 600,
+    bold: 700,
+    extrabold: 800,
+  },
 } as const;
 
-// Spacing scale (matches Tailwind)
+// ============================================================================
+// SPACING & LAYOUT
+// ============================================================================
+
 export const spacing = {
   xs: '0.25rem',
   sm: '0.5rem',
@@ -117,7 +217,6 @@ export const spacing = {
   '3xl': '4rem',
 } as const;
 
-// Border radius scale
 export const borderRadius = {
   sm: '0.375rem',
   md: '0.5rem',
@@ -127,14 +226,20 @@ export const borderRadius = {
   full: '9999px',
 } as const;
 
-// Animation durations
+// ============================================================================
+// ANIMATION
+// ============================================================================
+
 export const duration = {
   fast: '150ms',
   normal: '300ms',
   slow: '500ms',
 } as const;
 
-// Breakpoints
+// ============================================================================
+// BREAKPOINTS
+// ============================================================================
+
 export const breakpoints = {
   sm: '640px',
   md: '768px',
@@ -143,7 +248,10 @@ export const breakpoints = {
   '2xl': '1536px',
 } as const;
 
-// Helper functions
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
 export const getStatusColor = (status: string): string => {
   const statusMap: Record<string, string> = {
     success: colors.success,
@@ -175,7 +283,20 @@ export const getMarketColor = (value: number): string => {
   return colors.neutral;
 };
 
-// Format helpers
+export const getStageColors = (teal: string, gold: string): Record<string, string> => ({
+  '2496931':   '#7fb3d8',
+  '2496932':   '#6ba3cc',
+  '2496934':   '#5793c0',
+  '100409509': '#4383b4',
+  '2496935':   '#2f73a8',
+  '2496936':   gold,
+  '100411705': teal,
+});
+
+// ============================================================================
+// FORMAT HELPERS
+// ============================================================================
+
 export const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -199,3 +320,65 @@ export const formatCompactCurrency = (value: number, decimals: number = 2): stri
   if (value >= 1_000) return `$${(value / 1_000).toFixed(decimals)}K`;
   return formatCurrency(value);
 };
+
+// ============================================================================
+// INTAKE FORM THEME (for form pages)
+// ============================================================================
+
+export const THEME = {
+  colors: {
+    // Primary colors
+    charcoal: colors.charcoal,
+    white: colors.white,
+    slate: colors.slate,
+    ice: colors.ice,
+    teal: colors.teal,
+    cream: colors.cream,
+
+    // Muted variants
+    charcoalMuted: 'rgba(51, 51, 51, 0.6)',
+
+    // Status colors
+    success: colors.success,
+    successLight: 'rgba(74, 222, 128, 0.1)',
+    warning: colors.warning,
+    warningLight: 'rgba(251, 191, 36, 0.1)',
+    error: colors.danger,
+    errorLight: 'rgba(248, 113, 113, 0.1)',
+    info: colors.info,
+    infoLight: 'rgba(96, 165, 250, 0.1)',
+  },
+
+  spacing,
+  typography,
+} as const;
+
+export const STYLES = {
+  heading: {
+    fontFamily: typography.fontFamily.serif,
+    fontWeight: 600,
+    color: THEME.colors.charcoal,
+    lineHeight: 1.2,
+  },
+  body: {
+    fontFamily: typography.fontFamily.sans,
+    fontSize: typography.fontSize.base,
+    color: THEME.colors.charcoal,
+    lineHeight: 1.6,
+  },
+  label: {
+    fontFamily: typography.fontFamily.sans,
+    fontSize: typography.fontSize.sm,
+    fontWeight: 500,
+    color: THEME.colors.charcoal,
+    marginBottom: '0.5rem',
+  },
+  input: {
+    fontFamily: typography.fontFamily.sans,
+    fontSize: typography.fontSize.base,
+    padding: '0.75rem 1rem',
+    borderRadius: '0.5rem',
+    border: `1px solid ${THEME.colors.slate}`,
+    width: '100%',
+  },
+} as const;
