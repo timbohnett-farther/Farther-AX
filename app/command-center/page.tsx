@@ -21,7 +21,7 @@ const SWR_OPTS = {
 } as const;
 
 // Use centralized theme colors
-import { getThemeColors } from '@/lib/theme-colors';
+import { getThemeColors } from '@/lib/design-tokens';
 
 // ── Stage mappings for Advisor Recruiting ────────────────────────────────────
 const STAGE_LABELS: Record<string, string> = {

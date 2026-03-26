@@ -1,3 +1,8 @@
+'use client';
+
+import { useMemo } from 'react';
+import { useTheme } from '@/lib/theme-provider';
+import { getThemeColors } from '@/lib/design-tokens';
 import PageLayout from "@/components/PageLayout";
 import QuizSection from "@/components/QuizSection";
 
@@ -5,29 +10,25 @@ const characteristics = [
   {
     label: "Compliance Sensitivity",
     badge: "High",
-    badgeColor: "bg-red-600",
-    badgeShadow: "shadow-[0_0_10px_rgba(220,38,38,0.25)]",
+    badgeColor: "#DC2626",
     body: "Non-solicitation and non-compete agreements are common. Advisors may face legal action from their prior firm if they contact clients before resignation. AXM and Legal must be briefed before any advisor communication goes out.",
   },
   {
     label: "U4 Timing",
     badge: "Hold Until Resignation",
-    badgeColor: "bg-teal",
-    badgeShadow: "shadow-[0_0_10px_rgba(78,112,130,0.25)]",
+    badgeColor: "#1d7682",
     body: "The U4 registration form must NOT be submitted until after the advisor has formally resigned. Submitting early creates a trackable FINRA event that can alert the prior firm prematurely.",
   },
   {
     label: "Client Communication",
     badge: "Restricted Pre-Resignation",
-    badgeColor: "bg-amber-600",
-    badgeShadow: "shadow-[0_0_10px_rgba(217,119,6,0.25)]",
+    badgeColor: "#D97706",
     body: "Under the Protocol for Broker Recruitment, advisors may take only client names, addresses, phone numbers, email, and account titles. Any broader client data extraction is prohibited. Advisors should consult their prior firm's protocol membership status.",
   },
   {
     label: "Resignation Required",
     badge: "Mandatory First Step",
-    badgeColor: "bg-slate",
-    badgeShadow: "shadow-[0_0_10px_rgba(91,106,113,0.25)]",
+    badgeColor: "#5b6a71",
     body: "The advisor must formally resign before the Farther onboarding can fully proceed. The AXM coordinates timing with the advisor and Legal to minimize exposure and ensure the transition is clean.",
   },
 ];
@@ -77,6 +78,9 @@ const pitfalls = [
 ];
 
 export default function BreakawayPage() {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+
   return (
     <PageLayout
       step={4}
@@ -88,13 +92,22 @@ export default function BreakawayPage() {
       nextHref="/independent-ria"
       nextLabel="Independent RIA"
     >
-      <div className="max-w-[900px] mx-auto">
+      <div style={{ maxWidth: "900px", margin: "0 auto" }}>
         {/* Intro */}
-        <p className="text-cream-muted text-base leading-[1.75] mb-10 border-l-[3px] border-teal pl-4">
+        <p
+          style={{
+            color: C.slate,
+            fontSize: "1rem",
+            lineHeight: "1.75",
+            marginBottom: "2.5rem",
+            borderLeft: `3px solid ${C.teal}`,
+            paddingLeft: "1rem",
+          }}
+        >
           The Breakaway pathway applies to advisors departing a wirehouse
           (Merrill Lynch, Morgan Stanley, UBS, Wells Fargo, Raymond James, etc.)
           or other captive firm to join Farther. This pathway carries the{" "}
-          <strong className="text-cream">
+          <strong style={{ color: C.dark }}>
             highest compliance sensitivity
           </strong>{" "}
           of all four onboarding paths. Every step must be carefully sequenced
@@ -103,27 +116,77 @@ export default function BreakawayPage() {
         </p>
 
         {/* Key Characteristics */}
-        <section className="mb-10">
-          <h2 className="font-sans text-xl font-bold text-cream mb-5 tracking-[0.01em]">
+        <section style={{ marginBottom: "2.5rem" }}>
+          <h2
+            style={{
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: "1.25rem",
+              fontWeight: 700,
+              color: C.dark,
+              marginBottom: "1.25rem",
+              letterSpacing: "0.01em",
+            }}
+          >
             Key Characteristics
           </h2>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              gap: "1rem",
+            }}
+          >
             {characteristics.map((c) => (
               <div
                 key={c.label}
-                className="glass-card rounded-[10px] p-5 flex flex-col gap-2.5 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+                className="transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+                style={{
+                  backgroundColor: "#2f2f2f",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: "10px",
+                  padding: "1.25rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.625rem",
+                }}
               >
-                <div className="flex flex-col gap-1">
-                  <span className="text-[0.7rem] font-bold tracking-[0.08em] uppercase text-cream-muted">
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                  <span
+                    style={{
+                      fontSize: "0.7rem",
+                      fontWeight: 700,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      color: C.slate,
+                    }}
+                  >
                     {c.label}
                   </span>
                   <span
-                    className={`inline-block text-[0.7rem] font-semibold text-white ${c.badgeColor} rounded-full px-3 py-[3px] self-start ${c.badgeShadow} tracking-[0.03em]`}
+                    style={{
+                      display: "inline-block",
+                      fontSize: "0.7rem",
+                      fontWeight: 600,
+                      color: "#fff",
+                      backgroundColor: c.badgeColor,
+                      borderRadius: "9999px",
+                      padding: "3px 12px",
+                      alignSelf: "flex-start",
+                      boxShadow: `0 0 10px ${c.badgeColor}40`,
+                      letterSpacing: "0.03em",
+                    }}
                   >
                     {c.badge}
                   </span>
                 </div>
-                <p className="text-[0.85rem] text-cream-muted leading-[1.6] m-0">
+                <p
+                  style={{
+                    fontSize: "0.85rem",
+                    color: C.slate,
+                    lineHeight: "1.6",
+                    margin: 0,
+                  }}
+                >
                   {c.body}
                 </p>
               </div>
@@ -132,33 +195,92 @@ export default function BreakawayPage() {
         </section>
 
         {/* Protocol Callout */}
-        <section className="mb-10">
-          <h2 className="font-sans text-xl font-bold text-cream mb-5 tracking-[0.01em]">
+        <section style={{ marginBottom: "2.5rem" }}>
+          <h2
+            style={{
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: "1.25rem",
+              fontWeight: 700,
+              color: C.dark,
+              marginBottom: "1.25rem",
+              letterSpacing: "0.01em",
+            }}
+          >
             Protocol for Broker Recruitment
           </h2>
-          <div className="bg-amber-500/[0.15] border border-amber-500 border-l-4 rounded-lg px-6 py-5">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-[1.1rem]">&#9888;</span>
-              <span className="text-[0.8rem] font-bold tracking-[0.07em] uppercase text-amber-400">
+          <div
+            style={{
+              backgroundColor: C.amberBg,
+              border: `1px solid ${C.amberBorder}`,
+              borderLeft: `4px solid ${C.amberBorder}`,
+              borderRadius: "8px",
+              padding: "1.25rem 1.5rem",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                marginBottom: "0.75rem",
+              }}
+            >
+              <span style={{ fontSize: "1.1rem" }}>&#9888;</span>
+              <span
+                style={{
+                  fontSize: "0.8rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.07em",
+                  textTransform: "uppercase",
+                  color: C.amber,
+                }}
+              >
                 Protocol-Permitted Data Only
               </span>
             </div>
-            <p className="text-sm text-amber-400 leading-[1.65] mb-3.5">
+            <p
+              style={{
+                fontSize: "0.875rem",
+                color: C.amber,
+                lineHeight: "1.65",
+                marginBottom: "0.875rem",
+              }}
+            >
               Farther operates under the Protocol for Broker Recruitment.
               Advisors leaving a protocol member firm may bring{" "}
               <strong>only</strong> the following:
             </p>
-            <ol className="m-0 pl-5 flex flex-col gap-1">
+            <ol
+              style={{
+                margin: 0,
+                paddingLeft: "1.4rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.3rem",
+              }}
+            >
               {protocolItems.map((item, i) => (
                 <li
                   key={i}
-                  className="text-sm text-amber-400 font-medium"
+                  style={{
+                    fontSize: "0.875rem",
+                    color: C.amber,
+                    fontWeight: 500,
+                  }}
                 >
                   {item}
                 </li>
               ))}
             </ol>
-            <p className="text-[0.85rem] text-amber-400 leading-[1.65] mt-3.5 mb-0">
+            <p
+              style={{
+                fontSize: "0.85rem",
+                color: C.amber,
+                lineHeight: "1.65",
+                marginTop: "0.875rem",
+                marginBottom: 0,
+              }}
+            >
               Advisors must verify their prior firm&rsquo;s protocol status
               before departure. Non-protocol situations require additional Legal
               review.
@@ -167,31 +289,94 @@ export default function BreakawayPage() {
         </section>
 
         {/* Timeline */}
-        <section className="mb-10">
-          <h2 className="font-sans text-xl font-bold text-cream mb-5 tracking-[0.01em]">
+        <section style={{ marginBottom: "2.5rem" }}>
+          <h2
+            style={{
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: "1.25rem",
+              fontWeight: 700,
+              color: C.dark,
+              marginBottom: "1.25rem",
+              letterSpacing: "0.01em",
+            }}
+          >
             Critical Timeline Sequencing
           </h2>
-          <div className="flex flex-col">
+          <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
             {timelineSteps.map((step, i) => (
               <div
                 key={step.num}
-                className="flex gap-5 relative"
+                style={{
+                  display: "flex",
+                  gap: "1.25rem",
+                  position: "relative",
+                }}
               >
                 {/* Left column: number + line */}
-                <div className="flex flex-col items-center shrink-0">
-                  <div className="w-9 h-9 rounded-full bg-teal text-white flex items-center justify-center text-xs font-bold shrink-0 z-[1] shadow-[0_0_12px_rgba(78,112,130,0.4)]">
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "2.25rem",
+                      height: "2.25rem",
+                      borderRadius: "50%",
+                      backgroundColor: C.teal,
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      flexShrink: 0,
+                      zIndex: 1,
+                      boxShadow: "0 0 12px rgba(29, 118, 130, 0.4)",
+                    }}
+                  >
                     {step.num}
                   </div>
                   {i < timelineSteps.length - 1 && (
-                    <div className="w-0.5 flex-1 min-h-6 bg-cream-border my-1" />
+                    <div
+                      style={{
+                        width: "2px",
+                        flex: 1,
+                        minHeight: "1.5rem",
+                        backgroundColor: C.border,
+                        margin: "0.25rem 0",
+                      }}
+                    />
                   )}
                 </div>
                 {/* Right column: content */}
-                <div className={`pt-1 ${i < timelineSteps.length - 1 ? "pb-5" : ""}`}>
-                  <p className="font-bold text-[0.95rem] text-cream mb-1">
+                <div
+                  style={{
+                    paddingBottom: i < timelineSteps.length - 1 ? "1.25rem" : 0,
+                    paddingTop: "0.25rem",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontWeight: 700,
+                      fontSize: "0.95rem",
+                      color: C.dark,
+                      margin: "0 0 0.25rem 0",
+                    }}
+                  >
                     {step.title}
                   </p>
-                  <p className="text-sm text-cream-muted leading-[1.6]">
+                  <p
+                    style={{
+                      fontSize: "0.875rem",
+                      color: C.slate,
+                      lineHeight: "1.6",
+                      margin: 0,
+                    }}
+                  >
                     {step.body}
                   </p>
                 </div>
@@ -201,18 +386,60 @@ export default function BreakawayPage() {
         </section>
 
         {/* Common Pitfalls */}
-        <section className="mb-4">
-          <h2 className="font-sans text-xl font-bold text-cream mb-5 tracking-[0.01em]">
+        <section style={{ marginBottom: "1rem" }}>
+          <h2
+            style={{
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: "1.25rem",
+              fontWeight: 700,
+              color: C.dark,
+              marginBottom: "1.25rem",
+              letterSpacing: "0.01em",
+            }}
+          >
             Common Pitfalls
           </h2>
-          <div className="glass-card rounded-[10px] px-6 py-5 transition-all duration-200 hover:shadow-[0_0_16px_rgba(239,68,68,0.12)]">
-            <ul className="m-0 p-0 list-none flex flex-col gap-2.5">
+          <div
+            className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(239,68,68,0.12)]"
+            style={{
+              backgroundColor: "#2f2f2f",
+              border: `1px solid ${C.border}`,
+              borderRadius: "10px",
+              padding: "1.25rem 1.5rem",
+            }}
+          >
+            <ul
+              style={{
+                margin: 0,
+                padding: 0,
+                listStyle: "none",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.625rem",
+              }}
+            >
               {pitfalls.map((p, i) => (
                 <li
                   key={i}
-                  className="flex items-start gap-2.5 text-sm text-cream-muted leading-[1.6]"
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "0.625rem",
+                    fontSize: "0.875rem",
+                    color: C.slate,
+                    lineHeight: "1.6",
+                  }}
                 >
-                  <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-red-600 mt-[0.55rem]" />
+                  <span
+                    style={{
+                      flexShrink: 0,
+                      width: "6px",
+                      height: "6px",
+                      borderRadius: "50%",
+                      backgroundColor: "#DC2626",
+                      marginTop: "0.55rem",
+                    }}
+                  />
                   {p}
                 </li>
               ))}

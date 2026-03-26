@@ -12,74 +12,207 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 **Scope**:
 - Created `quiz_attempts` database table for tracking user quiz results
-- Built 450-question bank covering: Introduction, Onboarding vs Transitions, Key Documents, Breakaway, Independent RIA, M&A, No to Low AUM, LPOA, Breakaway Process
-- API routes: GET (randomized questions with answer stripping), POST (grading + persistence), results endpoint
-- Reusable `QuizSection` component: dark glass theme, progress tracking, submit-to-grade flow, wrong answer review with explanations
-- Quiz rules: 10 questions per attempt, 90% pass threshold (9/10), max 2 attempts, one retake allowed
-- Knowledge Check page (Step 13) redesigned as training logbook dashboard showing all quiz statuses
-- Integrated QuizSection into all 9 playbook pages
+- Built 450-question bank covering all 9 playbook topics
+- API routes: GET (randomized questions), POST (grading + persistence), results endpoint
+- Reusable `QuizSection` component with dark glass theme
+- Quiz rules: 10 questions, 90% pass threshold, max 2 attempts
+- Knowledge Check page (Step 13) redesigned as training logbook dashboard
 
 **Status**: ✅ Complete
 
 **Files**:
-- `lib/quiz-questions.ts` — 450-question bank (9 topics × 50 questions)
-- `app/api/quiz/route.ts` — GET questions + POST grading
-- `app/api/quiz/results/route.ts` — GET user results
-- `components/QuizSection.tsx` — Reusable quiz component
-- `scripts/migrate.ts` — Added quiz_attempts table
-- `app/knowledge-check/page.tsx` — Training logbook dashboard
-- `app/introduction/page.tsx` — Added QuizSection
-- `app/onboarding-vs-transitions/page.tsx` — Added QuizSection
-- `app/key-documents/page.tsx` — Added QuizSection
-- `app/breakaway/page.tsx` — Added QuizSection
-- `app/independent-ria/page.tsx` — Added QuizSection
-- `app/ma/page.tsx` — Added QuizSection
-- `app/no-to-low-aum/page.tsx` — Added QuizSection
-- `app/lpoa/page.tsx` — Added QuizSection
-- `app/breakaway-process/page.tsx` — Added QuizSection
+- `lib/quiz-questions.ts` — 450-question bank
+- `app/api/quiz/route.ts` — Quiz API
+- `app/api/quiz/results/route.ts` — Results API
+- `components/QuizSection.tsx` — Quiz component
+- `scripts/migrate.ts` — quiz_attempts table
+- `app/knowledge-check/page.tsx` — Training dashboard
+- 9 playbook pages — QuizSection integration
 
 ---
 
-## [Completed] Shimmer Loading States + Playbook Design System Migration — 2026-03-26
+## [Completed] Complete Color Scheme Overhaul — 2026-03-26
 
-**What**: Added animated shimmer loading skeletons to 6 command center pages. Migrated all 13 playbook pages from inline styles to Tailwind/design system classes.
+**What**: Implemented new color scheme for both light and dark modes with reversed palettes.
 
-**Scope**:
-- Replaced text loading indicators with `.shimmer` animated skeletons on: metrics, onboarding, team, alerts, advisor-hub, pipeline pages
-- Removed local COLORS objects from 10 playbook pages
-- Replaced all inline `style={{}}` with Tailwind utility classes
-- Cards now use `glass-card` / `glass-card-dark` CSS classes
-- Colors standardized to design token classes (text-cream, bg-charcoal, etc.)
+**Light Mode Colors**:
+- Background: #F8F4F0 (warm cream)
+- Text: #595959 (medium grey)
+- Cards/Tables: #466F81 (teal blue)
+- Card text: #F8F4F0 (cream)
+- Table alternating rows: #466F81 & #93B6C4
+- Chart axis: #F8F4F0
+
+**Dark Mode Colors (Reversed)**:
+- Background: #466F81 (teal blue)
+- Text: #F8F4F0 (cream)
+- Cards/Tables: #F8F4F0 (cream)
+- Card text: #595959 (grey)
+- Table alternating rows: #F8F4F0 & #93B6C4
+- Chart axis: #595959
+
+**Accent Colors Added**:
+- accent-1: #9B766A (terracotta/brown)
+- accent-2: #D2DFE6 (light blue/grey)
+- accent-3: #E1D2C5 (beige/cream)
 
 **Status**: ✅ Complete
 
 **Files**:
-- `app/command-center/metrics/page.tsx` — Shimmer loading
-- `app/command-center/onboarding/page.tsx` — Shimmer loading
-- `app/command-center/team/page.tsx` — Shimmer loading
-- `app/command-center/alerts/page.tsx` — Shimmer loading
-- `app/command-center/advisor-hub/page.tsx` — Shimmer loading
-- `app/command-center/page.tsx` — Shimmer loading
-- 10 playbook pages — Design system migration
+- `app/globals.css` — Updated semantic tokens, table/chart/card styling for both modes
+- `lib/design-tokens.ts` — Updated getThemeColors with new palette and accent colors
+- `tailwind.config.ts` — Added accent color classes
+
+**Commits**: `157ee82` (light mode), `511fff0` (accents), `cbaea4f` (dark mode reversed)
 
 ---
 
-## [Completed] Complexity Graph Fix + Sidebar Light Mode + Tailwind Colors — 2026-03-26
+## [Completed] Fix Sidebar Light Mode Background — 2026-03-26
 
-**What**: Fixed complexity score graph showing 0/250 by calling `computeComplexityScore` directly instead of unreliable internal HTTP fetch. Fixed sidebar light mode. Added cream color scale to Tailwind.
+**What**: Changed sidebar background from black to white in light mode.
 
-**Scope**:
-- Workload API now imports `computeComplexityScore` directly — eliminates origin detection failures
-- Fetches deal properties + team data from HubSpot, computes scores in-process
-- Sidebar light mode: bg from `charcoal-800` to `white`, borders from `charcoal-600` to `gray-200`
-- Added `cream` color scale (50-900 + DEFAULT/dark/muted) to Tailwind config
+**Problem**: Sidebar was using `bg-charcoal-800` (black #1a1a1a) in light mode.
+
+**Solution**: Changed to `bg-white` for light mode, keeping `dark:bg-surface` for dark mode.
 
 **Status**: ✅ Complete
 
 **Files**:
-- `app/api/command-center/workload/route.ts` — Direct complexity scoring
-- `tailwind.config.ts` — Added cream color scale
-- `components/Sidebar.tsx` — Fixed light mode
+- `components/Sidebar.tsx` — Updated aside element light mode background class
+
+**Commit**: `af06d40`
+
+---
+
+## [Completed] Fix Sidebar Dark Mode Background — 2026-03-26
+
+**What**: Changed sidebar background from grey to black in dark mode.
+
+**Problem**: Sidebar was using `dark:bg-charcoal` (grey #333333) which didn't match the main page background.
+
+**Solution**: Changed to `dark:bg-surface` (black #111111) to match semantic token system.
+
+**Status**: ✅ Complete
+
+**Files**:
+- `components/Sidebar.tsx` — Updated aside element dark mode background class
+
+**Commit**: `a3506a7`
+
+---
+
+## [Completed] Remove Background Images, Use Solid Colors — 2026-03-26
+
+**What**: Removed blue.png and cream.png background images, using solid colors instead.
+
+**Scope**:
+- Dark mode: `background-color: var(--color-surface)` (#111111)
+- Light mode: `background-color: #F8F4F0` (warm cream)
+- Simplified background approach - no more image loading or layering issues
+
+**Status**: ✅ Complete
+
+**Files**:
+- `app/globals.css` — Removed background-image rules, using background-color
+
+**Commit**: `d3cb79a`
+
+---
+
+## [Completed] Fix Background Images Not Displaying — 2026-03-26
+
+**What**: Fixed background texture images not showing due to inline style override.
+
+**Problem**: Inline style in `app/layout.tsx` was setting `background: "var(--color-charcoal-900)"` which overrode the background-image CSS rules, preventing blue.png and cream.png textures from displaying.
+
+**Solution**: Removed inline background style from body element. All background properties now come from globals.css.
+
+**Status**: ✅ Complete
+
+**Files**:
+- `app/layout.tsx` — Removed inline style object blocking background images
+
+**Commit**: `c796767`
+
+---
+
+## [Completed] Simplify Background Textures — 2026-03-26
+
+**What**: Removed overlay images, using only base texture backgrounds for cleaner appearance.
+
+**Scope**:
+- Dark mode: blue.png texture throughout all sections
+- Light mode: cream.png texture throughout all sections
+- Removed Overlay-Darkmode.png and Overlay-LightMode.png from background layers
+- Added `background-attachment: fixed` for consistent appearance on scroll
+
+**Status**: ✅ Complete
+
+**Files**:
+- `app/globals.css` — Updated body background styles
+
+**Commit**: `8a7c43d`
+
+---
+
+## [Completed] Semantic Token System Migration — 2026-03-26
+
+**What**: Migrated entire design system from brand-specific naming to semantic token system using Cream & Teal colors.
+
+**Scope**:
+- **Phase 1**: Consolidated 3 competing theme files into ONE unified `lib/design-tokens.ts`
+- **Phase 2**: Rebuilt `app/globals.css` with semantic token naming (--color-surface, --color-brand, --color-text-*)
+- Removed competing `design-system/` folder (Plum/Graphite aspirational specs)
+- Eliminated all inline COLORS objects from playbook pages
+- Updated `tailwind.config.ts` with semantic color scales + legacy aliases for backward compatibility
+- Fixed all import references across 100+ files
+- Brand colors: Cream (#FFFEF4) & Teal (#4E7082) retained throughout
+
+**Token Structure**:
+- **Brand**: brand-50 through brand-900 (Teal scale)
+- **Surface**: surface, surface-muted, surface-subtle, surface-elevated, surface-inverse
+- **Text**: text-primary, text-secondary, text-muted, text-subtle, text-inverse
+- **Border**: border, border-subtle, border-strong
+- **Status**: success, warning, error, info (full 50-900 scales)
+- **Legacy**: charcoal, teal, cream, ice, slate (maintained for backward compatibility)
+
+**Impact**: Single source of truth for all styling; semantic naming describes purpose not appearance; easier maintenance and theming.
+
+**Status**: ✅ Complete — Build passing with 31 static pages
+
+**Files**:
+- `lib/design-tokens.ts` — Unified design tokens with getThemeColors(), format helpers, typography
+- `app/globals.css` — Rebuilt with semantic @theme block, light/dark mode support
+- `tailwind.config.ts` — Semantic color configuration with legacy aliases
+- `app/breakaway/page.tsx` — Migrated to use design tokens
+- `app/independent-ria/page.tsx` — Migrated to use design tokens
+- Deleted: `design-system/`, `lib/theme-colors.ts`, `lib/theme.ts`
+
+**Commits**: `697d1ed` (Phase 1), `248c61c` (Phase 2)
+
+---
+
+## [Completed] Layered Background System — 2026-03-26
+
+**What**: Implemented dual-layer background system with base texture + overlay images for light and dark modes.
+
+**Scope**:
+- Light mode: cream.png base texture + Overlay-LightMode.png overlay
+- Dark mode: blue.png base texture + Overlay-Darkmode.png overlay
+- CSS uses multiple `background-image` layers with proper sizing and positioning
+- Both layers set to `cover` size with `center` positioning
+- Base texture repeats, overlay does not repeat
+
+**Status**: ✅ Complete
+
+**Files**:
+- `app/globals.css` — Updated body background styles with dual-layer CSS
+- `public/cream.png` — New: Light mode base texture
+- `public/Overlay-LightMode.png` — New: Light mode overlay
+- `public/blue.png` — New: Dark mode base texture
+- `public/Overlay-Darkmode.png` — New: Dark mode overlay
+
+**Commit**: `3cd0b4b`
 
 ---
 

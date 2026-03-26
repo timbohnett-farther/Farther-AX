@@ -5,7 +5,7 @@ import useSWR, { mutate } from 'swr';
 import Image from 'next/image';
 import { DataCard, StatusBadge } from '@/components/ui';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/theme-colors';
+import { getThemeColors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 

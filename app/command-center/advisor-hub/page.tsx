@@ -5,7 +5,7 @@ import useSWR from 'swr';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors, getStageColors, type ThemeColors } from '@/lib/theme-colors';
+import { getThemeColors, getStageColors, type ThemeColors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -745,7 +745,20 @@ export default function AdvisorHubPage() {
     <div style={{ padding: '40px 48px', maxWidth: '100vw', overflowX: 'hidden', margin: '0 auto' }}>
       {/* Header */}
       <div style={{ position: 'relative', marginBottom: 32 }}>
-        <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo-light.png"
+          alt=""
+          className="hidden dark:block"
+          style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5, width: '120px', height: 'auto' }}
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo-dark.png"
+          alt=""
+          className="block dark:hidden"
+          style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5, width: '120px', height: 'auto' }}
+        />
         <div style={{ textAlign: 'center' }}>
           <h1 style={{ fontSize: 32, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 6 }}>
             Advisor Hub
