@@ -8,7 +8,7 @@ import { ONBOARDING_STAGE_IDS, STAGE_LABELS, PHASE_ORDER, PHASE_META } from '@/l
 import type { OnboardingTask, Phase, TaskRole } from '@/lib/onboarding-tasks';
 import { StatCard, ProgressIndicator, DataCard, ScoreBadge } from '@/components/ui';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/theme-colors';
+import { getThemeColors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 

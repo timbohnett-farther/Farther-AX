@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { DataCard, StatCard } from '@/components/ui';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/theme-colors';
+import { getThemeColors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 

@@ -1,9 +1,9 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Farther AX — Tailwind Config
- * Full color scales + Tremor integration.
- * Glass-morphism classes live in app/globals.css.
+ * Farther AX — Tailwind Config (Semantic Tokens)
+ * Semantic color system with Cream & Teal brand colors
+ * Legacy colors maintained for backward compatibility
  */
 const config: Config = {
   darkMode: 'class',
@@ -16,6 +16,106 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // ── SEMANTIC TOKENS (Primary System) ──────────────────────────
+        brand: {
+          50: 'var(--color-brand-50)',
+          100: 'var(--color-brand-100)',
+          200: 'var(--color-brand-200)',
+          300: 'var(--color-brand-300)',
+          400: 'var(--color-brand-400)',
+          500: 'var(--color-brand-500)',
+          600: 'var(--color-brand-600)',
+          700: 'var(--color-brand-700)',
+          800: 'var(--color-brand-800)',
+          900: 'var(--color-brand-900)',
+          DEFAULT: 'var(--color-brand-500)',
+        },
+        surface: {
+          DEFAULT: 'var(--color-surface)',
+          muted: 'var(--color-surface-muted)',
+          subtle: 'var(--color-surface-subtle)',
+          elevated: 'var(--color-surface-elevated)',
+          inverse: 'var(--color-surface-inverse)',
+        },
+        text: {
+          primary: 'var(--color-text-primary)',
+          secondary: 'var(--color-text-secondary)',
+          muted: 'var(--color-text-muted)',
+          subtle: 'var(--color-text-subtle)',
+          inverse: 'var(--color-text-inverse)',
+        },
+        border: {
+          DEFAULT: 'var(--color-border)',
+          subtle: 'var(--color-border-subtle)',
+          strong: 'var(--color-border-strong)',
+        },
+        success: {
+          50: 'var(--color-success-50)',
+          100: 'var(--color-success-100)',
+          200: 'var(--color-success-200)',
+          300: 'var(--color-success-300)',
+          400: 'var(--color-success-400)',
+          500: 'var(--color-success-500)',
+          600: 'var(--color-success-600)',
+          700: 'var(--color-success-700)',
+          800: 'var(--color-success-800)',
+          900: 'var(--color-success-900)',
+          DEFAULT: 'var(--color-success-400)',
+        },
+        warning: {
+          50: 'var(--color-warning-50)',
+          100: 'var(--color-warning-100)',
+          200: 'var(--color-warning-200)',
+          300: 'var(--color-warning-300)',
+          400: 'var(--color-warning-400)',
+          500: 'var(--color-warning-500)',
+          600: 'var(--color-warning-600)',
+          700: 'var(--color-warning-700)',
+          800: 'var(--color-warning-800)',
+          900: 'var(--color-warning-900)',
+          DEFAULT: 'var(--color-warning-400)',
+        },
+        error: {
+          50: 'var(--color-error-50)',
+          100: 'var(--color-error-100)',
+          200: 'var(--color-error-200)',
+          300: 'var(--color-error-300)',
+          400: 'var(--color-error-400)',
+          500: 'var(--color-error-500)',
+          600: 'var(--color-error-600)',
+          700: 'var(--color-error-700)',
+          800: 'var(--color-error-800)',
+          900: 'var(--color-error-900)',
+          DEFAULT: 'var(--color-error-400)',
+        },
+        info: {
+          50: 'var(--color-info-50)',
+          100: 'var(--color-info-100)',
+          200: 'var(--color-info-200)',
+          300: 'var(--color-info-300)',
+          400: 'var(--color-info-400)',
+          500: 'var(--color-info-500)',
+          600: 'var(--color-info-600)',
+          700: 'var(--color-info-700)',
+          800: 'var(--color-info-800)',
+          900: 'var(--color-info-900)',
+          DEFAULT: 'var(--color-info-400)',
+        },
+        neutral: {
+          50: 'var(--color-neutral-50)',
+          100: 'var(--color-neutral-100)',
+          200: 'var(--color-neutral-200)',
+          300: 'var(--color-neutral-300)',
+          400: 'var(--color-neutral-400)',
+          500: 'var(--color-neutral-500)',
+          600: 'var(--color-neutral-600)',
+          700: 'var(--color-neutral-700)',
+          800: 'var(--color-neutral-800)',
+          900: 'var(--color-neutral-900)',
+          DEFAULT: 'var(--color-neutral-500)',
+        },
+
+        // ── LEGACY TOKENS (Backward Compatibility) ────────────────────
         charcoal: {
           50: '#f5f5f5',
           100: '#e0e0e0',
@@ -42,6 +142,9 @@ const config: Config = {
           900: '#1a2830',
           DEFAULT: '#4E7082',
         },
+        cream: {
+          DEFAULT: '#FFFEF4',
+        },
         ice: {
           50: '#f0f6fc',
           100: '#dce9f7',
@@ -53,30 +156,31 @@ const config: Config = {
         slate: {
           DEFAULT: '#5b6a71',
         },
-        // Tremor color mappings
+
+        // ── Tremor Integration ─────────────────────────────────────────
         tremor: {
           brand: {
             faint: '#091e1a',
             muted: '#0e3434',
             subtle: '#134a4e',
-            DEFAULT: '#4E7082',
-            emphasis: '#374E59',
-            inverted: '#ffffff',
+            DEFAULT: 'var(--color-brand-500)',
+            emphasis: 'var(--color-brand-700)',
+            inverted: 'var(--color-surface-inverse)',
           },
           background: {
-            muted: '#111111',
-            subtle: '#1a1a1a',
-            DEFAULT: '#222222',
-            emphasis: '#ffffff',
+            muted: 'var(--color-surface)',
+            subtle: 'var(--color-surface-muted)',
+            DEFAULT: 'var(--color-surface-subtle)',
+            emphasis: 'var(--color-text-primary)',
           },
-          border: { DEFAULT: 'rgba(255, 255, 255, 0.06)' },
-          ring: { DEFAULT: '#4E7082' },
+          border: { DEFAULT: 'var(--color-border)' },
+          ring: { DEFAULT: 'var(--color-brand-500)' },
           content: {
-            subtle: 'rgba(255, 255, 255, 0.3)',
-            DEFAULT: 'rgba(255, 255, 255, 0.6)',
-            emphasis: 'rgba(255, 255, 255, 0.9)',
-            strong: '#ffffff',
-            inverted: '#111111',
+            subtle: 'var(--color-text-subtle)',
+            DEFAULT: 'var(--color-text-muted)',
+            emphasis: 'var(--color-text-secondary)',
+            strong: 'var(--color-text-primary)',
+            inverted: 'var(--color-surface)',
           },
         },
       },

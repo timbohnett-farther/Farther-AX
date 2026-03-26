@@ -16,7 +16,7 @@ import { ChangeLogPanel } from '@/components/transitions/ChangeLogPanel';
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // Using centralized theme colors
-import { getThemeColors } from '@/lib/theme-colors';
+import { getThemeColors } from '@/lib/design-tokens';
 
 type TabKey = 'accounts' | 'docusign' | 'summary' | 'changelog';
 

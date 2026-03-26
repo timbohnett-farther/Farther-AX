@@ -156,7 +156,7 @@ export default function BreakawayPage() {
                       fontWeight: 700,
                       letterSpacing: "0.08em",
                       textTransform: "uppercase",
-                      color: C.darkMuted,
+                      color: C.slate,
                     }}
                   >
                     {c.label}
@@ -181,7 +181,7 @@ export default function BreakawayPage() {
                 <p
                   style={{
                     fontSize: "0.85rem",
-                    color: C.darkMuted,
+                    color: C.slate,
                     lineHeight: "1.6",
                     margin: 0,
                   }}
@@ -345,7 +345,7 @@ export default function BreakawayPage() {
                         width: "2px",
                         flex: 1,
                         minHeight: "1.5rem",
-                        backgroundColor: COLORS.creamBorder,
+                        backgroundColor: C.border,
                         margin: "0.25rem 0",
                       }}
                     />
@@ -371,7 +371,7 @@ export default function BreakawayPage() {
                   <p
                     style={{
                       fontSize: "0.875rem",
-                      color: C.darkMuted,
+                      color: C.slate,
                       lineHeight: "1.6",
                       margin: 0,
                     }}
@@ -425,7 +425,7 @@ export default function BreakawayPage() {
                     alignItems: "flex-start",
                     gap: "0.625rem",
                     fontSize: "0.875rem",
-                    color: C.darkMuted,
+                    color: C.slate,
                     lineHeight: "1.6",
                   }}
                 >

@@ -58,7 +58,7 @@ export default function IndependentRIAPage() {
         {/* Intro */}
         <p
           style={{
-            color: C.darkMuted,
+            color: C.slate,
             fontSize: "1rem",
             lineHeight: "1.75",
             marginBottom: "2.5rem",
@@ -119,7 +119,7 @@ export default function IndependentRIAPage() {
                       fontWeight: 700,
                       letterSpacing: "0.08em",
                       textTransform: "uppercase",
-                      color: C.darkMuted,
+                      color: C.slate,
                     }}
                   >
                     {c.label}
@@ -144,7 +144,7 @@ export default function IndependentRIAPage() {
                 <p
                   style={{
                     fontSize: "0.85rem",
-                    color: C.darkMuted,
+                    color: C.slate,
                     lineHeight: "1.6",
                     margin: 0,
                   }}
@@ -280,7 +280,7 @@ export default function IndependentRIAPage() {
               <p
                 style={{
                   fontSize: "0.875rem",
-                  color: C.darkMuted,
+                  color: C.slate,
                   lineHeight: "1.65",
                   margin: 0,
                 }}
@@ -332,7 +332,7 @@ export default function IndependentRIAPage() {
               <p
                 style={{
                   fontSize: "0.875rem",
-                  color: C.darkMuted,
+                  color: C.slate,
                   lineHeight: "1.65",
                   margin: 0,
                 }}
@@ -385,7 +385,7 @@ export default function IndependentRIAPage() {
                     alignItems: "flex-start",
                     gap: "0.625rem",
                     fontSize: "0.875rem",
-                    color: C.darkMuted,
+                    color: C.slate,
                     lineHeight: "1.6",
                   }}
                 >

@@ -5,7 +5,7 @@ import useSWR from 'swr';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors, getStageColors, type ThemeColors } from '@/lib/theme-colors';
+import { getThemeColors, getStageColors, type ThemeColors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 

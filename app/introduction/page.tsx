@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo } from 'react';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/theme-colors';
+import { getThemeColors } from '@/lib/design-tokens';
 
 export default function IntroductionPage() {
   const { theme } = useTheme();
