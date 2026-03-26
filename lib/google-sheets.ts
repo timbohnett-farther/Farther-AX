@@ -45,7 +45,17 @@ function getAuthClient(): GoogleAuth {
   );
 }
 
+// ── Token cache: tokens last 60 min, we cache for 50 min ────────────────────
+let cachedToken: string | null = null;
+let tokenExpiresAt = 0;
+const TOKEN_TTL_MS = 50 * 60 * 1000; // 50 minutes
+
 async function getAccessToken(): Promise<string> {
+  // Return cached token if still valid
+  if (cachedToken && Date.now() < tokenExpiresAt) {
+    return cachedToken;
+  }
+
   const auth = getAuthClient();
   const client = await auth.getClient();
   const tokenResponse = await client.getAccessToken();
@@ -55,7 +65,54 @@ async function getAccessToken(): Promise<string> {
     throw new Error('Failed to obtain access token from service account');
   }
 
+  cachedToken = accessToken;
+  tokenExpiresAt = Date.now() + TOKEN_TTL_MS;
   return accessToken;
+}
+
+// ── Retry helper with exponential backoff ────────────────────────────────────
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries = 3,
+): Promise<Response> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+    try {
+      const res = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timeout);
+
+      // Retry on rate limit (429) or server errors (5xx)
+      if (res.status === 429 || (res.status >= 500 && attempt < maxRetries)) {
+        const delay = Math.pow(2, attempt) * 1000; // 1s, 2s, 4s
+        console.warn(`[google-sheets] ${res.status} on attempt ${attempt + 1}, retrying in ${delay}ms`);
+        await new Promise(r => setTimeout(r, delay));
+
+        // On 401, invalidate cached token and refresh
+        if (res.status === 401) {
+          cachedToken = null;
+          tokenExpiresAt = 0;
+        }
+        continue;
+      }
+
+      return res;
+    } catch (err) {
+      clearTimeout(timeout);
+      if (attempt < maxRetries) {
+        const delay = Math.pow(2, attempt) * 1000;
+        console.warn(`[google-sheets] Fetch error on attempt ${attempt + 1}, retrying in ${delay}ms:`, err);
+        await new Promise(r => setTimeout(r, delay));
+        continue;
+      }
+      throw err;
+    }
+  }
+
+  // Should never reach here, but TypeScript needs it
+  throw new Error('Max retries exceeded');
 }
 
 // ── Drive API ─────────────────────────────────────────────────────────────────
@@ -94,7 +151,7 @@ export async function listSheetsInFolder(folderId: string): Promise<DriveFile[]>
     });
     if (after) params.set('pageToken', after);
 
-    const res = await fetch(`https://www.googleapis.com/drive/v3/files?${params}`, {
+    const res = await fetchWithRetry(`https://www.googleapis.com/drive/v3/files?${params}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
@@ -121,7 +178,7 @@ export async function fetchSheetData(
 
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}`;
 
-  const res = await fetch(url, {
+  const res = await fetchWithRetry(url, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 
@@ -139,7 +196,7 @@ export async function getSheetTabs(sheetId: string): Promise<string[]> {
 
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties.title`;
 
-  const res = await fetch(url, {
+  const res = await fetchWithRetry(url, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 
