@@ -152,7 +152,7 @@ When you report a fix:
 - **SWAT Plan:** See `DATA-LOADING-SWAT.md`
 
 ### **Task #6: Fix Alerts Page Load Failures + Show Unfinished Launched Advisor Tasks**
-- **Status:** 🔴 Not Started
+- **Status:** ✅ Fixed (2026-03-26)
 - **Priority:** 🚨 Critical
 - **Description:** Alerts page frequently fails to load data. Additionally, launched advisors with unfinished onboarding tasks are NOT appearing as alerts — they should all show as actionable alerts that need to be addressed.
 - **Sub-tasks:**
