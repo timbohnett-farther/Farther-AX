@@ -6,6 +6,30 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Layered Background System — 2026-03-26
+
+**What**: Implemented dual-layer background system with base texture + overlay images for light and dark modes.
+
+**Scope**:
+- Light mode: cream.png base texture + Overlay-LightMode.png overlay
+- Dark mode: blue.png base texture + Overlay-Darkmode.png overlay
+- CSS uses multiple `background-image` layers with proper sizing and positioning
+- Both layers set to `cover` size with `center` positioning
+- Base texture repeats, overlay does not repeat
+
+**Status**: ✅ Complete
+
+**Files**:
+- `app/globals.css` — Updated body background styles with dual-layer CSS
+- `public/cream.png` — New: Light mode base texture
+- `public/Overlay-LightMode.png` — New: Light mode overlay
+- `public/blue.png` — New: Dark mode base texture
+- `public/Overlay-Darkmode.png` — New: Dark mode overlay
+
+**Commit**: `3cd0b4b`
+
+---
+
 ## [Completed] Google Sheets Incremental Sync — 2026-03-26
 
 **What**: Transitions sync now uses Google Drive `modifiedTime` to skip sheets that haven't changed since last sync. Dramatically reduces API calls and sync time.
