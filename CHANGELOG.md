@@ -6,6 +6,25 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Queued] RIA Advisor Onboarding Content & Advisor Task Hub — 2026-03-26
+
+**What**: Added Task #12 to TODO.md — comprehensive update based on new RIA Advisor Onboarding & Client Transition documentation covering Pre-Signing through First 90 Days.
+
+**Scope**:
+- Gap analysis of new documentation vs existing tasks/training
+- Advisor task assignment section for advisor hub
+- New onboarding tasks (pre-signing, Day 1 tech activation, First Week setup, 10 dept meetings, 90-day KPIs)
+- Training page content enhancements
+- New roles: Trust & Estate, Farther Institutional, Insurance & Annuities, 401k/Pontera
+- Master Merge & Repaper/ACAT page buildout
+
+**Status**: 🔴 Queued in TODO.md
+
+**Files**:
+- `TODO.md` — Task #12 added
+
+---
+
 ## [Completed] Training Quiz System with Database Logging — 2026-03-26
 
 **What**: Built a comprehensive training quiz system across all 9 playbook pages. 450-question bank (50 per topic), randomized 10-question quizzes, graded on submit with answer review, database logging of all attempts.
