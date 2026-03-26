@@ -23,14 +23,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;450;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
       </head>
-      <body
-        className="antialiased text-gray-900 dark:text-cream"
-        style={{
-          fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          background: "var(--color-charcoal-900)",
-          backgroundAttachment: "fixed",
-        }}
-      >
+      <body className="antialiased text-gray-900 dark:text-cream">
         <ThemeProvider>
           <SessionProvider>
             <SWRProvider>
