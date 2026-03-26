@@ -79,23 +79,23 @@ export const colors = {
 // ============================================================================
 
 export const getThemeColors = (isDark: boolean) => ({
-  // Text colors
-  dark: isDark ? '#FFFEF4' : '#595959',         // Light mode: medium grey
-  white: isDark ? '#1a1a1a' : '#F8F4F0',        // Light mode: cream
-  slate: isDark ? 'rgba(212,223,229,0.5)' : '#595959',
-  cream: isDark ? '#FFFEF4' : '#F8F4F0',
-  textSecondary: isDark ? 'rgba(255,255,255,0.7)' : '#595959',
-  textOnCard: isDark ? '#FFFEF4' : '#F8F4F0',   // Cream text on cards
+  // Text colors - REVERSED for dark mode
+  dark: isDark ? '#F8F4F0' : '#595959',         // Dark: cream, Light: grey
+  white: isDark ? '#595959' : '#F8F4F0',        // Dark: grey, Light: cream
+  slate: isDark ? '#F8F4F0' : '#595959',        // Dark: cream, Light: grey
+  cream: isDark ? '#F8F4F0' : '#F8F4F0',
+  textSecondary: isDark ? '#F8F4F0' : '#595959',
+  textOnCard: isDark ? '#595959' : '#F8F4F0',   // Dark: grey on cream cards, Light: cream on teal cards
 
-  // Background colors
-  bg: isDark ? '#111111' : '#F8F4F0',           // Light mode: warm cream
-  cardBg: isDark ? '#171f27' : '#466F81',       // Light mode: teal blue
-  cardBgAlt: isDark ? 'rgba(250,247,242,0.03)' : '#93B6C4', // Light mode: light teal (for alternating rows)
+  // Background colors - REVERSED for dark mode
+  bg: isDark ? '#466F81' : '#F8F4F0',           // Dark: teal, Light: cream
+  cardBg: isDark ? '#F8F4F0' : '#466F81',       // Dark: cream, Light: teal
+  cardBgAlt: isDark ? '#93B6C4' : '#93B6C4',    // Alternating row color
 
-  // Border colors
-  border: isDark ? 'rgba(212,223,229,0.08)' : '#466F81',
-  borderSubtle: isDark ? 'rgba(212,223,229,0.05)' : '#93B6C4',
-  borderStrong: isDark ? 'rgba(212,223,229,0.15)' : '#466F81',
+  // Border colors - REVERSED
+  border: isDark ? '#F8F4F0' : '#466F81',
+  borderSubtle: isDark ? '#93B6C4' : '#93B6C4',
+  borderStrong: isDark ? '#F8F4F0' : '#466F81',
 
   // Brand colors (consistent across themes)
   teal: '#466F81',
@@ -126,11 +126,11 @@ export const getThemeColors = (isDark: boolean) => ({
   purpleBg: isDark ? 'rgba(167,139,250,0.15)' : 'rgba(167,139,250,0.1)',
   purpleBorder: isDark ? 'rgba(167,139,250,0.35)' : 'rgba(167,139,250,0.25)',
 
-  // Component specific
-  tableHeaderBg: isDark ? '#2f2f2f' : '#466F81',
-  tableRowEven: isDark ? 'rgba(250,247,242,0.03)' : '#466F81',
-  tableRowOdd: isDark ? 'rgba(250,247,242,0.01)' : '#93B6C4',
-  cardBgHover: isDark ? 'rgba(29,118,130,0.06)' : 'rgba(70,111,129,0.15)',
+  // Component specific - REVERSED
+  tableHeaderBg: isDark ? '#F8F4F0' : '#466F81',
+  tableRowEven: isDark ? '#F8F4F0' : '#466F81',
+  tableRowOdd: isDark ? '#93B6C4' : '#93B6C4',
+  cardBgHover: isDark ? 'rgba(248,244,240,0.15)' : 'rgba(70,111,129,0.15)',
 });
 
 export type ThemeColors = ReturnType<typeof getThemeColors>;

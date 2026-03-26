@@ -235,18 +235,25 @@
 
 /* ============================================================================
    DARK MODE (explicit .dark class)
-   Ensures dark theme when .dark class is present
+   Ensures dark theme when .dark class is present - REVERSED from light mode
    ============================================================================ */
 
 html.dark {
-  /* Reaffirm dark mode tokens */
-  --color-surface: #111111;
-  --color-surface-muted: #1a1a1a;
-  --color-surface-subtle: #222222;
-  --color-surface-elevated: rgba(23, 31, 39, 0.80);
-  --color-text-primary: #FFFEF4;
-  --color-text-secondary: rgba(255, 254, 244, 0.7);
-  --color-text-muted: rgba(255, 254, 244, 0.5);
+  /* Reaffirm dark mode tokens - REVERSED */
+  --color-surface: #466F81;              /* Teal background (was cream in light) */
+  --color-surface-muted: #466F81;
+  --color-surface-subtle: #466F81;
+  --color-surface-elevated: #F8F4F0;     /* Cream cards (was teal in light) */
+  --color-text-primary: #F8F4F0;         /* Cream text (was grey in light) */
+  --color-text-secondary: #F8F4F0;
+  --color-text-muted: #F8F4F0;
+  --color-text-inverse: #595959;         /* Grey for cards (was cream in light) */
+
+  /* Tremor */
+  --color-tremor-background: #F8F4F0;    /* Cards use cream */
+  --color-tremor-content: #595959;       /* Text on cards is grey */
+  --color-tremor-content-strong: #595959;
+  --color-tremor-content-emphasis: #595959;
 }
 
 /* ============================================================================
@@ -260,11 +267,11 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Dark mode background */
+/* Dark mode background - REVERSED (teal instead of cream) */
 html.dark body {
-  background-color: var(--color-surface);
+  background-color: #466F81;
   font-family: var(--font-sans);
-  color: var(--color-text-primary);
+  color: #F8F4F0;
 }
 
 /* Light mode background */
@@ -364,6 +371,34 @@ html:not(.dark) .chart-card {
 
 html:not(.dark) .chart-card * {
   color: #F8F4F0;
+}
+
+/* ── Card Text Colors (Dark Mode - REVERSED) ───────────────────────────── */
+html.dark .glass-card {
+  background: var(--color-surface-elevated);
+  color: #595959;
+}
+
+html.dark .glass-card * {
+  color: #595959;
+}
+
+html.dark .stat-card {
+  background: var(--color-surface-elevated);
+  color: #595959;
+}
+
+html.dark .stat-card * {
+  color: #595959;
+}
+
+html.dark .chart-card {
+  background: var(--color-surface-elevated);
+  color: #595959;
+}
+
+html.dark .chart-card * {
+  color: #595959;
 }
 
 /* ── Badges ────────────────────────────────────────────────────────────── */
@@ -483,6 +518,24 @@ html:not(.dark) table thead th {
   color: #F8F4F0 !important;
 }
 
+/* ── Table Alternating Rows (Dark Mode - REVERSED) ────────────────────── */
+html.dark table tbody tr:nth-child(even) {
+  background-color: #F8F4F0 !important;
+}
+
+html.dark table tbody tr:nth-child(odd) {
+  background-color: #93B6C4 !important;
+}
+
+html.dark table tbody tr td {
+  color: #595959 !important;
+}
+
+html.dark table thead th {
+  background-color: #F8F4F0 !important;
+  color: #595959 !important;
+}
+
 /* ── Chart Axis Styling (Light Mode) ──────────────────────────────────── */
 html:not(.dark) .recharts-cartesian-axis-tick-value,
 html:not(.dark) .recharts-label {
@@ -491,6 +544,16 @@ html:not(.dark) .recharts-label {
 
 html:not(.dark) .recharts-text {
   fill: #F8F4F0 !important;
+}
+
+/* ── Chart Axis Styling (Dark Mode - REVERSED) ────────────────────────── */
+html.dark .recharts-cartesian-axis-tick-value,
+html.dark .recharts-label {
+  fill: #595959 !important;
+}
+
+html.dark .recharts-text {
+  fill: #595959 !important;
 }
 
 /* ── Scrollbar Styling ─────────────────────────────────────────────────── */
