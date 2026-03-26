@@ -236,7 +236,21 @@ export default function AlertsPage() {
   const { data, isLoading, error } = useSWR('/api/command-center/alerts', fetcher, { refreshInterval: 300_000 });
   const [activeTab, setActiveTab] = useState<AlertTab>('all');
 
-  if (isLoading) return <div className="px-10 py-16" style={{ color: C.slate }}>Loading alerts...</div>;
+  if (isLoading) return (
+    <div className="px-10 py-16 space-y-6">
+      <div className="shimmer h-10 w-64 rounded-lg" />
+      <div className="shimmer h-5 w-48 rounded-md" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mt-8">
+        <div className="shimmer h-24 rounded-xl" />
+        <div className="shimmer h-24 rounded-xl" />
+        <div className="shimmer h-24 rounded-xl" />
+        <div className="shimmer h-24 rounded-xl" />
+        <div className="shimmer h-24 rounded-xl" />
+      </div>
+      <div className="shimmer h-10 w-96 rounded-lg mt-6" />
+      <div className="shimmer h-96 rounded-xl mt-6" />
+    </div>
+  );
   if (error) return <div className="px-10 py-16" style={{ color: C.red }}>Failed to load alerts.</div>;
 
   const allAlerts: Alert[] = data?.alerts ?? [];

@@ -322,7 +322,18 @@ export default function TeamPage() {
     mutate('/api/command-center/team');
   };
 
-  if (isLoading) return <div className="px-10 py-16" style={{ color: C.slate }}>Loading team…</div>;
+  if (isLoading) return (
+    <div className="px-10 py-16 space-y-6">
+      <div className="shimmer h-10 w-64 rounded-lg" />
+      <div className="shimmer h-5 w-48 rounded-md" />
+      <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-2.5 mt-8">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div key={i} className="shimmer h-20 rounded-lg" />
+        ))}
+      </div>
+      <div className="shimmer h-96 rounded-xl mt-6" />
+    </div>
+  );
   if (error) return <div className="px-10 py-16" style={{ color: C.red }}>Failed to load team data.</div>;
 
   return (

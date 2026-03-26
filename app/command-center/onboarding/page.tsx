@@ -110,7 +110,23 @@ function WorkloadDashboard() {
   const [expandedMember, setExpandedMember] = useState<number | null>(null);
 
   if (isLoading) {
-    return <div className="p-5 text-sm" style={{ color: C.slate }}>Loading workload data...</div>;
+    return (
+      <div className="p-5 space-y-6">
+        <div className="shimmer h-10 w-64 rounded-lg" />
+        <div className="shimmer h-5 w-48 rounded-md" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-6">
+          <div className="shimmer h-24 rounded-xl" />
+          <div className="shimmer h-24 rounded-xl" />
+          <div className="shimmer h-24 rounded-xl" />
+          <div className="shimmer h-24 rounded-xl" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-6">
+          <div className="shimmer h-40 rounded-xl" />
+          <div className="shimmer h-40 rounded-xl" />
+          <div className="shimmer h-40 rounded-xl" />
+        </div>
+      </div>
+    );
   }
 
   const workload: WorkloadEntry[] = data?.workload ?? [];
@@ -503,7 +519,24 @@ export default function OnboardingTracker() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   if (isLoading) {
-    return <div className="px-10 py-16" style={{ color: C.slate }}>Loading…</div>;
+    return (
+      <div className="px-10 py-16 space-y-6">
+        <div className="shimmer h-10 w-64 rounded-lg" />
+        <div className="shimmer h-5 w-48 rounded-md" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+          <div className="shimmer h-28 rounded-xl" />
+          <div className="shimmer h-28 rounded-xl" />
+          <div className="shimmer h-28 rounded-xl" />
+          <div className="shimmer h-28 rounded-xl" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <div className="shimmer h-48 rounded-xl" />
+          <div className="shimmer h-48 rounded-xl" />
+          <div className="shimmer h-48 rounded-xl" />
+        </div>
+        <div className="shimmer h-96 rounded-xl mt-6" />
+      </div>
+    );
   }
 
   if (error) {

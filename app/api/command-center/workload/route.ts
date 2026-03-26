@@ -104,7 +104,8 @@ export async function GET(request: Request) {
     // 3. Get complexity scores for all assigned deals
     const dealIds = Array.from(new Set(assignmentsResult.rows.map((a: { deal_id: string }) => a.deal_id)));
 
-    const dealScores: Record<string, { score: number; tier: string; deal_name: string; dealstage: string }> = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dealScores: Record<string, { score: number; tier: string; deal_name: string; dealstage: string; _props?: any }> = {};
 
     if (dealIds.length > 0 && HUBSPOT_PAT) {
       try {

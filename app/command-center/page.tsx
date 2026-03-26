@@ -1298,7 +1298,18 @@ function RecruitingTab() {
     aiBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [aiMessages]);
 
-  if (isLoading) return <div style={{ padding: '60px 0', color: C.slate }}>Loading pipeline…</div>;
+  if (isLoading) return (
+    <div className="py-16 space-y-6">
+      <div className="shimmer h-10 w-64 rounded-lg" />
+      <div className="shimmer h-5 w-48 rounded-md" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <div className="shimmer h-32 rounded-xl" />
+        <div className="shimmer h-32 rounded-xl" />
+        <div className="shimmer h-32 rounded-xl" />
+      </div>
+      <div className="shimmer h-96 rounded-xl mt-6" />
+    </div>
+  );
   if (error || data?.error) return <div style={{ padding: '60px 0', color: C.red }}>Failed to load pipeline data.</div>;
 
   // All deals sorted by funnel stage order
@@ -2042,7 +2053,18 @@ function AcquisitionsTab() {
   const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   const { data, error, isLoading } = useSWR('/api/command-center/acquisitions', fetcher, SWR_OPTS);
 
-  if (isLoading) return <div style={{ padding: '60px 0', color: C.slate }}>Loading acquisitions…</div>;
+  if (isLoading) return (
+    <div className="py-16 space-y-6">
+      <div className="shimmer h-10 w-64 rounded-lg" />
+      <div className="shimmer h-5 w-48 rounded-md" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <div className="shimmer h-32 rounded-xl" />
+        <div className="shimmer h-32 rounded-xl" />
+        <div className="shimmer h-32 rounded-xl" />
+      </div>
+      <div className="shimmer h-96 rounded-xl mt-6" />
+    </div>
+  );
   if (error || data?.error) return <div style={{ padding: '60px 0', color: C.red }}>Failed to load acquisitions data.</div>;
 
   const deals: AcquisitionsDeal[] = data?.deals ?? [];

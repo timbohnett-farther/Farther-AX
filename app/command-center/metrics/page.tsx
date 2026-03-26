@@ -51,8 +51,21 @@ export default function MetricsDashboard() {
 
   if (isLoading) {
     return (
-      <div className="px-10 py-16 text-slate">
-        Loading metrics…
+      <div className="px-10 py-16 space-y-6">
+        <div className="shimmer h-10 w-64 rounded-lg" />
+        <div className="shimmer h-5 w-48 rounded-md" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+          <div className="shimmer h-28 rounded-xl" />
+          <div className="shimmer h-28 rounded-xl" />
+          <div className="shimmer h-28 rounded-xl" />
+          <div className="shimmer h-28 rounded-xl" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <div className="shimmer h-28 rounded-xl" />
+          <div className="shimmer h-28 rounded-xl" />
+          <div className="shimmer h-28 rounded-xl" />
+        </div>
+        <div className="shimmer h-64 rounded-xl mt-6" />
       </div>
     );
   }

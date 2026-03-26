@@ -337,8 +337,15 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: 60, color: C.slate, fontSize: 14 }}>
-        Loading AUM data...
+      <div className="space-y-6 py-10">
+        <div className="shimmer h-10 w-64 rounded-lg" />
+        <div className="shimmer h-5 w-48 rounded-md" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <div className="shimmer h-32 rounded-xl" />
+          <div className="shimmer h-32 rounded-xl" />
+          <div className="shimmer h-32 rounded-xl" />
+        </div>
+        <div className="shimmer h-96 rounded-xl mt-6" />
       </div>
     );
   }
@@ -966,8 +973,15 @@ export default function AdvisorHubPage() {
 
       {/* Loading / Error */}
       {isLoading && activeTab !== 'aum' && (
-        <div style={{ textAlign: 'center', padding: 60, color: C.slate, fontSize: 14 }}>
-          Loading advisors...
+        <div className="space-y-6 py-10">
+          <div className="shimmer h-10 w-64 rounded-lg" />
+          <div className="shimmer h-5 w-48 rounded-md" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div className="shimmer h-32 rounded-xl" />
+            <div className="shimmer h-32 rounded-xl" />
+            <div className="shimmer h-32 rounded-xl" />
+          </div>
+          <div className="shimmer h-96 rounded-xl mt-6" />
         </div>
       )}
       {error && activeTab !== 'aum' && (
