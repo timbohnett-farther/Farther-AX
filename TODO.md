@@ -146,32 +146,50 @@ When you report a fix:
 ## 🚨 **Active Tasks (2026-03-26)**
 
 ### **Task #5: CRITICAL — Fix Data Loading & Caching Across All Pages**
-- **Status:** 🟡 In Progress
+- **Status:** ✅ Fixed (2026-03-26)
 - **Priority:** 🚨 Critical
-- **Description:** Pages that load HubSpot data (pipeline, advisor hub, etc.) fail on first load and require multiple refreshes. Data should pre-fetch in the background on app entry and cache for 10+ minutes so returning users see instant data.
-- **SWAT Plan:** See `DATA-LOADING-SWAT.md`
+- **What was done:**
+  - Global SWR Provider with localStorage persistence (`lib/swr-provider.tsx`)
+  - Background prefetcher fires 7 critical endpoints on app entry
+  - 1-hour deduplication interval prevents duplicate API calls
+  - Google Sheets auth hardened with 50-min token cache + exponential backoff retry
 
 ### **Task #6: Fix Alerts Page Load Failures + Show Unfinished Launched Advisor Tasks**
 - **Status:** ✅ Fixed (2026-03-26)
 - **Priority:** 🚨 Critical
-- **Description:** Alerts page frequently fails to load data. Additionally, launched advisors with unfinished onboarding tasks are NOT appearing as alerts — they should all show as actionable alerts that need to be addressed.
-- **Sub-tasks:**
-  - [ ] Debug and fix alerts API endpoint reliability (add withPgCache, error handling)
-  - [ ] Query all launched advisors with incomplete checklist tasks
-  - [ ] Generate alerts for each unfinished task on launched advisors
-  - [ ] Ensure alerts appear on first load without refresh
+- **What was done:**
+  - Promise.allSettled for error isolation
+  - Batch DB queries (2 total instead of 2 per deal)
+  - Unassigned tasks now show as alerts
 
 ### **Task #7: Fix Transitions Dashboard — Permanent Solution**
-- **Status:** 🟡 In Progress
+- **Status:** ✅ Fixed (2026-03-26)
 - **Priority:** 🚨 Critical
-- **Description:** Transitions page stops working intermittently. Root causes: Google API auth expiry, no error isolation per sheet, rate limiting, full re-sync every time. Need incremental sync with change detection.
-- **SWAT Plan:** See `TRANSITIONS-SWAT.md`
-- **Sub-tasks:**
-  - [ ] Phase 1: Error isolation — try/catch per sheet, auth token caching, retry logic
-  - [ ] Phase 2: Incremental sync — check modifiedTime, row checksums, only update changes
-  - [ ] Phase 3: Google API hardening — rate limiter, timeouts, backoff
-  - [ ] Phase 4: DB optimization — batch upserts, transactions, pool monitoring
-  - [ ] Phase 5: Auto-sync scheduler — cron-based, distributed lock, no page-load trigger
+- **What was done:**
+  - Google API auth with 50-min token cache + retry with backoff
+  - Incremental sync using Drive API `modifiedTime` — skips unchanged sheets
+  - Per-sheet error isolation (try/catch per workbook)
+  - Stores `drive_modified_time` in DB for comparison
+
+### **Task #10: Switch AI from Grok to OpenAI**
+- **Status:** ✅ Fixed (2026-03-26)
+- **Priority:** High
+- **What was done:**
+  - Created `lib/ai-router.ts` with auto model selection
+  - GPT-4.1-mini for chat, summaries, briefings (fast)
+  - GPT-4.1 for note parsing, sentiment analysis (precision)
+  - Auto-fallback from GPT-4.1 to mini on failure
+  - Removed Grok/xAI from all 4 API routes + UI
+
+### **Task #11: Advisor Hub DB-First Caching**
+- **Status:** ✅ Fixed (2026-03-26)
+- **Priority:** 🚨 Critical
+- **What was done:**
+  - Created `lib/advisor-store.ts` with structured DB tables (`advisor_profiles`, `advisor_activities`)
+  - First visit: full HubSpot fetch → write to DB → serve
+  - Return visits: serve from DB instantly → background sync fetches only new activities
+  - Background sync compares and upserts only changes since `last_synced_at`
+  - RIA Hub now uses `withPgCache` (2hr TTL)
 
 ### **Task #8: Fix Onboarding Page Complexity Score Graph**
 - **Status:** 🔴 Not Started
@@ -182,13 +200,13 @@ When you report a fix:
   - [ ] Sum complexity points per team member
   - [ ] Update the graph to reflect actual summed scores vs 250 capacity
 
-### **Task #8: Brand Consistency — Strike Team PRISM Audit Fixes**
-- **Status:** 🔴 Not Started
+### **Task #9: Brand Consistency — Strike Team PRISM Audit Fixes**
+- **Status:** 🟡 In Progress
 - **Priority:** Medium
 - **Description:** Strike Team audit found 2 P0 and 10 P1 brand consistency issues. See `Strike-Team.md` for full findings.
 - **Sub-tasks:**
-  - [ ] P0: Resolve font conflict (ABC Arizona Text/Fakt vs Inter/DM Mono)
-  - [ ] P0: Remove duplicate light mode CSS in globals.css
+  - [x] P0: Resolve font conflict — migrated all files to Inter/DM Mono
+  - [x] P0: Remove duplicate light mode CSS in globals.css
   - [ ] P1: Connect 13 playbook pages to design system (theme-colors, design tokens)
   - [ ] P1: Bring Transitions page to 85%+ compliance
   - [ ] P1: Bring AI Assistant page to 85%+ compliance
