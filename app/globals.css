@@ -255,22 +255,24 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Dark mode background - blue base with overlay */
+/* Dark mode background - blue texture */
 html.dark body {
-  background-image: url('/Overlay-Darkmode.png'), url('/blue.png');
-  background-size: cover, cover;
-  background-position: center, center;
-  background-repeat: no-repeat, repeat;
+  background-image: url('/blue.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: repeat;
+  background-attachment: fixed;
   font-family: var(--font-sans);
   color: var(--color-text-primary);
 }
 
-/* Light mode background - cream base with overlay */
+/* Light mode background - cream texture */
 html:not(.dark) body {
-  background-image: url('/Overlay-LightMode.png'), url('/cream.png');
-  background-size: cover, cover;
-  background-position: center, center;
-  background-repeat: no-repeat, repeat;
+  background-image: url('/cream.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: repeat;
+  background-attachment: fixed;
   font-family: var(--font-sans);
   color: var(--color-text-primary);
 }
