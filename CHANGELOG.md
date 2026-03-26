@@ -6,6 +6,31 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [In Progress] Strike Team Audit & SWAT Plans — 2026-03-26
+
+**What**: Ran full Strike Team audit across the entire AX Command Center codebase. Added PRISM brand consistency specialist. Created DATA-LOADING-SWAT.md to fix critical caching/load issues.
+
+**Scope**:
+- Added PRISM (Brand Consistency) audit specialist to Strike-Team.md
+- Ran audit across all 9 command center pages and 13 playbook pages
+- Identified 2 P0 issues (font conflict, duplicate CSS) and 10 P1 issues (brand inconsistency)
+- Created page-by-page compliance scores (Pipeline=100%, Team=88%, down to Playbook pages at 20-45%)
+- Created DATA-LOADING-SWAT.md with 3-layer caching architecture plan (pg-cache tuning, global SWR provider with localStorage persistence, background prefetching)
+- Updated TODO.md with 4 new critical/high-priority tasks
+- Added Font-Gold-Standard.md branding guide
+- Updated CLAUDE.md with 5 non-negotiable rules
+
+**Status**: Audit complete. Fixes pending.
+
+**Files**:
+- `Strike-Team.md` — Full audit findings, PRISM scores, P0/P1/P2 issue log
+- `DATA-LOADING-SWAT.md` — 4-phase plan to fix data loading across all pages
+- `Font-Gold-Standard.md` — Typography single source of truth
+- `CLAUDE.md` — Non-negotiable rules added
+- `TODO.md` — Updated with prioritized task queue
+
+---
+
 ## [Completed] Advisor Team Mappings — 2026-03-25
 
 **What**: Implemented automatic mapping of individual advisor names to team names in Transition sheets, eliminating duplicate entries for team-based advisors.

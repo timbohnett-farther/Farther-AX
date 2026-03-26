@@ -141,4 +141,53 @@ When you report a fix:
 
 ---
 
-**Last Updated:** 2026-03-25
+---
+
+## 🚨 **Active Tasks (2026-03-26)**
+
+### **Task #5: CRITICAL — Fix Data Loading & Caching Across All Pages**
+- **Status:** 🟡 In Progress
+- **Priority:** 🚨 Critical
+- **Description:** Pages that load HubSpot data (pipeline, advisor hub, etc.) fail on first load and require multiple refreshes. Data should pre-fetch in the background on app entry and cache for 10+ minutes so returning users see instant data.
+- **SWAT Plan:** See `DATA-LOADING-SWAT.md`
+
+### **Task #6: Fix Alerts Page Load Failures + Show Unfinished Launched Advisor Tasks**
+- **Status:** 🔴 Not Started
+- **Priority:** 🚨 Critical
+- **Description:** Alerts page frequently fails to load data. Additionally, launched advisors with unfinished onboarding tasks are NOT appearing as alerts — they should all show as actionable alerts that need to be addressed.
+- **Sub-tasks:**
+  - [ ] Debug and fix alerts API endpoint reliability (add withPgCache, error handling)
+  - [ ] Query all launched advisors with incomplete checklist tasks
+  - [ ] Generate alerts for each unfinished task on launched advisors
+  - [ ] Ensure alerts appear on first load without refresh
+
+### **Task #7: Fix Onboarding Page Complexity Score Graph**
+- **Status:** 🔴 Not Started
+- **Priority:** High
+- **Description:** The onboarding page is not reading the complexity scores of advisors assigned to team members. It should sum those scores and display them on the 0/250 complexity points graph for each AXM.
+- **Sub-tasks:**
+  - [ ] Connect complexity scores to advisor-team assignments
+  - [ ] Sum complexity points per team member
+  - [ ] Update the graph to reflect actual summed scores vs 250 capacity
+
+### **Task #8: Brand Consistency — Strike Team PRISM Audit Fixes**
+- **Status:** 🔴 Not Started
+- **Priority:** Medium
+- **Description:** Strike Team audit found 2 P0 and 10 P1 brand consistency issues. See `Strike-Team.md` for full findings.
+- **Sub-tasks:**
+  - [ ] P0: Resolve font conflict (ABC Arizona Text/Fakt vs Inter/DM Mono)
+  - [ ] P0: Remove duplicate light mode CSS in globals.css
+  - [ ] P1: Connect 13 playbook pages to design system (theme-colors, design tokens)
+  - [ ] P1: Bring Transitions page to 85%+ compliance
+  - [ ] P1: Bring AI Assistant page to 85%+ compliance
+  - [ ] P1: Bring RIA Hub page to 85%+ compliance
+  - [ ] P1: Add shimmer loading states to all command center pages
+  - [ ] P1: Add tabular-nums to all financial number displays
+  - [ ] P1: Fix Sidebar light mode colors
+  - [ ] P1: Replace hardcoded glass card colors with CSS variables
+  - [ ] P1: Consolidate 3 conflicting color systems into one
+  - [ ] P1: Add missing Tailwind color definitions (cream, teal variants)
+
+---
+
+**Last Updated:** 2026-03-26
