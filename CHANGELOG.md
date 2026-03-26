@@ -6,6 +6,25 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Simplify Background Textures — 2026-03-26
+
+**What**: Removed overlay images, using only base texture backgrounds for cleaner appearance.
+
+**Scope**:
+- Dark mode: blue.png texture throughout all sections
+- Light mode: cream.png texture throughout all sections
+- Removed Overlay-Darkmode.png and Overlay-LightMode.png from background layers
+- Added `background-attachment: fixed` for consistent appearance on scroll
+
+**Status**: ✅ Complete
+
+**Files**:
+- `app/globals.css` — Updated body background styles
+
+**Commit**: `8a7c43d`
+
+---
+
 ## [Completed] Semantic Token System Migration — 2026-03-26
 
 **What**: Migrated entire design system from brand-specific naming to semantic token system using Cream & Teal colors.
