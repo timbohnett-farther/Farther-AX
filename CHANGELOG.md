@@ -6,6 +6,43 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Semantic Token System Migration — 2026-03-26
+
+**What**: Migrated entire design system from brand-specific naming to semantic token system using Cream & Teal colors.
+
+**Scope**:
+- **Phase 1**: Consolidated 3 competing theme files into ONE unified `lib/design-tokens.ts`
+- **Phase 2**: Rebuilt `app/globals.css` with semantic token naming (--color-surface, --color-brand, --color-text-*)
+- Removed competing `design-system/` folder (Plum/Graphite aspirational specs)
+- Eliminated all inline COLORS objects from playbook pages
+- Updated `tailwind.config.ts` with semantic color scales + legacy aliases for backward compatibility
+- Fixed all import references across 100+ files
+- Brand colors: Cream (#FFFEF4) & Teal (#4E7082) retained throughout
+
+**Token Structure**:
+- **Brand**: brand-50 through brand-900 (Teal scale)
+- **Surface**: surface, surface-muted, surface-subtle, surface-elevated, surface-inverse
+- **Text**: text-primary, text-secondary, text-muted, text-subtle, text-inverse
+- **Border**: border, border-subtle, border-strong
+- **Status**: success, warning, error, info (full 50-900 scales)
+- **Legacy**: charcoal, teal, cream, ice, slate (maintained for backward compatibility)
+
+**Impact**: Single source of truth for all styling; semantic naming describes purpose not appearance; easier maintenance and theming.
+
+**Status**: ✅ Complete — Build passing with 31 static pages
+
+**Files**:
+- `lib/design-tokens.ts` — Unified design tokens with getThemeColors(), format helpers, typography
+- `app/globals.css` — Rebuilt with semantic @theme block, light/dark mode support
+- `tailwind.config.ts` — Semantic color configuration with legacy aliases
+- `app/breakaway/page.tsx` — Migrated to use design tokens
+- `app/independent-ria/page.tsx` — Migrated to use design tokens
+- Deleted: `design-system/`, `lib/theme-colors.ts`, `lib/theme.ts`
+
+**Commits**: `697d1ed` (Phase 1), `248c61c` (Phase 2)
+
+---
+
 ## [Completed] Layered Background System — 2026-03-26
 
 **What**: Implemented dual-layer background system with base texture + overlay images for light and dark modes.
