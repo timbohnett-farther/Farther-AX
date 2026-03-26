@@ -6,6 +6,23 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Sidebar Dark Mode Background — 2026-03-26
+
+**What**: Changed sidebar background from grey to black in dark mode.
+
+**Problem**: Sidebar was using `dark:bg-charcoal` (grey #333333) which didn't match the main page background.
+
+**Solution**: Changed to `dark:bg-surface` (black #111111) to match semantic token system.
+
+**Status**: ✅ Complete
+
+**Files**:
+- `components/Sidebar.tsx` — Updated aside element dark mode background class
+
+**Commit**: `a3506a7`
+
+---
+
 ## [Completed] Remove Background Images, Use Solid Colors — 2026-03-26
 
 **What**: Removed blue.png and cream.png background images, using solid colors instead.
