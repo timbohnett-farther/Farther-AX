@@ -149,9 +149,9 @@ const config: Config = {
         },
         cream: {
           DEFAULT: '#FFFEF4',
-          muted: 'rgba(255, 254, 244, 0.5)',
-          dark: '#e8e5d8',
-          border: 'rgba(255, 254, 244, 0.08)',
+          dark: '#E8E2D8',       // slightly darkened cream — borders, section dividers
+          muted: '#C8C0B8',      // muted cream — secondary labels on dark backgrounds
+          border: 'rgba(255,254,244,0.15)',  // cream at 15% — subtle borders
         },
         ice: {
           50: '#f0f6fc',

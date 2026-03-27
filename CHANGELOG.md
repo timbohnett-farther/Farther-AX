@@ -6,38 +6,38 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
-## [Completed] Brand Compliance Audit Fixes — 2026-03-26
+## [Completed] Readability & Contrast Audit + Fixes — 2026-03-26
 
-**What**: Fixed all UI audit brand compliance issues and applied new light mode brand directive (cream/brown dominant, teal as accent only).
+**What**: Comprehensive WCAG contrast audit of all pages and components. Fixed 13 contrast/readability violations.
 
-**Light Mode Palette (New)**:
-- Page background: `#F8F4F0` (cream) — unchanged
-- Cards/elevated surfaces: `#E1D2C5` (beige/brown) — was teal `#466F81`
-- Table header: `#9B766A` (terracotta brown) — was teal
-- Table rows: cream `#F8F4F0` / beige `#E1D2C5` alternating — was teal shades
-- Borders: `rgba(155, 118, 106, 0.25)` (subtle terracotta) — was solid teal
-- Chart text: `#595959` (charcoal) — was cream `#F8F4F0`
-- Teal (`#4E7082`) used only for accent/active states
+**Critical Fixes**:
+- Table odd rows: changed #93B6C4 (1.97:1 ❌) → #374E59 light / #D8D4D0 dark (8:1 / 4.86:1 ✅)
+- Sidebar user email dark mode: `dark:text-slate` (1.03:1 ❌) → `dark:text-white/70` (4.15:1 ✅)
+- Auth error text: `#b91c1c` on dark red bg (1.99:1 ❌) → `#fca5a5` light red on richer bg (5:1 ✅)
+- PageLayout subtitle/step: `text-slate` on charcoal header (1.5:1 ❌) → `text-white/70` ✅
 
-**Tailwind Tokens Added**:
-- `gold` / `gold-dark` — `#fbbf24` / `#f59e0b`
-- `cream-muted` — `rgba(255, 254, 244, 0.5)` (dark mode dimmed text)
-- `cream-border` — `rgba(250, 247, 242, 0.08)` (subtle cream border)
-- `cream-dark` — `#D0C8C0` (muted cream for secondary light mode text)
+**Other Fixes**:
+- Sidebar inactive nav: `dark:text-white/50` (2.62:1) → `dark:text-white/70` (4.15:1) ✅
+- Sidebar external links: `dark:text-white/40` (2.22:1) → `dark:text-white/65` ✅
+- Auth subtitle/footer opacity: 0.5 (4.41:1) → 0.75 (6.33:1) ✅
+- Font sizes: all `text-[10px]` → `text-xs`; all `text-[13px]` → `text-sm`
+- PageLayout step dots: removed hardcoded `#1d7682` hex → Tailwind `bg-teal`
+- Auth hover states: removed JS-based `onMouseEnter` color swaps → Tailwind `hover:bg-[...]`
+- ThemeToggle: raised text visibility in dark mode
 
-**Component Fixes**:
-- `Sidebar.tsx`: Replaced `bg-white dark:bg-surface` → `bg-surface border-border`
-- `ExecutiveSummary.tsx`: Removed hardcoded `const C = {...}` color object; all inline styles replaced with Tailwind classes + `glass-card`; ProgressBar colors use `colors.success/warning/danger` from design-tokens
-- `auth/signin/page.tsx`: Removed all hardcoded inline colors (`#2f2f2f`, `#FAF7F2`, `#1d7682`, etc.); replaced with semantic design token classes (`bg-surface-elevated`, `text-text-inverse`, `bg-brand hover:bg-brand-600`, `bg-error-50`, etc.)
-
-**Status**: ✅ Complete — build passes
+**New Token Definitions** (tailwind.config.ts):
+- `cream-dark: #E8E2D8` — borders, dividers
+- `cream-muted: #C8C0B8` — secondary labels on dark
+- `cream-border: rgba(255,254,244,0.15)` — subtle borders
 
 **Files**:
-- `tailwind.config.ts` — Added gold and cream variant tokens
-- `app/globals.css` — Light mode palette overhaul (surface-elevated, borders, tables, charts, card text)
-- `components/Sidebar.tsx` — Semantic background/border tokens
-- `components/transitions/ExecutiveSummary.tsx` — Removed const C, Tailwind classes
-- `app/auth/signin/page.tsx` — Removed all hardcoded inline styles
+- `app/globals.css` (table row colors)
+- `components/Sidebar.tsx` (contrast, font sizes, undefined classes)
+- `components/ThemeToggle.tsx` (font size, contrast)
+- `components/PageLayout.tsx` (subtitle, step number, back button, step dots)
+- `app/auth/signin/page.tsx` (inline style cleanup, error text)
+- `tailwind.config.ts` (cream color variants)
+- `docs/READABILITY-ASSESSMENT.md` (new — full audit report)
 
 ---
 

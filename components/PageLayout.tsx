@@ -40,17 +40,17 @@ export default function PageLayout({
             {title}
           </h1>
           {subtitle && (
-            <p className="text-sm mt-0.5 text-slate">
+            <p className="text-sm mt-0.5 text-white/70">
               {subtitle}
             </p>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold font-serif text-teal">
+          <span className="text-2xl font-bold font-serif text-cream">
             {stepStr}
           </span>
-          <span className="text-lg text-cream-border">/</span>
-          <span className="text-lg font-medium text-slate">
+          <span className="text-lg text-white/40">/</span>
+          <span className="text-lg font-medium text-white/70">
             {totalStr}
           </span>
         </div>
@@ -65,7 +65,7 @@ export default function PageLayout({
           {backHref ? (
             <Link
               href={backHref}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border border-cream-border text-slate bg-transparent hover:bg-white/5 hover:border-teal hover:shadow-[0_0_16px_rgba(29,118,130,0.2)]"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border border-white/20 text-white/80 bg-transparent hover:bg-white/5 hover:border-teal hover:shadow-[0_0_16px_rgba(78,112,130,0.3)]"
             >
               ← {backLabel}
             </Link>
@@ -81,11 +81,14 @@ export default function PageLayout({
             return (
               <div
                 key={i}
-                className={`rounded-full transition-all duration-300 h-1.5 ${isActive ? 'shadow-[0_0_8px_rgba(29,118,130,0.6)]' : ''}`}
-                style={{
-                  width: isActive ? "20px" : "6px",
-                  backgroundColor: isActive ? "#1d7682" : i + 1 < step ? "rgba(29,118,130,0.4)" : "rgba(182,208,237,0.3)",
-                }}
+                className={`rounded-full transition-all duration-300 h-1.5 ${
+                  isActive
+                    ? 'bg-teal shadow-[0_0_8px_rgba(78,112,130,0.6)]'
+                    : i + 1 < step
+                    ? 'bg-teal/40'
+                    : 'bg-white/20'
+                }`}
+                style={{ width: isActive ? "20px" : "6px" }}
               />
             );
           })}

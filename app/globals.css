@@ -501,12 +501,13 @@ html.dark .chart-card * {
 }
 
 /* ── Table Alternating Rows (Light Mode — cream/brown dominant) ───────── */
+/* Even: #F8F4F0 + charcoal → 6.40:1 ✅  |  Odd: #E1D2C5 + charcoal → 4.75:1 ✅ */
 html:not(.dark) table tbody tr:nth-child(even) {
   background-color: #F8F4F0 !important;  /* Cream */
 }
 
 html:not(.dark) table tbody tr:nth-child(odd) {
-  background-color: #E1D2C5 !important;  /* Beige/brown */
+  background-color: #E1D2C5 !important;  /* Beige/brown — 4.75:1 with #595959 ✅ */
 }
 
 html:not(.dark) table tbody tr td {
@@ -515,16 +516,17 @@ html:not(.dark) table tbody tr td {
 
 html:not(.dark) table thead th {
   background-color: #9B766A !important;  /* Terracotta brown header */
-  color: #F8F4F0 !important;             /* Cream text on brown */
+  color: #F8F4F0 !important;             /* Cream text on brown — 3.71:1 (large/bold) */
 }
 
 /* ── Table Alternating Rows (Dark Mode - REVERSED) ────────────────────── */
+/* Even: #F8F4F0 + grey → 6.40:1 ✅  |  Odd: #D8D4D0 + grey → 4.86:1 ✅ */
 html.dark table tbody tr:nth-child(even) {
   background-color: #F8F4F0 !important;
 }
 
 html.dark table tbody tr:nth-child(odd) {
-  background-color: #93B6C4 !important;
+  background-color: #D8D4D0 !important;
 }
 
 html.dark table tbody tr td {
