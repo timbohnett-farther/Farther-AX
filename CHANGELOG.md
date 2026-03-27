@@ -6,6 +6,41 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Readability & Contrast Audit + Fixes — 2026-03-26
+
+**What**: Comprehensive WCAG contrast audit of all pages and components. Fixed 13 contrast/readability violations.
+
+**Critical Fixes**:
+- Table odd rows: changed #93B6C4 (1.97:1 ❌) → #374E59 light / #D8D4D0 dark (8:1 / 4.86:1 ✅)
+- Sidebar user email dark mode: `dark:text-slate` (1.03:1 ❌) → `dark:text-white/70` (4.15:1 ✅)
+- Auth error text: `#b91c1c` on dark red bg (1.99:1 ❌) → `#fca5a5` light red on richer bg (5:1 ✅)
+- PageLayout subtitle/step: `text-slate` on charcoal header (1.5:1 ❌) → `text-white/70` ✅
+
+**Other Fixes**:
+- Sidebar inactive nav: `dark:text-white/50` (2.62:1) → `dark:text-white/70` (4.15:1) ✅
+- Sidebar external links: `dark:text-white/40` (2.22:1) → `dark:text-white/65` ✅
+- Auth subtitle/footer opacity: 0.5 (4.41:1) → 0.75 (6.33:1) ✅
+- Font sizes: all `text-[10px]` → `text-xs`; all `text-[13px]` → `text-sm`
+- PageLayout step dots: removed hardcoded `#1d7682` hex → Tailwind `bg-teal`
+- Auth hover states: removed JS-based `onMouseEnter` color swaps → Tailwind `hover:bg-[...]`
+- ThemeToggle: raised text visibility in dark mode
+
+**New Token Definitions** (tailwind.config.ts):
+- `cream-dark: #E8E2D8` — borders, dividers
+- `cream-muted: #C8C0B8` — secondary labels on dark
+- `cream-border: rgba(255,254,244,0.15)` — subtle borders
+
+**Files**:
+- `app/globals.css` (table row colors)
+- `components/Sidebar.tsx` (contrast, font sizes, undefined classes)
+- `components/ThemeToggle.tsx` (font size, contrast)
+- `components/PageLayout.tsx` (subtitle, step number, back button, step dots)
+- `app/auth/signin/page.tsx` (inline style cleanup, error text)
+- `tailwind.config.ts` (cream color variants)
+- `docs/READABILITY-ASSESSMENT.md` (new — full audit report)
+
+---
+
 ## [Completed] Complete Color Scheme Overhaul — 2026-03-26
 
 **What**: Implemented new color scheme for both light and dark modes with reversed palettes.

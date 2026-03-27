@@ -74,7 +74,7 @@ function NavGroup({
 }) {
   return (
     <>
-      <p className={`px-3 mb-2 text-[10px] font-semibold tracking-widest uppercase ${labelClassName ?? "text-gray-500 dark:text-cream-muted"}`}>
+      <p className={`px-3 mb-2 text-xs font-semibold tracking-widest uppercase ${labelClassName ?? "text-gray-500 dark:text-white/70"}`}>
         {label}
       </p>
       <ul className="space-y-0.5 mb-1">
@@ -87,13 +87,13 @@ function NavGroup({
             <li key={item.href}>
               <Link
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-smooth ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-smooth ${
                   isActive
                     ? "text-gray-900 dark:text-white bg-teal/15 dark:bg-teal/25 border-l-2 border-teal"
-                    : "text-gray-600 dark:text-white/50 hover:text-gray-900 dark:hover:text-white/80 hover:bg-gray-100 dark:hover:bg-white/5"
+                    : "text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10"
                 }`}
               >
-                <span className={isActive ? "text-teal" : "text-gray-500 dark:text-cream-muted"}>
+                <span className={isActive ? "text-teal" : "text-gray-500 dark:text-white/60"}>
                   <Icon className="w-4 h-4 shrink-0" />
                 </span>
                 <span className="leading-snug flex-1">{item.label}</span>
@@ -151,7 +151,7 @@ export default function Sidebar() {
           className="mb-2 object-contain object-left block dark:hidden"
           style={{ width: '160px', height: 'auto' }}
         />
-        <p className="text-[10px] tracking-widest uppercase text-cream-dark dark:text-slate">
+        <p className="text-xs tracking-widest uppercase text-gray-500 dark:text-white/60">
           Terminal AX
         </p>
       </div>
@@ -172,10 +172,10 @@ export default function Sidebar() {
         {/* AX Training & Information — collapsible */}
         <button
           onClick={() => setTrainingOpen(!trainingOpen)}
-          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase text-gray-600 dark:text-cream-muted bg-transparent border-none cursor-pointer hover:text-gray-900 dark:hover:text-slate transition-smooth"
+          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase text-gray-600 dark:text-white/70 bg-transparent border-none cursor-pointer hover:text-gray-900 dark:hover:text-white transition-smooth"
         >
           <span>AX Training &amp; Playbook</span>
-          <span className={`text-[10px] transition-transform ${trainingOpen ? 'rotate-0' : '-rotate-90'}`}>
+          <span className={`text-xs transition-transform ${trainingOpen ? 'rotate-0' : '-rotate-90'}`}>
             ▼
           </span>
         </button>
@@ -190,11 +190,11 @@ export default function Sidebar() {
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-smooth group ${
                       isActive
                         ? "text-gray-900 dark:text-white bg-teal/20 border-l-2 border-teal"
-                        : "text-gray-600 dark:text-white/50 hover:text-gray-900 dark:hover:text-white/80 hover:bg-gray-100 dark:hover:bg-white/5"
+                        : "text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10"
                     }`}
                   >
                     <span className={`text-xs font-mono w-5 shrink-0 text-right ${
-                      isActive ? 'text-teal' : 'text-gray-600 dark:text-cream-muted'
+                      isActive ? 'text-teal' : 'text-gray-600 dark:text-white/60'
                     }`}>
                       {String(item.step).padStart(2, "0")}
                     </span>
@@ -212,10 +212,10 @@ export default function Sidebar() {
         {/* External Links — collapsible */}
         <button
           onClick={() => setResourcesOpen(!resourcesOpen)}
-          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase text-gray-600 dark:text-cream-muted bg-transparent border-none cursor-pointer hover:text-gray-900 dark:hover:text-slate transition-smooth"
+          className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold tracking-widest uppercase text-gray-600 dark:text-white/70 bg-transparent border-none cursor-pointer hover:text-gray-900 dark:hover:text-white transition-smooth"
         >
           <span>Resources</span>
-          <span className={`text-[10px] transition-transform ${resourcesOpen ? 'rotate-0' : '-rotate-90'}`}>
+          <span className={`text-xs transition-transform ${resourcesOpen ? 'rotate-0' : '-rotate-90'}`}>
             ▼
           </span>
         </button>
@@ -227,9 +227,9 @@ export default function Sidebar() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-500 dark:text-white/40 hover:text-gray-700 dark:hover:text-white/70 hover:bg-gray-100 dark:hover:bg-white/5 transition-smooth"
+                  className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-500 dark:text-white/65 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-smooth"
                 >
-                  <span className="text-xs text-gray-600 dark:text-cream-muted">↗</span>
+                  <span className="text-xs text-gray-600 dark:text-white/60">↗</span>
                   {link.label}
                 </a>
               </li>
@@ -259,7 +259,7 @@ export default function Sidebar() {
               <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
                 {session.user.name}
               </p>
-              <p className="text-xs truncate text-gray-600 dark:text-slate">
+              <p className="text-xs truncate text-gray-600 dark:text-white/70">
                 {session.user.email}
               </p>
             </div>
@@ -267,7 +267,7 @@ export default function Sidebar() {
           <ThemeToggle />
           <button
             onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-            className="w-full text-left px-3 py-2 rounded-md text-xs transition-smooth text-gray-600 dark:text-white/40 hover:text-gray-900 dark:hover:text-white/70 hover:bg-gray-100 dark:hover:bg-white/5"
+            className="w-full text-left px-3 py-2 rounded-md text-xs transition-smooth text-gray-600 dark:text-white/65 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10"
           >
             ← Sign out
           </button>
@@ -277,7 +277,7 @@ export default function Sidebar() {
       {/* Footer (shown when not signed in) */}
       {!session?.user && (
         <div className="px-6 py-4 border-t border-charcoal-600 dark:border-white/10">
-          <p className="text-xs text-gray-600 dark:text-cream-muted">
+          <p className="text-xs text-gray-600 dark:text-white/70">
             Farther Wealth Management
           </p>
         </div>

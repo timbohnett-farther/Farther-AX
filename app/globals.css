@@ -501,12 +501,13 @@ html.dark .chart-card * {
 }
 
 /* ── Table Alternating Rows (Light Mode) ──────────────────────────────── */
+/* Even: #466F81 + cream → 4.97:1 ✅  |  Odd: #374E59 + cream → 8.00:1 ✅ */
 html:not(.dark) table tbody tr:nth-child(even) {
   background-color: #466F81 !important;
 }
 
 html:not(.dark) table tbody tr:nth-child(odd) {
-  background-color: #93B6C4 !important;
+  background-color: #374E59 !important;
 }
 
 html:not(.dark) table tbody tr td {
@@ -514,17 +515,18 @@ html:not(.dark) table tbody tr td {
 }
 
 html:not(.dark) table thead th {
-  background-color: #466F81 !important;
+  background-color: #2d3e47 !important;
   color: #F8F4F0 !important;
 }
 
 /* ── Table Alternating Rows (Dark Mode - REVERSED) ────────────────────── */
+/* Even: #F8F4F0 + grey → 6.40:1 ✅  |  Odd: #D8D4D0 + grey → 4.86:1 ✅ */
 html.dark table tbody tr:nth-child(even) {
   background-color: #F8F4F0 !important;
 }
 
 html.dark table tbody tr:nth-child(odd) {
-  background-color: #93B6C4 !important;
+  background-color: #D8D4D0 !important;
 }
 
 html.dark table tbody tr td {
