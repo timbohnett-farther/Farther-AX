@@ -236,8 +236,8 @@ export default function AlertsPage() {
   const { data, isLoading, error } = useSWR('/api/command-center/alerts', fetcher, { refreshInterval: 300_000 });
   const [activeTab, setActiveTab] = useState<AlertTab>('all');
 
-  if (isLoading) return <div className="px-10 py-16" style={{ color: C.slate }}>Loading alerts...</div>;
-  if (error) return <div className="px-10 py-16" style={{ color: C.red }}>Failed to load alerts.</div>;
+  if (isLoading) return <div className="px-4 sm:px-10 py-16" style={{ color: C.slate }}>Loading alerts...</div>;
+  if (error) return <div className="px-4 sm:px-10 py-16" style={{ color: C.red }}>Failed to load alerts.</div>;
 
   const allAlerts: Alert[] = data?.alerts ?? [];
   const counts = data?.counts ?? { task_overdue: 0, hard_gates: 0, sentiment_drop: 0, aum_behind: 0, aum_critical: 0 };
@@ -263,7 +263,7 @@ export default function AlertsPage() {
   ];
 
   return (
-    <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 lg:py-10 min-h-screen bg-transparent font-sans">
       <div className="relative mb-6">
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} className="absolute top-0 right-0 opacity-50" />
         <div className="text-center mb-6">
@@ -306,12 +306,12 @@ export default function AlertsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 rounded-lg p-1 mb-6 w-fit" style={{ backgroundColor: C.cardBg, border: `1px solid ${C.border}` }}>
+      <div className="flex gap-1 rounded-lg p-1 mb-6 w-full sm:w-fit overflow-x-auto scrollbar-hide" style={{ backgroundColor: C.cardBg, border: `1px solid ${C.border}` }}>
         {tabs.map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className="px-3.5 py-1.5 rounded text-xs font-medium transition-smooth border-none cursor-pointer flex items-center gap-1.5"
+            className="px-3.5 py-1.5 rounded text-xs font-medium transition-smooth border-none cursor-pointer flex items-center gap-1.5 shrink-0"
             style={{
               backgroundColor: activeTab === tab.key ? C.teal : 'transparent',
               color: activeTab === tab.key ? C.white : C.slate

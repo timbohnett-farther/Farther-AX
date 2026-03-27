@@ -6,6 +6,47 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Full Mobile Responsiveness — 2026-03-26
+
+**What**: Implemented full mobile-friendly layout across the entire AX Command Center, modeled after the farther-billing-portal responsive patterns.
+
+**Scope**:
+- Added mobile hamburger header + slide-out drawer navigation (same 3-element pattern as billing portal)
+- `app/layout.tsx` — Added viewport meta tag; added `main-content` CSS class to `<main>` for media query override
+- `components/Sidebar.tsx` — Full refactor: `sidebar-desktop` (hidden on mobile), `mobile-header` (hamburger bar), `sidebar-mobile` (slide-out drawer); extracted `SidebarContent` as shared component; auto-closes on nav click; `XMarkIcon` + `Bars3Icon` added
+- `app/globals.css` — Added responsive CSS block: sidebar show/hide at 768px breakpoint, `main-content` 0 margin-left on mobile with 56px top padding, `main-content-inner` for inline-style pages, `grid-4`/`grid-3`/`grid-2` responsive grid overrides, `table-wrapper` horizontal scroll, `scrollbar-hide` utility
+- `components/PageLayout.tsx` — `px-10` → `px-4 sm:px-8 lg:px-10` on header/content/footer; step dots hidden below `sm:` breakpoint; title truncation on mobile
+- `app/command-center/onboarding/page.tsx` — `px-10 py-10` → `px-4 sm:px-6 lg:px-10`; role tab row gets `overflow-x-auto scrollbar-hide` + `shrink-0` on buttons
+- `app/command-center/team/page.tsx` — `px-10 py-10` → `px-4 sm:px-6 lg:px-10`
+- `app/command-center/metrics/page.tsx` — `px-10 py-10` → `px-4 sm:px-6 lg:px-10`
+- `app/command-center/alerts/page.tsx` — `px-10 py-10` → `px-4 sm:px-6 lg:px-10`; tab row gets `overflow-x-auto scrollbar-hide` + `shrink-0`
+- `app/command-center/page.tsx` — Added `main-content-inner` class on root wrapper; 3 stat card grids get `grid-4` class for CSS override to 2-col on mobile
+- `app/command-center/advisor-hub/page.tsx` — Added `main-content-inner` class; summary card grids get `grid-3` class
+- `components/transitions/StatsCards.tsx` — Added `grid-4` class to 4-col grid
+- `components/transitions/AccountsTable.tsx` — Added `table-wrapper` class + `minWidth: 700px` on table for scroll containment
+- `app/introduction/page.tsx` — Step indicator `hidden sm:block`; outer `px-8 py-20` → `px-4 sm:px-8 py-12`; inner card `px-10 py-10` → `px-4 sm:px-10 py-6 sm:py-10`
+- `app/onboarding-vs-transitions/page.tsx` — `px-8`/`px-6` → `px-4 sm:px-8`/`px-4 sm:px-6`; main wrapper `py-14` → `py-8 sm:py-14`
+
+**Impact**: Site is now fully usable on mobile devices (375px+). Sidebar collapses to hamburger menu, all pages adjust padding/grid layout, tables scroll horizontally. Build confirmed clean (0 errors).
+
+**Files**:
+- `app/globals.css`
+- `components/Sidebar.tsx`
+- `app/layout.tsx`
+- `components/PageLayout.tsx`
+- `app/command-center/onboarding/page.tsx`
+- `app/command-center/team/page.tsx`
+- `app/command-center/metrics/page.tsx`
+- `app/command-center/alerts/page.tsx`
+- `app/command-center/page.tsx`
+- `app/command-center/advisor-hub/page.tsx`
+- `components/transitions/StatsCards.tsx`
+- `components/transitions/AccountsTable.tsx`
+- `app/introduction/page.tsx`
+- `app/onboarding-vs-transitions/page.tsx`
+
+---
+
 ## [Completed] Complete Color Scheme Overhaul — 2026-03-26
 
 **What**: Implemented new color scheme for both light and dark modes with reversed palettes.

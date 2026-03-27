@@ -125,14 +125,14 @@ function WorkloadDashboard() {
   return (
     <div className="mb-7">
       {/* Role Tabs */}
-      <div className="flex gap-0 border-b-2 mb-5" style={{ borderColor: C.borderSubtle }}>
+      <div className="flex gap-0 border-b-2 mb-5 overflow-x-auto scrollbar-hide" style={{ borderColor: C.borderSubtle }}>
         {CAPACITY_ROLES.map(role => {
           const isActive = activeRole === role;
           return (
             <button
               key={role}
               onClick={() => { setActiveRole(role); setExpandedMember(null); }}
-              className="px-5 py-2.5 text-sm font-medium border-b-2 -mb-0.5 cursor-pointer bg-transparent transition-all"
+              className="px-5 py-2.5 text-sm font-medium border-b-2 -mb-0.5 cursor-pointer bg-transparent transition-all shrink-0"
               style={{
                 color: isActive ? C.teal : C.slate,
                 borderColor: isActive ? C.teal : 'transparent'
@@ -503,11 +503,11 @@ export default function OnboardingTracker() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   if (isLoading) {
-    return <div className="px-10 py-16" style={{ color: C.slate }}>Loading…</div>;
+    return <div className="px-4 sm:px-10 py-16" style={{ color: C.slate }}>Loading…</div>;
   }
 
   if (error) {
-    return <div className="px-10 py-16" style={{ color: C.red }}>Failed to load data.</div>;
+    return <div className="px-4 sm:px-10 py-16" style={{ color: C.red }}>Failed to load data.</div>;
   }
 
   const onboardingDeals = (data?.deals ?? []).filter(
@@ -524,7 +524,7 @@ export default function OnboardingTracker() {
   const isDropdownRole = DROPDOWN_ROLES.includes(checklistRoleFilter as TaskRole);
 
   return (
-    <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 lg:py-10 min-h-screen bg-transparent font-sans">
       <div className="relative mb-6">
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} className="absolute top-0 right-0 opacity-50" />
         <div className="text-center mb-4">

@@ -754,7 +754,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
       </div>
 
       {/* ── Pipeline Stats ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 32 }}>
+      <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 32 }}>
         <SummaryCard
           label="Total Pipeline AUM"
           value={formatAUM(a.totalActiveAUM)}
@@ -786,7 +786,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
       </div>
 
       {/* ── Insight Cards: Sentiment · AUM · Revenue ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 32 }}>
+      <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 32 }}>
         {/* Sentiment Tracking */}
         {(() => {
           const scores = sentimentData?.scores ?? [];
@@ -2054,7 +2054,7 @@ function AcquisitionsTab() {
   return (
     <>
       {/* Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
+      <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
         <SummaryCard label="Total M&A Pipeline" value={formatAUM(totalAUM)} sub={`${activeDeals.length} active deals`} accent icon="◈" iconColor="#A8CED3" />
         <SummaryCard label="Total Deals" value={String(deals.length)} sub={`${activeDeals.length} active · ${terminalDeals.length} closed`} icon="▸" iconColor="#3b82f6" />
         <SummaryCard label="Active Stages" value={String(stages.filter(s => !s.isTerminal && s.count > 0).length)} sub="in progress" icon="▲" iconColor="#8b5cf6" />
@@ -2157,7 +2157,7 @@ export default function PipelineDashboard() {
   ];
 
   return (
-    <div style={{ padding: '40px 40px', minHeight: '100vh', fontFamily: "'Inter', system-ui, sans-serif", maxWidth: '100vw', overflowX: 'hidden' }}>
+    <div className="main-content-inner" style={{ padding: '40px 40px', minHeight: '100vh', fontFamily: "'Inter', system-ui, sans-serif", maxWidth: '100vw', overflowX: 'hidden' }}>
       {/* Header */}
       <div style={{ position: 'relative', marginBottom: 24 }}>
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />

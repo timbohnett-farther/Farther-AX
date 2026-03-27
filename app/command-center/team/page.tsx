@@ -322,11 +322,11 @@ export default function TeamPage() {
     mutate('/api/command-center/team');
   };
 
-  if (isLoading) return <div className="px-10 py-16" style={{ color: C.slate }}>Loading team…</div>;
-  if (error) return <div className="px-10 py-16" style={{ color: C.red }}>Failed to load team data.</div>;
+  if (isLoading) return <div className="px-4 sm:px-10 py-16" style={{ color: C.slate }}>Loading team…</div>;
+  if (error) return <div className="px-4 sm:px-10 py-16" style={{ color: C.red }}>Failed to load team data.</div>;
 
   return (
-    <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 lg:py-10 min-h-screen bg-transparent font-sans">
       {/* Header */}
       <div className="relative mb-6">
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} className="absolute top-0 right-0 opacity-50" />

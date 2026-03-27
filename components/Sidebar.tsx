@@ -14,6 +14,8 @@ import {
   ChartBarIcon,
   UserGroupIcon,
   BellAlertIcon,
+  Bars3Icon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -66,11 +68,13 @@ function NavGroup({
   items,
   pathname,
   labelClassName,
+  onNavClick,
 }: {
   label: string;
   items: NavItem[];
   pathname: string;
   labelClassName?: string;
+  onNavClick?: () => void;
 }) {
   return (
     <>
@@ -87,6 +91,7 @@ function NavGroup({
             <li key={item.href}>
               <Link
                 href={item.href}
+                onClick={onNavClick}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-smooth ${
                   isActive
                     ? "text-gray-900 dark:text-white bg-teal/15 dark:bg-teal/25 border-l-2 border-teal"
@@ -111,30 +116,27 @@ function NavGroup({
   );
 }
 
-export default function Sidebar() {
-  const pathname = usePathname();
-  const { data: session } = useSession();
-
+function SidebarContent({
+  pathname,
+  session,
+  alertCount,
+  onNavClick,
+}: {
+  pathname: string;
+  session: ReturnType<typeof useSession>["data"];
+  alertCount: number;
+  onNavClick?: () => void;
+}) {
   const firstName = session?.user?.name?.split(" ")[0] ?? "";
-
   const [trainingOpen, setTrainingOpen] = useState(true);
   const [resourcesOpen, setResourcesOpen] = useState(true);
 
-  // Fetch alert count for sidebar badge
-  const { data: alertData } = useSWR<{ total?: number }>(
-    "/api/command-center/alerts",
-    sidebarFetcher,
-    { refreshInterval: 5 * 60 * 1000, revalidateOnFocus: false, errorRetryCount: 1 }
-  );
-  const alertCount = alertData?.total ?? 0;
-
-  // Inject alert badge into nav items
   const opsWithBadges: NavItem[] = coreOps.map(item =>
     item.label === "Alerts" ? { ...item, badge: alertCount } : item
   );
 
   return (
-    <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-white dark:bg-surface border-r border-gray-200 dark:border-white/10">
+    <div className="flex flex-col h-full">
       {/* Logo / Brand */}
       <div className="px-6 pt-8 pb-5 border-b border-charcoal-600 dark:border-white/10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -158,12 +160,13 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
-        {/* ── AX Operations ─────────────────── */}
+        {/* ── AX Operations ─────────────────────────────────────────────── */}
         <NavGroup
           label="AX Operations"
           items={opsWithBadges}
           pathname={pathname}
           labelClassName="text-teal"
+          onNavClick={onNavClick}
         />
 
         {/* Divider */}
@@ -187,6 +190,7 @@ export default function Sidebar() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    onClick={onNavClick}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-smooth group ${
                       isActive
                         ? "text-gray-900 dark:text-white bg-teal/20 border-l-2 border-teal"
@@ -282,6 +286,132 @@ export default function Sidebar() {
           </p>
         </div>
       )}
-    </aside>
+    </div>
+  );
+}
+
+export default function Sidebar() {
+  const pathname = usePathname();
+  const { data: session } = useSession();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Fetch alert count for sidebar badge
+  const { data: alertData } = useSWR<{ total?: number }>(
+    "/api/command-center/alerts",
+    sidebarFetcher,
+    { refreshInterval: 5 * 60 * 1000, revalidateOnFocus: false, errorRetryCount: 1 }
+  );
+  const alertCount = alertData?.total ?? 0;
+
+  const sharedProps = {
+    pathname,
+    session,
+    alertCount,
+  };
+
+  return (
+    <>
+      {/* ── Mobile Header Bar ──────────────────────────────────────────── */}
+      <div
+        className="mobile-header"
+        style={{
+          display: 'none',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '56px',
+          zIndex: 200,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          borderBottom: '1px solid rgba(0,0,0,0.1)',
+        }}
+        // Background matches body (light/dark via inline className approach)
+      >
+        <div className="flex items-center gap-3 bg-white dark:bg-surface h-full w-full px-4 border-b border-gray-200 dark:border-white/10">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="p-1.5 rounded-md text-gray-600 dark:text-white/70 hover:bg-gray-100 dark:hover:bg-white/10 transition-smooth"
+            aria-label="Open menu"
+          >
+            <Bars3Icon className="w-5 h-5" />
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-dark.png"
+            alt="Farther"
+            className="block dark:hidden"
+            style={{ height: '24px', width: 'auto' }}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-light.png"
+            alt="Farther"
+            className="hidden dark:block"
+            style={{ height: '24px', width: 'auto' }}
+          />
+          <span className="text-[10px] tracking-widest uppercase text-gray-500 dark:text-slate ml-1">
+            Terminal AX
+          </span>
+          {/* Alert badge in mobile header */}
+          {alertCount > 0 && (
+            <span className="ml-auto min-w-[20px] h-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1.5">
+              {alertCount > 99 ? "99+" : alertCount}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* ── Mobile Overlay ─────────────────────────────────────────────── */}
+      {mobileOpen && (
+        <div
+          className="mobile-overlay"
+          onClick={() => setMobileOpen(false)}
+          style={{
+            display: 'none',
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            zIndex: 299,
+          }}
+        />
+      )}
+
+      {/* ── Mobile Slide-out Drawer ────────────────────────────────────── */}
+      <aside
+        className={`sidebar-mobile bg-white dark:bg-surface border-r border-gray-200 dark:border-white/10`}
+        style={{
+          display: 'none',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          bottom: 0,
+          width: '280px',
+          flexDirection: 'column',
+          zIndex: 300,
+          transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'transform 250ms ease',
+          overflowY: 'auto',
+        }}
+      >
+        {/* Close button */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="absolute top-4 right-4 p-1.5 rounded-md text-gray-500 dark:text-white/50 hover:bg-gray-100 dark:hover:bg-white/10 transition-smooth z-10"
+          aria-label="Close menu"
+        >
+          <XMarkIcon className="w-5 h-5" />
+        </button>
+        <SidebarContent {...sharedProps} onNavClick={() => setMobileOpen(false)} />
+      </aside>
+
+      {/* ── Desktop Sidebar ────────────────────────────────────────────── */}
+      <aside
+        className="sidebar-desktop fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-white dark:bg-surface border-r border-gray-200 dark:border-white/10"
+      >
+        <SidebarContent {...sharedProps} />
+      </aside>
+    </>
   );
 }

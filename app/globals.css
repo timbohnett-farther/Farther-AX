@@ -556,6 +556,15 @@ html.dark .recharts-text {
   fill: #595959 !important;
 }
 
+/* ── Hide Scrollbar (for horizontal tab rows) ──────────────────────────── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Scrollbar Styling ─────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 8px;
@@ -573,4 +582,71 @@ html.dark .recharts-text {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-brand-600);
+}
+
+/* ============================================================================
+   RESPONSIVE LAYOUT — Mobile-First
+   Matches pattern from farther-billing-portal
+   ============================================================================ */
+
+/* Desktop: ensure sidebar and layout are correct */
+@media (min-width: 769px) {
+  .mobile-header { display: none !important; }
+  .sidebar-mobile { display: none !important; }
+  .mobile-overlay { display: none !important; }
+}
+
+/* Mobile: hide desktop sidebar, show mobile header + drawer */
+@media (max-width: 768px) {
+  .sidebar-desktop { display: none !important; }
+  .mobile-header   { display: flex !important; }
+  .mobile-overlay  { display: block !important; }
+  .sidebar-mobile  { display: flex !important; }
+  .sidebar-mobile.open { transform: translateX(0) !important; }
+
+  /* Main content: full width, padded below fixed header */
+  .main-content {
+    margin-left: 0 !important;
+    max-width: 100vw !important;
+    padding: 0 !important;
+    padding-top: 56px !important;
+  }
+
+  /* Inner page padding for inline-style pages (Pipeline, Advisor Hub) */
+  .main-content-inner {
+    padding: 16px !important;
+  }
+
+  /* Responsive grids — works with inline-style pages that set className="grid-4" etc. */
+  .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+  .grid-3 { grid-template-columns: 1fr !important; }
+  .grid-2 { grid-template-columns: 1fr !important; }
+
+  /* Page headers: stack vertically on mobile */
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .page-header-actions {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+  }
+
+  /* Tables: enable horizontal scroll on mobile */
+  .table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table-wrapper table { min-width: 600px; }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .grid-4 { grid-template-columns: 1fr !important; }
+  .main-content-inner { padding: 12px !important; }
+  .main-content {
+    padding: 0 !important;
+    padding-top: 56px !important;
+  }
 }

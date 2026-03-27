@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   description: "Farther Advisor Experience Onboarding & Transition Reference",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,7 +34,7 @@ export default function RootLayout({
             <SWRProvider>
               <div className="flex min-h-screen">
                 <Sidebar />
-                <main className="flex-1 ml-64 min-h-screen">
+                <main className="main-content flex-1 ml-64 min-h-screen">
                   {children}
                 </main>
               </div>

@@ -15,7 +15,7 @@ export default function OnboardingVsTransitions() {
         </div>
       </div>
 
-      <main className="max-w-5xl mx-auto px-6 py-14">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-14">
         {/* Page Header */}
         <div className="mb-12">
           <p className="text-gold text-xs tracking-widest uppercase font-medium mb-3">
@@ -84,7 +84,7 @@ export default function OnboardingVsTransitions() {
           </h2>
           <div className="glass-card-dark rounded-xl overflow-hidden">
             {/* Card Header */}
-            <div className="border-b border-cream-border px-8 py-6 flex flex-wrap gap-6 items-start">
+            <div className="border-b border-cream-border px-4 sm:px-8 py-6 flex flex-wrap gap-6 items-start">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-gold flex items-center justify-center shrink-0">
                   <span className="text-cream text-xl font-serif font-bold">A</span>
@@ -107,7 +107,7 @@ export default function OnboardingVsTransitions() {
 
             <div className="grid md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-cream-border">
               {/* Core Responsibilities */}
-              <div className="px-8 py-7">
+              <div className="px-4 sm:px-8 py-6 sm:py-7">
                 <h4 className="text-xs text-gold-dark uppercase tracking-widest font-medium mb-5">
                   Core Responsibilities
                 </h4>
@@ -132,7 +132,7 @@ export default function OnboardingVsTransitions() {
 
               {/* Right column: Key Relationships + Metrics */}
               <div className="divide-y divide-cream-border">
-                <div className="px-8 py-7">
+                <div className="px-4 sm:px-8 py-6 sm:py-7">
                   <h4 className="text-xs text-gold-dark uppercase tracking-widest font-medium mb-5">
                     Key Relationships
                   </h4>
@@ -149,7 +149,7 @@ export default function OnboardingVsTransitions() {
                     )}
                   </div>
                 </div>
-                <div className="px-8 py-7">
+                <div className="px-4 sm:px-8 py-6 sm:py-7">
                   <h4 className="text-xs text-gold-dark uppercase tracking-widest font-medium mb-5">
                     Success Metrics
                   </h4>
@@ -179,7 +179,7 @@ export default function OnboardingVsTransitions() {
           </h2>
           <div className="glass-card-dark rounded-xl overflow-hidden">
             {/* Card Header */}
-            <div className="border-b border-cream-border px-8 py-6 flex flex-wrap gap-6 items-start">
+            <div className="border-b border-cream-border px-4 sm:px-8 py-6 flex flex-wrap gap-6 items-start">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-charcoal flex items-center justify-center shrink-0">
                   <span className="text-cream text-xl font-serif font-bold">A</span>
@@ -202,7 +202,7 @@ export default function OnboardingVsTransitions() {
 
             <div className="grid md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-cream-border">
               {/* Core Responsibilities */}
-              <div className="px-8 py-7">
+              <div className="px-4 sm:px-8 py-6 sm:py-7">
                 <h4 className="text-xs text-gold-dark uppercase tracking-widest font-medium mb-5">
                   Core Responsibilities
                 </h4>
@@ -227,7 +227,7 @@ export default function OnboardingVsTransitions() {
 
               {/* Right column: Key Relationships + Metrics */}
               <div className="divide-y divide-cream-border">
-                <div className="px-8 py-7">
+                <div className="px-4 sm:px-8 py-6 sm:py-7">
                   <h4 className="text-xs text-gold-dark uppercase tracking-widest font-medium mb-5">
                     Key Relationships
                   </h4>
@@ -244,7 +244,7 @@ export default function OnboardingVsTransitions() {
                     )}
                   </div>
                 </div>
-                <div className="px-8 py-7">
+                <div className="px-4 sm:px-8 py-6 sm:py-7">
                   <h4 className="text-xs text-gold-dark uppercase tracking-widest font-medium mb-5">
                     Success Metrics
                   </h4>
@@ -271,7 +271,7 @@ export default function OnboardingVsTransitions() {
           <h2 className="font-serif text-2xl text-cream mb-6">
             The Handoff Moment
           </h2>
-          <div className="relative bg-charcoal rounded-xl px-8 py-8 overflow-hidden">
+          <div className="relative bg-charcoal rounded-xl px-4 sm:px-8 py-6 sm:py-8 overflow-hidden">
             {/* Decorative accent */}
             <div className="absolute top-0 left-0 w-1 h-full bg-gold rounded-l-xl" />
             <div className="absolute top-4 right-6 text-gold opacity-10 text-8xl font-serif leading-none select-none">

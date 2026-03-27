@@ -51,7 +51,7 @@ export default function MetricsDashboard() {
 
   if (isLoading) {
     return (
-      <div className="px-10 py-16 text-slate">
+      <div className="px-4 sm:px-10 py-16 text-slate">
         Loading metrics…
       </div>
     );
@@ -59,7 +59,7 @@ export default function MetricsDashboard() {
 
   if (error || data?.error) {
     return (
-      <div className="px-10 py-16 text-red-600">
+      <div className="px-4 sm:px-10 py-16 text-red-600">
         Failed to load metrics.
       </div>
     );
@@ -101,7 +101,7 @@ export default function MetricsDashboard() {
     }));
 
   return (
-    <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 lg:py-10 min-h-screen bg-transparent font-sans">
       <div className="relative mb-8">
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} className="absolute top-0 right-0 opacity-50" />
         <div className="text-center">
