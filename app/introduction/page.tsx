@@ -11,14 +11,14 @@ export default function IntroductionPage() {
 
   return (
     <div className="min-h-screen" style={{ color: C.dark }}>
-      {/* Step Indicator */}
-      <div className="fixed top-6 right-8 z-50">
+      {/* Step Indicator — hidden on mobile (covered by nav header) */}
+      <div className="hidden sm:block fixed top-6 right-8 z-50">
         <span className="font-sans text-xs tracking-[0.2em] uppercase px-4 py-2 rounded-full" style={{ background: C.cardBg, border: `1px solid ${C.border}`, color: C.slate }}>
           01 / 13
         </span>
       </div>
 
-      <div className="max-w-4xl mx-auto px-8 py-20 lg:py-28">
+      <div className="max-w-4xl mx-auto px-4 sm:px-8 py-12 lg:py-20">
 
         {/* Page Header */}
         <header className="mb-20">
@@ -39,7 +39,7 @@ export default function IntroductionPage() {
 
         {/* Overview */}
         <section className="mb-20">
-          <div className="rounded-2xl px-10 py-10" style={{ background: C.cardBg, border: `1px solid ${C.border}` }}>
+          <div className="rounded-2xl px-4 sm:px-10 py-6 sm:py-10" style={{ background: C.cardBg, border: `1px solid ${C.border}` }}>
             <p className="font-sans text-base leading-8" style={{ color: C.dark }}>
               This playbook is the definitive reference for Farther&rsquo;s Advisor Experience (AX) team. It
               guides <strong className="font-semibold" style={{ color: C.dark }}>AX Managers (AXMs)</strong> and{" "}

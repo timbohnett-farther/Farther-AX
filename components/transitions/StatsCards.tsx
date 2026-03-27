@@ -32,7 +32,7 @@ export function StatsCards({ filterParams }: StatsCardsProps) {
   ];
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+    <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
       {cards.map(card => (
         <div key={card.label} style={{
           background: C.cardBg, borderRadius: 10, padding: '16px 18px',

@@ -735,7 +735,7 @@ export default function AdvisorHubPage() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '100vw', overflowX: 'hidden', margin: '0 auto' }}>
+    <div className="main-content-inner" style={{ padding: '40px 48px', maxWidth: '100vw', overflowX: 'hidden', margin: '0 auto' }}>
       {/* Header */}
       <div style={{ position: 'relative', marginBottom: 32 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -763,7 +763,7 @@ export default function AdvisorHubPage() {
       </div>
 
       {/* Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
+      <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
         {[
           { label: 'Launch to Graduation', value: String(launchDeals.length), sub: undefined, color: C.teal, icon: '▲' },
           { label: 'Early Deals', value: String(earlyDeals.length), sub: undefined, color: '#4383b4', icon: '◈' },

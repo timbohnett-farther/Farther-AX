@@ -74,8 +74,8 @@ export function AccountsTable({ accounts, total, page, perPage, onPageChange, sh
 
   return (
     <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, overflow: 'hidden' }}>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+      <div className="table-wrapper" style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', minWidth: '700px', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ borderBottom: `1px solid ${C.border}`, background: '#2f2f2f' }}>
               {columns.map(col => (

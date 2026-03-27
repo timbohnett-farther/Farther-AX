@@ -34,19 +34,19 @@ export default function PageLayout({
   return (
     <div className="min-h-screen flex flex-col bg-transparent">
       {/* Top bar */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b border-cream-border bg-charcoal/80 backdrop-blur-md">
-        <div>
-          <h1 className="text-2xl font-bold font-serif text-cream leading-tight">
+      <header className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8 lg:px-10 py-4 border-b border-cream-border bg-charcoal/80 backdrop-blur-md">
+        <div className="min-w-0 flex-1 mr-4">
+          <h1 className="text-xl sm:text-2xl font-bold font-serif text-cream leading-tight truncate">
             {title}
           </h1>
           {subtitle && (
-            <p className="text-sm mt-0.5 text-slate">
+            <p className="text-sm mt-0.5 text-slate truncate">
               {subtitle}
             </p>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold font-serif text-teal">
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xl sm:text-2xl font-bold font-serif text-teal">
             {stepStr}
           </span>
           <span className="text-lg text-cream-border">/</span>
@@ -57,10 +57,10 @@ export default function PageLayout({
       </header>
 
       {/* Page content */}
-      <div className="flex-1 px-10 py-8">{children}</div>
+      <div className="flex-1 px-4 sm:px-8 lg:px-10 py-6 lg:py-8">{children}</div>
 
       {/* Bottom navigation */}
-      <footer className="px-10 py-6 border-t border-cream-border bg-charcoal-700 flex items-center justify-between">
+      <footer className="px-4 sm:px-8 lg:px-10 py-5 lg:py-6 border-t border-cream-border bg-charcoal-700 flex items-center justify-between">
         <div>
           {backHref ? (
             <Link
@@ -74,8 +74,8 @@ export default function PageLayout({
           )}
         </div>
 
-        {/* Step dots */}
-        <div className="flex gap-1.5 items-center">
+        {/* Step dots — hidden on small screens to prevent overflow */}
+        <div className="hidden sm:flex gap-1.5 items-center">
           {Array.from({ length: totalSteps }).map((_, i) => {
             const isActive = i + 1 === step;
             return (
