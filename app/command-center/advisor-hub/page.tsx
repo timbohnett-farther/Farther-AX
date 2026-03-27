@@ -979,8 +979,8 @@ export default function AdvisorHubPage() {
 
       {/* Loading / Error */}
       {isLoading && activeTab !== 'aum' && (
-        <div style={{ textAlign: 'center', padding: 60, color: C.slate, fontSize: 14 }}>
-          Loading advisors...
+        <div className="px-4 py-4 space-y-3">
+          {[1,2,3,4,5].map(i => <div key={i} className="shimmer h-16 rounded-lg" />)}
         </div>
       )}
       {error && activeTab !== 'aum' && (
