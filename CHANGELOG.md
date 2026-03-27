@@ -28,6 +28,21 @@ Removed all bright gold (#fbbf24) text from light mode. Brown (`#7A5042` / `#9B7
 
 ---
 
+## [Completed] Fix Onboarding Complexity Score Graph (Task #8) — 2026-03-26
+
+**What**: Workload API was always returning 0 complexity scores for all assigned deals, causing the capacity progress bars on the Onboarding page to show 0/250 for every AXM.
+
+**Root Cause**: `app/api/command-center/workload/route.ts` made a self-referential internal HTTP call (`fetch(`http://${host}/api/command-center/complexity/batch`, ...)`) wrapped in a silent `try-catch`. In Railway production, internal loopback HTTP doesn't resolve, so the call always failed and all scores defaulted to 0.
+
+**Fix**: Replaced the two-step approach (HubSpot for names + internal HTTP for scores) with a single HubSpot batch fetch that retrieves all 20 deal properties needed for scoring, then calls `computeComplexityScore` from `@/lib/complexity-score` directly.
+
+**Impact**: Capacity graphs on the Onboarding page now show real complexity totals per AXM instead of always showing 0.
+
+**Files**:
+- `app/api/command-center/workload/route.ts` — eliminated self-referential HTTP call, added direct scoring
+
+---
+
 ## [Completed] Readability & Contrast Audit + Fixes — 2026-03-26
 
 **What**: Comprehensive WCAG contrast audit of all pages and components. Fixed 13 contrast/readability violations.

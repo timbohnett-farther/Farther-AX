@@ -192,13 +192,15 @@ When you report a fix:
   - RIA Hub now uses `withPgCache` (2hr TTL)
 
 ### **Task #8: Fix Onboarding Page Complexity Score Graph**
-- **Status:** 🔴 Not Started
+- **Status:** ✅ Fixed (2026-03-26)
 - **Priority:** High
 - **Description:** The onboarding page is not reading the complexity scores of advisors assigned to team members. It should sum those scores and display them on the 0/250 complexity points graph for each AXM.
+- **Root Cause:** `app/api/command-center/workload/route.ts` made a self-referential HTTP call to `/api/command-center/complexity/batch` that silently fails in Railway production (internal loopback doesn't resolve), causing all complexity scores to return 0.
+- **Fix:** Replaced the two-step fetch (HubSpot for names + internal HTTP for scores) with a single HubSpot batch fetch of all scoring properties, then calling `computeComplexityScore` directly from `@/lib/complexity-score`.
 - **Sub-tasks:**
-  - [ ] Connect complexity scores to advisor-team assignments
-  - [ ] Sum complexity points per team member
-  - [ ] Update the graph to reflect actual summed scores vs 250 capacity
+  - [x] Connect complexity scores to advisor-team assignments
+  - [x] Sum complexity points per team member
+  - [x] Update the graph to reflect actual summed scores vs 250 capacity
 
 ### **Task #9: Brand Consistency — Strike Team PRISM Audit Fixes**
 - **Status:** 🟡 In Progress

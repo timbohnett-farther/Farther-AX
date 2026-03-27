@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { computeComplexityScore } from '@/lib/complexity-score';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // WORKLOAD & CAPACITY API
@@ -78,64 +79,48 @@ export async function GET(request: Request) {
     // 3. Get complexity scores for all assigned deals
     const dealIds = Array.from(new Set(assignmentsResult.rows.map((a: { deal_id: string }) => a.deal_id)));
 
+    const DEAL_PROPS = [
+      'dealname', 'dealstage', 'createdate',
+      'transferable_aum', 'aum', 'client_households', 'transferable_households',
+      'transition_type', 'transition_notes', 'prior_transitions', 'prior_transitions_notes',
+      'firm_type', 'n401k_aum', 'insurance_annuity_revenue', 'broker_dealer_revenue',
+      'crm_platform__cloned_', 'financial_planning_platform__cloned_',
+      'performance_platform__cloned_', 'technology_platforms_being_used__cloned_',
+      'people', 'description',
+    ];
+
     const dealScores: Record<string, { score: number; tier: string; deal_name: string; dealstage: string }> = {};
 
     if (dealIds.length > 0) {
-      // Fetch deal info from HubSpot batch
       const hubspotToken = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT;
       if (hubspotToken) {
         try {
-          const batchRes = await fetch('https://api.hubapi.com/crm/v3/objects/deals/batch/read', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${hubspotToken}` },
-            body: JSON.stringify({
-              properties: ['dealname', 'dealstage'],
-              inputs: dealIds.map(id => ({ id })),
-            }),
-          });
-          const batchData = await batchRes.json();
-          if (batchData.results) {
-            for (const d of batchData.results) {
+          // Single batch fetch — gets both display fields and all scoring properties
+          for (let i = 0; i < dealIds.length; i += 100) {
+            const batch = dealIds.slice(i, i + 100);
+            const batchRes = await fetch('https://api.hubapi.com/crm/v3/objects/deals/batch/read', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${hubspotToken}` },
+              body: JSON.stringify({
+                properties: DEAL_PROPS,
+                inputs: batch.map(id => ({ id })),
+              }),
+            });
+            if (!batchRes.ok) continue;
+            const batchData = await batchRes.json();
+            for (const d of batchData.results ?? []) {
+              const result = computeComplexityScore(d.properties, null, []);
               dealScores[d.id] = {
-                score: 0,
-                tier: 'Low',
+                score: result.score,
+                tier: result.tier,
                 deal_name: d.properties.dealname || 'Unknown',
                 dealstage: d.properties.dealstage || '',
               };
             }
           }
         } catch {
-          // Continue without HubSpot data
+          // Continue with zero scores if HubSpot is unavailable
         }
-      }
-
-      // Fetch complexity scores from our batch endpoint
-      try {
-        const origin = request.headers.get('host') ? `http://${request.headers.get('host')}` : 'http://localhost:3000';
-        const complexityRes = await fetch(`${origin}/api/command-center/complexity/batch`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ dealIds }),
-        });
-        const complexityData = await complexityRes.json();
-        if (complexityData.scores) {
-          for (const [dealId, scoreData] of Object.entries(complexityData.scores)) {
-            const sd = scoreData as { score: number; tier: string };
-            if (dealScores[dealId]) {
-              dealScores[dealId].score = sd.score;
-              dealScores[dealId].tier = sd.tier;
-            } else {
-              dealScores[dealId] = {
-                score: sd.score,
-                tier: sd.tier,
-                deal_name: 'Unknown',
-                dealstage: '',
-              };
-            }
-          }
-        }
-      } catch {
-        // Continue with zero scores
       }
     }
 
