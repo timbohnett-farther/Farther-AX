@@ -210,7 +210,7 @@ function AumAlertRow({ alert }: { alert: AumAlert }) {
         <span className="text-[10px] font-bold block" style={{ color: isCritical ? C.red : C.amber }}>
           {alert.deficit}% behind
         </span>
-        <span className="text-[10px]" style={{ color: C.slate }}>
+        <span className="text-[10px] tabular-nums" style={{ color: C.slate }}>
           {formatCurrency(alert.actual_aum)} / {formatCurrency(alert.expected_aum)}
         </span>
       </div>

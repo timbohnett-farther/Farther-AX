@@ -385,7 +385,7 @@ export default function TeamPage() {
                 if (!isActive) e.currentTarget.style.backgroundColor = C.cardBg;
               }}
             >
-              <div className="text-2xl font-bold font-serif" style={{ color: style.hex }}>
+              <div className="text-2xl font-bold font-serif tabular-nums" style={{ color: style.hex }}>
                 {roleCounts[role]}
               </div>
               <div className="text-[11px] font-semibold mt-0.5" style={{ color: isActive ? style.hex : C.slate }}>

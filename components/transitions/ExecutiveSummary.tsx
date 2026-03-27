@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useMemo } from 'react';
 import useSWR from 'swr';
+import { useTheme } from '@/lib/theme-provider';
+import { getThemeColors } from '@/lib/design-tokens';
 import { ProgressBar } from './StatusPill';
 import { colors } from '@/lib/design-tokens';
 
@@ -25,6 +28,8 @@ interface ExecutiveSummaryProps {
 }
 
 export function ExecutiveSummary({ onAdvisorClick }: ExecutiveSummaryProps) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   const { data, isLoading } = useSWR('/api/command-center/transitions/executive-summary', fetcher, { revalidateOnFocus: false });
   const [sortCol, setSortCol] = useState<string>('advisor_name');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');

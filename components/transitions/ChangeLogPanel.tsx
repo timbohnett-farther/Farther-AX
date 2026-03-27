@@ -1,25 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import useSWR from 'swr';
+import { useTheme } from '@/lib/theme-provider';
+import { getThemeColors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
-
-const C = {
-  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
-  teal: '#4E7082', green: '#4ade80', amber: '#fbbf24', red: '#f87171', blue: '#60a5fa',
-  cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
-  greenBg: 'rgba(74,222,128,0.15)', amberBg: 'rgba(251,191,36,0.15)', redBg: 'rgba(248,113,113,0.15)',
-  blueBg: 'rgba(96,165,250,0.15)',
-};
-
-const CHANGE_TYPE_STYLES: Record<string, { color: string; bg: string; icon: string }> = {
-  new_household: { color: C.green, bg: C.greenBg, icon: '+' },
-  removed_household: { color: C.red, bg: C.redBg, icon: '-' },
-  status_change: { color: C.amber, bg: C.amberBg, icon: '\u2192' },
-  new_envelope: { color: C.blue, bg: C.blueBg, icon: '\u2709' },
-  completed_envelope: { color: C.green, bg: C.greenBg, icon: '\u2713' },
-};
 
 interface ChangeEvent {
   id: number;
@@ -34,6 +20,17 @@ interface ChangeEvent {
 }
 
 export function ChangeLogPanel() {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+
+  const CHANGE_TYPE_STYLES: Record<string, { color: string; bg: string; icon: string }> = {
+    new_household: { color: C.green, bg: C.greenBg, icon: '+' },
+    removed_household: { color: C.red, bg: C.redBg, icon: '-' },
+    status_change: { color: C.amber, bg: C.amberBg, icon: '\u2192' },
+    new_envelope: { color: '#60a5fa', bg: 'rgba(96,165,250,0.15)', icon: '\u2709' },
+    completed_envelope: { color: C.green, bg: C.greenBg, icon: '\u2713' },
+  };
+
   const [page, setPage] = useState(1);
   const [typeFilter, setTypeFilter] = useState('');
   const limit = 30;

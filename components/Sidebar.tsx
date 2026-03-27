@@ -134,7 +134,7 @@ export default function Sidebar() {
   );
 
   return (
-    <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-surface border-r border-border">
+    <aside className="fixed top-0 left-0 h-full w-64 flex flex-col z-40 bg-[#F8F4F0] dark:bg-surface border-r border-gray-200 dark:border-white/10">
       {/* Logo / Brand */}
       <div className="px-6 pt-8 pb-5 border-b border-charcoal-600 dark:border-white/10">
         {/* eslint-disable-next-line @next/next/no-img-element */}

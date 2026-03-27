@@ -1,18 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import useSWR from 'swr';
 import { StatusPill, ProgressBar } from './StatusPill';
 import { EnvelopeCard } from './EnvelopeCard';
+import { useTheme } from '@/lib/theme-provider';
+import { getThemeColors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
-
-const C = {
-  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
-  teal: '#4E7082', green: '#4ade80', amber: '#fbbf24', red: '#f87171',
-  purple: '#a78bfa', purpleBg: 'rgba(167,139,250,0.15)', purpleBorder: 'rgba(167,139,250,0.35)',
-  cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
-};
 
 interface HouseholdGroup {
   household_name: string;
@@ -30,6 +25,9 @@ interface DocuSignDashboardProps {
 }
 
 export function DocuSignDashboard({ advisorFilter }: DocuSignDashboardProps) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+
   const url = advisorFilter
     ? `/api/command-center/transitions/households?advisor=${encodeURIComponent(advisorFilter)}`
     : '/api/command-center/transitions/households';

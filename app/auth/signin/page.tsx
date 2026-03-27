@@ -3,12 +3,16 @@
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { Suspense } from "react";
+import { Suspense, useMemo } from "react";
+import { useTheme } from "@/lib/theme-provider";
+import { getThemeColors } from "@/lib/design-tokens";
 
 function SignInContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/introduction";
   const error = searchParams.get("error");
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === "dark"), [theme]);
 
   const errorMessages: Record<string, string> = {
     AccessDenied: "Access denied. Only @farther.com email addresses are permitted.",
@@ -20,9 +24,16 @@ function SignInContent() {
   const errorMessage = error ? (errorMessages[error] ?? errorMessages.Default) : null;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-transparent">
       {/* Card */}
-      <div className="w-full max-w-md rounded-2xl p-10 bg-surface-elevated border border-border shadow-glass">
+      <div
+        className="w-full max-w-md rounded-2xl p-10"
+        style={{
+          backgroundColor: C.cardBg,
+          border: `1px solid ${C.border}`,
+          boxShadow: "0 4px 32px rgba(0,0,0,0.3)",
+        }}
+      >
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <Image
@@ -36,16 +47,29 @@ function SignInContent() {
         </div>
 
         {/* Heading */}
-        <h1 className="text-center mb-2 text-[1.35rem] font-light leading-[1.45] text-text-inverse">
+        <h1
+          className="text-center mb-2 font-sans text-xl font-light"
+          style={{ color: C.textOnCard, lineHeight: 1.45 }}
+        >
           Advisor Experience &amp; Transition Command Center
         </h1>
-        <p className="text-center mb-8 text-sm text-text-secondary">
+        <p
+          className="text-center mb-8 font-sans text-sm"
+          style={{ color: C.slate }}
+        >
           Sign in with your Farther Google account to continue.
         </p>
 
         {/* Error message */}
         {errorMessage && (
-          <div className="mb-6 px-4 py-3 rounded-lg text-sm bg-error-50 border border-error-200 text-error-600">
+          <div
+            className="mb-6 px-4 py-3 rounded-lg text-sm font-sans"
+            style={{
+              backgroundColor: C.redBg,
+              border: `1px solid ${C.redBorder}`,
+              color: C.red,
+            }}
+          >
             {errorMessage}
           </div>
         )}
@@ -53,7 +77,7 @@ function SignInContent() {
         {/* Google Sign-In Button */}
         <button
           onClick={() => signIn("google", { callbackUrl })}
-          className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-lg text-white font-medium bg-brand hover:bg-brand-600 transition-all duration-150 text-[0.95rem]"
+          className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-lg text-white font-medium font-sans text-[0.95rem] transition-all duration-150 bg-teal hover:bg-teal-600"
         >
           {/* Google G icon */}
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -66,15 +90,15 @@ function SignInContent() {
         </button>
 
         {/* Restriction note */}
-        <p className="mt-5 text-center text-xs text-text-secondary">
+        <p className="mt-5 text-center text-xs font-sans" style={{ color: C.slate }}>
           Access restricted to{" "}
-          <span className="text-brand font-medium">@farther.com</span>{" "}
+          <span className="font-medium text-teal">@farther.com</span>{" "}
           accounts only.
         </p>
       </div>
 
       {/* Footer */}
-      <p className="mt-8 text-xs text-text-secondary">
+      <p className="mt-8 text-xs font-sans" style={{ color: C.slate }}>
         Farther Wealth Management · Internal Use Only
       </p>
     </div>

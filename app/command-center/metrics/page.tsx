@@ -393,7 +393,7 @@ export default function MetricsDashboard() {
                         <dt className="text-sm text-slate mb-1 capitalize">
                           {key.replace(/([A-Z])/g, ' $1').trim()}
                         </dt>
-                        <dd className="text-xl font-semibold text-cream">
+                        <dd className="text-xl font-semibold text-cream tabular-nums">
                           {typeof value === 'number' && key.toLowerCase().includes('aum')
                             ? formatAUM(value)
                             : typeof value === 'number' && key.toLowerCase().includes('revenue')

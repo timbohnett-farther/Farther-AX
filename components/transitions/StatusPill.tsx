@@ -1,5 +1,6 @@
 'use client';
 
+// Status colors are static and theme-independent (status meaning is consistent across themes)
 const C = {
   dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
   green: '#4ade80', greenBg: 'rgba(74,222,128,0.2)', greenBorder: 'rgba(74,222,128,0.35)',

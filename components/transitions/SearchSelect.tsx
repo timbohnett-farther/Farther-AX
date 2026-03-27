@@ -1,12 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-
-const C = {
-  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
-  teal: '#4E7082', cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
-  white: '#1a1a1a',
-};
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { useTheme } from '@/lib/theme-provider';
+import { getThemeColors } from '@/lib/design-tokens';
 
 interface Option {
   name: string;
@@ -21,6 +17,9 @@ interface SearchSelectProps {
 }
 
 export function SearchSelect({ options, value, onChange, placeholder = 'All Advisors' }: SearchSelectProps) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const ref = useRef<HTMLDivElement>(null);
@@ -67,7 +66,7 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
           marginTop: 4, borderRadius: 8, overflow: 'hidden',
-          background: '#252525', border: `1px solid ${C.border}`,
+          background: C.cardBg, border: `1px solid ${C.border}`,
           boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
           maxHeight: 320, display: 'flex', flexDirection: 'column',
         }}>
@@ -80,7 +79,7 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
               placeholder="Type to search..."
               style={{
                 width: '100%', padding: '7px 10px', borderRadius: 6,
-                border: `1px solid ${C.border}`, background: C.white,
+                border: `1px solid ${C.border}`, background: C.cardBg,
                 color: C.dark, fontSize: 13, outline: 'none',
                 fontFamily: "'Inter', system-ui, sans-serif",
               }}

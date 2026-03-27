@@ -146,7 +146,7 @@ function SummaryCard({ label, value, sub, accent, icon, iconColor, onClick }: { 
         <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: iconColor || (accent ? C.white : C.slate) }}>{icon}</span>
       )}
       <p style={{ fontSize: 11, color: accent ? 'rgba(255,255,255,0.7)' : C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{label}</p>
-      <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>{value}</p>
+      <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums' }}>{value}</p>
       {sub && <p style={{ fontSize: 12, color: accent ? 'rgba(255,255,255,0.6)' : C.slate, marginTop: 4 }}>{sub}</p>}
     </div>
   );
@@ -639,7 +639,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           <span style={{ fontSize: 12, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
           <span style={{ fontSize: 11, color: C.slate }}>{count} launched</span>
         </div>
-        <div style={{ fontSize: 24, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 2 }}>
+        <div style={{ fontSize: 24, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 2, fontVariantNumeric: 'tabular-nums' }}>
           {formatAUM(aum)}
         </div>
         <div style={{ fontSize: 11, color: C.slate, marginBottom: 10 }}>
