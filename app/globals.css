@@ -230,6 +230,11 @@
     --shadow-glass: 0 1px 3px rgba(155, 118, 106, 0.15);
     --shadow-glass-hover: 0 4px 6px rgba(155, 118, 106, 0.2);
     --shadow-glass-sm: 0 2px 4px rgba(155, 118, 106, 0.1);
+
+    /* ── Brown accent colors (dominant in light mode) ─────────────────── */
+    --color-brown-deep: #7A5042;       /* Headings, strong emphasis */
+    --color-brown-mid: #9B766A;        /* Labels, secondary accents */
+    --color-brown-light: #E1D2C5;      /* Card backgrounds, subtle fills */
   }
 }
 
@@ -556,6 +561,22 @@ html.dark .recharts-label {
 
 html.dark .recharts-text {
   fill: #595959 !important;
+}
+
+/* ── Light Mode: Gold → Deep Brown Override ────────────────────────────── */
+/* Gold (#fbbf24) must never appear as visible text in light mode.
+   Deep brown (#7A5042) on cream (#F8F4F0) = ~7:1 contrast ratio ✅        */
+html:not(.dark) .text-gold {
+  color: #7A5042 !important;
+}
+html:not(.dark) .text-gold-dark {
+  color: #9B766A !important;
+}
+html:not(.dark) [class*="bg-gold"] {
+  background-color: rgba(155, 118, 106, 0.12) !important;
+}
+html:not(.dark) [class*="border-gold"] {
+  border-color: rgba(155, 118, 106, 0.25) !important;
 }
 
 /* ── Scrollbar Styling ─────────────────────────────────────────────────── */
