@@ -20,19 +20,9 @@ function SignInContent() {
   const errorMessage = error ? (errorMessages[error] ?? errorMessages.Default) : null;
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-4"
-      style={{ backgroundColor: "transparent" }}
-    >
+    <div className="min-h-screen flex flex-col items-center justify-center px-4">
       {/* Card */}
-      <div
-        className="w-full max-w-md rounded-2xl p-10"
-        style={{
-          backgroundColor: "#2f2f2f",
-          border: "1px solid rgba(250,247,242,0.08)",
-          boxShadow: "0 4px 32px rgba(0,0,0,0.3)",
-        }}
-      >
+      <div className="w-full max-w-md rounded-2xl p-10 bg-surface-elevated border border-border shadow-glass">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <Image
@@ -46,40 +36,16 @@ function SignInContent() {
         </div>
 
         {/* Heading */}
-        <h1
-          className="text-center mb-2"
-          style={{
-            fontFamily: "'Inter', system-ui, sans-serif",
-            fontSize: "1.35rem",
-            fontWeight: 300,
-            color: "#FAF7F2",
-            lineHeight: 1.45,
-          }}
-        >
+        <h1 className="text-center mb-2 text-[1.35rem] font-light leading-[1.45] text-text-inverse">
           Advisor Experience &amp; Transition Command Center
         </h1>
-        <p
-          className="text-center mb-8"
-          style={{
-            fontFamily: "'Inter', system-ui, sans-serif",
-            fontSize: "0.9rem",
-            color: "rgba(250,247,242,0.5)",
-          }}
-        >
+        <p className="text-center mb-8 text-sm text-text-secondary">
           Sign in with your Farther Google account to continue.
         </p>
 
         {/* Error message */}
         {errorMessage && (
-          <div
-            className="mb-6 px-4 py-3 rounded-lg text-sm"
-            style={{
-              backgroundColor: "rgba(220,38,38,0.08)",
-              border: "1px solid rgba(220,38,38,0.2)",
-              color: "#b91c1c",
-              fontFamily: "'Inter', system-ui, sans-serif",
-            }}
-          >
+          <div className="mb-6 px-4 py-3 rounded-lg text-sm bg-error-50 border border-error-200 text-error-600">
             {errorMessage}
           </div>
         )}
@@ -87,18 +53,7 @@ function SignInContent() {
         {/* Google Sign-In Button */}
         <button
           onClick={() => signIn("google", { callbackUrl })}
-          className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-lg text-white font-medium transition-all duration-150"
-          style={{
-            backgroundColor: "#1d7682",
-            fontFamily: "'Inter', system-ui, sans-serif",
-            fontSize: "0.95rem",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#155961";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1d7682";
-          }}
+          className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-lg text-white font-medium bg-brand hover:bg-brand-600 transition-all duration-150 text-[0.95rem]"
         >
           {/* Google G icon */}
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -111,27 +66,15 @@ function SignInContent() {
         </button>
 
         {/* Restriction note */}
-        <p
-          className="mt-5 text-center text-xs"
-          style={{
-            fontFamily: "'Inter', system-ui, sans-serif",
-            color: "rgba(250,247,242,0.5)",
-          }}
-        >
+        <p className="mt-5 text-center text-xs text-text-secondary">
           Access restricted to{" "}
-          <span style={{ color: "#1d7682", fontWeight: 500 }}>@farther.com</span>{" "}
+          <span className="text-brand font-medium">@farther.com</span>{" "}
           accounts only.
         </p>
       </div>
 
       {/* Footer */}
-      <p
-        className="mt-8 text-xs"
-        style={{
-          fontFamily: "'Inter', system-ui, sans-serif",
-          color: "rgba(250,247,242,0.5)",
-        }}
-      >
+      <p className="mt-8 text-xs text-text-secondary">
         Farther Wealth Management · Internal Use Only
       </p>
     </div>

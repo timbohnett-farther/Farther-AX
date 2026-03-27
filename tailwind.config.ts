@@ -149,6 +149,13 @@ const config: Config = {
         },
         cream: {
           DEFAULT: '#FFFEF4',
+          dark: '#D0C8C0',                         // Muted cream for secondary text on light bg
+          muted: 'rgba(255, 254, 244, 0.5)',       // Semi-transparent cream (dark mode dimmed text)
+          border: 'rgba(250, 247, 242, 0.08)',     // Very subtle cream border (dark mode)
+        },
+        gold: {
+          DEFAULT: '#fbbf24',                      // Primary gold (tier, financial accents)
+          dark: '#f59e0b',                         // Hover/darker gold
         },
         ice: {
           50: '#f0f6fc',

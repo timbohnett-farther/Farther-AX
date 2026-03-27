@@ -213,10 +213,10 @@ When you report a fix:
   - [ ] P1: Bring RIA Hub page to 85%+ compliance
   - [ ] P1: Add shimmer loading states to all command center pages
   - [ ] P1: Add tabular-nums to all financial number displays
-  - [ ] P1: Fix Sidebar light mode colors
-  - [ ] P1: Replace hardcoded glass card colors with CSS variables
+  - [x] P1: Fix Sidebar light mode colors — `bg-surface border-border` tokens
+  - [x] P1: Replace hardcoded glass card colors with CSS variables — ExecutiveSummary.tsx & signin
   - [ ] P1: Consolidate 3 conflicting color systems into one
-  - [ ] P1: Add missing Tailwind color definitions (cream, teal variants)
+  - [x] P1: Add missing Tailwind color definitions (gold, cream-muted, cream-border, cream-dark)
 
 ---
 

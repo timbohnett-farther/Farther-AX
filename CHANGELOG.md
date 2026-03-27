@@ -6,6 +6,41 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Brand Compliance Audit Fixes — 2026-03-26
+
+**What**: Fixed all UI audit brand compliance issues and applied new light mode brand directive (cream/brown dominant, teal as accent only).
+
+**Light Mode Palette (New)**:
+- Page background: `#F8F4F0` (cream) — unchanged
+- Cards/elevated surfaces: `#E1D2C5` (beige/brown) — was teal `#466F81`
+- Table header: `#9B766A` (terracotta brown) — was teal
+- Table rows: cream `#F8F4F0` / beige `#E1D2C5` alternating — was teal shades
+- Borders: `rgba(155, 118, 106, 0.25)` (subtle terracotta) — was solid teal
+- Chart text: `#595959` (charcoal) — was cream `#F8F4F0`
+- Teal (`#4E7082`) used only for accent/active states
+
+**Tailwind Tokens Added**:
+- `gold` / `gold-dark` — `#fbbf24` / `#f59e0b`
+- `cream-muted` — `rgba(255, 254, 244, 0.5)` (dark mode dimmed text)
+- `cream-border` — `rgba(250, 247, 242, 0.08)` (subtle cream border)
+- `cream-dark` — `#D0C8C0` (muted cream for secondary light mode text)
+
+**Component Fixes**:
+- `Sidebar.tsx`: Replaced `bg-white dark:bg-surface` → `bg-surface border-border`
+- `ExecutiveSummary.tsx`: Removed hardcoded `const C = {...}` color object; all inline styles replaced with Tailwind classes + `glass-card`; ProgressBar colors use `colors.success/warning/danger` from design-tokens
+- `auth/signin/page.tsx`: Removed all hardcoded inline colors (`#2f2f2f`, `#FAF7F2`, `#1d7682`, etc.); replaced with semantic design token classes (`bg-surface-elevated`, `text-text-inverse`, `bg-brand hover:bg-brand-600`, `bg-error-50`, etc.)
+
+**Status**: ✅ Complete — build passes
+
+**Files**:
+- `tailwind.config.ts` — Added gold and cream variant tokens
+- `app/globals.css` — Light mode palette overhaul (surface-elevated, borders, tables, charts, card text)
+- `components/Sidebar.tsx` — Semantic background/border tokens
+- `components/transitions/ExecutiveSummary.tsx` — Removed const C, Tailwind classes
+- `app/auth/signin/page.tsx` — Removed all hardcoded inline styles
+
+---
+
 ## [Completed] Complete Color Scheme Overhaul — 2026-03-26
 
 **What**: Implemented new color scheme for both light and dark modes with reversed palettes.
