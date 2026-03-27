@@ -6,6 +6,28 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Light Mode Brand — Cream/Brown Dominant, No Gold Text — 2026-03-26
+
+**What**: Fixed light mode so it correctly shows cream backgrounds + brown accents as dominant.
+Removed all bright gold (#fbbf24) text from light mode. Brown (`#7A5042` / `#9B766A`) replaces gold everywhere text is used.
+
+**Root Cause**:
+- `getThemeColors()` in light mode had `cardBg: '#466F81'` (teal) instead of warm beige — making all cards and borders teal in light mode
+- `text-gold` class hardcoded to `#fbbf24` (yellow) with no light/dark awareness — showing bright gold on cream backgrounds
+
+**Fixes**:
+- `lib/design-tokens.ts`: Fixed `getThemeColors()` light mode values — `cardBg` → `#E1D2C5` (warm beige), borders → terracotta rgba, table headers → `#9B766A`, hover → terracotta tint
+- `app/globals.css`: Added light mode CSS overrides — `text-gold` → `#7A5042` (deep brown, 7:1 contrast), `text-gold-dark` → `#9B766A`, gold backgrounds/borders → terracotta equivalents
+- `app/globals.css`: Added `--color-brown-deep`, `--color-brown-mid`, `--color-brown-light` CSS variables in light mode block
+
+**Result**: Light mode now shows cream page background + warm beige cards + terracotta/brown borders + dark brown accent text. No gold. Dark mode unchanged.
+
+**Files**:
+- `lib/design-tokens.ts`
+- `app/globals.css`
+
+---
+
 ## [Completed] Readability & Contrast Audit + Fixes — 2026-03-26
 
 **What**: Comprehensive WCAG contrast audit of all pages and components. Fixed 13 contrast/readability violations.
