@@ -33,10 +33,10 @@
   --color-accent-3: #E1D2C5;      /* Beige/cream */
 
   /* ── Surface Colors (Backgrounds) ───────────────────────────────────── */
-  --color-surface: #111111;              /* Main background */
-  --color-surface-muted: #1a1a1a;        /* Secondary background */
-  --color-surface-subtle: #222222;       /* Tertiary background */
-  --color-surface-elevated: rgba(23, 31, 39, 0.80);  /* Cards/modals */
+  --color-surface: #4E7082;              /* Main background */
+  --color-surface-muted: #3D5A6A;        /* Secondary background */
+  --color-surface-subtle: #456878;       /* Tertiary background */
+  --color-surface-elevated: rgba(78, 112, 130, 0.80);  /* Cards/modals */
   --color-surface-inverse: #FFFEF4;      /* Cream for inverted elements */
 
   /* ── Text Colors (Cream-based) ──────────────────────────────────────── */
@@ -240,9 +240,9 @@
 
 html.dark {
   /* Reaffirm dark mode tokens - REVERSED */
-  --color-surface: #466F81;              /* Teal background (was cream in light) */
-  --color-surface-muted: #466F81;
-  --color-surface-subtle: #466F81;
+  --color-surface: #4E7082;              /* Teal background (was cream in light) */
+  --color-surface-muted: #4E7082;
+  --color-surface-subtle: #4E7082;
   --color-surface-elevated: #F8F4F0;     /* Cream cards (was teal in light) */
   --color-text-primary: #F8F4F0;         /* Cream text (was grey in light) */
   --color-text-secondary: #F8F4F0;
@@ -269,7 +269,7 @@ html {
 
 /* Dark mode background - REVERSED (teal instead of cream) */
 html.dark body {
-  background-color: #466F81;
+  background-color: #4E7082;
   font-family: var(--font-sans);
   color: #F8F4F0;
 }

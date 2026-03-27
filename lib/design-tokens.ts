@@ -88,7 +88,7 @@ export const getThemeColors = (isDark: boolean) => ({
   textOnCard: isDark ? '#595959' : '#F8F4F0',   // Dark: grey on cream cards, Light: cream on teal cards
 
   // Background colors - REVERSED for dark mode
-  bg: isDark ? '#466F81' : '#F8F4F0',           // Dark: teal, Light: cream
+  bg: isDark ? '#4E7082' : '#F8F4F0',           // Dark: teal, Light: cream
   cardBg: isDark ? '#F8F4F0' : '#466F81',       // Dark: cream, Light: teal
   cardBgAlt: isDark ? '#93B6C4' : '#93B6C4',    // Alternating row color
 
@@ -98,7 +98,7 @@ export const getThemeColors = (isDark: boolean) => ({
   borderStrong: isDark ? '#F8F4F0' : '#466F81',
 
   // Brand colors (consistent across themes)
-  teal: '#466F81',
+  teal: '#4E7082',
   lightBlue: '#93B6C4',
 
   // Accent colors
