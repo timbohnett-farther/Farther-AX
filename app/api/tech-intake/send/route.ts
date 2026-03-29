@@ -43,8 +43,8 @@ function buildBrandedEmail({
           <!-- Header -->
           <tr>
             <td style="padding:32px 40px 24px;text-align:center;border-radius:14px 14px 0 0;background:linear-gradient(135deg,#1a1a1a 0%,#222222 100%);border:1px solid rgba(250,247,242,0.08);border-bottom:none;">
-              <p style="margin:0;font-size:14px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#28a1af;">Farther</p>
-              <h1 style="margin:12px 0 0;font-size:24px;font-weight:300;color:#FAF7F2;font-family:Georgia,'Times New Roman',serif;">Technology Intake Form</h1>
+              <p style="margin:0;font-size:14px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#3B5A69;">Farther</p>
+              <h1 style="margin:12px 0 0;font-size:24px;font-weight:300;color:#F8F4F0;font-family:Georgia,'Times New Roman',serif;">Technology Intake Form</h1>
             </td>
           </tr>
 
@@ -58,7 +58,7 @@ function buildBrandedEmail({
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0;">
                 <tr>
                   <td align="center">
-                    <a href="${formLink}" target="_blank" style="display:inline-block;padding:14px 40px;background:linear-gradient(135deg,#1d7682,#28a1af);color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:8px;box-shadow:0 4px 16px rgba(29,118,130,0.3);">
+                    <a href="${formLink}" target="_blank" style="display:inline-block;padding:14px 40px;background:linear-gradient(135deg,#3B5A69,#3B5A69);color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:8px;box-shadow:0 4px 16px rgba(29,118,130,0.3);">
                       Complete Your Tech Intake
                     </a>
                   </td>
@@ -69,7 +69,7 @@ function buildBrandedEmail({
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;padding:20px 24px;background:#f8fafb;border-radius:8px;border:1px solid #e5e7eb;">
                 <tr>
                   <td>
-                    <p style="margin:0 0 12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#1d7682;">Have These Ready</p>
+                    <p style="margin:0 0 12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#3B5A69;">Have These Ready</p>
                     <p style="margin:0 0 6px;font-size:13px;color:#555;">&#10003; Your shipping address</p>
                     <p style="margin:0 0 6px;font-size:13px;color:#555;">&#10003; IT vendor contact info (if applicable)</p>
                     <p style="margin:0 0 6px;font-size:13px;color:#555;">&#10003; Website domain names (if any)</p>
@@ -85,10 +85,10 @@ function buildBrandedEmail({
                 <tr>
                   <td>
                     <p style="margin:0 0 2px;font-size:15px;font-weight:600;color:#333333;">${axmName}</p>
-                    <p style="margin:0 0 8px;font-size:13px;color:#1d7682;">Advisor Experience Manager</p>
-                    ${axmEmail ? `<p style="margin:0 0 2px;font-size:13px;color:#555;">&#9993; <a href="mailto:${axmEmail}" style="color:#1d7682;text-decoration:none;">${axmEmail}</a></p>` : ''}
+                    <p style="margin:0 0 8px;font-size:13px;color:#3B5A69;">Advisor Experience Manager</p>
+                    ${axmEmail ? `<p style="margin:0 0 2px;font-size:13px;color:#555;">&#9993; <a href="mailto:${axmEmail}" style="color:#3B5A69;text-decoration:none;">${axmEmail}</a></p>` : ''}
                     ${axmPhone ? `<p style="margin:0 0 2px;font-size:13px;color:#555;">&#9743; ${axmPhone}</p>` : ''}
-                    ${axmCalendar ? `<p style="margin:0;font-size:13px;"><a href="${axmCalendar}" style="color:#1d7682;text-decoration:none;">Schedule a call &#8594;</a></p>` : ''}
+                    ${axmCalendar ? `<p style="margin:0;font-size:13px;"><a href="${axmCalendar}" style="color:#3B5A69;text-decoration:none;">Schedule a call &#8594;</a></p>` : ''}
                   </td>
                 </tr>
               </table>

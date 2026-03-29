@@ -6,7 +6,7 @@
 
 /* ============================================================================
    FARTHER AX DESIGN SYSTEM — Semantic Tokens
-   Brand Colors: Cream (#FFFEF4) & Teal (#4E7082)
+   Brand Colors: Limestone (#F8F4F0), Steel Blue (#3B5A69), Granite Blue (#2C3B4E), Clay (#9F8E75)
    ============================================================================ */
 
 @theme {
@@ -21,29 +21,29 @@
   --color-brand-200: #a8ced3;
   --color-brand-300: #99b6c3;
   --color-brand-400: #6b8fa1;
-  --color-brand-500: #4E7082;     /* Primary brand - Teal */
+  --color-brand-500: #3B5A69;     /* Primary brand - Teal */
   --color-brand-600: #405b69;
   --color-brand-700: #374e59;
   --color-brand-800: #2d3e47;
   --color-brand-900: #1a2830;
 
   /* ── Accent Colors ──────────────────────────────────────────────────── */
-  --color-accent-1: #9B766A;      /* Terracotta/brown */
-  --color-accent-2: #D2DFE6;      /* Light blue/grey */
-  --color-accent-3: #E1D2C5;      /* Beige/cream */
+  --color-accent-1: #9F8E75;      /* Terracotta/brown */
+  --color-accent-2: #E3D3C5;      /* Light blue/grey */
+  --color-accent-3: #E3D3C5;      /* Beige/cream */
 
   /* ── Surface Colors (Backgrounds) ───────────────────────────────────── */
-  --color-surface: #4E7082;              /* Main background */
-  --color-surface-muted: #3D5A6A;        /* Secondary background */
-  --color-surface-subtle: #456878;       /* Tertiary background */
-  --color-surface-elevated: rgba(78, 112, 130, 0.80);  /* Cards/modals */
-  --color-surface-inverse: #FFFEF4;      /* Cream for inverted elements */
+  --color-surface: #2C3B4E;              /* Main background */
+  --color-surface-muted: #344F5D;        /* Secondary background */
+  --color-surface-subtle: #3B5A69;       /* Tertiary background */
+  --color-surface-elevated: rgba(59, 90, 105, 0.80);  /* Cards/modals */
+  --color-surface-inverse: #F8F4F0;      /* Cream for inverted elements */
 
   /* ── Text Colors (Cream-based) ──────────────────────────────────────── */
-  --color-text-primary: #FFFEF4;                    /* Cream - primary text */
-  --color-text-secondary: rgba(255, 254, 244, 0.7); /* Dimmed cream */
-  --color-text-muted: rgba(255, 254, 244, 0.5);     /* Even more dimmed */
-  --color-text-subtle: rgba(255, 254, 244, 0.35);   /* Very subtle */
+  --color-text-primary: #F8F4F0;                    /* Cream - primary text */
+  --color-text-secondary: rgba(248, 244, 240, 0.7); /* Dimmed cream */
+  --color-text-muted: rgba(248, 244, 240, 0.5);     /* Even more dimmed */
+  --color-text-subtle: rgba(248, 244, 240, 0.35);   /* Very subtle */
   --color-text-inverse: #1a1a1a;                    /* For light backgrounds */
 
   /* ── Border Colors ──────────────────────────────────────────────────── */
@@ -156,7 +156,7 @@
   --shadow-glass-sm: 0 4px 16px 0 rgba(0, 0, 0, 0.25);
 
   /* Glow shadows */
-  --shadow-glow-brand: 0 0 20px rgba(78, 112, 130, 0.3);
+  --shadow-glow-brand: 0 0 20px rgba(59, 90, 105, 0.3);
   --shadow-glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
   --shadow-glow-error: 0 0 20px rgba(239, 68, 68, 0.4);
 
@@ -197,7 +197,7 @@
     --color-surface: #F8F4F0;           /* Warm cream background */
     --color-surface-muted: #F8F4F0;
     --color-surface-subtle: #F8F4F0;
-    --color-surface-elevated: #E1D2C5;  /* Beige/brown for cards — cream dominant */
+    --color-surface-elevated: #E3D3C5;  /* Beige/brown for cards — cream dominant */
     --color-surface-inverse: #1a1a1a;
 
     /* ── Text Colors (Light Mode) ─────────────────────────────────────── */
@@ -208,14 +208,14 @@
     --color-text-inverse: #595959;      /* Charcoal on card surfaces (cards are now light) */
 
     /* ── Border Colors (Light Mode — subtle brown, not dominant teal) ─── */
-    --color-border: rgba(155, 118, 106, 0.25);        /* Subtle terracotta */
-    --color-border-subtle: rgba(155, 118, 106, 0.12);
-    --color-border-strong: rgba(155, 118, 106, 0.4);
+    --color-border: rgba(159, 142, 117, 0.25);        /* Subtle terracotta */
+    --color-border-subtle: rgba(159, 142, 117, 0.12);
+    --color-border-strong: rgba(159, 142, 117, 0.4);
 
     /* ── Tremor (Light Mode) ──────────────────────────────────────────── */
     --color-tremor-background-muted: #F8F4F0;
     --color-tremor-background-subtle: #F8F4F0;
-    --color-tremor-background: #E1D2C5;     /* Cards use beige */
+    --color-tremor-background: #E3D3C5;     /* Cards use beige */
     --color-tremor-background-emphasis: #595959;
 
     --color-tremor-content-subtle: rgba(89, 89, 89, 0.6);
@@ -224,17 +224,17 @@
     --color-tremor-content-strong: #595959;
     --color-tremor-content-inverted: #F8F4F0;
 
-    --color-tremor-border: rgba(155, 118, 106, 0.25);
+    --color-tremor-border: rgba(159, 142, 117, 0.25);
 
     /* ── Shadows (Light Mode — warm brown tones) ──────────────────────── */
-    --shadow-glass: 0 1px 3px rgba(155, 118, 106, 0.15);
-    --shadow-glass-hover: 0 4px 6px rgba(155, 118, 106, 0.2);
-    --shadow-glass-sm: 0 2px 4px rgba(155, 118, 106, 0.1);
+    --shadow-glass: 0 1px 3px rgba(159, 142, 117, 0.15);
+    --shadow-glass-hover: 0 4px 6px rgba(159, 142, 117, 0.2);
+    --shadow-glass-sm: 0 2px 4px rgba(159, 142, 117, 0.1);
 
     /* ── Brown accent colors (dominant in light mode) ─────────────────── */
-    --color-brown-deep: #7A5042;       /* Headings, strong emphasis */
-    --color-brown-mid: #9B766A;        /* Labels, secondary accents */
-    --color-brown-light: #E1D2C5;      /* Card backgrounds, subtle fills */
+    --color-brown-deep: #9F8E75;       /* Headings, strong emphasis */
+    --color-brown-mid: #9F8E75;        /* Labels, secondary accents */
+    --color-brown-light: #E3D3C5;      /* Card backgrounds, subtle fills */
   }
 }
 
@@ -245,9 +245,9 @@
 
 html.dark {
   /* Reaffirm dark mode tokens - REVERSED */
-  --color-surface: #4E7082;              /* Teal background (was cream in light) */
-  --color-surface-muted: #4E7082;
-  --color-surface-subtle: #4E7082;
+  --color-surface: #2C3B4E;              /* Teal background (was cream in light) */
+  --color-surface-muted: #2C3B4E;
+  --color-surface-subtle: #2C3B4E;
   --color-surface-elevated: #F8F4F0;     /* Cream cards (was teal in light) */
   --color-text-primary: #F8F4F0;         /* Cream text (was grey in light) */
   --color-text-secondary: #F8F4F0;
@@ -274,7 +274,7 @@ html {
 
 /* Dark mode background - REVERSED (teal instead of cream) */
 html.dark body {
-  background-color: #4E7082;
+  background-color: #2C3B4E;
   font-family: var(--font-sans);
   color: #F8F4F0;
 }
@@ -408,7 +408,7 @@ html.dark .chart-card * {
 
 /* ── Badges ────────────────────────────────────────────────────────────── */
 .badge-glass {
-  background: rgba(78, 112, 130, 0.15);
+  background: rgba(59, 90, 105, 0.15);
   border: 1px solid var(--color-brand-500);
   color: var(--color-brand-200);
   padding: 0.25rem 0.75rem;
@@ -506,13 +506,13 @@ html.dark .chart-card * {
 }
 
 /* ── Table Alternating Rows (Light Mode — cream/brown dominant) ───────── */
-/* Even: #F8F4F0 + charcoal → 6.40:1 ✅  |  Odd: #E1D2C5 + charcoal → 4.75:1 ✅ */
+/* Even: #F8F4F0 + charcoal → 6.40:1 ✅  |  Odd: #E3D3C5 + charcoal → 4.75:1 ✅ */
 html:not(.dark) table tbody tr:nth-child(even) {
   background-color: #F8F4F0 !important;  /* Cream */
 }
 
 html:not(.dark) table tbody tr:nth-child(odd) {
-  background-color: #E1D2C5 !important;  /* Beige/brown — 4.75:1 with #595959 ✅ */
+  background-color: #E3D3C5 !important;  /* Beige/brown — 4.75:1 with #595959 ✅ */
 }
 
 html:not(.dark) table tbody tr td {
@@ -520,18 +520,18 @@ html:not(.dark) table tbody tr td {
 }
 
 html:not(.dark) table thead th {
-  background-color: #9B766A !important;  /* Terracotta brown header */
+  background-color: #9F8E75 !important;  /* Terracotta brown header */
   color: #F8F4F0 !important;             /* Cream text on brown — 3.71:1 (large/bold) */
 }
 
 /* ── Table Alternating Rows (Dark Mode - REVERSED) ────────────────────── */
-/* Even: #F8F4F0 + grey → 6.40:1 ✅  |  Odd: #D8D4D0 + grey → 4.86:1 ✅ */
+/* Even: #F8F4F0 + grey → 6.40:1 ✅  |  Odd: #E3D3C5 + grey → 4.86:1 ✅ */
 html.dark table tbody tr:nth-child(even) {
   background-color: #F8F4F0 !important;
 }
 
 html.dark table tbody tr:nth-child(odd) {
-  background-color: #D8D4D0 !important;
+  background-color: #E3D3C5 !important;
 }
 
 html.dark table tbody tr td {
@@ -570,13 +570,13 @@ html:not(.dark) .text-gold {
   color: #7A5042 !important;
 }
 html:not(.dark) .text-gold-dark {
-  color: #9B766A !important;
+  color: #9F8E75 !important;
 }
 html:not(.dark) [class*="bg-gold"] {
-  background-color: rgba(155, 118, 106, 0.12) !important;
+  background-color: rgba(159, 142, 117, 0.12) !important;
 }
 html:not(.dark) [class*="border-gold"] {
-  border-color: rgba(155, 118, 106, 0.25) !important;
+  border-color: rgba(159, 142, 117, 0.25) !important;
 }
 
 /* ── Scrollbar Styling ─────────────────────────────────────────────────── */

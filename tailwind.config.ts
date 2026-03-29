@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 
 /**
  * Farther AX — Tailwind Config (Semantic Tokens)
- * Semantic color system with Cream & Teal brand colors
+ * Semantic color system with Limestone (#F8F4F0), Steel Blue (#3B5A69), Granite Blue (#2C3B4E), Clay (#9F8E75)
  * Legacy colors maintained for backward compatibility
  */
 const config: Config = {
@@ -135,34 +135,34 @@ const config: Config = {
           DEFAULT: '#333333',
         },
         teal: {
-          50: '#f0f4f6',
-          100: '#d4dfe5',
-          200: '#99b6c3',
-          300: '#a8ced3',
-          400: '#99B6C3',
-          500: '#4E7082',
-          600: '#374E59',
-          700: '#405B69',
-          800: '#2d3e47',
-          900: '#1a2830',
-          DEFAULT: '#4E7082',
+          50: '#E3D3C5',
+          100: '#C4B8AA',
+          200: '#7CA4B4',
+          300: '#6A929F',
+          400: '#527F8B',
+          500: '#3B5A69',
+          600: '#344F5D',
+          700: '#2C3B4E',
+          800: '#243242',
+          900: '#1E2A38',
+          DEFAULT: '#3B5A69',
         },
         cream: {
-          DEFAULT: '#FFFEF4',
-          dark: '#E8E2D8',       // slightly darkened cream — borders, section dividers
-          muted: '#C8C0B8',      // muted cream — secondary labels on dark backgrounds
-          border: 'rgba(255,254,244,0.15)',  // cream at 15% — subtle borders
+          DEFAULT: '#F8F4F0',
+          dark: '#E3D3C5',       // slightly darkened cream — borders, section dividers
+          muted: '#C4B8AA',      // muted cream — secondary labels on dark backgrounds
+          border: 'rgba(248,244,240,0.15)',  // cream at 15% — subtle borders
         },
         ice: {
-          50: '#f0f6fc',
-          100: '#dce9f7',
-          200: '#A8CED3',
-          300: '#99B6C3',
-          400: '#6a9ed9',
-          DEFAULT: '#D4DFE5',
+          50: '#F8F4F0',
+          100: '#E3D3C5',
+          200: '#7CA4B4',
+          300: '#6A929F',
+          400: '#527F8B',
+          DEFAULT: '#E3D3C5',
         },
         slate: {
-          DEFAULT: '#5b6a71',
+          DEFAULT: '#3B5A69',
         },
         gold: {
           DEFAULT: '#fbbf24',

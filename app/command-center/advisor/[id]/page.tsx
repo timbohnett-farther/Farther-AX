@@ -371,7 +371,7 @@ function U4Card({ dealId, contactId, contactEmail, advisorName }: { dealId: stri
           <button onClick={handleSend} disabled={sending}
             style={{
               padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: sending ? 'not-allowed' : 'pointer',
-              border: 'none', background: `linear-gradient(135deg, ${C.teal}, #28a1af)`, color: '#fff',
+              border: 'none', background: `linear-gradient(135deg, ${C.teal}, #3B5A69)`, color: '#fff',
               boxShadow: '0 4px 16px rgba(29,118,130,0.3)', opacity: sending ? 0.7 : 1,
             }}>
             {sending ? 'Sending...' : (status === 'expired' ? 'Resend Form' : 'Send U4 & 2B Form')}
@@ -487,7 +487,7 @@ function TechIntakeCard({ dealId, contactId, contactEmail, advisorName }: { deal
           <button onClick={handleSend} disabled={sending}
             style={{
               padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: sending ? 'not-allowed' : 'pointer',
-              border: 'none', background: `linear-gradient(135deg, ${C.teal}, #28a1af)`, color: '#fff',
+              border: 'none', background: `linear-gradient(135deg, ${C.teal}, #3B5A69)`, color: '#fff',
               boxShadow: '0 4px 16px rgba(29,118,130,0.3)', opacity: sending ? 0.7 : 1,
             }}>
             {sending ? 'Sending...' : (status === 'expired' ? 'Resend Form' : 'Send Tech Intake')}
@@ -1539,7 +1539,7 @@ export default function AdvisorProfilePage() {
     : null;
 
   const tabs: { key: ProfileTab; label: string; icon: string; color: string }[] = [
-    { key: 'overview', label: 'Overview', icon: '◈', color: '#28a1af' },
+    { key: 'overview', label: 'Overview', icon: '◈', color: '#3B5A69' },
     { key: 'financials', label: 'Financials', icon: '▲', color: '#10b981' },
     { key: 'engagements', label: 'Engagements', icon: '◉', color: '#3b82f6' },
     { key: 'tech', label: 'Tech & Complexity', icon: '◎', color: '#8b5cf6' },

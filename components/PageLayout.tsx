@@ -65,7 +65,7 @@ export default function PageLayout({
           {backHref ? (
             <Link
               href={backHref}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border border-white/20 text-white/80 bg-transparent hover:bg-white/5 hover:border-teal hover:shadow-[0_0_16px_rgba(78,112,130,0.3)]"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border border-white/20 text-white/80 bg-transparent hover:bg-white/5 hover:border-teal hover:shadow-[0_0_16px_rgba(59,90,105,0.3)]"
             >
               ← {backLabel}
             </Link>
@@ -83,7 +83,7 @@ export default function PageLayout({
                 key={i}
                 className={`rounded-full transition-all duration-300 h-1.5 ${
                   isActive
-                    ? 'bg-teal shadow-[0_0_8px_rgba(78,112,130,0.6)]'
+                    ? 'bg-teal shadow-[0_0_8px_rgba(59,90,105,0.6)]'
                     : i + 1 < step
                     ? 'bg-teal/40'
                     : 'bg-white/20'
@@ -98,7 +98,7 @@ export default function PageLayout({
           {nextHref ? (
             <Link
               href={nextHref}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-white bg-teal hover:bg-teal-dark shadow-[0_0_12px_rgba(29,118,130,0.3)] hover:shadow-[0_0_24px_rgba(29,118,130,0.5)] hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-white bg-teal hover:bg-teal-dark shadow-[0_0_12px_rgba(59,90,105,0.3)] hover:shadow-[0_0_24px_rgba(59,90,105,0.5)] hover:-translate-y-0.5"
             >
               {nextLabel} →
             </Link>

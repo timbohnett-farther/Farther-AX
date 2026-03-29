@@ -77,7 +77,7 @@ export const TIER_CONFIG: Record<
   { min: number; max: number; color: string; bgColor: string; icon: string }
 > = {
   'Advocate':  { min: 80, max: 100, color: '#27ae60', bgColor: 'rgba(39,174,96,0.10)',   icon: '★' },
-  'Positive':  { min: 58, max: 79,  color: '#4E7082', bgColor: 'rgba(78,112,130,0.10)',  icon: '▲' },
+  'Positive':  { min: 58, max: 79,  color: '#3B5A69', bgColor: 'rgba(78,112,130,0.10)',  icon: '▲' },
   'Neutral':   { min: 38, max: 57,  color: '#b27d2e', bgColor: 'rgba(178,125,46,0.08)', icon: '●' },
   'At Risk':   { min: 20, max: 37,  color: '#e67e22', bgColor: 'rgba(230,126,34,0.10)', icon: '◈' },
   'High Risk': { min: 0,  max: 19,  color: '#c0392b', bgColor: 'rgba(192,57,43,0.08)',  icon: '▼' },

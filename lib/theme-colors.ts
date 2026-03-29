@@ -5,10 +5,10 @@
 
 export const getThemeColors = (isDark: boolean) => ({
   // Text colors
-  dark: isDark ? '#FFFEF4' : '#1a1a1a',           // Primary text
-  white: isDark ? '#1a1a1a' : '#FFFEF4',          // Inverse text
+  dark: isDark ? '#F8F4F0' : '#1a1a1a',           // Primary text
+  white: isDark ? '#1a1a1a' : '#F8F4F0',          // Inverse text
   slate: isDark ? 'rgba(212,223,229,0.5)' : 'rgba(102,102,102,0.6)', // Secondary text
-  cream: isDark ? '#FFFEF4' : '#405C6A',          // Heading text
+  cream: isDark ? '#F8F4F0' : '#405C6A',          // Heading text
   textSecondary: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(26,26,26,0.7)',
 
   // Background colors
@@ -22,8 +22,8 @@ export const getThemeColors = (isDark: boolean) => ({
   borderStrong: isDark ? 'rgba(212,223,229,0.15)' : 'rgba(224,224,224,0.6)',
 
   // Brand colors
-  teal: '#4E7082',
-  lightBlue: '#A8CED3',
+  teal: '#3B5A69',
+  lightBlue: '#7CA4B4',
 
   // Status colors
   green: '#10b981',

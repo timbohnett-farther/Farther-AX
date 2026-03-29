@@ -2,41 +2,41 @@
  * Farther AX Design Tokens — Unified Design System
  *
  * Single source of truth for all colors, typography, spacing, and theming.
- * Brand colors: Cream (#FFFEF4) & Teal (#4E7082)
+ * Brand colors: Limestone (#F8F4F0), Steel Blue (#3B5A69), Granite Blue (#2C3B4E), Clay (#9F8E75)
  */
 
 // ============================================================================
-// CORE BRAND COLORS (Cream & Teal)
+// CORE BRAND COLORS (Steel Blue & Limestone)
 // ============================================================================
 
 export const colors = {
   // Primary brand colors
-  cream: '#FFFEF4',
-  teal: '#4E7082',
-  tealDark: '#374E59',
-  tealLight: '#A8CED3',
+  cream: '#F8F4F0',
+  teal: '#3B5A69',
+  tealDark: '#2C3B4E',
+  tealLight: '#7CA4B4',
 
   // Neutrals
   charcoal: '#333333',
   white: '#ffffff',
-  slate: '#405B69',
-  ice: '#D4DFE5',
+  slate: '#3B5A69',
+  ice: '#E3D3C5',
 
   // Background gradient stops (dark mode)
-  bg600: '#2a2a2a',
-  bg800: '#1a1a1a',
-  bg900: '#111111',
+  bg600: '#354858',
+  bg800: '#2C3B4E',
+  bg900: '#1E2A38',
 
   // Surface colors (dark mode default)
-  cardBg: 'rgba(23, 31, 39, 0.80)',
-  border: 'rgba(250, 247, 242, 0.08)',
-  borderSubtle: 'rgba(250, 247, 242, 0.05)',
+  cardBg: 'rgba(44, 59, 78, 0.80)',
+  border: 'rgba(248, 244, 240, 0.08)',
+  borderSubtle: 'rgba(248, 244, 240, 0.05)',
 
   // Text colors (cream-based for dark mode)
-  textPrimary: '#FFFEF4',
-  textSecondary: 'rgba(255, 255, 255, 0.7)',
-  textMuted: 'rgba(255, 255, 255, 0.5)',
-  textTertiary: 'rgba(255, 255, 255, 0.35)',
+  textPrimary: '#F8F4F0',
+  textSecondary: 'rgba(248, 244, 240, 0.7)',
+  textMuted: 'rgba(248, 244, 240, 0.5)',
+  textTertiary: 'rgba(248, 244, 240, 0.35)',
 
   // Market colors
   bull: '#34d399',
@@ -63,12 +63,12 @@ export const colors = {
 
   // Chart palette (teal-based)
   chart: [
-    '#4E7082', // Teal
-    '#A8CED3', // Teal Light
-    '#99B6C3', // Teal Muted
-    '#D4DFE5', // Ice
-    '#405B69', // Slate
-    '#8A5C4F', // Terra
+    '#3B5A69', // Teal
+    '#7CA4B4', // Teal Light
+    '#7CA4B4', // Teal Muted
+    '#E3D3C5', // Ice
+    '#3B5A69', // Slate
+    '#9F8E75', // Terra
     '#34d399', // Bull
     '#fbbf24', // Gold
   ],
@@ -88,23 +88,23 @@ export const getThemeColors = (isDark: boolean) => ({
   textOnCard: isDark ? '#595959' : '#595959',   // Charcoal on cards in both modes
 
   // Background colors
-  bg: isDark ? '#4E7082' : '#F8F4F0',           // Dark: teal, Light: cream
-  cardBg: isDark ? '#F8F4F0' : '#E1D2C5',       // Dark: cream cards, Light: warm beige cards
-  cardBgAlt: isDark ? '#D8D4D0' : '#F8F4F0',    // Alternating row color
+  bg: isDark ? '#2C3B4E' : '#F8F4F0',           // Dark: teal, Light: cream
+  cardBg: isDark ? '#F8F4F0' : '#E3D3C5',       // Dark: cream cards, Light: warm beige cards
+  cardBgAlt: isDark ? '#E3D3C5' : '#F8F4F0',    // Alternating row color
 
   // Border colors
-  border: isDark ? 'rgba(248,244,240,0.25)' : 'rgba(155, 118, 106, 0.3)',
-  borderSubtle: isDark ? 'rgba(248,244,240,0.12)' : 'rgba(155, 118, 106, 0.15)',
-  borderStrong: isDark ? 'rgba(248,244,240,0.45)' : 'rgba(155, 118, 106, 0.45)',
+  border: isDark ? 'rgba(248,244,240,0.25)' : 'rgba(159, 142, 117, 0.3)',
+  borderSubtle: isDark ? 'rgba(248,244,240,0.12)' : 'rgba(159, 142, 117, 0.15)',
+  borderStrong: isDark ? 'rgba(248,244,240,0.45)' : 'rgba(159, 142, 117, 0.45)',
 
   // Brand colors (consistent across themes)
-  teal: '#4E7082',
-  lightBlue: '#93B6C4',
+  teal: '#3B5A69',
+  lightBlue: '#7CA4B4',
 
   // Accent colors
-  accent1: '#9B766A',  // Terracotta/brown
-  accent2: '#D2DFE6',  // Light blue/grey
-  accent3: '#E1D2C5',  // Beige/cream
+  accent1: '#9F8E75',  // Terracotta/brown
+  accent2: '#E3D3C5',  // Light blue/grey
+  accent3: '#E3D3C5',  // Beige/cream
 
   // Status colors with backgrounds
   green: '#10b981',
@@ -127,10 +127,10 @@ export const getThemeColors = (isDark: boolean) => ({
   purpleBorder: isDark ? 'rgba(167,139,250,0.35)' : 'rgba(167,139,250,0.25)',
 
   // Component specific
-  tableHeaderBg: isDark ? '#F8F4F0' : '#9B766A',   // Dark: cream header, Light: terracotta header
+  tableHeaderBg: isDark ? '#F8F4F0' : '#9F8E75',   // Dark: cream header, Light: terracotta header
   tableRowEven: isDark ? '#F8F4F0' : '#F8F4F0',    // Cream in both modes
-  tableRowOdd: isDark ? '#D8D4D0' : '#E1D2C5',     // Slightly darker in both modes
-  cardBgHover: isDark ? 'rgba(248,244,240,0.15)' : 'rgba(155, 118, 106, 0.1)',
+  tableRowOdd: isDark ? '#E3D3C5' : '#E3D3C5',     // Slightly darker in both modes
+  cardBgHover: isDark ? 'rgba(248,244,240,0.15)' : 'rgba(159, 142, 117, 0.1)',
 });
 
 export type ThemeColors = ReturnType<typeof getThemeColors>;
@@ -292,11 +292,11 @@ export const getMarketColor = (value: number): string => {
 };
 
 export const getStageColors = (teal: string, gold: string): Record<string, string> => ({
-  '2496931':   '#7fb3d8',
-  '2496932':   '#6ba3cc',
-  '2496934':   '#5793c0',
-  '100409509': '#4383b4',
-  '2496935':   '#2f73a8',
+  '2496931':   '#7CA4B4',
+  '2496932':   '#6A929F',
+  '2496934':   '#527F8B',
+  '100409509': '#3B5A69',
+  '2496935':   '#2C3B4E',
   '2496936':   gold,
   '100411705': teal,
 });

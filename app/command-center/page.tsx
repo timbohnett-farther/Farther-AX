@@ -759,7 +759,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           label="Total Pipeline AUM"
           value={formatAUM(a.totalActiveAUM)}
           sub={`${a.activeDeals.length} active deals`}
-          accent icon="◈" iconColor="#A8CED3"
+          accent icon="◈" iconColor="#7CA4B4"
           onClick={() => setDrillDown({ title: 'Total Pipeline AUM', deals: a.activeDeals })}
         />
         <SummaryCard
@@ -804,10 +804,10 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                 padding: '20px 24px', position: 'relative', cursor: sentimentDeals.length > 0 ? 'pointer' : 'default',
                 transition: 'border-color 150ms ease',
               }}
-              onMouseEnter={e => { if (sentimentDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = '#4E7082'; }}
+              onMouseEnter={e => { if (sentimentDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = '#3B5A69'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
             >
-              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: '#4E7082' }}>✦</span>
+              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: '#3B5A69' }}>✦</span>
               <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Sentiment Tracking</p>
               <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {scores.length > 0 ? `${scores.length}` : '—'}
@@ -2063,7 +2063,7 @@ function AcquisitionsTab() {
     <>
       {/* Summary Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
-        <SummaryCard label="Total M&A Pipeline" value={formatAUM(totalAUM)} sub={`${activeDeals.length} active deals`} accent icon="◈" iconColor="#A8CED3" />
+        <SummaryCard label="Total M&A Pipeline" value={formatAUM(totalAUM)} sub={`${activeDeals.length} active deals`} accent icon="◈" iconColor="#7CA4B4" />
         <SummaryCard label="Total Deals" value={String(deals.length)} sub={`${activeDeals.length} active · ${terminalDeals.length} closed`} icon="▸" iconColor="#3b82f6" />
         <SummaryCard label="Active Stages" value={String(stages.filter(s => !s.isTerminal && s.count > 0).length)} sub="in progress" icon="▲" iconColor="#8b5cf6" />
         <SummaryCard

@@ -15,13 +15,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 12,
     borderBottomWidth: 2,
-    borderBottomColor: '#1d7682',
+    borderBottomColor: '#3B5A69',
   },
   logo: {
     width: 28,
     height: 28,
     borderRadius: 4,
-    backgroundColor: '#1d7682',
+    backgroundColor: '#3B5A69',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontFamily: 'Helvetica-Bold',
-    color: '#1d7682',
+    color: '#3B5A69',
     marginTop: 16,
     marginBottom: 8,
     paddingBottom: 4,
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#FAF7F2',
+    backgroundColor: '#F8F4F0',
     paddingVertical: 4,
     paddingHorizontal: 6,
     borderBottomWidth: 1,
