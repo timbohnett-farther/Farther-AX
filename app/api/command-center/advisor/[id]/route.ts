@@ -336,57 +336,65 @@ async function fetchEngagementsSince(contactId: string, since: string) {
 }
 
 // ── Main GET handler ─────────────────────────────────────────────────────────
-// DB-first with background sync:
-//   1. Check DB for stored advisor data
-//   2. If found: return immediately, sync new activities in background
-//   3. If not found: full HubSpot fetch → write to DB → return
+// Cache-first with 3-tier waterfall:
+//   L1: Redis (5-min TTL, sub-ms reads)
+//   L2: S3 Bucket (durable warm cache)
+//   L3: PostgreSQL DB-first + HubSpot origin (existing logic, unchanged)
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    // Ensure tables exist (idempotent, fast after first call)
-    await ensureAdvisorTables();
+    const { getCached, writeThroughCache } = await import('@/lib/cached-fetchers');
 
-    // Try to serve from DB first
-    const snapshot = await getAdvisorFromDB(params.id);
+    const { data, source } = await getCached('advisor', params.id, async () => {
+      // ── This is the EXISTING fetch logic, unchanged ──────────────────
+      await ensureAdvisorTables();
 
-    if (snapshot.fromDB && snapshot.profile) {
-      // Serve from DB immediately
-      const formatted = formatDBDataForFrontend(snapshot);
-      const res = NextResponse.json(formatted);
-      res.headers.set('X-Data-Source', 'database');
-      res.headers.set('X-Last-Synced', snapshot.profile.last_synced_at);
+      // Try to serve from DB first
+      const snapshot = await getAdvisorFromDB(params.id);
 
-      // Fire background sync (don't await — user gets instant response)
-      backgroundSync(params.id, snapshot.profile.last_synced_at).catch(() => {});
+      if (snapshot.fromDB && snapshot.profile) {
+        const formatted = formatDBDataForFrontend(snapshot);
 
-      return res;
-    }
+        // Fire background sync (don't await)
+        backgroundSync(params.id, snapshot.profile.last_synced_at).catch(() => {});
 
-    // No DB data — full fetch from HubSpot (first visit)
-    const data = await fetchAdvisorData(params.id);
+        return formatted;
+      }
 
-    // Write to DB in background (don't block the response)
-    writeAdvisorToDB({
-      deal: data.deal,
-      allContacts: data.allContacts,
-      team: data.team,
-      pinnedNote: data.pinnedNote,
-      notes: data.notes,
-      engagements: data.engagements,
-    }).catch(err => console.error('[advisor-store] Initial write failed:', err));
+      // No DB data — full fetch from HubSpot (first visit)
+      const freshData = await fetchAdvisorData(params.id);
+
+      // Write to DB in background
+      writeAdvisorToDB({
+        deal: freshData.deal,
+        allContacts: freshData.allContacts,
+        team: freshData.team,
+        pinnedNote: freshData.pinnedNote,
+        notes: freshData.notes,
+        engagements: freshData.engagements,
+      }).catch(err => console.error('[advisor-store] Initial write failed:', err));
+
+      return freshData;
+    });
+
+    // If data came from origin (DB/HubSpot), backfill Redis+S3 is handled by getCached.
+    // If background sync updates data, it will be written through on next warm cycle.
 
     const res = NextResponse.json(data);
-    res.headers.set('X-Data-Source', 'hubspot');
+    res.headers.set('X-Data-Source', source);
+    res.headers.set('X-Cache', source.toUpperCase());
     return res;
   } catch (err) {
     console.error('[advisor detail]', err);
 
-    // Last resort: try serving stale DB data even if HubSpot failed
+    // Last resort: try serving stale DB data even if everything failed
     try {
+      await ensureAdvisorTables();
       const snapshot = await getAdvisorFromDB(params.id);
       if (snapshot.fromDB) {
         const formatted = formatDBDataForFrontend(snapshot);
         const res = NextResponse.json(formatted);
         res.headers.set('X-Data-Source', 'database-fallback');
+        res.headers.set('X-Cache', 'FALLBACK');
         return res;
       }
     } catch {

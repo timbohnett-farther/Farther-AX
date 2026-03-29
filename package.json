@@ -12,10 +12,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1019.0",
     "@heroicons/react": "^2.2.0",
     "@react-pdf/renderer": "^4.3.2",
     "@tremor/react": "^3.18.7",
     "google-auth-library": "^10.6.2",
+    "ioredis": "^5.10.1",
     "next": "14.2.35",
     "next-auth": "^4.24.13",
     "openai": "^6.32.0",

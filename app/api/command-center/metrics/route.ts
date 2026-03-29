@@ -213,15 +213,22 @@ async function fetchMetricsData() {
   };
 }
 
+// Cache waterfall: Redis (L1) → S3 Bucket (L2) → PostgreSQL cache (L3) → HubSpot (L4)
 export async function GET() {
   try {
-    const { data, cached, stale } = await withPgCache(
-      'metrics',
-      fetchMetricsData,
-      { ttlMs: 12 * 60 * 60 * 1000 } // 12 hours
-    );
+    const { getCached } = await import('@/lib/cached-fetchers');
+
+    const { data, source } = await getCached('metrics', 'all', async () => {
+      const { data } = await withPgCache(
+        'metrics',
+        fetchMetricsData,
+        { ttlMs: 12 * 60 * 60 * 1000 }
+      );
+      return data;
+    });
+
     const res = NextResponse.json(data);
-    if (cached) res.headers.set('X-Cache', stale ? 'STALE' : 'HIT');
+    res.headers.set('X-Cache', source.toUpperCase());
     return res;
   } catch (err) {
     console.error('[metrics]', err);

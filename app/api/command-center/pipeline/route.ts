@@ -150,18 +150,24 @@ async function fetchPipelineData() {
   return { deals: enriched, total: enriched.length };
 }
 
-// ── GET handler (PostgreSQL-cached — 12hr TTL, stale fallback on HubSpot errors) ─
+// ── GET handler ─────────────────────────────────────────────────────────────
+// Cache waterfall: Redis (L1) → S3 Bucket (L2) → PostgreSQL cache (L3) → HubSpot (L4)
 export async function GET() {
   try {
-    const { data, cached, stale } = await withPgCache(
-      'pipeline',
-      fetchPipelineData,
-      { ttlMs: 12 * 60 * 60 * 1000 } // 12 hours
-    );
+    const { getCached } = await import('@/lib/cached-fetchers');
+
+    const { data, source } = await getCached('pipeline', 'all', async () => {
+      // Existing withPgCache logic — UNCHANGED
+      const { data } = await withPgCache(
+        'pipeline',
+        fetchPipelineData,
+        { ttlMs: 12 * 60 * 60 * 1000 } // 12 hours
+      );
+      return data;
+    });
+
     const res = NextResponse.json(data);
-    if (cached) {
-      res.headers.set('X-Cache', stale ? 'STALE' : 'HIT');
-    }
+    res.headers.set('X-Cache', source.toUpperCase());
     return res;
   } catch (err) {
     console.error('[pipeline]', err);

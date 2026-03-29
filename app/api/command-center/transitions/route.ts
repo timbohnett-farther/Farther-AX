@@ -43,8 +43,21 @@ interface AdvisorGroup {
 
 // ── GET handler ───────────────────────────────────────────────────────────────
 
+// Cache waterfall: Redis (L1) → PostgreSQL (L2, existing)
+// Transitions use dynamic query params, so cache key includes the full query string.
 export async function GET(req: NextRequest) {
   try {
+    const { getFromRedis, setInRedis } = await import('@/lib/redis-client');
+
+    // Build cache key from query params
+    const cacheKey = `transitions:${req.nextUrl.search || 'default'}`;
+    const cached = await getFromRedis<ReturnType<typeof NextResponse.json>>('transitions', req.nextUrl.search || 'default');
+    if (cached) {
+      const res = NextResponse.json(cached);
+      res.headers.set('X-Cache', 'REDIS');
+      return res;
+    }
+
     // ── Parse filter params ────────────────────────────────────────────────
     const { searchParams } = req.nextUrl;
     const advisor = searchParams.get('advisor');
@@ -184,7 +197,7 @@ export async function GET(req: NextRequest) {
     );
     const lastSyncedAt = syncTimeResult.rows[0]?.last_synced?.toISOString() ?? null;
 
-    return NextResponse.json({
+    const responseData = {
       advisors,
       lastSyncedAt,
       total,
@@ -197,7 +210,14 @@ export async function GET(req: NextRequest) {
         paperwork_signed,
         pending_documents,
       },
-    });
+    };
+
+    // Backfill Redis for next request (non-blocking)
+    setInRedis('transitions', req.nextUrl.search || 'default', responseData).catch(() => {});
+
+    const res = NextResponse.json(responseData);
+    res.headers.set('X-Cache', 'ORIGIN');
+    return res;
   } catch (err) {
     console.error('[transitions GET]', err);
     const message = err instanceof Error ? err.message : String(err);
