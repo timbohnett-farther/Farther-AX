@@ -6,6 +6,26 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Brand Color Update — Educational Pages Hex Values — 2026-03-29
+
+**What**: Updated hardcoded hex color values in educational content pages to align with new Farther brand palette (Steel Blue/Clay design system).
+
+**Scope**:
+- Replaced old teal colors (#1d7682, #5b6a71) with Steel Blue/700 (#3B5A69)
+- Updated badge colors on Breakaway pathway page (2 instances)
+- Updated badge color on Independent RIA pathway page (1 instance)
+- Note: No-to-low-aum page already updated in previous commit
+
+**Status**: ✅ Fixed and deployed
+
+**Files**:
+- `app/breakaway/page.tsx` (badge colors for U4 Timing + Resignation Required)
+- `app/independent-ria/page.tsx` (badge color for ADV-W Required)
+
+**Commit**: `a851692`
+
+---
+
 ## [Completed] Strike Force Audit — Code Quality & Database Integrity Cleanup — 2026-03-29
 
 **What**: Ran 4-phase pre-launch audit (AXIOM Repo Mapping, DATUM Database Audit, NEXUS API Integration Audit, CIPHER Security Audit). Fixed critical findings across database layer, error handling, and dead code.
