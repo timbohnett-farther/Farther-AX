@@ -16,7 +16,7 @@ const characteristics = [
   {
     label: "ADV-W Required",
     badge: "Within 90 Days",
-    badgeColor: "#1d7682",
+    badgeColor: "#3B5A69",
     body: "The advisor must file Form ADV-W (withdrawal of investment adviser registration) within 90 days of joining Farther. This formally dissolves their independent RIA registration with the SEC or state regulator.",
   },
   {

@@ -16,7 +16,7 @@ const characteristics = [
   {
     label: "U4 Timing",
     badge: "Hold Until Resignation",
-    badgeColor: "#1d7682",
+    badgeColor: "#3B5A69",
     body: "The U4 registration form must NOT be submitted until after the advisor has formally resigned. Submitting early creates a trackable FINRA event that can alert the prior firm prematurely.",
   },
   {
@@ -28,7 +28,7 @@ const characteristics = [
   {
     label: "Resignation Required",
     badge: "Mandatory First Step",
-    badgeColor: "#5b6a71",
+    badgeColor: "#3B5A69",
     body: "The advisor must formally resign before the Farther onboarding can fully proceed. The AXM coordinates timing with the advisor and Legal to minimize exposure and ensure the transition is clean.",
   },
 ];
