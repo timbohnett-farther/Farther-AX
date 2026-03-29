@@ -6,12 +6,12 @@ import { useParams } from 'next/navigation';
 // ── Design tokens (matching Farther brand) ──────────────────────────────────
 const C = {
   bg: '#111111',
-  cardBg: '#2f2f2f',
+  cardBg: '#2C3B4E',
   cardBgAlt: '#262626',
   border: 'rgba(250,247,242,0.08)',
-  borderFocus: '#1d7682',
-  teal: '#1d7682',
-  tealLight: '#28a1af',
+  borderFocus: '#3B5A69',
+  teal: '#3B5A69',
+  tealLight: '#3B5A69',
   dark: '#FAF7F2',
   slate: 'rgba(250,247,242,0.5)',
   green: '#10b981',

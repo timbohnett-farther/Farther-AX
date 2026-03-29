@@ -19,7 +19,7 @@ function ErrorContent() {
       <div
         className="w-full max-w-md rounded-2xl p-10 text-center"
         style={{
-          backgroundColor: "#2f2f2f",
+          backgroundColor: "#2C3B4E",
           border: "1px solid rgba(250,247,242,0.08)",
           boxShadow: "0 4px 32px rgba(0,0,0,0.3)",
         }}
@@ -69,7 +69,7 @@ function ErrorContent() {
           href="/auth/signin"
           className="inline-flex items-center justify-center px-6 py-3 rounded-lg text-white text-sm font-medium"
           style={{
-            backgroundColor: "#1d7682",
+            backgroundColor: "#3B5A69",
             fontFamily: "'Inter', system-ui, sans-serif",
           }}
         >

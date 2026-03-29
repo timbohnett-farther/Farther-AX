@@ -67,7 +67,7 @@ function SignInContent() {
         {/* Google Sign-In Button */}
         <button
           onClick={() => signIn("google", { callbackUrl })}
-          className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-lg text-white font-medium text-[0.95rem] transition-all duration-150 bg-[#1d7682] hover:bg-[#155961]"
+          className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-lg text-white font-medium text-[0.95rem] transition-all duration-150 bg-[#3B5A69] hover:bg-[#2C3B4E]"
         >
           {/* Google G icon */}
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">

@@ -6,6 +6,27 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Update Auth & Form Pages to New Farther Brand Palette — 2026-03-29
+
+**What**: Updated hardcoded hex color values in auth and form pages to align with the new Farther brand palette (Steel Blue #3B5A69, Granite Blue #2C3B4E, Limestone #F8F4F0).
+
+**Color Mappings Applied**:
+- `#1d7682` → `#3B5A69` (Steel Blue/700)
+- `#28a1af` → `#3B5A69` (Steel Blue/700)
+- `#2f2f2f` → `#2C3B4E` (Granite Blue/900)
+
+**Files Updated**:
+- `app/auth/signin/page.tsx` — Google sign-in button background + hover state
+- `app/auth/error/page.tsx` — Card background + "Back to Sign In" button
+- `app/forms/tech-intake/[token]/page.tsx` — Design token object `C` (cardBg, teal, tealLight, borderFocus)
+- `app/forms/u4-2b/[token]/page.tsx` — Design token object `C` (cardBg, teal, tealLight, borderFocus)
+
+**Build Result**: PASS (except pre-existing Redis/S3 dependency errors unrelated to this change)
+
+**Status**: ✅ Complete
+
+---
+
 ## [Completed] Brand Color Update — Transition Components Hex Values — 2026-03-29
 
 **What**: Updated hardcoded hex color values in transition components to align with new Farther brand palette (Steel Blue #3B5A69, Limestone #F8F4F0/#E3D3C5).
