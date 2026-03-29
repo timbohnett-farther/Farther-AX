@@ -98,11 +98,11 @@ export function AccountsTable({ accounts, total, page, perPage, onPageChange, sh
                 key={acc.id}
                 style={{
                   borderBottom: `1px solid ${C.border}`,
-                  background: i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)',
+                  background: i % 2 === 0 ? C.cardBg : 'rgba(248,244,240,0.03)',
                   transition: 'background 120ms ease',
                 }}
                 onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(59,90,105,0.06)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? C.cardBg : 'rgba(248,244,240,0.03)'; }}
               >
                 {showAdvisorColumn && <td style={{ padding: '10px 10px', color: C.teal, fontWeight: 600 }}>{acc.advisor_name || '--'}</td>}
                 <td style={{ padding: '10px 10px', fontWeight: 500, color: C.dark }}>{acc.household_name || '--'}</td>

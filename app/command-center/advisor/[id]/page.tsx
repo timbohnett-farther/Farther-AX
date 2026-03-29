@@ -10,10 +10,10 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const C = {
-  dark: '#FAF7F2', white: '#1a1a1a', slate: 'rgba(250,247,242,0.5)',
-  lightBlue: '#b6d0ed',
-  teal: '#2bb8c4', bg: '#111111',
-  cardBg: '#2f2f2f', border: 'rgba(250,247,242,0.08)',
+  dark: '#F8F4F0', white: '#595959', slate: 'rgba(248,244,240,0.5)',
+  lightBlue: '#7CA4B4',
+  teal: '#3B5A69', bg: '#2C3B4E',
+  cardBg: '#F8F4F0', border: 'rgba(248,244,240,0.08)',
   green: '#10b981', greenBg: 'rgba(16,185,129,0.15)',
   amber: '#f59e0b', amberBg: 'rgba(245,158,11,0.15)', amberBorder: 'rgba(245,158,11,0.3)',
   red: '#ef4444', redBg: 'rgba(239,68,68,0.15)', redBorder: 'rgba(239,68,68,0.3)',
@@ -1152,7 +1152,7 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
                       {/* Checkbox */}
                       <button onClick={() => handleToggle(task.id, task.completed)} style={{
                         width: 22, height: 22, borderRadius: 5, flexShrink: 0, cursor: 'pointer',
-                        border: `2px solid ${task.completed ? cfg.color : 'rgba(250,247,242,0.2)'}`,
+                        border: `2px solid ${task.completed ? cfg.color : 'rgba(248,244,240,0.2)'}`,
                         background: task.completed ? cfg.color : 'transparent',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         transition: 'all 0.15s ease',
@@ -1165,7 +1165,7 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
                         <span style={{
                           fontSize: 13, color: task.completed ? C.slate : C.dark,
                           textDecoration: task.completed ? 'line-through' : 'none',
-                          textDecorationColor: 'rgba(250,247,242,0.3)',
+                          textDecorationColor: 'rgba(248,244,240,0.3)',
                         }}>{task.label}</span>
 
                         {/* Responsible person and countdown */}

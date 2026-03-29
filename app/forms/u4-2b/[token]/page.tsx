@@ -5,22 +5,22 @@ import { useParams } from 'next/navigation';
 
 // ── Design tokens (matching Farther brand) ──────────────────────────────────
 const C = {
-  bg: '#111111',
-  cardBg: '#2C3B4E',
-  cardBgAlt: '#262626',
-  border: 'rgba(250,247,242,0.08)',
+  bg: '#2C3B4E',
+  cardBg: '#F8F4F0',
+  cardBgAlt: '#E3D3C5',
+  border: 'rgba(248,244,240,0.08)',
   borderFocus: '#3B5A69',
   teal: '#3B5A69',
-  tealLight: '#3B5A69',
-  dark: '#FAF7F2',
-  slate: 'rgba(250,247,242,0.5)',
+  tealLight: '#7CA4B4',
+  dark: '#F8F4F0',
+  slate: 'rgba(248,244,240,0.5)',
   green: '#10b981',
   greenBg: 'rgba(16,185,129,0.15)',
   amber: '#f59e0b',
   amberBg: 'rgba(245,158,11,0.15)',
   red: '#ef4444',
   redBg: 'rgba(239,68,68,0.15)',
-  white: '#1a1a1a',
+  white: '#595959',
 };
 
 const STEPS = [
@@ -884,7 +884,7 @@ export default function U4FormPage() {
 
       {/* Footer */}
       <div style={{ maxWidth: 720, margin: '24px auto 0', textAlign: 'center' }}>
-        <p style={{ fontSize: 11, color: 'rgba(250,247,242,0.3)' }}>
+        <p style={{ fontSize: 11, color: 'rgba(248,244,240,0.3)' }}>
           Farther Finance Advisors LLC &middot; Information submitted is encrypted in transit and stored securely.
         </p>
       </div>

@@ -20,7 +20,7 @@ function ErrorContent() {
         className="w-full max-w-md rounded-2xl p-10 text-center"
         style={{
           backgroundColor: "#2C3B4E",
-          border: "1px solid rgba(250,247,242,0.08)",
+          border: "1px solid rgba(248,244,240,0.08)",
           boxShadow: "0 4px 32px rgba(0,0,0,0.3)",
         }}
       >
@@ -47,7 +47,7 @@ function ErrorContent() {
             fontFamily: "'Inter', system-ui, sans-serif",
             fontSize: "1.5rem",
             fontWeight: 300,
-            color: "#FAF7F2",
+            color: "#F8F4F0",
           }}
         >
           {isAccessDenied ? "Access Denied" : "Sign-In Error"}
@@ -57,7 +57,7 @@ function ErrorContent() {
           className="mb-8 text-sm leading-relaxed"
           style={{
             fontFamily: "'Inter', system-ui, sans-serif",
-            color: "rgba(250,247,242,0.5)",
+            color: "rgba(248,244,240,0.5)",
           }}
         >
           {isAccessDenied

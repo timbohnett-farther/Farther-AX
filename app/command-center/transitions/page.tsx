@@ -523,7 +523,7 @@ function TransitionsPageInner() {
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', fontSize: 11, borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr style={{ background: 'rgba(250,247,242,0.03)', borderBottom: `1px solid ${C.border}` }}>
+                    <tr style={{ background: 'rgba(248,244,240,0.03)', borderBottom: `1px solid ${C.border}` }}>
                       <th style={{ padding: '6px 8px', textAlign: 'left', color: C.slate, fontWeight: 600 }}>Record ID</th>
                       <th style={{ padding: '6px 8px', textAlign: 'left', color: C.slate, fontWeight: 600 }}>Advisor Name</th>
                       <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>Current Value</th>
@@ -554,7 +554,7 @@ function TransitionsPageInner() {
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', fontSize: 11, borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr style={{ background: 'rgba(250,247,242,0.03)', borderBottom: `1px solid ${C.border}` }}>
+                    <tr style={{ background: 'rgba(248,244,240,0.03)', borderBottom: `1px solid ${C.border}` }}>
                       <th style={{ padding: '6px 8px', textAlign: 'left', color: C.slate, fontWeight: 600 }}>Advisor Name</th>
                       <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>TRAN AUM</th>
                       <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>Revenue</th>
@@ -671,7 +671,7 @@ function TransitionsPageInner() {
 // Wrap with Suspense for useSearchParams
 export default function TransitionsPage() {
   return (
-    <Suspense fallback={<div style={{ padding: 60, textAlign: 'center', color: 'rgba(250,247,242,0.5)' }}>Loading...</div>}>
+    <Suspense fallback={<div style={{ padding: 60, textAlign: 'center', color: 'rgba(248,244,240,0.5)' }}>Loading...</div>}>
       <TransitionsPageInner />
     </Suspense>
   );

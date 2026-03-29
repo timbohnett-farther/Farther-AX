@@ -47,10 +47,10 @@ function SignInContent() {
         </div>
 
         {/* Heading */}
-        <h1 className="text-center mb-2 text-[1.35rem] font-light text-[#FAF7F2] leading-[1.45]">
+        <h1 className="text-center mb-2 text-[1.35rem] font-light text-[#F8F4F0] leading-[1.45]">
           Advisor Experience &amp; Transition Command Center
         </h1>
-        <p className="text-center mb-8 text-sm text-[rgba(250,247,242,0.75)]">
+        <p className="text-center mb-8 text-sm text-[rgba(248,244,240,0.75)]">
           Sign in with your Farther Google account to continue.
         </p>
 
@@ -80,7 +80,7 @@ function SignInContent() {
         </button>
 
         {/* Restriction note */}
-        <p className="mt-5 text-center text-xs text-[rgba(250,247,242,0.75)]">
+        <p className="mt-5 text-center text-xs text-[rgba(248,244,240,0.75)]">
           Access restricted to{" "}
           <span className="font-medium text-[#5ec4cc]">@farther.com</span>{" "}
           accounts only.
@@ -88,7 +88,7 @@ function SignInContent() {
       </div>
 
       {/* Footer */}
-      <p className="mt-8 text-xs text-[rgba(250,247,242,0.75)]">
+      <p className="mt-8 text-xs text-[rgba(248,244,240,0.75)]">
         Farther Wealth Management · Internal Use Only
       </p>
     </div>

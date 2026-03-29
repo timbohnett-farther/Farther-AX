@@ -334,7 +334,7 @@ function HorizontalBar({ items, maxValue, perItemMax }: { items: { label: string
             key={i}
             onClick={item.onClick}
             style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: item.onClick ? 'pointer' : 'default', borderRadius: 4, transition: 'background 150ms ease' }}
-            onMouseEnter={e => { if (item.onClick) (e.currentTarget as HTMLDivElement).style.background = 'rgba(250,247,242,0.04)'; }}
+            onMouseEnter={e => { if (item.onClick) (e.currentTarget as HTMLDivElement).style.background = 'rgba(248,244,240,0.04)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
           >
             <div style={{ width: 130, fontSize: 12, color: C.slate, textAlign: 'right', flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -394,9 +394,9 @@ function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[
             </thead>
             <tbody>
               {deals.map((deal, i) => (
-                <tr key={deal.id} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? 'transparent' : 'rgba(250,247,242,0.02)', transition: 'background 120ms ease' }}
+                <tr key={deal.id} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? 'transparent' : 'rgba(248,244,240,0.02)', transition: 'background 120ms ease' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? 'transparent' : 'rgba(250,247,242,0.02)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? 'transparent' : 'rgba(248,244,240,0.02)'; }}
                 >
                   <td style={{ padding: '8px 10px' }}>
                     <Link href={`/command-center/advisor/${deal.id}`} style={{ color: C.teal, fontWeight: 600, textDecoration: 'none' }}>{deal.dealname}</Link>
@@ -938,7 +938,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           <SectionHeader title="Monthly Launches" subtitle="AUM launched & advisor count vs goals (last 6 months)" />
           <ResponsiveContainer width="100%" height={280}>
             <ComposedChart data={a.monthlyLaunches} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(250,247,242,0.06)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(248,244,240,0.06)" vertical={false} />
               <XAxis dataKey="month" tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis
                 yAxisId="aum"
@@ -952,7 +952,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                 allowDecimals={false}
               />
               <Tooltip
-                cursor={{ stroke: 'rgba(250,247,242,0.08)', strokeWidth: 1 }}
+                cursor={{ stroke: 'rgba(248,244,240,0.08)', strokeWidth: 1 }}
                 content={({ active, payload, label }) => {
                   if (!active || !payload?.length) return null;
                   const entry = payload[0]?.payload as { count: number; aum: number; names: string[]; aumGoal: number; advisorGoal: number } | undefined;
@@ -1002,14 +1002,14 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           <SectionHeader title="Cumulative YTD Launched AUM" subtitle={`Running total vs $25B linear pace`} />
           <ResponsiveContainer width="100%" height={220}>
             <ComposedChart data={a.cumulativeYtd} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(250,247,242,0.06)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(248,244,240,0.06)" vertical={false} />
               <XAxis dataKey="month" tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis
                 tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false}
                 tickFormatter={(v: number) => formatAUM(v)}
               />
               <Tooltip
-                cursor={{ stroke: 'rgba(250,247,242,0.08)', strokeWidth: 1 }}
+                cursor={{ stroke: 'rgba(248,244,240,0.08)', strokeWidth: 1 }}
                 contentStyle={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, color: C.dark }}
                 itemStyle={{ color: C.dark }}
                 formatter={(value: unknown, name: unknown) => {
@@ -2105,12 +2105,12 @@ function AcquisitionsTab() {
                 return (
                   <tr key={deal.id} style={{
                     borderBottom: `1px solid ${C.border}`,
-                    background: deal.isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)',
+                    background: deal.isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? C.cardBg : 'rgba(248,244,240,0.03)',
                     opacity: rowOpacity,
                     transition: 'background 120ms ease',
                   }}
                     onMouseEnter={e => { if (!deal.isTerminal) (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = deal.isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = deal.isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? C.cardBg : 'rgba(248,244,240,0.03)'; }}
                   >
                     <td style={{ padding: '10px 14px' }}>
                       <Link
