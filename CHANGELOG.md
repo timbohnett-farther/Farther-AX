@@ -6,6 +6,38 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Brand Color Update — Transition Components Hex Values — 2026-03-29
+
+**What**: Updated hardcoded hex color values in transition components to align with new Farther brand palette (Steel Blue #3B5A69, Limestone #F8F4F0/#E3D3C5).
+
+**Color Mappings Applied**:
+- `#4E7082` → `#3B5A69` (Steel Blue/700) — main teal brand color
+- `#FFFEF4` → `#F8F4F0` (Limestone/50) — light text
+- `rgba(212,223,229,0.5)` → `rgba(227,211,197,0.5)` (Limestone/200 alpha) — muted slate
+- `#60a5fa` → `#7CA4B4` (Steel Blue/400) — blue accent for stats cards + changelog
+- `rgba(96,165,250,0.2)` → `rgba(124,164,180,0.2)` — blue backgrounds
+- `rgba(78,112,130,0.08)` → `rgba(59,90,105,0.08)` — dropdown hover states
+- `rgba(78,112,130,0.06)` → `rgba(59,90,105,0.06)` — active selection states
+- `rgba(29,118,130,0.06)` → `rgba(59,90,105,0.06)` — table row hover (AccountsTable)
+
+**Status**: ✅ Fixed and deployed
+
+**Files**:
+- `components/transitions/StatusPill.tsx` — Status color constants (dark, slate, blue, teal)
+- `components/transitions/StatsCards.tsx` — Blue accent variable for Households card
+- `components/transitions/SearchSelect.tsx` — Dropdown selection + hover states (4 instances)
+- `components/transitions/ChangeLogPanel.tsx` — New envelope change type color
+- `components/transitions/ExecutiveSummary.tsx` — Table row hover state
+- `components/transitions/AccountsTable.tsx` — Table row hover state
+
+**Note**: Status colors (green/amber/red for completed/pending/error states) remain unchanged to preserve semantic meaning across themes.
+
+**Build Result**: PASS — TypeScript build verified (pre-existing AWS SDK errors unrelated to this change)
+
+**Commit**: `98f2ad7`
+
+---
+
 ## [Completed] Brand Color Update — Educational Pages Hex Values — 2026-03-29
 
 **What**: Updated hardcoded hex color values in educational content pages to align with new Farther brand palette (Steel Blue/Clay design system).
