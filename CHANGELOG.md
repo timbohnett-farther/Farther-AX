@@ -6,6 +6,33 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Strike Force Audit — Code Quality & Database Integrity Cleanup — 2026-03-29
+
+**What**: Ran 4-phase pre-launch audit (AXIOM Repo Mapping, DATUM Database Audit, NEXUS API Integration Audit, CIPHER Security Audit). Fixed critical findings across database layer, error handling, and dead code.
+
+**Scope**:
+- Fixed `is_active` → `active` column name bug in team_members index (migrate.ts)
+- Consolidated duplicate `advisor_sentiment` table definitions — adopted richer schema from migrate-sentiment.ts with extra columns (contact_id, deal_stage, engagements_analyzed, signals, updated_at)
+- Wrapped TRUNCATE operations in managed-accounts sync inside a transaction to prevent data loss on crash
+- Added error logging to 9 empty catch blocks across warm, managed-accounts-sync, transitions/sync, transitions/sync-all, and sentiment/score routes
+- Removed dead code: `_backup/` directory (1 .bak file), `_disabled/` directory (9 files — old intake form system), `globals.css.backup`
+- Removed sample data exposure and env var leakage from debug endpoint
+- Fixed localhost fallback in transitions/sync-all to use RAILWAY_PUBLIC_DOMAIN
+
+**Status**: ✅ Complete — build passes
+
+**Files**:
+- `scripts/migrate.ts` — Fixed index bug, consolidated sentiment schema
+- `app/api/command-center/managed-accounts/sync/route.ts` — Transaction-safe TRUNCATE
+- `app/api/command-center/warm/route.ts` — 3 empty catch blocks fixed
+- `app/api/command-center/transitions/sync/route.ts` — 3 empty catch blocks fixed
+- `app/api/command-center/transitions/sync-all/route.ts` — Empty catch + localhost fix
+- `app/api/command-center/sentiment/score/route.ts` — Empty catch block fixed
+- `app/api/debug/transitions-status/route.ts` — Removed data exposure
+- `_backup/`, `_disabled/`, `app/globals.css.backup` — Deleted (dead code)
+
+---
+
 ## [Completed] Cache-First Data Architecture — Redis + S3 Bucket + Background Sync — 2026-03-29
 
 **What**: Implemented a 3-tier cache-first architecture (Redis L1, S3 Bucket L2, PostgreSQL/HubSpot L3) to eliminate direct API calls on every page view. Background sync worker keeps caches fresh. HubSpot webhook endpoint enables near-real-time updates. Existing fetch logic and data shapes are completely unchanged.

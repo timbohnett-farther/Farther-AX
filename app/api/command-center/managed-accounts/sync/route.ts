@@ -21,8 +21,8 @@ async function shouldSkipSync(): Promise<boolean> {
     if (result.rows[0] && result.rows[0].expires_at > new Date()) {
       return true;
     }
-  } catch {
-    // If DB fails, allow sync to proceed
+  } catch (err) {
+    console.warn('[managed-accounts-sync] Cache check failed, proceeding:', err instanceof Error ? err.message : String(err));
   }
   return false;
 }
@@ -103,57 +103,69 @@ export async function GET() {
       });
     }
 
-    // Truncate and reload managed_accounts
-    await pool.query('TRUNCATE managed_accounts');
+    // Truncate and reload inside a transaction to prevent data loss on crash
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    // Insert in batches
-    const batchSize = 50;
-    for (let i = 0; i < records.length; i += batchSize) {
-      const batch = records.slice(i, i + batchSize);
-      const values: unknown[] = [];
-      const placeholders: string[] = [];
+      await client.query('TRUNCATE managed_accounts');
 
-      for (let j = 0; j < batch.length; j++) {
-        const r = batch[j];
-        const offset = j * 5;
-        placeholders.push(
-          `($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, $${offset + 5})`
-        );
-        values.push(
-          r.advisor_name || 'Unknown',
-          parseFloat(r.current_value || r.bd_market_value || '0') || 0,
-          parseFloat(r.fee_rate_bps || '0') || 0,
-          parseFloat(r.monthly_fee_amount || '0') || 0,
-          r.hubspot_object_id || null
+      // Insert in batches
+      const batchSize = 50;
+      for (let i = 0; i < records.length; i += batchSize) {
+        const batch = records.slice(i, i + batchSize);
+        const values: unknown[] = [];
+        const placeholders: string[] = [];
+
+        for (let j = 0; j < batch.length; j++) {
+          const r = batch[j];
+          const offset = j * 5;
+          placeholders.push(
+            `($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, $${offset + 5})`
+          );
+          values.push(
+            r.advisor_name || 'Unknown',
+            parseFloat(r.current_value || r.bd_market_value || '0') || 0,
+            parseFloat(r.fee_rate_bps || '0') || 0,
+            parseFloat(r.monthly_fee_amount || '0') || 0,
+            r.hubspot_object_id || null
+          );
+        }
+
+        await client.query(
+          `INSERT INTO managed_accounts (advisor_name, current_value, fee_rate_bps, monthly_fee_amount, hubspot_object_id)
+           VALUES ${placeholders.join(', ')}`,
+          values
         );
       }
 
-      await pool.query(
-        `INSERT INTO managed_accounts (advisor_name, current_value, fee_rate_bps, monthly_fee_amount, hubspot_object_id)
-         VALUES ${placeholders.join(', ')}`,
-        values
-      );
-    }
+      // Rebuild summary table
+      await client.query('TRUNCATE managed_accounts_summary');
+      await client.query(`
+        INSERT INTO managed_accounts_summary (advisor_name, total_aum, total_monthly_revenue, account_count, weighted_fee_bps, synced_at)
+        SELECT
+          advisor_name,
+          COALESCE(SUM(current_value), 0) as total_aum,
+          COALESCE(SUM(monthly_fee_amount), 0) as total_monthly_revenue,
+          COUNT(*) as account_count,
+          CASE
+            WHEN COUNT(*) > 0
+            THEN COALESCE(SUM(fee_rate_bps), 0) / COUNT(*)
+            ELSE 0
+          END as avg_fee_bps,
+          NOW() as synced_at
+        FROM managed_accounts
+        WHERE advisor_name IS NOT NULL AND advisor_name != ''
+        GROUP BY advisor_name
+      `);
 
-    // Rebuild summary table: simple avg for fee_rate_bps (sum / count)
-    await pool.query('TRUNCATE managed_accounts_summary');
-    await pool.query(`
-      INSERT INTO managed_accounts_summary (advisor_name, total_aum, total_monthly_revenue, account_count, weighted_fee_bps, synced_at)
-      SELECT
-        advisor_name,
-        COALESCE(SUM(current_value), 0) as total_aum,
-        COALESCE(SUM(monthly_fee_amount), 0) as total_monthly_revenue,
-        COUNT(*) as account_count,
-        CASE
-          WHEN COUNT(*) > 0
-          THEN COALESCE(SUM(fee_rate_bps), 0) / COUNT(*)
-          ELSE 0
-        END as avg_fee_bps,
-        NOW() as synced_at
-      FROM managed_accounts
-      WHERE advisor_name IS NOT NULL AND advisor_name != ''
-      GROUP BY advisor_name
-    `);
+      await client.query('COMMIT');
+    } catch (txErr) {
+      await client.query('ROLLBACK');
+      throw txErr;
+    } finally {
+      client.release();
+    }
 
     // Mark sync timestamp
     await markSyncRun();

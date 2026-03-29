@@ -9,7 +9,7 @@ async function shouldSkip(): Promise<boolean> {
       `SELECT expires_at FROM api_cache WHERE cache_key = 'transitions-sync-all-last-run'`
     );
     if (result.rows[0] && result.rows[0].expires_at > new Date()) return true;
-  } catch { /* allow sync */ }
+  } catch (err) { console.warn('[sync-all] Cache check failed, proceeding:', err instanceof Error ? err.message : String(err)); }
   return false;
 }
 
@@ -35,7 +35,8 @@ export async function GET() {
 
     // 1. Google Sheets sync
     try {
-      const sheetsRes = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/command-center/transitions/sync`);
+      const baseUrl = process.env.NEXTAUTH_URL || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'http://localhost:3000');
+      const sheetsRes = await fetch(`${baseUrl}/api/command-center/transitions/sync`);
       results.sheets = await sheetsRes.json();
     } catch (err) {
       results.sheets = { error: String(err) };

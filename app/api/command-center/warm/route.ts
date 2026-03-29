@@ -83,8 +83,8 @@ async function shouldSkipWarm(): Promise<boolean> {
     if (result.rows[0] && result.rows[0].expires_at > new Date()) {
       return true;
     }
-  } catch {
-    // If DB fails, allow warm to proceed
+  } catch (err) {
+    console.warn('[warm] Cache check failed, proceeding:', err instanceof Error ? err.message : String(err));
   }
   return false;
 }
@@ -202,7 +202,7 @@ async function fetchAdvisorDetail(dealId: string) {
             const otherData = await otherRes.json();
             allContacts.push({ id: otherData.id, ...otherData.properties });
           }
-        } catch { /* skip */ }
+        } catch (err) { console.warn('[warm] Contact fetch skipped:', err instanceof Error ? err.message : String(err)); }
       }
     }
   }
@@ -239,7 +239,7 @@ async function fetchAdvisorDetail(dealId: string) {
             });
           }
         }
-      } catch { /* silent */ }
+      } catch (err) { console.warn('[warm] Engagement fetch skipped:', err instanceof Error ? err.message : String(err)); }
     }));
     engagements.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     engagements = engagements.slice(0, 20);

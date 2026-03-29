@@ -34,20 +34,9 @@ export async function GET() {
         last_synced: aumResult.rows[0]?.last_sync?.toISOString() || null,
       };
 
-      // Get sample data
-      const sampleResult = await pool.query('SELECT advisor_name, tran_aum, revenue, record_count FROM advisor_tran_aum LIMIT 5');
-      checks.advisor_tran_aum.sample = sampleResult.rows;
     } catch (err) {
       checks.advisor_tran_aum = { error: err instanceof Error ? err.message : String(err) };
     }
-
-    // Check environment variables
-    checks.env_vars = {
-      google_service_account: !!process.env.GOOGLE_SERVICE_ACCOUNT_JSON,
-      google_drive_folder: !!process.env.GOOGLE_DRIVE_FOLDER_ID,
-      hubspot_token: !!process.env.HUBSPOT_ACCESS_TOKEN || !!process.env.HUBSPOT_PAT,
-      database_url: !!process.env.DATABASE_URL,
-    };
 
     return NextResponse.json(checks, { status: 200 });
   } catch (err) {

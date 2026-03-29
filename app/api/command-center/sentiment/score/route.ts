@@ -138,8 +138,8 @@ async function fetchEngagements(contactId: string): Promise<Engagement[]> {
             properties: item.properties ?? {},
           });
         }
-      } catch {
-        // Engagement fetch is supplementary — swallow per established pattern
+      } catch (err) {
+        console.warn('[sentiment/score] Engagement fetch skipped:', err instanceof Error ? err.message : String(err));
       }
     })
   );

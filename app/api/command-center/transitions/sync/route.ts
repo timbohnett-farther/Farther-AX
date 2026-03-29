@@ -246,8 +246,8 @@ async function loadLastModifiedTimes(): Promise<Map<string, string>> {
       map.set(row.sheet_id, row.drive_modified_time);
     }
     return map;
-  } catch {
-    // Column may not exist yet — return empty map
+  } catch (err) {
+    console.warn('[transitions/sync] Modified time column query failed:', err instanceof Error ? err.message : String(err));
     return new Map();
   }
 }
@@ -261,8 +261,8 @@ async function ensureModifiedTimeColumn(): Promise<void> {
       ALTER TABLE transition_workbooks
       ADD COLUMN IF NOT EXISTS drive_modified_time TIMESTAMPTZ
     `);
-  } catch {
-    // Ignore — column may already exist or table may not exist
+  } catch (err) {
+    console.warn('[transitions/sync] Column migration skipped:', err instanceof Error ? err.message : String(err));
   }
 }
 
@@ -275,8 +275,8 @@ async function updateWorkbookModifiedTime(sheetId: string, modifiedTime: string)
       `UPDATE transition_workbooks SET drive_modified_time = $2 WHERE sheet_id = $1`,
       [sheetId, modifiedTime]
     );
-  } catch {
-    // Non-critical
+  } catch (err) {
+    console.warn('[transitions/sync] Modified time update skipped:', err instanceof Error ? err.message : String(err));
   }
 }
 

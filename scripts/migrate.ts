@@ -42,7 +42,7 @@ async function migrate() {
       CREATE INDEX IF NOT EXISTS idx_team_members_role
         ON team_members(role);
       CREATE INDEX IF NOT EXISTS idx_team_members_active
-        ON team_members(is_active);
+        ON team_members(active);
 
       CREATE TABLE IF NOT EXISTS advisor_assignments (
         id          SERIAL PRIMARY KEY,
@@ -83,36 +83,47 @@ async function migrate() {
       CREATE INDEX IF NOT EXISTS idx_api_cache_expires_at
         ON api_cache(expires_at);
 
-      -- Advisor sentiment scores (computed data cache)
+      -- Advisor sentiment scores (canonical definition — see also migrate-sentiment.ts)
       CREATE TABLE IF NOT EXISTS advisor_sentiment (
-        deal_id         VARCHAR(64) PRIMARY KEY,
-        deal_name       VARCHAR(255),
-        composite_score DECIMAL(5,2) NOT NULL,
-        tier            VARCHAR(32) NOT NULL,
-        activity_score  DECIMAL(5,2),
-        tone_score      DECIMAL(5,2),
-        milestone_score DECIMAL(5,2),
-        recency_score   DECIMAL(5,2),
-        computed_at     TIMESTAMPTZ DEFAULT NOW()
+        id                  SERIAL PRIMARY KEY,
+        deal_id             VARCHAR(64) NOT NULL UNIQUE,
+        deal_name           VARCHAR(255),
+        contact_id          VARCHAR(64),
+        composite_score     NUMERIC(5,2) NOT NULL,
+        tier                VARCHAR(32) NOT NULL,
+        activity_score      NUMERIC(5,2),
+        tone_score          NUMERIC(5,2),
+        milestone_score     NUMERIC(5,2),
+        recency_score       NUMERIC(5,2),
+        deal_stage          VARCHAR(64),
+        engagements_analyzed INTEGER DEFAULT 0,
+        signals             JSONB,
+        scored_at           TIMESTAMPTZ DEFAULT NOW(),
+        updated_at          TIMESTAMPTZ DEFAULT NOW()
       );
 
+      CREATE INDEX IF NOT EXISTS idx_advisor_sentiment_deal_id
+        ON advisor_sentiment(deal_id);
       CREATE INDEX IF NOT EXISTS idx_advisor_sentiment_tier
         ON advisor_sentiment(tier);
-      CREATE INDEX IF NOT EXISTS idx_advisor_sentiment_computed_at
-        ON advisor_sentiment(computed_at);
 
       -- Sentiment history (for tracking changes over time)
       CREATE TABLE IF NOT EXISTS advisor_sentiment_history (
         id              SERIAL PRIMARY KEY,
         deal_id         VARCHAR(64) NOT NULL,
-        composite_score DECIMAL(5,2) NOT NULL,
+        composite_score NUMERIC(5,2) NOT NULL,
         tier            VARCHAR(32) NOT NULL,
+        activity_score  NUMERIC(5,2),
+        tone_score      NUMERIC(5,2),
+        milestone_score NUMERIC(5,2),
+        recency_score   NUMERIC(5,2),
+        signal_summary  JSONB,
         scored_at       TIMESTAMPTZ DEFAULT NOW()
       );
 
-      CREATE INDEX IF NOT EXISTS idx_advisor_sentiment_history_deal_id
+      CREATE INDEX IF NOT EXISTS idx_sentiment_history_deal_id
         ON advisor_sentiment_history(deal_id);
-      CREATE INDEX IF NOT EXISTS idx_advisor_sentiment_history_scored_at
+      CREATE INDEX IF NOT EXISTS idx_sentiment_history_scored_at
         ON advisor_sentiment_history(scored_at);
 
       -- Managed accounts (synced from HubSpot custom object 2-13676628)
