@@ -1,12 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { StatusPill, statusStyle } from './StatusPill';
-
-const C = {
-  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
-  teal: '#4E7082', cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
-};
+import { useTheme } from '@/lib/theme-provider';
+import { getThemeColors } from '@/lib/design-tokens';
 
 interface Account {
   id: number;
@@ -40,6 +37,8 @@ interface AccountsTableProps {
 type SortKey = keyof Account | '';
 
 export function AccountsTable({ accounts, total, page, perPage, onPageChange, showAdvisorColumn }: AccountsTableProps) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   const [sortCol, setSortCol] = useState<SortKey>('');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
@@ -77,7 +76,7 @@ export function AccountsTable({ accounts, total, page, perPage, onPageChange, sh
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
-            <tr style={{ borderBottom: `1px solid ${C.border}`, background: '#2f2f2f' }}>
+            <tr style={{ borderBottom: `1px solid ${C.border}`, background: C.cardBg }}>
               {columns.map(col => (
                 <th
                   key={col.key}

@@ -3,12 +3,16 @@
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { Suspense } from "react";
+import { Suspense, useMemo } from "react";
+import { useTheme } from "@/lib/theme-provider";
+import { getThemeColors } from "@/lib/design-tokens";
 
 function SignInContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/introduction";
   const error = searchParams.get("error");
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === "dark"), [theme]);
 
   const errorMessages: Record<string, string> = {
     AccessDenied: "Access denied. Only @farther.com email addresses are permitted.",
@@ -20,16 +24,13 @@ function SignInContent() {
   const errorMessage = error ? (errorMessages[error] ?? errorMessages.Default) : null;
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-4"
-      style={{ backgroundColor: "transparent" }}
-    >
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-transparent">
       {/* Card */}
       <div
         className="w-full max-w-md rounded-2xl p-10"
         style={{
-          backgroundColor: "#2f2f2f",
-          border: "1px solid rgba(250,247,242,0.08)",
+          backgroundColor: C.cardBg,
+          border: `1px solid ${C.border}`,
           boxShadow: "0 4px 32px rgba(0,0,0,0.3)",
         }}
       >
@@ -46,39 +47,18 @@ function SignInContent() {
         </div>
 
         {/* Heading */}
-        <h1
-          className="text-center mb-2"
-          style={{
-            fontFamily: "'Inter', system-ui, sans-serif",
-            fontSize: "1.35rem",
-            fontWeight: 300,
-            color: "#FAF7F2",
-            lineHeight: 1.45,
-          }}
-        >
+        <h1 className="text-center mb-2 text-[1.35rem] font-light text-[#FAF7F2] leading-[1.45]">
           Advisor Experience &amp; Transition Command Center
         </h1>
-        <p
-          className="text-center mb-8"
-          style={{
-            fontFamily: "'Inter', system-ui, sans-serif",
-            fontSize: "0.9rem",
-            color: "rgba(250,247,242,0.5)",
-          }}
-        >
+        <p className="text-center mb-8 text-sm text-[rgba(250,247,242,0.75)]">
           Sign in with your Farther Google account to continue.
         </p>
 
-        {/* Error message */}
+        {/* Error message — high-contrast light red on dark card */}
         {errorMessage && (
           <div
-            className="mb-6 px-4 py-3 rounded-lg text-sm"
-            style={{
-              backgroundColor: "rgba(220,38,38,0.08)",
-              border: "1px solid rgba(220,38,38,0.2)",
-              color: "#b91c1c",
-              fontFamily: "'Inter', system-ui, sans-serif",
-            }}
+            className="mb-6 px-4 py-3 rounded-lg text-sm text-[#fca5a5] border border-[rgba(220,38,38,0.4)]"
+            style={{ backgroundColor: "rgba(220,38,38,0.15)" }}
           >
             {errorMessage}
           </div>
@@ -87,18 +67,7 @@ function SignInContent() {
         {/* Google Sign-In Button */}
         <button
           onClick={() => signIn("google", { callbackUrl })}
-          className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-lg text-white font-medium transition-all duration-150"
-          style={{
-            backgroundColor: "#1d7682",
-            fontFamily: "'Inter', system-ui, sans-serif",
-            fontSize: "0.95rem",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#155961";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1d7682";
-          }}
+          className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-lg text-white font-medium text-[0.95rem] transition-all duration-150 bg-[#1d7682] hover:bg-[#155961]"
         >
           {/* Google G icon */}
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -111,27 +80,15 @@ function SignInContent() {
         </button>
 
         {/* Restriction note */}
-        <p
-          className="mt-5 text-center text-xs"
-          style={{
-            fontFamily: "'Inter', system-ui, sans-serif",
-            color: "rgba(250,247,242,0.5)",
-          }}
-        >
+        <p className="mt-5 text-center text-xs text-[rgba(250,247,242,0.75)]">
           Access restricted to{" "}
-          <span style={{ color: "#1d7682", fontWeight: 500 }}>@farther.com</span>{" "}
+          <span className="font-medium text-[#5ec4cc]">@farther.com</span>{" "}
           accounts only.
         </p>
       </div>
 
       {/* Footer */}
-      <p
-        className="mt-8 text-xs"
-        style={{
-          fontFamily: "'Inter', system-ui, sans-serif",
-          color: "rgba(250,247,242,0.5)",
-        }}
-      >
+      <p className="mt-8 text-xs text-[rgba(250,247,242,0.75)]">
         Farther Wealth Management · Internal Use Only
       </p>
     </div>

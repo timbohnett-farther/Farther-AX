@@ -210,7 +210,7 @@ function AumAlertRow({ alert }: { alert: AumAlert }) {
         <span className="text-[10px] font-bold block" style={{ color: isCritical ? C.red : C.amber }}>
           {alert.deficit}% behind
         </span>
-        <span className="text-[10px]" style={{ color: C.slate }}>
+        <span className="text-[10px] tabular-nums" style={{ color: C.slate }}>
           {formatCurrency(alert.actual_aum)} / {formatCurrency(alert.expected_aum)}
         </span>
       </div>
@@ -237,18 +237,12 @@ export default function AlertsPage() {
   const [activeTab, setActiveTab] = useState<AlertTab>('all');
 
   if (isLoading) return (
-    <div className="px-10 py-16 space-y-6">
-      <div className="shimmer h-10 w-64 rounded-lg" />
-      <div className="shimmer h-5 w-48 rounded-md" />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mt-8">
-        <div className="shimmer h-24 rounded-xl" />
-        <div className="shimmer h-24 rounded-xl" />
-        <div className="shimmer h-24 rounded-xl" />
-        <div className="shimmer h-24 rounded-xl" />
-        <div className="shimmer h-24 rounded-xl" />
+    <div className="px-10 py-8 space-y-3">
+      <div className="shimmer h-8 w-48 rounded-lg mb-6" />
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        {[1,2,3,4].map(i => <div key={i} className="shimmer h-20 rounded-xl" />)}
       </div>
-      <div className="shimmer h-10 w-96 rounded-lg mt-6" />
-      <div className="shimmer h-96 rounded-xl mt-6" />
+      {[1,2,3,4,5].map(i => <div key={i} className="shimmer h-14 rounded-lg" />)}
     </div>
   );
   if (error) return <div className="px-10 py-16" style={{ color: C.red }}>Failed to load alerts.</div>;

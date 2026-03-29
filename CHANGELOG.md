@@ -6,7 +6,7 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
-## [Queued] RIA Advisor Onboarding Content & Advisor Task Hub — 2026-03-26
+## [Queued] RIA Advisor Onboarding Content & Advisor Task Hub — 2026-03-29
 
 **What**: Added Task #12 to TODO.md — comprehensive update based on new RIA Advisor Onboarding & Client Transition documentation covering Pre-Signing through First 90 Days.
 
@@ -47,6 +47,78 @@ Format: Each entry includes completion status, feature name, date, scope, status
 - `scripts/migrate.ts` — quiz_attempts table
 - `app/knowledge-check/page.tsx` — Training dashboard
 - 9 playbook pages — QuizSection integration
+
+---
+
+## [Completed] Fix Light Mode Brand — Cream/Brown Dominant, No Gold Text — 2026-03-26
+
+**What**: Fixed light mode so it correctly shows cream backgrounds + brown accents as dominant.
+Removed all bright gold (#fbbf24) text from light mode. Brown (`#7A5042` / `#9B766A`) replaces gold everywhere text is used.
+
+**Root Cause**:
+- `getThemeColors()` in light mode had `cardBg: '#466F81'` (teal) instead of warm beige — making all cards and borders teal in light mode
+- `text-gold` class hardcoded to `#fbbf24` (yellow) with no light/dark awareness — showing bright gold on cream backgrounds
+
+**Fixes**:
+- `lib/design-tokens.ts`: Fixed `getThemeColors()` light mode values — `cardBg` → `#E1D2C5` (warm beige), borders → terracotta rgba, table headers → `#9B766A`, hover → terracotta tint
+- `app/globals.css`: Added light mode CSS overrides — `text-gold` → `#7A5042` (deep brown, 7:1 contrast), `text-gold-dark` → `#9B766A`, gold backgrounds/borders → terracotta equivalents
+- `app/globals.css`: Added `--color-brown-deep`, `--color-brown-mid`, `--color-brown-light` CSS variables in light mode block
+
+**Result**: Light mode now shows cream page background + warm beige cards + terracotta/brown borders + dark brown accent text. No gold. Dark mode unchanged.
+
+**Files**:
+- `lib/design-tokens.ts`
+- `app/globals.css`
+
+---
+
+## [Completed] Fix Onboarding Complexity Score Graph (Task #8) — 2026-03-26
+
+**What**: Workload API was always returning 0 complexity scores for all assigned deals, causing the capacity progress bars on the Onboarding page to show 0/250 for every AXM.
+
+**Root Cause**: `app/api/command-center/workload/route.ts` made a self-referential internal HTTP call (`fetch(`http://${host}/api/command-center/complexity/batch`, ...)`) wrapped in a silent `try-catch`. In Railway production, internal loopback HTTP doesn't resolve, so the call always failed and all scores defaulted to 0.
+
+**Fix**: Replaced the two-step approach (HubSpot for names + internal HTTP for scores) with a single HubSpot batch fetch that retrieves all 20 deal properties needed for scoring, then calls `computeComplexityScore` from `@/lib/complexity-score` directly.
+
+**Impact**: Capacity graphs on the Onboarding page now show real complexity totals per AXM instead of always showing 0.
+
+**Files**:
+- `app/api/command-center/workload/route.ts` — eliminated self-referential HTTP call, added direct scoring
+
+---
+
+## [Completed] Readability & Contrast Audit + Fixes — 2026-03-26
+
+**What**: Comprehensive WCAG contrast audit of all pages and components. Fixed 13 contrast/readability violations.
+
+**Critical Fixes**:
+- Table odd rows: changed #93B6C4 (1.97:1 ❌) → #374E59 light / #D8D4D0 dark (8:1 / 4.86:1 ✅)
+- Sidebar user email dark mode: `dark:text-slate` (1.03:1 ❌) → `dark:text-white/70` (4.15:1 ✅)
+- Auth error text: `#b91c1c` on dark red bg (1.99:1 ❌) → `#fca5a5` light red on richer bg (5:1 ✅)
+- PageLayout subtitle/step: `text-slate` on charcoal header (1.5:1 ❌) → `text-white/70` ✅
+
+**Other Fixes**:
+- Sidebar inactive nav: `dark:text-white/50` (2.62:1) → `dark:text-white/70` (4.15:1) ✅
+- Sidebar external links: `dark:text-white/40` (2.22:1) → `dark:text-white/65` ✅
+- Auth subtitle/footer opacity: 0.5 (4.41:1) → 0.75 (6.33:1) ✅
+- Font sizes: all `text-[10px]` → `text-xs`; all `text-[13px]` → `text-sm`
+- PageLayout step dots: removed hardcoded `#1d7682` hex → Tailwind `bg-teal`
+- Auth hover states: removed JS-based `onMouseEnter` color swaps → Tailwind `hover:bg-[...]`
+- ThemeToggle: raised text visibility in dark mode
+
+**New Token Definitions** (tailwind.config.ts):
+- `cream-dark: #E8E2D8` — borders, dividers
+- `cream-muted: #C8C0B8` — secondary labels on dark
+- `cream-border: rgba(255,254,244,0.15)` — subtle borders
+
+**Files**:
+- `app/globals.css` (table row colors)
+- `components/Sidebar.tsx` (contrast, font sizes, undefined classes)
+- `components/ThemeToggle.tsx` (font size, contrast)
+- `components/PageLayout.tsx` (subtitle, step number, back button, step dots)
+- `app/auth/signin/page.tsx` (inline style cleanup, error text)
+- `tailwind.config.ts` (cream color variants)
+- `docs/READABILITY-ASSESSMENT.md` (new — full audit report)
 
 ---
 

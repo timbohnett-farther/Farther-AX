@@ -146,7 +146,7 @@ function SummaryCard({ label, value, sub, accent, icon, iconColor, onClick }: { 
         <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: iconColor || (accent ? C.white : C.slate) }}>{icon}</span>
       )}
       <p style={{ fontSize: 11, color: accent ? 'rgba(255,255,255,0.7)' : C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{label}</p>
-      <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>{value}</p>
+      <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums' }}>{value}</p>
       {sub && <p style={{ fontSize: 12, color: accent ? 'rgba(255,255,255,0.6)' : C.slate, marginTop: 4 }}>{sub}</p>}
     </div>
   );
@@ -639,7 +639,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           <span style={{ fontSize: 12, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
           <span style={{ fontSize: 11, color: C.slate }}>{count} launched</span>
         </div>
-        <div style={{ fontSize: 24, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 2 }}>
+        <div style={{ fontSize: 24, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 2, fontVariantNumeric: 'tabular-nums' }}>
           {formatAUM(aum)}
         </div>
         <div style={{ fontSize: 11, color: C.slate, marginBottom: 10 }}>
@@ -1299,15 +1299,12 @@ function RecruitingTab() {
   }, [aiMessages]);
 
   if (isLoading) return (
-    <div className="py-16 space-y-6">
-      <div className="shimmer h-10 w-64 rounded-lg" />
-      <div className="shimmer h-5 w-48 rounded-md" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <div className="shimmer h-32 rounded-xl" />
-        <div className="shimmer h-32 rounded-xl" />
-        <div className="shimmer h-32 rounded-xl" />
+    <div className="px-10 py-8 space-y-3">
+      <div className="shimmer h-8 w-48 rounded-lg mb-6" />
+      <div className="grid grid-cols-5 gap-4 mb-6">
+        {[1,2,3,4,5].map(i => <div key={i} className="shimmer h-20 rounded-xl" />)}
       </div>
-      <div className="shimmer h-96 rounded-xl mt-6" />
+      {[1,2,3,4,5,6].map(i => <div key={i} className="shimmer h-16 rounded-lg" />)}
     </div>
   );
   if (error || data?.error) return <div style={{ padding: '60px 0', color: C.red }}>Failed to load pipeline data.</div>;
@@ -2053,18 +2050,7 @@ function AcquisitionsTab() {
   const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   const { data, error, isLoading } = useSWR('/api/command-center/acquisitions', fetcher, SWR_OPTS);
 
-  if (isLoading) return (
-    <div className="py-16 space-y-6">
-      <div className="shimmer h-10 w-64 rounded-lg" />
-      <div className="shimmer h-5 w-48 rounded-md" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <div className="shimmer h-32 rounded-xl" />
-        <div className="shimmer h-32 rounded-xl" />
-        <div className="shimmer h-32 rounded-xl" />
-      </div>
-      <div className="shimmer h-96 rounded-xl mt-6" />
-    </div>
-  );
+  if (isLoading) return <div style={{ padding: '60px 0', color: C.slate }}>Loading acquisitions…</div>;
   if (error || data?.error) return <div style={{ padding: '60px 0', color: C.red }}>Failed to load acquisitions data.</div>;
 
   const deals: AcquisitionsDeal[] = data?.deals ?? [];

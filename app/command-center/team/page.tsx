@@ -323,15 +323,12 @@ export default function TeamPage() {
   };
 
   if (isLoading) return (
-    <div className="px-10 py-16 space-y-6">
-      <div className="shimmer h-10 w-64 rounded-lg" />
-      <div className="shimmer h-5 w-48 rounded-md" />
-      <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-2.5 mt-8">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="shimmer h-20 rounded-lg" />
-        ))}
+    <div className="px-10 py-8 space-y-3">
+      <div className="shimmer h-8 w-48 rounded-lg mb-6" />
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        {[1,2,3].map(i => <div key={i} className="shimmer h-28 rounded-xl" />)}
       </div>
-      <div className="shimmer h-96 rounded-xl mt-6" />
+      {[1,2,3,4,5].map(i => <div key={i} className="shimmer h-16 rounded-lg" />)}
     </div>
   );
   if (error) return <div className="px-10 py-16" style={{ color: C.red }}>Failed to load team data.</div>;
@@ -396,7 +393,7 @@ export default function TeamPage() {
                 if (!isActive) e.currentTarget.style.backgroundColor = C.cardBg;
               }}
             >
-              <div className="text-2xl font-bold font-serif" style={{ color: style.hex }}>
+              <div className="text-2xl font-bold font-serif tabular-nums" style={{ color: style.hex }}>
                 {roleCounts[role]}
               </div>
               <div className="text-[11px] font-semibold mt-0.5" style={{ color: isActive ? style.hex : C.slate }}>

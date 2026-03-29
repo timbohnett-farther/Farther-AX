@@ -1,16 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import { SearchSelect } from './SearchSelect';
+import { useTheme } from '@/lib/theme-provider';
+import { getThemeColors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
-
-const C = {
-  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
-  teal: '#4E7082', cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
-  white: '#1a1a1a',
-};
 
 interface Filters {
   advisor: string;
@@ -27,6 +23,9 @@ interface FilterPanelProps {
 }
 
 export function FilterPanel({ filters, onChange, onReset }: FilterPanelProps) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+
   const { data: advisorData } = useSWR('/api/command-center/transitions/filters/advisors', fetcher, {
     revalidateOnFocus: false,
   });

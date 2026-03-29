@@ -51,21 +51,15 @@ export default function MetricsDashboard() {
 
   if (isLoading) {
     return (
-      <div className="px-10 py-16 space-y-6">
-        <div className="shimmer h-10 w-64 rounded-lg" />
-        <div className="shimmer h-5 w-48 rounded-md" />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
-          <div className="shimmer h-28 rounded-xl" />
-          <div className="shimmer h-28 rounded-xl" />
-          <div className="shimmer h-28 rounded-xl" />
-          <div className="shimmer h-28 rounded-xl" />
+      <div className="px-10 py-8 space-y-4">
+        <div className="shimmer h-8 w-48 rounded-lg mb-6" />
+        <div className="grid grid-cols-4 gap-4 mb-4">
+          {[1,2,3,4].map(i => <div key={i} className="shimmer h-24 rounded-xl" />)}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-          <div className="shimmer h-28 rounded-xl" />
-          <div className="shimmer h-28 rounded-xl" />
-          <div className="shimmer h-28 rounded-xl" />
+        <div className="grid grid-cols-4 gap-4 mb-4">
+          {[1,2,3,4].map(i => <div key={i} className="shimmer h-24 rounded-xl" />)}
         </div>
-        <div className="shimmer h-64 rounded-xl mt-6" />
+        {[1,2,3].map(i => <div key={i} className="shimmer h-16 rounded-lg" />)}
       </div>
     );
   }
@@ -406,7 +400,7 @@ export default function MetricsDashboard() {
                         <dt className="text-sm text-slate mb-1 capitalize">
                           {key.replace(/([A-Z])/g, ' $1').trim()}
                         </dt>
-                        <dd className="text-xl font-semibold text-cream">
+                        <dd className="text-xl font-semibold text-cream tabular-nums">
                           {typeof value === 'number' && key.toLowerCase().includes('aum')
                             ? formatAUM(value)
                             : typeof value === 'number' && key.toLowerCase().includes('revenue')

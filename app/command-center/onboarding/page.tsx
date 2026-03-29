@@ -216,7 +216,7 @@ function WorkloadDashboard() {
               >
                 <div>
                   <p className="text-sm font-bold mb-0.5" style={{ color: C.cream }}>{w.member_name}</p>
-                  <p className="text-xs" style={{ color: C.slate }}>
+                  <p className="text-xs tabular-nums" style={{ color: C.slate }}>
                     {w.active_deals} advisor{w.active_deals !== 1 ? 's' : ''} · {w.total_complexity} pts
                   </p>
                 </div>

@@ -625,7 +625,14 @@ function TransitionsPageInner() {
           <FilterPanel filters={filters} onChange={handleFilterChange} onReset={handleFilterReset} />
 
           {/* Loading */}
-          {isLoading && !data && <div style={{ padding: 40, color: C.slate, textAlign: 'center' }}>Loading transition data...</div>}
+          {isLoading && !data && (
+            <div className="py-4 space-y-3">
+              <div className="grid grid-cols-4 gap-4 mb-4">
+                {[1,2,3,4].map(i => <div key={i} className="shimmer h-20 rounded-xl" />)}
+              </div>
+              {[1,2,3,4,5].map(i => <div key={i} className="shimmer h-12 rounded-lg" />)}
+            </div>
+          )}
           {error && <div style={{ padding: 40, color: C.red, textAlign: 'center' }}>Failed to load data.</div>}
 
           {/* Accounts Table */}

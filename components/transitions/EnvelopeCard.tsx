@@ -1,13 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useTheme } from '@/lib/theme-provider';
+import { getThemeColors } from '@/lib/design-tokens';
 import { StatusPill } from './StatusPill';
-
-const C = {
-  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
-  teal: '#4E7082', border: 'rgba(212,223,229,0.08)',
-  green: '#4ade80', amber: '#fbbf24',
-};
 
 interface DocuSignSigner {
   name: string;
@@ -33,6 +29,8 @@ function fmtDate(d?: string) {
 }
 
 export function EnvelopeCard({ envelope }: { envelope: DocuSignEnvelope }) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
   const [expanded, setExpanded] = useState(false);
   return (
     <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: 8, border: `1px solid ${C.border}`, marginBottom: 8, overflow: 'hidden' }}>

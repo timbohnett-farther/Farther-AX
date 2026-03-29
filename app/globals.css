@@ -33,10 +33,10 @@
   --color-accent-3: #E1D2C5;      /* Beige/cream */
 
   /* ── Surface Colors (Backgrounds) ───────────────────────────────────── */
-  --color-surface: #111111;              /* Main background */
-  --color-surface-muted: #1a1a1a;        /* Secondary background */
-  --color-surface-subtle: #222222;       /* Tertiary background */
-  --color-surface-elevated: rgba(23, 31, 39, 0.80);  /* Cards/modals */
+  --color-surface: #4E7082;              /* Main background */
+  --color-surface-muted: #3D5A6A;        /* Secondary background */
+  --color-surface-subtle: #456878;       /* Tertiary background */
+  --color-surface-elevated: rgba(78, 112, 130, 0.80);  /* Cards/modals */
   --color-surface-inverse: #FFFEF4;      /* Cream for inverted elements */
 
   /* ── Text Colors (Cream-based) ──────────────────────────────────────── */
@@ -195,41 +195,46 @@
   :root:not(.dark) {
     /* ── Surface Colors (Light Mode) ──────────────────────────────────── */
     --color-surface: #F8F4F0;           /* Warm cream background */
-    --color-surface-muted: #F8F4F0;     /* Same as surface */
-    --color-surface-subtle: #F8F4F0;    /* Same as surface */
-    --color-surface-elevated: #466F81;  /* Teal blue for cards */
-    --color-surface-inverse: #1a1a1a;   /* Dark for inverted elements */
+    --color-surface-muted: #F8F4F0;
+    --color-surface-subtle: #F8F4F0;
+    --color-surface-elevated: #E1D2C5;  /* Beige/brown for cards — cream dominant */
+    --color-surface-inverse: #1a1a1a;
 
     /* ── Text Colors (Light Mode) ─────────────────────────────────────── */
-    --color-text-primary: #595959;      /* Medium grey - general text */
-    --color-text-secondary: #595959;    /* Same grey */
-    --color-text-muted: #595959;        /* Same grey */
-    --color-text-subtle: #595959;       /* Same grey */
-    --color-text-inverse: #F8F4F0;      /* Cream for cards/dark backgrounds */
+    --color-text-primary: #595959;      /* Charcoal — page body text */
+    --color-text-secondary: #595959;
+    --color-text-muted: #595959;
+    --color-text-subtle: rgba(89, 89, 89, 0.6);
+    --color-text-inverse: #595959;      /* Charcoal on card surfaces (cards are now light) */
 
-    /* ── Border Colors (Light Mode) ───────────────────────────────────── */
-    --color-border: #466F81;
-    --color-border-subtle: #93B6C4;
-    --color-border-strong: #466F81;
+    /* ── Border Colors (Light Mode — subtle brown, not dominant teal) ─── */
+    --color-border: rgba(155, 118, 106, 0.25);        /* Subtle terracotta */
+    --color-border-subtle: rgba(155, 118, 106, 0.12);
+    --color-border-strong: rgba(155, 118, 106, 0.4);
 
     /* ── Tremor (Light Mode) ──────────────────────────────────────────── */
     --color-tremor-background-muted: #F8F4F0;
     --color-tremor-background-subtle: #F8F4F0;
-    --color-tremor-background: #466F81;     /* Cards use teal */
-    --color-tremor-background-emphasis: #F8F4F0;
+    --color-tremor-background: #E1D2C5;     /* Cards use beige */
+    --color-tremor-background-emphasis: #595959;
 
-    --color-tremor-content-subtle: #F8F4F0;
-    --color-tremor-content: #F8F4F0;
-    --color-tremor-content-emphasis: #F8F4F0;
-    --color-tremor-content-strong: #F8F4F0;
-    --color-tremor-content-inverted: #595959;
+    --color-tremor-content-subtle: rgba(89, 89, 89, 0.6);
+    --color-tremor-content: #595959;
+    --color-tremor-content-emphasis: #595959;
+    --color-tremor-content-strong: #595959;
+    --color-tremor-content-inverted: #F8F4F0;
 
-    --color-tremor-border: #466F81;
+    --color-tremor-border: rgba(155, 118, 106, 0.25);
 
-    /* ── Shadows (Light Mode) ─────────────────────────────────────────── */
-    --shadow-glass: 0 1px 3px rgba(70, 111, 129, 0.15);
-    --shadow-glass-hover: 0 4px 6px rgba(70, 111, 129, 0.2);
-    --shadow-glass-sm: 0 2px 4px rgba(70, 111, 129, 0.1);
+    /* ── Shadows (Light Mode — warm brown tones) ──────────────────────── */
+    --shadow-glass: 0 1px 3px rgba(155, 118, 106, 0.15);
+    --shadow-glass-hover: 0 4px 6px rgba(155, 118, 106, 0.2);
+    --shadow-glass-sm: 0 2px 4px rgba(155, 118, 106, 0.1);
+
+    /* ── Brown accent colors (dominant in light mode) ─────────────────── */
+    --color-brown-deep: #7A5042;       /* Headings, strong emphasis */
+    --color-brown-mid: #9B766A;        /* Labels, secondary accents */
+    --color-brown-light: #E1D2C5;      /* Card backgrounds, subtle fills */
   }
 }
 
@@ -240,9 +245,9 @@
 
 html.dark {
   /* Reaffirm dark mode tokens - REVERSED */
-  --color-surface: #466F81;              /* Teal background (was cream in light) */
-  --color-surface-muted: #466F81;
-  --color-surface-subtle: #466F81;
+  --color-surface: #4E7082;              /* Teal background (was cream in light) */
+  --color-surface-muted: #4E7082;
+  --color-surface-subtle: #4E7082;
   --color-surface-elevated: #F8F4F0;     /* Cream cards (was teal in light) */
   --color-text-primary: #F8F4F0;         /* Cream text (was grey in light) */
   --color-text-secondary: #F8F4F0;
@@ -269,7 +274,7 @@ html {
 
 /* Dark mode background - REVERSED (teal instead of cream) */
 html.dark body {
-  background-color: #466F81;
+  background-color: #4E7082;
   font-family: var(--font-sans);
   color: #F8F4F0;
 }
@@ -314,11 +319,11 @@ html:not(.dark) .glass-card {
   background: var(--color-surface-elevated);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-glass);
-  color: #F8F4F0;
+  color: #595959;
 }
 
 html:not(.dark) .glass-card * {
-  color: #F8F4F0;
+  color: #595959;
 }
 
 .glass-card:hover {
@@ -341,11 +346,11 @@ html:not(.dark) .stat-card {
   background: var(--color-surface-elevated);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-glass-sm);
-  color: #F8F4F0;
+  color: #595959;
 }
 
 html:not(.dark) .stat-card * {
-  color: #F8F4F0;
+  color: #595959;
 }
 
 .stat-card:hover {
@@ -366,11 +371,11 @@ html:not(.dark) .stat-card * {
 html:not(.dark) .chart-card {
   background: var(--color-surface-elevated);
   border: 1px solid var(--color-border);
-  color: #F8F4F0;
+  color: #595959;
 }
 
 html:not(.dark) .chart-card * {
-  color: #F8F4F0;
+  color: #595959;
 }
 
 /* ── Card Text Colors (Dark Mode - REVERSED) ───────────────────────────── */
@@ -500,31 +505,33 @@ html.dark .chart-card * {
   transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Table Alternating Rows (Light Mode) ──────────────────────────────── */
+/* ── Table Alternating Rows (Light Mode — cream/brown dominant) ───────── */
+/* Even: #F8F4F0 + charcoal → 6.40:1 ✅  |  Odd: #E1D2C5 + charcoal → 4.75:1 ✅ */
 html:not(.dark) table tbody tr:nth-child(even) {
-  background-color: #466F81 !important;
+  background-color: #F8F4F0 !important;  /* Cream */
 }
 
 html:not(.dark) table tbody tr:nth-child(odd) {
-  background-color: #93B6C4 !important;
+  background-color: #E1D2C5 !important;  /* Beige/brown — 4.75:1 with #595959 ✅ */
 }
 
 html:not(.dark) table tbody tr td {
-  color: #F8F4F0 !important;
+  color: #595959 !important;             /* Charcoal text */
 }
 
 html:not(.dark) table thead th {
-  background-color: #466F81 !important;
-  color: #F8F4F0 !important;
+  background-color: #9B766A !important;  /* Terracotta brown header */
+  color: #F8F4F0 !important;             /* Cream text on brown — 3.71:1 (large/bold) */
 }
 
 /* ── Table Alternating Rows (Dark Mode - REVERSED) ────────────────────── */
+/* Even: #F8F4F0 + grey → 6.40:1 ✅  |  Odd: #D8D4D0 + grey → 4.86:1 ✅ */
 html.dark table tbody tr:nth-child(even) {
   background-color: #F8F4F0 !important;
 }
 
 html.dark table tbody tr:nth-child(odd) {
-  background-color: #93B6C4 !important;
+  background-color: #D8D4D0 !important;
 }
 
 html.dark table tbody tr td {
@@ -536,14 +543,14 @@ html.dark table thead th {
   color: #595959 !important;
 }
 
-/* ── Chart Axis Styling (Light Mode) ──────────────────────────────────── */
+/* ── Chart Axis Styling (Light Mode — charcoal on cream) ──────────────── */
 html:not(.dark) .recharts-cartesian-axis-tick-value,
 html:not(.dark) .recharts-label {
-  fill: #F8F4F0 !important;
+  fill: #595959 !important;
 }
 
 html:not(.dark) .recharts-text {
-  fill: #F8F4F0 !important;
+  fill: #595959 !important;
 }
 
 /* ── Chart Axis Styling (Dark Mode - REVERSED) ────────────────────────── */
@@ -554,6 +561,22 @@ html.dark .recharts-label {
 
 html.dark .recharts-text {
   fill: #595959 !important;
+}
+
+/* ── Light Mode: Gold → Deep Brown Override ────────────────────────────── */
+/* Gold (#fbbf24) must never appear as visible text in light mode.
+   Deep brown (#7A5042) on cream (#F8F4F0) = ~7:1 contrast ratio ✅        */
+html:not(.dark) .text-gold {
+  color: #7A5042 !important;
+}
+html:not(.dark) .text-gold-dark {
+  color: #9B766A !important;
+}
+html:not(.dark) [class*="bg-gold"] {
+  background-color: rgba(155, 118, 106, 0.12) !important;
+}
+html:not(.dark) [class*="border-gold"] {
+  border-color: rgba(155, 118, 106, 0.25) !important;
 }
 
 /* ── Scrollbar Styling ─────────────────────────────────────────────────── */

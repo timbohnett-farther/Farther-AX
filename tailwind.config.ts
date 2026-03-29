@@ -147,6 +147,12 @@ const config: Config = {
           900: '#1a2830',
           DEFAULT: '#4E7082',
         },
+        cream: {
+          DEFAULT: '#FFFEF4',
+          dark: '#E8E2D8',       // slightly darkened cream — borders, section dividers
+          muted: '#C8C0B8',      // muted cream — secondary labels on dark backgrounds
+          border: 'rgba(255,254,244,0.15)',  // cream at 15% — subtle borders
+        },
         ice: {
           50: '#f0f6fc',
           100: '#dce9f7',
@@ -155,23 +161,12 @@ const config: Config = {
           400: '#6a9ed9',
           DEFAULT: '#D4DFE5',
         },
-        cream: {
-          50: '#FFFEF9',
-          100: '#FFFDF4',
-          200: '#FFFCEE',
-          300: '#FFF9E3',
-          400: '#FAF7F2',
-          500: '#F5F0E8',
-          600: '#E8E0D4',
-          700: '#D4CABB',
-          800: '#B8AE9F',
-          900: '#8C8476',
-          DEFAULT: '#FAF7F2',
-          dark: '#FFFEF4',
-          muted: 'rgba(250, 247, 242, 0.6)',
-        },
         slate: {
           DEFAULT: '#5b6a71',
+        },
+        gold: {
+          DEFAULT: '#fbbf24',
+          dark: '#f59e0b',
         },
 
         // ── Tremor Integration ─────────────────────────────────────────

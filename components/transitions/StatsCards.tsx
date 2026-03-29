@@ -1,20 +1,21 @@
 'use client';
 
 import useSWR from 'swr';
+import { useMemo } from 'react';
+import { useTheme } from '@/lib/theme-provider';
+import { getThemeColors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
-
-const C = {
-  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
-  teal: '#4E7082', green: '#4ade80', amber: '#fbbf24', red: '#f87171', blue: '#60a5fa',
-  cardBg: '#171f27', border: 'rgba(212,223,229,0.08)',
-};
 
 interface StatsCardsProps {
   filterParams: string;
 }
 
 export function StatsCards({ filterParams }: StatsCardsProps) {
+  const { theme } = useTheme();
+  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const blue = '#60a5fa';
+
   const { data } = useSWR(`/api/command-center/transitions/stats?${filterParams}`, fetcher, {
     keepPreviousData: true,
     revalidateOnFocus: false,
@@ -23,7 +24,7 @@ export function StatsCards({ filterParams }: StatsCardsProps) {
   const cards = [
     { label: 'Total Advisors', value: data?.total_advisors ?? '--', color: C.teal },
     { label: 'Total Accounts', value: data?.total_accounts ?? '--', color: C.dark },
-    { label: 'Households', value: data?.total_households ?? '--', color: C.blue },
+    { label: 'Households', value: data?.total_households ?? '--', color: blue },
     { label: 'IAA Signed', value: data?.iaa_signed ?? '--', color: C.green },
     { label: 'Paperwork Signed', value: data?.paperwork_signed ?? '--', color: C.green },
     { label: 'Portal Complete', value: data?.portal_complete ?? '--', color: C.teal },
