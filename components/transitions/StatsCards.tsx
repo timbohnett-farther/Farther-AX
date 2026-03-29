@@ -14,7 +14,7 @@ interface StatsCardsProps {
 export function StatsCards({ filterParams }: StatsCardsProps) {
   const { theme } = useTheme();
   const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
-  const blue = '#60a5fa';
+  const blue = '#7CA4B4';
 
   const { data } = useSWR(`/api/command-center/transitions/stats?${filterParams}`, fetcher, {
     keepPreviousData: true,

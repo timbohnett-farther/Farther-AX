@@ -27,7 +27,7 @@ export function ChangeLogPanel() {
     new_household: { color: C.green, bg: C.greenBg, icon: '+' },
     removed_household: { color: C.red, bg: C.redBg, icon: '-' },
     status_change: { color: C.amber, bg: C.amberBg, icon: '\u2192' },
-    new_envelope: { color: '#60a5fa', bg: 'rgba(96,165,250,0.15)', icon: '\u2709' },
+    new_envelope: { color: '#7CA4B4', bg: 'rgba(124,164,180,0.15)', icon: '\u2709' },
     completed_envelope: { color: C.green, bg: C.greenBg, icon: '\u2713' },
   };
 

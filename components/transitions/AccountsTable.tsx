@@ -101,7 +101,7 @@ export function AccountsTable({ accounts, total, page, perPage, onPageChange, sh
                   background: i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)',
                   transition: 'background 120ms ease',
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(59,90,105,0.06)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? C.cardBg : 'rgba(250,247,242,0.03)'; }}
               >
                 {showAdvisorColumn && <td style={{ padding: '10px 10px', color: C.teal, fontWeight: 600 }}>{acc.advisor_name || '--'}</td>}

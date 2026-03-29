@@ -2,12 +2,12 @@
 
 // Status colors are static and theme-independent (status meaning is consistent across themes)
 const C = {
-  dark: '#FFFEF4', slate: 'rgba(212,223,229,0.5)',
+  dark: '#F8F4F0', slate: 'rgba(227,211,197,0.5)',
   green: '#4ade80', greenBg: 'rgba(74,222,128,0.2)', greenBorder: 'rgba(74,222,128,0.35)',
   amber: '#fbbf24', amberBg: 'rgba(251,191,36,0.2)', amberBorder: 'rgba(251,191,36,0.35)',
   red: '#f87171', redBg: 'rgba(248,113,113,0.2)', redBorder: 'rgba(248,113,113,0.35)',
-  blue: '#60a5fa', blueBg: 'rgba(96,165,250,0.2)', blueBorder: 'rgba(96,165,250,0.35)',
-  teal: '#4E7082', tealBg: 'rgba(78,112,130,0.2)', tealBorder: 'rgba(78,112,130,0.35)',
+  blue: '#7CA4B4', blueBg: 'rgba(124,164,180,0.2)', blueBorder: 'rgba(124,164,180,0.35)',
+  teal: '#3B5A69', tealBg: 'rgba(59,90,105,0.2)', tealBorder: 'rgba(59,90,105,0.35)',
 };
 
 export function statusStyle(status: string | null): React.CSSProperties {

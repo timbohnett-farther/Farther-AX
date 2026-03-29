@@ -89,7 +89,7 @@ export function ExecutiveSummary({ onAdvisorClick }: ExecutiveSummaryProps) {
                 key={adv.advisor_name}
                 className={`border-b border-border transition-colors duration-[120ms] ${onAdvisorClick ? 'cursor-pointer' : ''}`}
                 onClick={() => onAdvisorClick?.(adv.advisor_name)}
-                onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = 'rgba(78,112,130,0.06)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = 'rgba(59,90,105,0.06)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = ''; }}
               >
                 <td className="px-3.5 py-3 font-semibold text-teal">{adv.advisor_name}</td>
