@@ -8,10 +8,17 @@ export default function IntroductionPage() {
   const { THEME } = useTheme();
 
   return (
-    <div className="min-h-screen" style={{ color: THEME.colors.text }}>
+    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg, color: THEME.colors.text }}>
       {/* Step Indicator */}
       <div className="fixed top-6 right-8 z-50">
-        <span className="font-sans text-xs tracking-[0.2em] uppercase px-4 py-2 rounded-full" style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, color: THEME.colors.textSecondary }}>
+        <span
+          className="font-sans text-xs tracking-[0.2em] uppercase px-4 py-2 rounded-full"
+          style={{
+            backgroundColor: THEME.colors.surface,
+            border: `1px solid ${THEME.colors.border}`,
+            color: THEME.colors.textSecondary
+          }}
+        >
           01 / 13
         </span>
       </div>
@@ -21,14 +28,14 @@ export default function IntroductionPage() {
         {/* Page Header */}
         <header className="mb-20">
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-px flex-1 bg-gold opacity-30" />
-            <span className="font-sans text-xs tracking-[0.25em] uppercase text-gold">
+            <div className="h-px flex-1" style={{ backgroundColor: THEME.colors.gold, opacity: 0.3 }} />
+            <span className="font-sans text-xs tracking-[0.25em] uppercase" style={{ color: THEME.colors.gold }}>
               Farther Advisor Experience
             </span>
-            <div className="h-px flex-1 bg-gold opacity-30" />
+            <div className="h-px flex-1" style={{ backgroundColor: THEME.colors.gold, opacity: 0.3 }} />
           </div>
           <h1 className="font-serif text-4xl lg:text-5xl leading-tight mb-5 tracking-tight text-center" style={{ color: THEME.colors.text }}>
-            Welcome to the <span className="text-gold">AX Playbook</span>
+            Welcome to the <span style={{ color: THEME.colors.gold }}>AX Playbook</span>
           </h1>
           <p className="font-sans text-base tracking-wide text-center" style={{ color: THEME.colors.textSecondary }}>
             Advisor Experience Onboarding &amp; Transition Reference
@@ -37,11 +44,11 @@ export default function IntroductionPage() {
 
         {/* Overview */}
         <section className="mb-20">
-          <div className="rounded-2xl px-10 py-10" style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
+          <div className="rounded-2xl px-10 py-10" style={{ backgroundColor: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
             <p className="font-sans text-base leading-8" style={{ color: THEME.colors.text }}>
               This playbook is the definitive reference for Farther&rsquo;s Advisor Experience (AX) team. It
-              guides <strong className="font-semibold" style={{ color: THEME.colors.text }}>AX Managers (AXMs)</strong> and{" "}
-              <strong className="font-semibold" style={{ color: THEME.colors.text }}>AX Associates (AXAs)</strong> through every step of
+              guides <strong className="font-semibold">AX Managers (AXMs)</strong> and{" "}
+              <strong className="font-semibold">AX Associates (AXAs)</strong> through every step of
               bringing a new advisor onto the Farther platform — from the moment a deal is signed through the
               advisor&rsquo;s graduation to full independence. Whether you&rsquo;re onboarding a breakaway advisor
               leaving a wirehouse, integrating an Independent RIA, or working through a complex M&amp;A situation,
@@ -55,7 +62,7 @@ export default function IntroductionPage() {
           <div className="mb-10">
             <h2 className="font-serif text-3xl mb-2" style={{ color: THEME.colors.text }}>
               The Four Advisor{" "}
-              <span className="text-gold">Onboarding Paths</span>
+              <span style={{ color: THEME.colors.gold }}>Onboarding Paths</span>
             </h2>
             <p className="font-sans text-sm" style={{ color: THEME.colors.textSecondary }}>
               Every advisor follows one of four distinct paths based on their background and book of business.
@@ -65,10 +72,26 @@ export default function IntroductionPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
             {/* Card 1: Breakaway */}
-            <div className="rounded-2xl p-8 group hover:shadow-[0_0_24px_rgba(29,118,130,0.2)] transition-all duration-300" style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
+            <div
+              className="rounded-2xl p-8 group transition-all duration-300"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`,
+                boxShadow: '0 0 0 rgba(29,118,130,0)'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(29,118,130,0.2)'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 rgba(29,118,130,0)'}
+            >
               <div className="flex items-start justify-between mb-6">
-                <span className="font-serif text-5xl text-gold opacity-25 leading-none select-none">01</span>
-                <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-3 py-1 rounded-full shadow-[0_0_8px_rgba(29,118,130,0.15)]">
+                <span className="font-serif text-5xl leading-none select-none" style={{ color: THEME.colors.gold, opacity: 0.25 }}>01</span>
+                <span
+                  className="font-sans text-[10px] tracking-[0.2em] uppercase px-3 py-1 rounded-full"
+                  style={{
+                    backgroundColor: 'rgba(182, 138, 76, 0.1)',
+                    color: THEME.colors.gold,
+                    border: `1px solid rgba(182, 138, 76, 0.2)`
+                  }}
+                >
                   High Compliance
                 </span>
               </div>
@@ -84,10 +107,26 @@ export default function IntroductionPage() {
             </div>
 
             {/* Card 2: Independent RIA */}
-            <div className="rounded-2xl p-8 group hover:shadow-[0_0_24px_rgba(16,185,129,0.15)] transition-all duration-300" style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
+            <div
+              className="rounded-2xl p-8 group transition-all duration-300"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`,
+                boxShadow: '0 0 0 rgba(16,185,129,0)'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(16,185,129,0.15)'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 rgba(16,185,129,0)'}
+            >
               <div className="flex items-start justify-between mb-6">
-                <span className="font-serif text-5xl text-gold opacity-25 leading-none select-none">02</span>
-                <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.2)]">
+                <span className="font-serif text-5xl leading-none select-none" style={{ color: THEME.colors.gold, opacity: 0.25 }}>02</span>
+                <span
+                  className="font-sans text-[10px] tracking-[0.2em] uppercase px-3 py-1 rounded-full"
+                  style={{
+                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                    color: '#10B981',
+                    border: '1px solid rgba(16, 185, 129, 0.3)'
+                  }}
+                >
                   Lower Legal Risk
                 </span>
               </div>
@@ -102,10 +141,26 @@ export default function IntroductionPage() {
             </div>
 
             {/* Card 3: M&A */}
-            <div className="rounded-2xl p-8 group hover:shadow-[0_0_24px_rgba(59,130,246,0.15)] transition-all duration-300" style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
+            <div
+              className="rounded-2xl p-8 group transition-all duration-300"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`,
+                boxShadow: '0 0 0 rgba(59,130,246,0)'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(59,130,246,0.15)'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 rgba(59,130,246,0)'}
+            >
               <div className="flex items-start justify-between mb-6">
-                <span className="font-serif text-5xl text-gold opacity-25 leading-none select-none">03</span>
-                <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.2)]">
+                <span className="font-serif text-5xl leading-none select-none" style={{ color: THEME.colors.gold, opacity: 0.25 }}>03</span>
+                <span
+                  className="font-sans text-[10px] tracking-[0.2em] uppercase px-3 py-1 rounded-full"
+                  style={{
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    color: '#3B82F6',
+                    border: '1px solid rgba(59, 130, 246, 0.3)'
+                  }}
+                >
                   Case-by-Case
                 </span>
               </div>
@@ -120,10 +175,26 @@ export default function IntroductionPage() {
             </div>
 
             {/* Card 4: No to Low AUM */}
-            <div className="rounded-2xl p-8 group hover:shadow-[0_0_24px_rgba(245,158,11,0.15)] transition-all duration-300" style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
+            <div
+              className="rounded-2xl p-8 group transition-all duration-300"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`,
+                boxShadow: '0 0 0 rgba(245,158,11,0)'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(245,158,11,0.15)'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 rgba(245,158,11,0)'}
+            >
               <div className="flex items-start justify-between mb-6">
-                <span className="font-serif text-5xl text-gold opacity-25 leading-none select-none">04</span>
-                <span className="font-sans text-[10px] tracking-[0.2em] uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.2)]">
+                <span className="font-serif text-5xl leading-none select-none" style={{ color: THEME.colors.gold, opacity: 0.25 }}>04</span>
+                <span
+                  className="font-sans text-[10px] tracking-[0.2em] uppercase px-3 py-1 rounded-full"
+                  style={{
+                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                    color: '#F59E0B',
+                    border: '1px solid rgba(245, 158, 11, 0.3)'
+                  }}
+                >
                   Training First
                 </span>
               </div>
@@ -145,7 +216,7 @@ export default function IntroductionPage() {
           <div className="mb-10">
             <h2 className="font-serif text-3xl mb-2" style={{ color: THEME.colors.text }}>
               The Three{" "}
-              <span className="text-gold">Transition Methods</span>
+              <span style={{ color: THEME.colors.gold }}>Transition Methods</span>
             </h2>
             <p className="font-sans text-sm" style={{ color: THEME.colors.textSecondary }}>
               After an advisor joins, client assets must transition to Farther&rsquo;s custodians via one of three methods.
@@ -155,16 +226,23 @@ export default function IntroductionPage() {
           <div className="flex flex-col gap-5">
 
             {/* Method 1: Master Merge */}
-            <div className="rounded-2xl px-8 py-7" style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
+            <div className="rounded-2xl px-8 py-7" style={{ backgroundColor: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
               <div className="flex flex-col sm:flex-row sm:items-start gap-6">
                 <div className="shrink-0">
-                  <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-4 py-2 rounded-full whitespace-nowrap shadow-[0_0_8px_rgba(29,118,130,0.15)]">
+                  <span
+                    className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase px-4 py-2 rounded-full whitespace-nowrap"
+                    style={{
+                      backgroundColor: 'rgba(182, 138, 76, 0.1)',
+                      color: THEME.colors.gold,
+                      border: `1px solid rgba(182, 138, 76, 0.2)`
+                    }}
+                  >
                     4–6 weeks
                   </span>
                 </div>
                 <div>
                   <div className="flex items-center gap-3 mb-1">
-                    <div className="w-2 h-2 rounded-full bg-gold shrink-0" />
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: THEME.colors.gold }} />
                     <h3 className="font-serif text-lg" style={{ color: THEME.colors.text }}>Master Merge</h3>
                   </div>
                   <p className="font-sans text-xs uppercase tracking-widest mb-3 pl-5" style={{ color: THEME.colors.textSecondary }}>
@@ -180,16 +258,23 @@ export default function IntroductionPage() {
             </div>
 
             {/* Method 2: LPOA */}
-            <div className="rounded-2xl px-8 py-7" style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
+            <div className="rounded-2xl px-8 py-7" style={{ backgroundColor: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
               <div className="flex flex-col sm:flex-row sm:items-start gap-6">
                 <div className="shrink-0">
-                  <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-4 py-2 rounded-full whitespace-nowrap shadow-[0_0_8px_rgba(29,118,130,0.15)]">
+                  <span
+                    className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase px-4 py-2 rounded-full whitespace-nowrap"
+                    style={{
+                      backgroundColor: 'rgba(182, 138, 76, 0.1)',
+                      color: THEME.colors.gold,
+                      border: `1px solid rgba(182, 138, 76, 0.2)`
+                    }}
+                  >
                     6–8 weeks
                   </span>
                 </div>
                 <div>
                   <div className="flex items-center gap-3 mb-1">
-                    <div className="w-2 h-2 rounded-full bg-gold shrink-0" />
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: THEME.colors.gold }} />
                     <h3 className="font-serif text-lg" style={{ color: THEME.colors.text }}>LPOA — Limited Power of Attorney</h3>
                   </div>
                   <p className="font-sans text-xs uppercase tracking-widest mb-3 pl-5" style={{ color: THEME.colors.textSecondary }}>
@@ -205,16 +290,23 @@ export default function IntroductionPage() {
             </div>
 
             {/* Method 3: Repaper / ACAT */}
-            <div className="rounded-2xl px-8 py-7" style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
+            <div className="rounded-2xl px-8 py-7" style={{ backgroundColor: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
               <div className="flex flex-col sm:flex-row sm:items-start gap-6">
                 <div className="shrink-0">
-                  <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase bg-gold/10 text-gold-dark border border-gold/20 px-4 py-2 rounded-full whitespace-nowrap shadow-[0_0_8px_rgba(29,118,130,0.15)]">
+                  <span
+                    className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase px-4 py-2 rounded-full whitespace-nowrap"
+                    style={{
+                      backgroundColor: 'rgba(182, 138, 76, 0.1)',
+                      color: THEME.colors.gold,
+                      border: `1px solid rgba(182, 138, 76, 0.2)`
+                    }}
+                  >
                     8–12 weeks
                   </span>
                 </div>
                 <div>
                   <div className="flex items-center gap-3 mb-1">
-                    <div className="w-2 h-2 rounded-full bg-gold shrink-0" />
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: THEME.colors.gold }} />
                     <h3 className="font-serif text-lg" style={{ color: THEME.colors.text }}>Repaper / ACAT</h3>
                   </div>
                   <p className="font-sans text-xs uppercase tracking-widest mb-3 pl-5" style={{ color: THEME.colors.textSecondary }}>
@@ -237,17 +329,17 @@ export default function IntroductionPage() {
           <div className="mb-8">
             <h2 className="font-serif text-3xl mb-2" style={{ color: THEME.colors.text }}>
               How to Use{" "}
-              <span className="text-gold">This Playbook</span>
+              <span style={{ color: THEME.colors.gold }}>This Playbook</span>
             </h2>
           </div>
 
-          <div className="rounded-2xl px-10 py-9" style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
+          <div className="rounded-2xl px-10 py-9" style={{ backgroundColor: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
             <p className="font-sans text-sm leading-8" style={{ color: THEME.colors.text }}>
               Use the navigation on the left to move through each section of this playbook. The step indicator
               in the top-right corner of every page shows your current position — for example,{" "}
-              <span className="font-semibold" style={{ color: THEME.colors.text }}>01 / 13</span>. Use the{" "}
-              <span className="font-semibold" style={{ color: THEME.colors.text }}>Next</span> and{" "}
-              <span className="font-semibold" style={{ color: THEME.colors.text }}>Back</span> buttons at the bottom of each page to
+              <span className="font-semibold">01 / 13</span>. Use the{" "}
+              <span className="font-semibold">Next</span> and{" "}
+              <span className="font-semibold">Back</span> buttons at the bottom of each page to
               move sequentially through the material, or jump directly to any section from the sidebar at any
               time.
             </p>
@@ -261,10 +353,23 @@ export default function IntroductionPage() {
           </span>
           <Link
             href="/onboarding-vs-transitions"
-            className="group inline-flex items-center gap-3 font-sans text-sm tracking-wide bg-gold text-white px-8 py-4 rounded-full hover:bg-gold-dark transition-all duration-200 shadow-[0_0_16px_rgba(29,118,130,0.3)] hover:shadow-[0_0_28px_rgba(29,118,130,0.5)] hover:-translate-y-0.5"
+            className="group inline-flex items-center gap-3 font-sans text-sm tracking-wide px-8 py-4 rounded-full transition-all duration-200"
+            style={{
+              backgroundColor: THEME.colors.gold,
+              color: '#FFFFFF',
+              boxShadow: '0 0 16px rgba(29,118,130,0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 28px rgba(29,118,130,0.5)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 16px rgba(29,118,130,0.3)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
           >
             <span>Next</span>
-            <span className="transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
+            <span>&rarr;</span>
           </Link>
         </footer>
 

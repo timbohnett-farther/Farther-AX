@@ -6,6 +6,40 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Complete Layout Rebuild - Introduction & Onboarding Pages — 2026-03-30
+
+**What**: Completely rebuilt two training pages with proper theme system implementation
+
+**Problem**: Introduction and Onboarding vs. Transitions pages had broken layouts with undefined Tailwind classes
+
+**Root Cause**: Onboarding page was using undefined custom classes (glass-card, text-teal-dark, text-foreground-muted, border-border, etc.) instead of theme system
+
+**Solution**:
+- Completely rewrote both pages from scratch
+- Removed all undefined Tailwind classes
+- Implemented proper `useTheme()` hook with `THEME.colors.*` inline styles throughout
+- Consistent layout structure matching the Farther brand guide
+- Proper responsive design with mobile-first approach
+- All backgrounds, text colors, borders use semantic theme tokens
+- Hover effects with proper shadow transitions
+- Step indicators with proper positioning
+
+**Files Modified**:
+- `app/introduction/page.tsx` (complete rewrite - 550 lines)
+- `app/onboarding-vs-transitions/page.tsx` (complete rewrite - 540 lines)
+
+**Impact**:
+- ✅ Both pages now use consistent theme system
+- ✅ All colors properly adapt to light/dark mode
+- ✅ Professional, polished layout matching brand standards
+- ✅ No more undefined Tailwind classes
+- ✅ Proper responsive behavior on all screen sizes
+- ✅ Smooth hover transitions and visual polish
+
+**Status**: ✅ Complete - ready to deploy
+
+---
+
 ## [Completed] Fix TypeScript Build Error — 2026-03-30
 
 **What**: Fixed TypeScript build error blocking Railway deployment
