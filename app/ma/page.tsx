@@ -84,10 +84,11 @@ function SectionHeader({ part, title, THEME }: { part: string; title: string; TH
   return (
     <div className="flex items-center gap-3 mb-6 mt-12 first:mt-0">
       <span
-        className="inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-full text-xs font-bold shadow-[0_0_12px_rgba(29,118,130,0.4)]"
+        className="inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-full text-xs font-bold"
         style={{
           backgroundColor: THEME.colors.teal,
-          color: '#FFFFFF'
+          color: '#FFFFFF',
+          boxShadow: `0 0 12px ${THEME.colors.teal}66`
         }}
       >
         {part}
@@ -102,22 +103,22 @@ function SectionHeader({ part, title, THEME }: { part: string; title: string; TH
 function Callout({ children, color = "teal", THEME }: { children: React.ReactNode; color?: "teal" | "amber" | "red"; THEME: any }) {
   const styles = {
     teal: {
-      bg: 'rgba(78, 112, 130, 0.08)',
-      border: 'rgba(78, 112, 130, 0.4)',
+      bg: `${THEME.colors.teal}14`,
+      border: THEME.colors.teal,
       text: THEME.colors.teal,
-      shadow: '0 0 12px rgba(78,112,130,0.15)'
+      shadow: `0 0 12px ${THEME.colors.teal}26`
     },
     amber: {
-      bg: 'rgba(245, 158, 11, 0.08)',
-      border: 'rgba(245, 158, 11, 0.4)',
-      text: '#fbbf24',
-      shadow: '0 0 12px rgba(245,158,11,0.15)'
+      bg: `${THEME.colors.gold}14`,
+      border: THEME.colors.gold,
+      text: THEME.colors.gold,
+      shadow: `0 0 12px ${THEME.colors.gold}26`
     },
     red: {
-      bg: 'rgba(239, 68, 68, 0.08)',
-      border: 'rgba(239, 68, 68, 0.3)',
-      text: '#f87171',
-      shadow: '0 0 12px rgba(239,68,68,0.12)'
+      bg: `${THEME.colors.gold}14`,
+      border: THEME.colors.gold,
+      text: THEME.colors.gold,
+      shadow: `0 0 12px ${THEME.colors.gold}1F`
     },
   };
 
@@ -307,7 +308,7 @@ export default function MAPage() {
         </div>
 
         <Callout color="amber" THEME={THEME}>
-          <strong style={{ color: '#fcd34d' }}>Onboarding team takeaway:</strong> A delayed technology migration,
+          <strong style={{ color: THEME.colors.gold }}>Onboarding team takeaway:</strong> A delayed technology migration,
           a poor client communication rollout, or a rocky first 90 days can directly reduce earnout payments &mdash;
           and damage Farther&rsquo;s reputation as an acquirer.
         </Callout>
@@ -388,10 +389,11 @@ export default function MAPage() {
               }}
             >
               <span
-                className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold shadow-[0_0_6px_rgba(239,68,68,0.2)]"
+                className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold"
                 style={{
-                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                  color: '#f87171'
+                  backgroundColor: `${THEME.colors.gold}26`,
+                  color: THEME.colors.gold,
+                  boxShadow: `0 0 6px ${THEME.colors.gold}33`
                 }}
               >
                 !
@@ -417,10 +419,11 @@ export default function MAPage() {
               {/* Left: dot + line */}
               <div className="flex flex-col items-center shrink-0">
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold z-10 shadow-[0_0_12px_rgba(29,118,130,0.4)]"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold z-10"
                   style={{
                     backgroundColor: THEME.colors.teal,
-                    color: '#FFFFFF'
+                    color: '#FFFFFF',
+                    boxShadow: `0 0 12px ${THEME.colors.teal}66`
                   }}
                 >
                   {i + 1}
@@ -454,7 +457,7 @@ export default function MAPage() {
         </div>
 
         <Callout color="red" THEME={THEME}>
-          <strong style={{ color: '#fca5a5' }}>Slow onboarding is not an operational nuisance</strong> &mdash;
+          <strong style={{ color: THEME.colors.gold }}>Slow onboarding is not an operational nuisance</strong> &mdash;
           it is a compliance failure vector.
         </Callout>
 
@@ -536,10 +539,11 @@ export default function MAPage() {
               }}
             >
               <span
-                className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold shadow-[0_0_6px_rgba(16,185,129,0.2)]"
+                className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold"
                 style={{
-                  backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                  color: '#34d399'
+                  backgroundColor: `${THEME.colors.teal}26`,
+                  color: THEME.colors.teal,
+                  boxShadow: `0 0 6px ${THEME.colors.teal}33`
                 }}
               >
                 {i + 1}
@@ -563,7 +567,13 @@ export default function MAPage() {
             <h3 className="font-serif text-base font-semibold" style={{ color: THEME.colors.text }}>
               The Warm Handoff Standard
             </h3>
-            <span className="text-[10px] font-semibold tracking-wider uppercase text-white bg-emerald-600 px-3 py-1 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+            <span
+              className="text-[10px] font-semibold tracking-wider uppercase text-white px-3 py-1 rounded-full"
+              style={{
+                backgroundColor: THEME.colors.teal,
+                boxShadow: `0 0 10px ${THEME.colors.teal}4D`
+              }}
+            >
               Gold Standard
             </span>
           </div>
@@ -574,7 +584,7 @@ export default function MAPage() {
               "Use Farther's technology — CRM tracking, automated follow-up workflows, and the AI-powered proposal tool — to ensure no client is overlooked",
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
-                <span className="mt-0.5 shrink-0" style={{ color: '#34d399' }}>&#9670;</span>
+                <span className="mt-0.5 shrink-0" style={{ color: THEME.colors.teal }}>&#9670;</span>
                 {item}
               </li>
             ))}
@@ -633,10 +643,11 @@ export default function MAPage() {
               }}
             >
               <span
-                className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold shadow-[0_0_6px_rgba(245,158,11,0.2)]"
+                className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold"
                 style={{
-                  backgroundColor: 'rgba(245, 158, 11, 0.15)',
-                  color: '#fbbf24'
+                  backgroundColor: `${THEME.colors.gold}26`,
+                  color: THEME.colors.gold,
+                  boxShadow: `0 0 6px ${THEME.colors.gold}33`
                 }}
               >
                 !
