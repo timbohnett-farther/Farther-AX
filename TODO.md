@@ -130,6 +130,7 @@ When you report a fix:
 
 | Fix | Date | Commits | Summary |
 |-----|------|---------|---------|
+| TypeScript build error blocking deployment | 2026-03-30 | `54c6b59` | Fixed THEME.colors.background to THEME.colors.bg in 2 training pages |
 | AI Assistant chat window unreadable | 2026-03-25 | `4944cc1` | Fixed white-on-white text by changing bg-cream to bg-charcoal |
 | Metrics cards detail view | 2026-03-25 | `bad934d` | Added interactive slide-in panel with onClick handlers for all 20+ cards |
 | Alerts page not loading data | 2026-03-25 | `e6a5278` | Fixed type mismatch - API now returns task_key and phase_label |
