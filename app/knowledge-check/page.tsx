@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import PageLayout from "@/components/PageLayout";
+import { useTheme } from "@/lib/theme-provider";
 
 interface QuizResult {
   topic_slug: string;
@@ -27,6 +28,7 @@ const QUIZ_TOPICS = [
 ];
 
 export default function KnowledgeCheckPage() {
+  const { THEME } = useTheme();
   const { data: session } = useSession();
   const [results, setResults] = useState<QuizResult[]>([]);
   const [loading, setLoading] = useState(true);
