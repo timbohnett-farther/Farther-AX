@@ -6,6 +6,33 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [In Progress] Fix Training Pages - Key Documents — 2026-03-30
+
+**What**: Completely rewrote key-documents page with proper theme system
+
+**Problem**: Page used 28 instances of undefined Tailwind classes causing inconsistent styling
+
+**Solution**:
+- Removed all undefined classes: text-foreground, bg-card-700, border-border, text-bronze, text-teal, glass-card, etc.
+- Replaced with THEME.colors.* inline styles throughout
+- Proper table styling with alternating row backgrounds
+- Definition cards with numbered badges and proper spacing
+- Max-w-5xl container width for proper text display
+- Consistent with introduction and onboarding-vs-transitions pages
+
+**Files Modified**:
+- `app/key-documents/page.tsx` (complete rewrite - 485 lines)
+
+**Impact**:
+- ✅ All colors now use theme system
+- ✅ Proper responsive layout
+- ✅ Text has breathing room, no bunching
+- ✅ Consistent brand styling
+
+**Status**: ✅ Complete - ready to test
+
+---
+
 ## [Completed] Fix Sign-In Page Width - Text No Longer Bunched — 2026-03-30
 
 **What**: Fixed sign-in modal width so text displays properly without bunching

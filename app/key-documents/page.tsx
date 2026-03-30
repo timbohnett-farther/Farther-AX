@@ -120,7 +120,12 @@ function CellValue({ value }: { value: string }) {
   if (value === "✓") {
     return (
       <span
-        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/15 text-emerald-400 font-bold text-sm shadow-[0_0_8px_rgba(16,185,129,0.25)]"
+        className="inline-flex items-center justify-center w-7 h-7 rounded-full font-bold text-sm"
+        style={{
+          backgroundColor: 'rgba(16, 185, 129, 0.15)',
+          color: '#10B981',
+          boxShadow: '0 0 8px rgba(16,185,129,0.25)'
+        }}
         aria-label="Required"
       >
         ✓
@@ -130,7 +135,12 @@ function CellValue({ value }: { value: string }) {
   if (value === "–") {
     return (
       <span
-        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-red-500/15 text-red-400 font-medium text-sm shadow-[0_0_8px_rgba(239,68,68,0.2)]"
+        className="inline-flex items-center justify-center w-7 h-7 rounded-full font-medium text-sm"
+        style={{
+          backgroundColor: 'rgba(239, 68, 68, 0.15)',
+          color: '#EF4444',
+          boxShadow: '0 0 8px rgba(239,68,68,0.2)'
+        }}
         aria-label="Not applicable"
       >
         –
@@ -140,7 +150,12 @@ function CellValue({ value }: { value: string }) {
   if (value === "C") {
     return (
       <span
-        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-amber-500/15 text-amber-400 font-semibold text-sm shadow-[0_0_8px_rgba(245,158,11,0.2)]"
+        className="inline-flex items-center justify-center w-7 h-7 rounded-full font-semibold text-sm"
+        style={{
+          backgroundColor: 'rgba(245, 158, 11, 0.15)',
+          color: '#F59E0B',
+          boxShadow: '0 0 8px rgba(245,158,11,0.2)'
+        }}
         aria-label="Conditional"
       >
         C
@@ -229,28 +244,43 @@ export default function KeyDocumentsPage() {
   const { THEME } = useTheme();
 
   return (
-    <main className="min-h-screen text-foreground font-sans">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg, color: THEME.colors.text }}>
+      {/* Step Indicator */}
+      <div className="fixed top-6 right-8 z-50">
+        <span
+          className="font-sans text-xs tracking-[0.2em] uppercase px-4 py-2 rounded-full"
+          style={{
+            backgroundColor: THEME.colors.surface,
+            border: `1px solid ${THEME.colors.border}`,
+            color: THEME.colors.textSecondary
+          }}
+        >
+          03 / 13
+        </span>
+      </div>
 
-        {/* Page header */}
-        <div className="mb-10">
-          <p className="text-sm font-semibold text-bronze uppercase tracking-widest mb-2">
-            Step 03 of 13
-          </p>
-          <h1 className="font-serif text-4xl sm:text-5xl text-foreground mb-3">
-            Key Documents
+      <div className="max-w-5xl mx-auto px-8 py-20 lg:py-28">
+
+        {/* Page Header */}
+        <header className="mb-20">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-px flex-1" style={{ backgroundColor: THEME.colors.gold, opacity: 0.3 }} />
+            <span className="font-sans text-xs tracking-[0.25em] uppercase" style={{ color: THEME.colors.gold }}>
+              Step 03 — Playbook
+            </span>
+            <div className="h-px flex-1" style={{ backgroundColor: THEME.colors.gold, opacity: 0.3 }} />
+          </div>
+          <h1 className="font-serif text-4xl lg:text-5xl leading-tight mb-5 tracking-tight text-center" style={{ color: THEME.colors.text }}>
+            Key <span style={{ color: THEME.colors.gold }}>Documents</span>
           </h1>
-          <p className="text-teal font-serif text-lg sm:text-xl">
+          <p className="font-sans text-base tracking-wide text-center" style={{ color: THEME.colors.textSecondary }}>
             Document Applicability Matrix &amp; Definitions
           </p>
-        </div>
-
-        {/* Divider */}
-        <div className="border-t border-border mb-10" />
+        </header>
 
         {/* Section 1: Introduction */}
-        <section className="mb-12">
-          <p className="text-foreground leading-relaxed text-base sm:text-lg max-w-4xl">
+        <section className="mb-16">
+          <p className="font-sans text-base leading-8" style={{ color: THEME.colors.text }}>
             Every advisor onboarding involves a set of core documents. Which documents apply depends on
             the advisor&apos;s pathway and the transition method selected. Use the matrix below to quickly
             identify which documents are required for any given scenario, then refer to the definitions
@@ -259,23 +289,39 @@ export default function KeyDocumentsPage() {
         </section>
 
         {/* Section 2: Document Applicability Matrix */}
-        <section className="mb-14">
-          <h2 className="font-serif text-2xl sm:text-3xl text-foreground mb-6">
-            Document Applicability Matrix
+        <section className="mb-20">
+          <h2 className="font-serif text-3xl mb-8" style={{ color: THEME.colors.text }}>
+            Document Applicability <span style={{ color: THEME.colors.gold }}>Matrix</span>
           </h2>
 
-          {/* Responsive table wrapper */}
-          <div className="overflow-x-auto rounded-lg border border-border shadow-xs">
+          {/* Table wrapper */}
+          <div
+            className="overflow-x-auto rounded-xl"
+            style={{
+              border: `1px solid ${THEME.colors.border}`,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}
+          >
             <table className="min-w-full text-sm border-collapse">
               <thead>
-                <tr className="bg-card-700">
-                  <th className="text-left px-4 py-3 font-semibold text-foreground text-sm border-b border-border whitespace-nowrap">
+                <tr style={{ backgroundColor: THEME.colors.surfaceHover }}>
+                  <th
+                    className="text-left px-6 py-4 font-semibold text-sm whitespace-nowrap"
+                    style={{
+                      color: THEME.colors.text,
+                      borderBottom: `1px solid ${THEME.colors.border}`
+                    }}
+                  >
                     Document
                   </th>
                   {columns.map((col) => (
                     <th
                       key={col.key}
-                      className="text-center px-4 py-3 font-semibold text-foreground text-sm border-b border-border whitespace-nowrap"
+                      className="text-center px-4 py-4 font-semibold text-sm whitespace-nowrap"
+                      style={{
+                        color: THEME.colors.text,
+                        borderBottom: `1px solid ${THEME.colors.border}`
+                      }}
                     >
                       {col.label}
                     </th>
@@ -286,22 +332,38 @@ export default function KeyDocumentsPage() {
                 {matrixData.map((row, idx) => (
                   <tr
                     key={row.document}
-                    className={
-                      idx % 2 === 0
-                        ? "bg-card-600/40 hover:bg-card-700 transition-colors"
-                        : "bg-card-600/20 hover:bg-card-700 transition-colors"
-                    }
+                    className="transition-colors"
+                    style={{
+                      backgroundColor: idx % 2 === 0 ? THEME.colors.surface : THEME.colors.bg
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = THEME.colors.surfaceHover}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = idx % 2 === 0 ? THEME.colors.surface : THEME.colors.bg}
                   >
-                    <td className="px-4 py-3 border-b border-border font-medium text-foreground whitespace-nowrap">
+                    <td
+                      className="px-6 py-4 font-medium whitespace-nowrap"
+                      style={{
+                        color: THEME.colors.text,
+                        borderBottom: `1px solid ${THEME.colors.border}`
+                      }}
+                    >
                       <span className="font-semibold">{row.document}</span>
-                      <span className="block text-xs text-foreground-muted font-normal mt-0.5 max-w-[160px] whitespace-normal leading-tight">
-                        {row.fullName !== row.document ? row.fullName : ""}
-                      </span>
+                      {row.fullName !== row.document && (
+                        <span
+                          className="block text-xs font-normal mt-1 leading-tight"
+                          style={{
+                            color: THEME.colors.textSecondary,
+                            maxWidth: '180px'
+                          }}
+                        >
+                          {row.fullName}
+                        </span>
+                      )}
                     </td>
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        className="text-center px-4 py-3 border-b border-border"
+                        className="text-center px-4 py-4"
+                        style={{ borderBottom: `1px solid ${THEME.colors.border}` }}
                       >
                         <CellValue value={row[col.key as keyof typeof row] as string} />
                       </td>
@@ -313,70 +375,110 @@ export default function KeyDocumentsPage() {
           </div>
 
           {/* Legend */}
-          <div className="mt-4 flex flex-wrap gap-6 text-sm text-foreground-muted">
+          <div className="mt-6 flex flex-wrap gap-8 text-sm" style={{ color: THEME.colors.textSecondary }}>
             <span className="flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/15 text-emerald-400 font-bold text-xs shadow-[0_0_6px_rgba(16,185,129,0.25)]">✓</span>
+              <span
+                className="inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs"
+                style={{
+                  backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                  color: '#10B981',
+                  boxShadow: '0 0 6px rgba(16,185,129,0.25)'
+                }}
+              >
+                ✓
+              </span>
               Required
             </span>
             <span className="flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500/15 text-red-400 font-medium text-xs shadow-[0_0_6px_rgba(239,68,68,0.2)]">–</span>
+              <span
+                className="inline-flex items-center justify-center w-6 h-6 rounded-full font-medium text-xs"
+                style={{
+                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  color: '#EF4444',
+                  boxShadow: '0 0 6px rgba(239,68,68,0.2)'
+                }}
+              >
+                –
+              </span>
               Not Applicable
             </span>
             <span className="flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-500/15 text-amber-400 font-semibold text-xs shadow-[0_0_6px_rgba(245,158,11,0.2)]">C</span>
+              <span
+                className="inline-flex items-center justify-center w-6 h-6 rounded-full font-semibold text-xs"
+                style={{
+                  backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                  color: '#F59E0B',
+                  boxShadow: '0 0 6px rgba(245,158,11,0.2)'
+                }}
+              >
+                C
+              </span>
               Conditional (see definitions)
             </span>
           </div>
         </section>
 
-        {/* Divider */}
-        <div className="border-t border-border mb-12" />
-
         {/* Section 3: Document Definitions */}
-        <section className="mb-16">
-          <h2 className="font-serif text-2xl sm:text-3xl text-foreground mb-8">
-            Document Definitions
+        <section className="mb-24">
+          <h2 className="font-serif text-3xl mb-10" style={{ color: THEME.colors.text }}>
+            Document <span style={{ color: THEME.colors.gold }}>Definitions</span>
           </h2>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             {definitions.map((def, idx) => (
               <div
                 key={def.id}
-                className="glass-card rounded-lg p-6"
+                className="rounded-xl p-8"
+                style={{
+                  backgroundColor: THEME.colors.surface,
+                  border: `1px solid ${THEME.colors.border}`
+                }}
               >
-                {/* Card header */}
-                <div className="flex items-start gap-4 mb-3">
-                  <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-card-700 text-bronze text-xs font-bold font-sans">
+                {/* Header */}
+                <div className="flex items-start gap-4 mb-4">
+                  <span
+                    className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-full font-bold text-sm"
+                    style={{
+                      backgroundColor: THEME.colors.gold,
+                      color: '#FFFFFF'
+                    }}
+                  >
                     {String(idx + 1).padStart(2, "0")}
                   </span>
                   <div>
-                    <h3 className="font-serif text-xl text-foreground mb-0.5">
-                      <span className="text-bronze">{def.code}</span>
+                    <h3 className="font-serif text-2xl" style={{ color: THEME.colors.text }}>
+                      <span style={{ color: THEME.colors.gold }}>{def.code}</span>
                       {def.code !== def.title && (
-                        <span className="text-foreground"> — {def.title}</span>
+                        <span> — {def.title}</span>
                       )}
                     </h3>
                   </div>
                 </div>
 
                 {/* Body */}
-                <p className="text-foreground leading-relaxed mb-4 pl-12">
+                <p className="font-sans text-base leading-7 mb-6 pl-14" style={{ color: THEME.colors.text }}>
                   {def.body}
                 </p>
 
                 {/* Meta row */}
-                <div className="pl-12 flex flex-wrap gap-6 text-sm">
+                <div className="pl-14 flex flex-wrap gap-8 text-sm">
                   <div>
-                    <span className="font-semibold text-foreground-muted uppercase tracking-wide text-xs">
+                    <span
+                      className="font-semibold uppercase tracking-wide text-xs mb-1 block"
+                      style={{ color: THEME.colors.textSecondary }}
+                    >
                       Owner
                     </span>
-                    <p className="text-foreground mt-0.5">{def.owner}</p>
+                    <p className="font-medium" style={{ color: THEME.colors.text }}>{def.owner}</p>
                   </div>
                   <div>
-                    <span className="font-semibold text-foreground-muted uppercase tracking-wide text-xs">
+                    <span
+                      className="font-semibold uppercase tracking-wide text-xs mb-1 block"
+                      style={{ color: THEME.colors.textSecondary }}
+                    >
                       Timing
                     </span>
-                    <p className="text-foreground mt-0.5">{def.timing}</p>
+                    <p className="font-medium" style={{ color: THEME.colors.text }}>{def.timing}</p>
                   </div>
                 </div>
               </div>
@@ -384,33 +486,48 @@ export default function KeyDocumentsPage() {
           </div>
         </section>
 
-        {/* Bottom navigation */}
-        <div className="border-t border-border pt-8">
-          <div className="flex items-center justify-between">
-            <Link
-              href="/onboarding-vs-transitions"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg glass-card text-foreground hover:bg-card-700 hover:border-teal transition-all duration-200 text-sm font-medium hover:shadow-[0_0_16px_rgba(29,118,130,0.2)]"
-            >
-              <span aria-hidden="true">←</span>
-              Back
-            </Link>
+        {/* Bottom Navigation */}
+        <footer className="flex items-center justify-between border-t pt-10" style={{ borderColor: THEME.colors.border }}>
+          <Link
+            href="/onboarding-vs-transitions"
+            className="group inline-flex items-center gap-3 font-sans text-sm tracking-wide px-6 py-3 rounded-full transition-all duration-200"
+            style={{ color: THEME.colors.textSecondary }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = THEME.colors.text; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = THEME.colors.textSecondary; }}
+          >
+            <span>&larr;</span>
+            <span>Back</span>
+          </Link>
 
-            <span className="text-xs font-semibold text-foreground-muted tracking-widest uppercase">
-              03 / 13
-            </span>
+          <span className="font-sans text-xs tracking-[0.2em] uppercase" style={{ color: THEME.colors.textSecondary }}>
+            03 / 13
+          </span>
 
-            <Link
-              href="/breakaway"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-teal text-white hover:bg-bronze transition-all duration-200 text-sm font-medium shadow-[0_0_12px_rgba(29,118,130,0.3)] hover:shadow-[0_0_24px_rgba(29,118,130,0.5)] hover:-translate-y-0.5"
-            >
-              Next
-              <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-        </div>
+          <Link
+            href="/breakaway"
+            className="group inline-flex items-center gap-3 font-sans text-sm tracking-wide px-8 py-4 rounded-full transition-all duration-200"
+            style={{
+              backgroundColor: THEME.colors.gold,
+              color: '#FFFFFF',
+              boxShadow: '0 0 16px rgba(29,118,130,0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 28px rgba(29,118,130,0.5)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 16px rgba(29,118,130,0.3)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <span>Next</span>
+            <span>&rarr;</span>
+          </Link>
+        </footer>
 
         <QuizSection topicSlug="key-documents" topicTitle="Key Documents" />
+
       </div>
-    </main>
+    </div>
   );
 }
