@@ -6,6 +6,66 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Phase 4: Training Pages Audit — 2026-03-30
+
+**What**: Fixed all AX Training & Playbook pages - eliminated all hardcoded colors, cards, and formatting issues
+
+**Impact**: All 9 training pages now properly themed with Farther brand colors (teal, gold, steel)
+
+**Pages Fixed:**
+
+1. **Independent RIA** - 17 hardcoded colors → THEME
+   - Badge colors now use theme (teal, steel, gold)
+   - Card backgrounds use THEME.colors.surface
+   - Dots and accents use theme colors with proper opacity
+   - Commit: `704c13c`
+
+2. **M&A** - 11 hardcoded colors → THEME
+   - Callout badges use gold for warnings, teal for info
+   - Alert icons use gold with proper shadows
+   - Timeline dots use teal
+   - Success indicators use teal
+   - Commit: `ea4906d`
+
+3. **Key Documents** - 8 hardcoded colors → THEME
+   - Table badges (✓, –, C) use theme colors
+   - Legend badges match table styling
+   - Green → teal, Red/Amber → gold
+   - Commit: `dec08aa`
+
+4. **Breakaway** - 6 hardcoded colors → THEME
+   - Characteristic badges use theme colors
+   - Card backgrounds use THEME.colors.surface
+   - Timeline dots use gold
+   - Commit: `dec08aa`
+
+5. **Introduction** - 3 hardcoded colors → THEME
+   - Pathway badges use theme colors
+   - Teal for lower risk, steel for case-by-case, gold for training
+   - Commit: `dec08aa`
+
+6. **Onboarding vs Transitions** - Already clean ✅
+7. **LPOA** - Already clean ✅
+8. **Breakaway Process** - Already clean ✅
+9. **Knowledge Check** - Fixed missing useTheme import (`2e4c720`)
+
+**Result**:
+- **45 hardcoded colors eliminated** across 5 training pages
+- Zero undefined Tailwind classes
+- Zero hardcoded hex colors remaining
+- All cards, badges, and UI elements use consistent Farther brand theme
+- Professional, on-brand appearance across entire training section
+
+**Files Modified:**
+- `app/independent-ria/page.tsx`
+- `app/ma/page.tsx`
+- `app/key-documents/page.tsx`
+- `app/breakaway/page.tsx`
+- `app/introduction/page.tsx`
+- `app/knowledge-check/page.tsx`
+
+---
+
 ## [Completed] Phase 3: Forms & Remaining Pages — 2026-03-30
 
 **What**: Fixed all remaining pages with theme system integration - site now at 100%
