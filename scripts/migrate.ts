@@ -172,6 +172,96 @@ async function migrate() {
         ON quiz_attempts(topic_slug);
       CREATE INDEX IF NOT EXISTS idx_quiz_attempts_completed
         ON quiz_attempts(completed_at);
+
+      -- Transitions system tables
+      CREATE TABLE IF NOT EXISTS transition_clients (
+        id SERIAL PRIMARY KEY,
+        advisor_name VARCHAR(255),
+        farther_contact VARCHAR(255),
+        custodian VARCHAR(255),
+        document_readiness VARCHAR(128),
+        status_of_iaa VARCHAR(128),
+        status_of_account_paperwork VARCHAR(128),
+        portal_status VARCHAR(128),
+        household_name VARCHAR(255),
+        billing_group VARCHAR(255),
+        primary_first_name VARCHAR(255),
+        primary_email VARCHAR(255),
+        fee_schedule VARCHAR(128),
+        new_account_number VARCHAR(128),
+        account_type VARCHAR(128),
+        sheet_id VARCHAR(255),
+        sheet_row_index INTEGER,
+        workbook_name VARCHAR(512),
+        synced_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_transition_clients_advisor_name
+        ON transition_clients(advisor_name);
+      CREATE INDEX IF NOT EXISTS idx_transition_clients_primary_email
+        ON transition_clients(primary_email);
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_transition_clients_sheet_id_row
+        ON transition_clients(sheet_id, sheet_row_index);
+
+      CREATE TABLE IF NOT EXISTS transition_workbooks (
+        id SERIAL PRIMARY KEY,
+        sheet_id VARCHAR(255) UNIQUE NOT NULL,
+        workbook_name VARCHAR(512),
+        sheet_url TEXT,
+        detected_advisor_name VARCHAR(255),
+        assigned_advisor_name VARCHAR(255),
+        hubspot_contact_id VARCHAR(128),
+        is_locked BOOLEAN DEFAULT FALSE,
+        last_synced_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS docusign_tokens (
+        id SERIAL PRIMARY KEY,
+        access_token TEXT NOT NULL,
+        refresh_token TEXT NOT NULL,
+        expires_at TIMESTAMPTZ NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      -- Advisor Team Mappings (individual advisor names → team names)
+      CREATE TABLE IF NOT EXISTS advisor_team_mappings (
+        id SERIAL PRIMARY KEY,
+        individual_name VARCHAR(255) NOT NULL UNIQUE,
+        team_name VARCHAR(255) NOT NULL,
+        hubspot_contact_id VARCHAR(128),
+        hubspot_deal_id VARCHAR(128),
+        source VARCHAR(50) DEFAULT 'hubspot',
+        notes TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_advisor_team_mappings_individual
+        ON advisor_team_mappings(individual_name);
+      CREATE INDEX IF NOT EXISTS idx_advisor_team_mappings_team
+        ON advisor_team_mappings(team_name);
+      CREATE INDEX IF NOT EXISTS idx_advisor_team_mappings_hubspot_deal
+        ON advisor_team_mappings(hubspot_deal_id);
+
+      -- Advisor TRAN AUM & Revenue
+      CREATE TABLE IF NOT EXISTS advisor_tran_aum (
+        id SERIAL PRIMARY KEY,
+        advisor_name VARCHAR(255) NOT NULL UNIQUE,
+        tran_aum NUMERIC(15, 2) DEFAULT 0,
+        revenue NUMERIC(15, 2) DEFAULT 0,
+        record_count INTEGER DEFAULT 0,
+        last_synced_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_advisor_tran_aum_advisor_name
+        ON advisor_tran_aum(advisor_name);
     `);
     console.log('Migration complete.');
   } finally {
