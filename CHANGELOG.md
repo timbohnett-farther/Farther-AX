@@ -6,6 +6,65 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Comprehensive Color System Overhaul — 2026-03-30
+
+**What**: Fixed backgrounds, surfaces, and color scheme for proper light/dark mode theming
+
+**User Feedback**:
+- "Background is white when it should be cream" (light mode)
+- "In dark mode the background should be slate"
+- "All text in light mode needs to be adjusted darker"
+- "Text boxes in AX Training & Playbook aren't properly formatted"
+- Gold colors missing from Tailwind config
+
+**Problems Fixed**:
+1. **Light mode backgrounds were white** (#FFFFFF) instead of cream (#F8F4F0)
+2. **Surface colors were white** across all cards/panels/boxes
+3. **Gold colors undefined** in Tailwind → `text-gold`, `bg-gold` classes broken
+4. **Inconsistent theming** between `lib/theme.ts` and CSS variables
+
+**Solution**:
+
+**Light Mode (Cream + Dark Text)**:
+- Background: `#F8F4F0` (limestone-50 - warm cream)
+- Surfaces: `#F8F4F0` (cards match background)
+- Surface Hover: `#E6E3DB` (clay-100)
+- Text: `#333333` (charcoal - dark and readable)
+
+**Dark Mode (Slate + Light Text)**:
+- Background: `#2F424B` (steel-blue-900 - deep slate)
+- Surfaces: `#3B5A69` (steel-blue-700 - lighter slate for cards)
+- Surface Hover: `#476F82` (steel-blue-600)
+- Text: `#F8F4F0` (limestone - light and readable)
+
+**Gold Colors Added**:
+```typescript
+gold: {
+  DEFAULT: '#B68A4C',  // Bronze/gold brand accent
+  dark: '#9A7440',     // Darker for light mode
+  light: '#C99B5F',    // Lighter for dark mode
+}
+```
+
+**Files Modified**:
+- `lib/theme.ts` - Lines 101-110: Updated bg/surface definitions
+- `tailwind.config.ts` - Lines 121-126: Added gold color variants
+- `app/globals.css` - Lines 49-85: Updated all CSS variables
+
+**Impact**:
+- ✅ Light mode now has cream backgrounds throughout (not white)
+- ✅ Dark mode has proper slate/steel-blue backgrounds
+- ✅ Text boxes in Training pages now properly formatted
+- ✅ Gold accent colors work (`text-gold`, `bg-gold`, `border-gold`)
+- ✅ All surfaces match intended color scheme
+- ✅ Proper contrast in both modes for accessibility
+
+**Commit**: `81f68d3`
+
+**Status**: ✅ Complete
+
+---
+
 ## [Completed] Fix Sidebar Text Colors for Light Mode — 2026-03-30
 
 **What**: Fixed sidebar text colors to be readable in light mode (charcoal instead of cream)
