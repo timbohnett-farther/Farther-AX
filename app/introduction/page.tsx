@@ -122,9 +122,9 @@ export default function IntroductionPage() {
                 <span
                   className="font-sans text-[10px] tracking-[0.2em] uppercase px-3 py-1 rounded-full"
                   style={{
-                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                    color: '#10B981',
-                    border: '1px solid rgba(16, 185, 129, 0.3)'
+                    backgroundColor: `${THEME.colors.teal}33`,
+                    color: THEME.colors.teal,
+                    border: `1px solid ${THEME.colors.teal}4D`
                   }}
                 >
                   Lower Legal Risk
@@ -156,9 +156,9 @@ export default function IntroductionPage() {
                 <span
                   className="font-sans text-[10px] tracking-[0.2em] uppercase px-3 py-1 rounded-full"
                   style={{
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                    color: '#3B82F6',
-                    border: '1px solid rgba(59, 130, 246, 0.3)'
+                    backgroundColor: `${THEME.colors.steel}33`,
+                    color: THEME.colors.steel,
+                    border: `1px solid ${THEME.colors.steel}4D`
                   }}
                 >
                   Case-by-Case
@@ -190,9 +190,9 @@ export default function IntroductionPage() {
                 <span
                   className="font-sans text-[10px] tracking-[0.2em] uppercase px-3 py-1 rounded-full"
                   style={{
-                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                    color: '#F59E0B',
-                    border: '1px solid rgba(245, 158, 11, 0.3)'
+                    backgroundColor: `${THEME.colors.gold}33`,
+                    color: THEME.colors.gold,
+                    border: `1px solid ${THEME.colors.gold}4D`
                   }}
                 >
                   Training First

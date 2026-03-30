@@ -116,15 +116,15 @@ const columns = [
   { key: "repaperACAT", label: "Repaper / ACAT" },
 ];
 
-function CellValue({ value }: { value: string }) {
+function CellValue({ value, THEME }: { value: string; THEME: any }) {
   if (value === "✓") {
     return (
       <span
         className="inline-flex items-center justify-center w-7 h-7 rounded-full font-bold text-sm"
         style={{
-          backgroundColor: 'rgba(16, 185, 129, 0.15)',
-          color: '#10B981',
-          boxShadow: '0 0 8px rgba(16,185,129,0.25)'
+          backgroundColor: `${THEME.colors.teal}26`,
+          color: THEME.colors.teal,
+          boxShadow: `0 0 8px ${THEME.colors.teal}40`
         }}
         aria-label="Required"
       >
@@ -137,9 +137,9 @@ function CellValue({ value }: { value: string }) {
       <span
         className="inline-flex items-center justify-center w-7 h-7 rounded-full font-medium text-sm"
         style={{
-          backgroundColor: 'rgba(239, 68, 68, 0.15)',
-          color: '#EF4444',
-          boxShadow: '0 0 8px rgba(239,68,68,0.2)'
+          backgroundColor: `${THEME.colors.gold}26`,
+          color: THEME.colors.gold,
+          boxShadow: `0 0 8px ${THEME.colors.gold}33`
         }}
         aria-label="Not applicable"
       >
@@ -152,9 +152,9 @@ function CellValue({ value }: { value: string }) {
       <span
         className="inline-flex items-center justify-center w-7 h-7 rounded-full font-semibold text-sm"
         style={{
-          backgroundColor: 'rgba(245, 158, 11, 0.15)',
-          color: '#F59E0B',
-          boxShadow: '0 0 8px rgba(245,158,11,0.2)'
+          backgroundColor: `${THEME.colors.gold}26`,
+          color: THEME.colors.gold,
+          boxShadow: `0 0 8px ${THEME.colors.gold}33`
         }}
         aria-label="Conditional"
       >
@@ -365,7 +365,7 @@ export default function KeyDocumentsPage() {
                         className="text-center px-4 py-4"
                         style={{ borderBottom: `1px solid ${THEME.colors.border}` }}
                       >
-                        <CellValue value={row[col.key as keyof typeof row] as string} />
+                        <CellValue value={row[col.key as keyof typeof row] as string} THEME={THEME} />
                       </td>
                     ))}
                   </tr>
@@ -380,9 +380,9 @@ export default function KeyDocumentsPage() {
               <span
                 className="inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs"
                 style={{
-                  backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                  color: '#10B981',
-                  boxShadow: '0 0 6px rgba(16,185,129,0.25)'
+                  backgroundColor: `${THEME.colors.teal}26`,
+                  color: THEME.colors.teal,
+                  boxShadow: `0 0 6px ${THEME.colors.teal}40`
                 }}
               >
                 ✓
@@ -393,9 +393,9 @@ export default function KeyDocumentsPage() {
               <span
                 className="inline-flex items-center justify-center w-6 h-6 rounded-full font-medium text-xs"
                 style={{
-                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                  color: '#EF4444',
-                  boxShadow: '0 0 6px rgba(239,68,68,0.2)'
+                  backgroundColor: `${THEME.colors.gold}26`,
+                  color: THEME.colors.gold,
+                  boxShadow: `0 0 6px ${THEME.colors.gold}33`
                 }}
               >
                 –
@@ -406,9 +406,9 @@ export default function KeyDocumentsPage() {
               <span
                 className="inline-flex items-center justify-center w-6 h-6 rounded-full font-semibold text-xs"
                 style={{
-                  backgroundColor: 'rgba(245, 158, 11, 0.15)',
-                  color: '#F59E0B',
-                  boxShadow: '0 0 6px rgba(245,158,11,0.2)'
+                  backgroundColor: `${THEME.colors.gold}26`,
+                  color: THEME.colors.gold,
+                  boxShadow: `0 0 6px ${THEME.colors.gold}33`
                 }}
               >
                 C

@@ -8,25 +8,25 @@ const characteristics = [
   {
     label: "Compliance Sensitivity",
     badge: "High",
-    badgeColor: "#DC2626",
+    colorKey: "gold" as const,
     body: "Non-solicitation and non-compete agreements are common. Advisors may face legal action from their prior firm if they contact clients before resignation. AXM and Legal must be briefed before any advisor communication goes out.",
   },
   {
     label: "U4 Timing",
     badge: "Hold Until Resignation",
-    badgeColor: "#3B5A69",
+    colorKey: "teal" as const,
     body: "The U4 registration form must NOT be submitted until after the advisor has formally resigned. Submitting early creates a trackable FINRA event that can alert the prior firm prematurely.",
   },
   {
     label: "Client Communication",
     badge: "Restricted Pre-Resignation",
-    badgeColor: "#D97706",
+    colorKey: "gold" as const,
     body: "Under the Protocol for Broker Recruitment, advisors may take only client names, addresses, phone numbers, email, and account titles. Any broader client data extraction is prohibited. Advisors should consult their prior firm's protocol membership status.",
   },
   {
     label: "Resignation Required",
     badge: "Mandatory First Step",
-    badgeColor: "#3B5A69",
+    colorKey: "steel" as const,
     body: "The advisor must formally resign before the Farther onboarding can fully proceed. The AXM coordinates timing with the advisor and Legal to minimize exposure and ensure the transition is clean.",
   },
 ];
@@ -165,11 +165,10 @@ export default function BreakawayPage() {
                       fontSize: "0.7rem",
                       fontWeight: 600,
                       color: "#fff",
-                      backgroundColor: c.badgeColor,
+                      backgroundColor: THEME.colors[c.colorKey],
                       borderRadius: "9999px",
                       padding: "3px 12px",
                       alignSelf: "flex-start",
-                      boxShadow: `0 0 10px ${c.badgeColor}40`,
                       letterSpacing: "0.03em",
                     }}
                   >
@@ -399,7 +398,7 @@ export default function BreakawayPage() {
           <div
             className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(239,68,68,0.12)]"
             style={{
-              backgroundColor: "#2f2f2f",
+              backgroundColor: THEME.colors.surface,
               border: `1px solid ${THEME.colors.border}`,
               borderRadius: "10px",
               padding: "1.25rem 1.5rem",
@@ -433,7 +432,7 @@ export default function BreakawayPage() {
                       width: "6px",
                       height: "6px",
                       borderRadius: "50%",
-                      backgroundColor: "#DC2626",
+                      backgroundColor: THEME.colors.gold,
                       marginTop: "0.55rem",
                     }}
                   />
