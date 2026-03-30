@@ -239,7 +239,7 @@ When you report a fix:
   - [ ] P1: Add tabular-nums to all financial number displays
   - [x] P1: Fix Sidebar light mode colors — `bg-surface border-border` tokens
   - [x] P1: Replace hardcoded glass card colors with CSS variables — ExecutiveSummary.tsx & signin
-  - [ ] P1: Consolidate 3 conflicting color systems into one
+  - [x] P1: Consolidate 3 conflicting color systems into one — Fixed with mode-aware CSS variables (commit 3308dd7)
   - [x] P1: Add missing Tailwind color definitions (gold, cream-muted, cream-border, cream-dark)
 
 ### **Task #12: RIA Advisor Onboarding Content & Advisor Task Hub**
