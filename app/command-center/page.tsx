@@ -2153,7 +2153,7 @@ export default function PipelineDashboard() {
   ];
 
   return (
-    <div style={{ padding: '40px 40px', minHeight: '100vh', fontFamily: "'Inter', system-ui, sans-serif", maxWidth: '100vw', overflowX: 'hidden' }}>
+    <div style={{ padding: '40px 40px', minHeight: '100vh', fontFamily: "'Inter', system-ui, sans-serif", width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
       {/* Header */}
       <div style={{ position: 'relative', marginBottom: 24 }}>
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />
