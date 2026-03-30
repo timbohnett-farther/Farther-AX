@@ -6,6 +6,33 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Body/Main Element Backgrounds — 2026-03-30
+
+**What**: Applied cream/slate background to body and main elements (was still white)
+
+**Problem**: Despite fixing theme colors, main pages still showed white background
+
+**Root Cause**: `<body>` and `<main>` elements in `app/layout.tsx` had no background color set, defaulting to browser white (#FFFFFF)
+
+**Solution**: Added CSS variable references:
+```tsx
+<body className="bg-[var(--color-bg)] text-[var(--color-text)]">
+<main className="bg-[var(--color-bg)]">
+```
+
+**Result**:
+- ✅ Light mode: All pages now have cream background (#F8F4F0)
+- ✅ Dark mode: All pages now have slate background (#2F424B)
+- ✅ Text colors adapt properly to background
+
+**Files Modified**: `app/layout.tsx` - Lines 26, 32
+
+**Commit**: `4dda142`
+
+**Status**: ✅ Complete
+
+---
+
 ## [Completed] Comprehensive Color System Overhaul — 2026-03-30
 
 **What**: Fixed backgrounds, surfaces, and color scheme for proper light/dark mode theming
