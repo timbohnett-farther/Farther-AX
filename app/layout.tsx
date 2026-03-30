@@ -23,13 +23,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;450;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
       </head>
-      <body className="antialiased">
+      <body className="antialiased bg-[var(--color-bg)] text-[var(--color-text)]">
         <ThemeProvider>
           <SessionProvider>
             <SWRProvider>
               <div className="flex min-h-screen">
                 <Sidebar />
-                <main className="flex-1 ml-64 min-h-screen">
+                <main className="flex-1 ml-64 min-h-screen bg-[var(--color-bg)]">
                   {children}
                 </main>
               </div>
