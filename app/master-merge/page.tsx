@@ -1,6 +1,11 @@
+'use client';
+
 import PageLayout from "@/components/PageLayout";
+import { useTheme } from '@/lib/theme-provider';
 
 export default function MasterMergePage() {
+  const { THEME } = useTheme();
+
   return (
     <PageLayout
       step={8}
@@ -21,10 +26,10 @@ export default function MasterMergePage() {
               key={stat.label}
               className="glass-card rounded-lg p-5 text-center"
             >
-              <p className="text-xs tracking-widest uppercase mb-1 text-teal-dark">
+              <p className="text-xs tracking-widest uppercase mb-1" style={{ color: THEME.colors.textMuted }}>
                 {stat.label}
               </p>
-              <p className="text-xl font-bold font-sans text-cream">
+              <p className="text-xl font-bold font-sans" style={{ color: THEME.colors.text }}>
                 {stat.value}
               </p>
             </div>
@@ -33,11 +38,11 @@ export default function MasterMergePage() {
 
         {/* Coming Soon Banner */}
         <div className="glass-card-dark rounded-xl p-8 mb-8 text-center">
-          <div className="text-5xl mb-4 text-teal">&#9670;</div>
-          <h2 className="text-2xl font-bold font-sans text-cream mb-3">
+          <div className="text-5xl mb-4" style={{ color: THEME.colors.teal }}>&#9670;</div>
+          <h2 className="text-2xl font-bold font-sans mb-3" style={{ color: THEME.colors.text }}>
             Detailed Content Coming Soon
           </h2>
-          <p className="text-base leading-relaxed text-cream-muted">
+          <p className="text-base leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
             The Master Merge section will provide a complete step-by-step guide to
             executing the fastest available transition method, including custodian
             requirements, eligibility criteria, and the full workflow.
@@ -46,7 +51,7 @@ export default function MasterMergePage() {
 
         {/* Preview */}
         <div className="glass-card rounded-lg p-6">
-          <h3 className="text-lg font-semibold font-sans text-cream mb-4">
+          <h3 className="text-lg font-semibold font-sans mb-4" style={{ color: THEME.colors.text }}>
             What This Section Will Cover
           </h3>
           <ul className="space-y-3">
@@ -59,8 +64,8 @@ export default function MasterMergePage() {
               "Post-merge verification and reconciliation",
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3">
-                <span className="text-teal mt-0.5">&#9656;</span>
-                <span className="text-sm text-cream">{item}</span>
+                <span className="mt-0.5" style={{ color: THEME.colors.teal }}>&#9656;</span>
+                <span className="text-sm" style={{ color: THEME.colors.text }}>{item}</span>
               </li>
             ))}
           </ul>

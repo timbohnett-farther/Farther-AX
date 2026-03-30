@@ -1,5 +1,8 @@
+'use client';
+
 import Link from "next/link";
 import QuizSection from "@/components/QuizSection";
+import { useTheme } from '@/lib/theme-provider';
 
 const matrixData = [
   {
@@ -223,8 +226,10 @@ const definitions = [
 ];
 
 export default function KeyDocumentsPage() {
+  const { THEME } = useTheme();
+
   return (
-    <main className="min-h-screen text-cream font-sans">
+    <main className="min-h-screen text-foreground font-sans">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         {/* Page header */}
@@ -232,7 +237,7 @@ export default function KeyDocumentsPage() {
           <p className="text-sm font-semibold text-gold-dark uppercase tracking-widest mb-2">
             Step 03 of 13
           </p>
-          <h1 className="font-serif text-4xl sm:text-5xl text-cream mb-3">
+          <h1 className="font-serif text-4xl sm:text-5xl text-foreground mb-3">
             Key Documents
           </h1>
           <p className="text-gold font-serif text-lg sm:text-xl">
@@ -241,11 +246,11 @@ export default function KeyDocumentsPage() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-cream-border mb-10" />
+        <div className="border-t border-border mb-10" />
 
         {/* Section 1: Introduction */}
         <section className="mb-12">
-          <p className="text-cream leading-relaxed text-base sm:text-lg max-w-4xl">
+          <p className="text-foreground leading-relaxed text-base sm:text-lg max-w-4xl">
             Every advisor onboarding involves a set of core documents. Which documents apply depends on
             the advisor&apos;s pathway and the transition method selected. Use the matrix below to quickly
             identify which documents are required for any given scenario, then refer to the definitions
@@ -255,22 +260,22 @@ export default function KeyDocumentsPage() {
 
         {/* Section 2: Document Applicability Matrix */}
         <section className="mb-14">
-          <h2 className="font-serif text-2xl sm:text-3xl text-cream mb-6">
+          <h2 className="font-serif text-2xl sm:text-3xl text-foreground mb-6">
             Document Applicability Matrix
           </h2>
 
           {/* Responsive table wrapper */}
-          <div className="overflow-x-auto rounded-lg border border-cream-border shadow-xs">
+          <div className="overflow-x-auto rounded-lg border border-border shadow-xs">
             <table className="min-w-full text-sm border-collapse">
               <thead>
-                <tr className="bg-charcoal-700">
-                  <th className="text-left px-4 py-3 font-semibold text-cream text-sm border-b border-cream-border whitespace-nowrap">
+                <tr className="bg-card-700">
+                  <th className="text-left px-4 py-3 font-semibold text-foreground text-sm border-b border-border whitespace-nowrap">
                     Document
                   </th>
                   {columns.map((col) => (
                     <th
                       key={col.key}
-                      className="text-center px-4 py-3 font-semibold text-cream text-sm border-b border-cream-border whitespace-nowrap"
+                      className="text-center px-4 py-3 font-semibold text-foreground text-sm border-b border-border whitespace-nowrap"
                     >
                       {col.label}
                     </th>
@@ -283,20 +288,20 @@ export default function KeyDocumentsPage() {
                     key={row.document}
                     className={
                       idx % 2 === 0
-                        ? "bg-charcoal-600/40 hover:bg-charcoal-700 transition-colors"
-                        : "bg-charcoal-600/20 hover:bg-charcoal-700 transition-colors"
+                        ? "bg-card-600/40 hover:bg-card-700 transition-colors"
+                        : "bg-card-600/20 hover:bg-card-700 transition-colors"
                     }
                   >
-                    <td className="px-4 py-3 border-b border-cream-border font-medium text-cream whitespace-nowrap">
+                    <td className="px-4 py-3 border-b border-border font-medium text-foreground whitespace-nowrap">
                       <span className="font-semibold">{row.document}</span>
-                      <span className="block text-xs text-cream-muted font-normal mt-0.5 max-w-[160px] whitespace-normal leading-tight">
+                      <span className="block text-xs text-foreground-muted font-normal mt-0.5 max-w-[160px] whitespace-normal leading-tight">
                         {row.fullName !== row.document ? row.fullName : ""}
                       </span>
                     </td>
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        className="text-center px-4 py-3 border-b border-cream-border"
+                        className="text-center px-4 py-3 border-b border-border"
                       >
                         <CellValue value={row[col.key as keyof typeof row] as string} />
                       </td>
@@ -308,7 +313,7 @@ export default function KeyDocumentsPage() {
           </div>
 
           {/* Legend */}
-          <div className="mt-4 flex flex-wrap gap-6 text-sm text-cream-muted">
+          <div className="mt-4 flex flex-wrap gap-6 text-sm text-foreground-muted">
             <span className="flex items-center gap-2">
               <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/15 text-emerald-400 font-bold text-xs shadow-[0_0_6px_rgba(16,185,129,0.25)]">✓</span>
               Required
@@ -325,11 +330,11 @@ export default function KeyDocumentsPage() {
         </section>
 
         {/* Divider */}
-        <div className="border-t border-cream-border mb-12" />
+        <div className="border-t border-border mb-12" />
 
         {/* Section 3: Document Definitions */}
         <section className="mb-16">
-          <h2 className="font-serif text-2xl sm:text-3xl text-cream mb-8">
+          <h2 className="font-serif text-2xl sm:text-3xl text-foreground mb-8">
             Document Definitions
           </h2>
 
@@ -341,37 +346,37 @@ export default function KeyDocumentsPage() {
               >
                 {/* Card header */}
                 <div className="flex items-start gap-4 mb-3">
-                  <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-charcoal-700 text-gold-dark text-xs font-bold font-sans">
+                  <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-card-700 text-gold-dark text-xs font-bold font-sans">
                     {String(idx + 1).padStart(2, "0")}
                   </span>
                   <div>
-                    <h3 className="font-serif text-xl text-cream mb-0.5">
+                    <h3 className="font-serif text-xl text-foreground mb-0.5">
                       <span className="text-gold-dark">{def.code}</span>
                       {def.code !== def.title && (
-                        <span className="text-cream"> — {def.title}</span>
+                        <span className="text-foreground"> — {def.title}</span>
                       )}
                     </h3>
                   </div>
                 </div>
 
                 {/* Body */}
-                <p className="text-cream leading-relaxed mb-4 pl-12">
+                <p className="text-foreground leading-relaxed mb-4 pl-12">
                   {def.body}
                 </p>
 
                 {/* Meta row */}
                 <div className="pl-12 flex flex-wrap gap-6 text-sm">
                   <div>
-                    <span className="font-semibold text-cream-muted uppercase tracking-wide text-xs">
+                    <span className="font-semibold text-foreground-muted uppercase tracking-wide text-xs">
                       Owner
                     </span>
-                    <p className="text-cream mt-0.5">{def.owner}</p>
+                    <p className="text-foreground mt-0.5">{def.owner}</p>
                   </div>
                   <div>
-                    <span className="font-semibold text-cream-muted uppercase tracking-wide text-xs">
+                    <span className="font-semibold text-foreground-muted uppercase tracking-wide text-xs">
                       Timing
                     </span>
-                    <p className="text-cream mt-0.5">{def.timing}</p>
+                    <p className="text-foreground mt-0.5">{def.timing}</p>
                   </div>
                 </div>
               </div>
@@ -380,23 +385,23 @@ export default function KeyDocumentsPage() {
         </section>
 
         {/* Bottom navigation */}
-        <div className="border-t border-cream-border pt-8">
+        <div className="border-t border-border pt-8">
           <div className="flex items-center justify-between">
             <Link
               href="/onboarding-vs-transitions"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg glass-card text-cream hover:bg-charcoal-700 hover:border-teal transition-all duration-200 text-sm font-medium hover:shadow-[0_0_16px_rgba(29,118,130,0.2)]"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg glass-card text-foreground hover:bg-card-700 hover:border-teal transition-all duration-200 text-sm font-medium hover:shadow-[0_0_16px_rgba(29,118,130,0.2)]"
             >
               <span aria-hidden="true">←</span>
               Back
             </Link>
 
-            <span className="text-xs font-semibold text-cream-muted tracking-widest uppercase">
+            <span className="text-xs font-semibold text-foreground-muted tracking-widest uppercase">
               03 / 13
             </span>
 
             <Link
               href="/breakaway"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gold text-white hover:bg-gold-dark transition-all duration-200 text-sm font-medium shadow-[0_0_12px_rgba(29,118,130,0.3)] hover:shadow-[0_0_24px_rgba(29,118,130,0.5)] hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-teal text-white hover:bg-bronze transition-all duration-200 text-sm font-medium shadow-[0_0_12px_rgba(29,118,130,0.3)] hover:shadow-[0_0_24px_rgba(29,118,130,0.5)] hover:-translate-y-0.5"
             >
               Next
               <span aria-hidden="true">→</span>

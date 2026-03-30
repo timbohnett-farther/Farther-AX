@@ -1,5 +1,8 @@
+'use client';
+
 import PageLayout from "@/components/PageLayout";
 import QuizSection from "@/components/QuizSection";
+import { useTheme } from '@/lib/theme-provider';
 
 const keyCharacteristics = [
   {
@@ -40,6 +43,8 @@ const focusTeamItems = [
 ];
 
 export default function NoToLowAUMPage() {
+  const { THEME } = useTheme();
+
   return (
     <PageLayout
       step={7}
@@ -53,7 +58,7 @@ export default function NoToLowAUMPage() {
       <div className="max-w-4xl mx-auto">
 
         {/* Intro */}
-        <p className="text-cream-muted leading-relaxed text-base mb-12 max-w-3xl">
+        <p className="leading-relaxed text-base mb-12 max-w-3xl" style={{ color: THEME.colors.textSecondary }}>
           The No to Low AUM pathway applies to advisors bringing fewer than $15-20 million in assets
           under management to Farther. While Farther welcomes advisors at all stages, advisors below
           this threshold follow a modified, training-first onboarding approach before proceeding to
@@ -63,8 +68,8 @@ export default function NoToLowAUMPage() {
         {/* Section: When This Pathway Applies */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-1 h-6 rounded-full bg-teal" />
-            <h2 className="font-sans text-2xl font-bold text-cream">
+            <div className="w-1 h-6 rounded-full" style={{ background: THEME.colors.teal }} />
+            <h2 className="font-sans text-2xl font-bold" style={{ color: THEME.colors.text }}>
               When This Pathway Applies
             </h2>
           </div>
@@ -72,7 +77,7 @@ export default function NoToLowAUMPage() {
           {/* Informational callout */}
           <div className="rounded-xl px-7 py-6 bg-blue-500/[0.15] border border-blue-500/30 border-l-4 border-l-blue-500 shadow-[0_0_12px_rgba(91,155,213,0.15)]">
             <div className="flex items-start gap-4">
-              <div className="shrink-0 w-8 h-8 flex items-center justify-center text-sm font-bold mt-0.5 shadow-[0_0_10px_rgba(91,155,213,0.4)] bg-blue-500 text-charcoal-800 rounded-full">
+              <div className="shrink-0 w-8 h-8 flex items-center justify-center text-sm font-bold mt-0.5 shadow-[0_0_10px_rgba(91,155,213,0.4)] bg-blue-500 rounded-full" style={{ color: THEME.colors.charcoal900 }}>
                 i
               </div>
               <p className="leading-relaxed text-sm text-blue-300">
@@ -87,8 +92,8 @@ export default function NoToLowAUMPage() {
         {/* Section: Key Characteristics */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full bg-teal" />
-            <h2 className="font-sans text-2xl font-bold text-cream">
+            <div className="w-1 h-6 rounded-full" style={{ background: THEME.colors.teal }} />
+            <h2 className="font-sans text-2xl font-bold" style={{ color: THEME.colors.text }}>
               Key Characteristics
             </h2>
           </div>
@@ -100,14 +105,14 @@ export default function NoToLowAUMPage() {
                 className="glass-card rounded-xl p-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 shadow-[0_0_10px_rgba(78,112,130,0.3)] bg-teal text-charcoal-800">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 shadow-[0_0_10px_rgba(78,112,130,0.3)]" style={{ background: THEME.colors.teal, color: THEME.colors.charcoal900 }}>
                     {item.icon}
                   </div>
-                  <h3 className="font-sans text-lg leading-tight text-cream">
+                  <h3 className="font-sans text-lg leading-tight" style={{ color: THEME.colors.text }}>
                     {item.title}
                   </h3>
                 </div>
-                <p className="text-sm leading-relaxed text-cream-muted">
+                <p className="text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
                   {item.body}
                 </p>
               </div>
@@ -118,26 +123,26 @@ export default function NoToLowAUMPage() {
         {/* Section: The Focus Team Review */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-1 h-6 rounded-full bg-teal" />
-            <h2 className="font-sans text-2xl font-bold text-cream">
+            <div className="w-1 h-6 rounded-full" style={{ background: THEME.colors.teal }} />
+            <h2 className="font-sans text-2xl font-bold" style={{ color: THEME.colors.text }}>
               The Focus Team Review
             </h2>
           </div>
 
-          <div className="rounded-xl overflow-hidden border border-cream-border">
-            <div className="px-7 py-5 border-b border-cream-border bg-charcoal-600">
-              <p className="text-sm leading-relaxed text-cream">
+          <div className="rounded-xl overflow-hidden border" style={{ borderColor: THEME.colors.border }}>
+            <div className="px-7 py-5 border-b" style={{ background: THEME.colors.surface, borderColor: THEME.colors.border }}>
+              <p className="text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
                 The Focus Team is an internal Farther committee that reviews borderline advisor
                 candidates. Their assessment covers the following areas. The AXM must present the
                 advisor&apos;s profile to the Focus Team before initiating any onboarding steps.
               </p>
             </div>
-            <div className="px-7 py-6 bg-charcoal-500/50">
+            <div className="px-7 py-6" style={{ background: THEME.colors.surfaceSubtle }}>
               <ul className="space-y-3">
                 {focusTeamItems.map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <span className="shrink-0 mt-0.5 text-teal">&#9670;</span>
-                    <span className="text-sm leading-relaxed text-cream">
+                    <span className="shrink-0 mt-0.5" style={{ color: THEME.colors.teal }}>&#9670;</span>
+                    <span className="text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
                       {item}
                     </span>
                   </li>
@@ -150,28 +155,29 @@ export default function NoToLowAUMPage() {
         {/* Section: Training Curriculum Priority */}
         <section className="mb-4">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full bg-teal" />
-            <h2 className="font-sans text-2xl font-bold text-cream">
+            <div className="w-1 h-6 rounded-full" style={{ background: THEME.colors.teal }} />
+            <h2 className="font-sans text-2xl font-bold" style={{ color: THEME.colors.text }}>
               Training Curriculum Priority
             </h2>
           </div>
 
-          <div className="rounded-xl border border-cream-border overflow-hidden">
-            <div className="px-2 py-1 border-b border-cream-border bg-charcoal-600">
-              <span className="text-xs uppercase tracking-widest font-medium px-5 py-3 inline-block text-teal">
+          <div className="rounded-xl border overflow-hidden" style={{ borderColor: THEME.colors.border }}>
+            <div className="px-2 py-1 border-b" style={{ background: THEME.colors.surface, borderColor: THEME.colors.border }}>
+              <span className="text-xs uppercase tracking-widest font-medium px-5 py-3 inline-block" style={{ color: THEME.colors.teal }}>
                 Required Training Modules — In Order
               </span>
             </div>
-            <div className="bg-charcoal-500/50">
+            <div style={{ background: THEME.colors.surfaceSubtle }}>
               {trainingItems.map((item, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center gap-5 px-6 py-4 border-b last:border-b-0 border-cream-border"
+                  className="flex items-center gap-5 px-6 py-4 border-b last:border-b-0"
+                  style={{ borderColor: THEME.colors.border }}
                 >
-                  <span className="shrink-0 w-7 h-7 flex items-center justify-center text-xs font-bold font-sans shadow-[0_0_8px_rgba(78,112,130,0.3)] bg-charcoal-600 text-teal border border-cream-border rounded-full">
+                  <span className="shrink-0 w-7 h-7 flex items-center justify-center text-xs font-bold font-sans shadow-[0_0_8px_rgba(78,112,130,0.3)] rounded-full" style={{ background: THEME.colors.surface, color: THEME.colors.teal, border: `1px solid ${THEME.colors.border}` }}>
                     {String(idx + 1).padStart(2, "0")}
                   </span>
-                  <span className="text-sm leading-relaxed text-cream">
+                  <span className="text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
                     {item}
                   </span>
                 </div>
