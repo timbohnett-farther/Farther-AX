@@ -6,6 +6,34 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Sign-In Page Width - Text No Longer Bunched — 2026-03-30
+
+**What**: Fixed sign-in modal width so text displays properly without bunching
+
+**Problem**: Sign-in modal was too narrow (max-w-md = 448px), causing all text to break awkwardly on nearly every word
+
+**Root Cause**: Modal had `max-w-md` class instead of wider container width
+
+**Solution**:
+- Changed modal width from `max-w-md` (448px) to `max-w-xl` (576px)
+- Increased padding from `p-10` to `p-12` for more breathing room
+- Increased font sizes for better readability
+- Replaced hardcoded colors with proper theme system colors
+- Added hover states using theme colors
+
+**Files Modified**:
+- `app/auth/signin/page.tsx` (complete rewrite with proper widths)
+
+**Impact**:
+- ✅ Sign-in text no longer bunched up
+- ✅ Professional, spacious layout
+- ✅ Proper theme system usage
+- ✅ Better readability and UX
+
+**Status**: ✅ Complete - ready to deploy
+
+---
+
 ## [Completed] Add Missing Gold Color to Theme — 2026-03-30
 
 **What**: Added gold color alias to theme system
