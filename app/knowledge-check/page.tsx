@@ -65,7 +65,13 @@ export default function KnowledgeCheckPage() {
     >
       <div className="max-w-3xl mx-auto">
         {/* Overall Progress */}
-        <div className="glass-card-dark rounded-xl p-8 mb-8">
+        <div
+          className="rounded-xl p-8 mb-8"
+          style={{
+            backgroundColor: THEME.colors.surfaceSubtle,
+            border: `1px solid ${THEME.colors.border}`
+          }}
+        >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
               <h2 className="text-2xl font-bold text-white font-sans">

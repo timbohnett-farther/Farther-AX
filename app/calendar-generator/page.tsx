@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import PageLayout from "@/components/PageLayout";
+import { useTheme } from '@/lib/theme-provider';
 
 // --- Types ---
 
@@ -102,6 +103,7 @@ function AttendeeBadge({ attendee }: { attendee: Attendee }) {
 // --- Page ---
 
 export default function CalendarGeneratorPage() {
+  const { THEME } = useTheme();
   const [advisorName, setAdvisorName] = useState("");
   const [pathway, setPathway] = useState("breakaway");
   const [launchDate, setLaunchDate] = useState("");
@@ -187,7 +189,13 @@ export default function CalendarGeneratorPage() {
       <div className="max-w-3xl">
 
         {/* -- Advisor Details -- */}
-        <div className="glass-card rounded-xl p-6 mb-6">
+        <div
+          className="rounded-xl p-6 mb-6"
+          style={{
+            backgroundColor: THEME.colors.surface,
+            border: `1px solid ${THEME.colors.border}`
+          }}
+        >
           <h2 className="text-xl font-bold font-sans text-cream mb-5">
             Advisor Details
           </h2>
@@ -234,7 +242,13 @@ export default function CalendarGeneratorPage() {
         </div>
 
         {/* -- Team & Attendees -- */}
-        <div className="glass-card rounded-xl p-6 mb-6">
+        <div
+          className="rounded-xl p-6 mb-6"
+          style={{
+            backgroundColor: THEME.colors.surface,
+            border: `1px solid ${THEME.colors.border}`
+          }}
+        >
           <h2 className="text-xl font-bold font-sans text-cream mb-5">
             Team &amp; Attendees
           </h2>

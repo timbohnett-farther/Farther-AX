@@ -102,7 +102,11 @@ export default function NoToLowAUMPage() {
             {keyCharacteristics.map((item, idx) => (
               <div
                 key={idx}
-                className="glass-card rounded-xl p-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+                className="rounded-xl p-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+                style={{
+                  backgroundColor: THEME.colors.surface,
+                  border: `1px solid ${THEME.colors.border}`
+                }}
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 shadow-[0_0_10px_rgba(78,112,130,0.3)]" style={{ background: THEME.colors.teal, color: THEME.colors.charcoal900 }}>

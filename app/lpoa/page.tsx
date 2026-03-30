@@ -82,7 +82,11 @@ export default function LPOAPage() {
             {statCards.map((card, idx) => (
               <div
                 key={idx}
-                className="glass-card rounded-xl text-center px-6 py-7 transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.2)]"
+                className="rounded-xl text-center px-6 py-7 transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.2)]"
+                style={{
+                  backgroundColor: THEME.colors.surface,
+                  border: `1px solid ${THEME.colors.border}`
+                }}
               >
                 <p className="text-xs uppercase tracking-widest font-medium mb-3" style={{ color: THEME.colors.textSecondary }}>
                   {card.label}
@@ -153,7 +157,11 @@ export default function LPOAPage() {
             {custodians.map((c, idx) => (
               <div
                 key={idx}
-                className="glass-card rounded-xl p-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)]"
+                className="rounded-xl p-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)]"
+                style={{
+                  backgroundColor: THEME.colors.surface,
+                  border: `1px solid ${THEME.colors.border}`
+                }}
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center font-serif font-bold text-lg shrink-0" style={{ background: THEME.colors.text, color: THEME.colors.charcoal900 }}>

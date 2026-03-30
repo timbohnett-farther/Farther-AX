@@ -24,7 +24,11 @@ export default function MasterMergePage() {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="glass-card rounded-lg p-5 text-center"
+              className="rounded-lg p-5 text-center"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`
+              }}
             >
               <p className="text-xs tracking-widest uppercase mb-1" style={{ color: THEME.colors.textMuted }}>
                 {stat.label}
@@ -37,7 +41,13 @@ export default function MasterMergePage() {
         </div>
 
         {/* Coming Soon Banner */}
-        <div className="glass-card-dark rounded-xl p-8 mb-8 text-center">
+        <div
+          className="rounded-xl p-8 mb-8 text-center"
+          style={{
+            backgroundColor: THEME.colors.surfaceSubtle,
+            border: `1px solid ${THEME.colors.border}`
+          }}
+        >
           <div className="text-5xl mb-4" style={{ color: THEME.colors.teal }}>&#9670;</div>
           <h2 className="text-2xl font-bold font-sans mb-3" style={{ color: THEME.colors.text }}>
             Detailed Content Coming Soon
@@ -50,7 +60,13 @@ export default function MasterMergePage() {
         </div>
 
         {/* Preview */}
-        <div className="glass-card rounded-lg p-6">
+        <div
+          className="rounded-lg p-6"
+          style={{
+            backgroundColor: THEME.colors.surface,
+            border: `1px solid ${THEME.colors.border}`
+          }}
+        >
           <h3 className="text-lg font-semibold font-sans mb-4" style={{ color: THEME.colors.text }}>
             What This Section Will Cover
           </h3>

@@ -6,6 +6,49 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Phase 1 Quick Fixes - Training Pages — 2026-03-30
+
+**What**: Fixed 5 training pages with undefined `glass-card` and `glass-card-dark` Tailwind classes
+
+**Problem**: Pages used undefined Tailwind utility classes that don't exist in the theme configuration
+
+**Solution**: Replaced all undefined classes with proper theme-based inline styles using `THEME.colors.*`
+
+**Pages Fixed** (9 total issues):
+1. **No to Low AUM** (1 issue) - Replaced `glass-card` on line 105
+2. **Master Merge** (3 issues) - Replaced 3 instances of `glass-card` and `glass-card-dark`
+3. **LPOA** (2 issues) - Replaced 2 instances of `glass-card`
+4. **Knowledge Check** (1 issue) - Replaced `glass-card-dark` on line 68
+5. **Calendar Generator** (2 issues) - Added useTheme import, replaced 2 instances of `glass-card`
+
+**Pattern Used**:
+```tsx
+// Before:
+<div className="glass-card rounded-xl p-6">
+
+// After:
+<div
+  className="rounded-xl p-6"
+  style={{
+    backgroundColor: THEME.colors.surface,
+    border: `1px solid ${THEME.colors.border}`
+  }}
+>
+```
+
+**Status**: ✅ Fixed and tested - ready for deployment
+
+**Files**:
+- `app/no-to-low-aum/page.tsx`
+- `app/master-merge/page.tsx`
+- `app/lpoa/page.tsx`
+- `app/knowledge-check/page.tsx`
+- `app/calendar-generator/page.tsx`
+
+**Next**: M&A page (63 issues - most complex remaining)
+
+---
+
 ## [Completed] Complete Site Audit — 2026-03-30
 
 **What**: Comprehensive audit of all 30 pages in the application
