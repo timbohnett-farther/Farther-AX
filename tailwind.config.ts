@@ -121,6 +121,13 @@ const config: Config = {
         bronze: '#B68A4C',
         pomegranate: '#CE3657',
 
+        // Gold/Bronze brand accent
+        gold: {
+          DEFAULT: '#B68A4C',
+          dark: '#9A7440',      // Darker variant for light mode
+          light: '#C99B5F',     // Lighter variant for dark mode
+        },
+
         // Additional contextual colors
         'cream-bg': 'var(--color-bg)',
         'cream-border': 'var(--color-border)',

@@ -48,13 +48,13 @@
 
 :root {
   /* Backgrounds (Light mode: cream/limestone) */
-  --color-bg: #F8F4F0;           /* limestone-50 */
-  --color-bg-soft: #FFFFFF;
-  --color-bg-elevated: #FFFFFF;
+  --color-bg: #F8F4F0;           /* limestone-50 - main cream background */
+  --color-bg-soft: #F2EAE2;      /* limestone-100 - soft cream */
+  --color-bg-elevated: #FAFAFA;  /* nearly white for elevation */
 
-  /* Surfaces */
-  --color-surface: #FFFFFF;
-  --color-surface-hover: #F5F8FA;
+  /* Surfaces (Light mode: cream tones) */
+  --color-surface: #F8F4F0;      /* limestone-50 - cards/panels match bg */
+  --color-surface-hover: #E6E3DB; /* clay-100 - hover state */
   --color-surface-subtle: rgba(59, 90, 105, 0.06);
 
   /* Text (Light mode: dark charcoal) */
@@ -74,14 +74,14 @@
    ============================================================================ */
 
 .dark {
-  /* Backgrounds (Dark mode: steel-blue) */
-  --color-bg: #2F424B;           /* steel-blue-900 */
-  --color-bg-soft: #334D59;      /* steel-blue-800 */
-  --color-bg-elevated: #3F535F;  /* smalt-blue-700 */
+  /* Backgrounds (Dark mode: slate/steel-blue) */
+  --color-bg: #2F424B;           /* steel-blue-900 - main slate background */
+  --color-bg-soft: #334D59;      /* steel-blue-800 - soft slate */
+  --color-bg-elevated: #3F535F;  /* smalt-blue-700 - elevated elements */
 
-  /* Surfaces */
-  --color-surface: #3B5A69;      /* steel-blue-700 */
-  --color-surface-hover: #476F82; /* steel-blue-600 */
+  /* Surfaces (Dark mode: slate/steel-blue) */
+  --color-surface: #3B5A69;      /* steel-blue-700 - cards/panels slate */
+  --color-surface-hover: #476F82; /* steel-blue-600 - hover state */
   --color-surface-subtle: rgba(59, 90, 105, 0.30);
 
   /* Text (Dark mode: light cream/limestone) */

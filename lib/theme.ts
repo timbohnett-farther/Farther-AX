@@ -99,14 +99,16 @@ export function createTheme(mode: ThemeMode) {
     iceLight: PALETTE.steelBlue300,
 
     // === Backgrounds (mode-aware) ===
-    bg: isDark ? '#2F424B' : '#F8F4F0',
-    bgSoft: isDark ? '#334D59' : '#FFFFFF',
-    bgElevated: isDark ? '#3F535F' : '#FFFFFF',
-    bgDeep: isDark ? '#2F424B' : '#F8F4F0',
+    // Light mode: cream (#F8F4F0) | Dark mode: slate/steel-blue (#2F424B)
+    bg: isDark ? '#2F424B' : '#F8F4F0',              // Main page background
+    bgSoft: isDark ? '#334D59' : '#F2EAE2',          // Soft background (limestone-100 in light)
+    bgElevated: isDark ? '#3F535F' : '#FAFAFA',      // Elevated elements
+    bgDeep: isDark ? '#2F424B' : '#F8F4F0',          // Deep background
 
     // === Surfaces (mode-aware) ===
-    surface: isDark ? '#3B5A69' : '#FFFFFF',
-    surfaceHover: isDark ? '#476F82' : '#F5F8FA',
+    // Light mode: cream tones | Dark mode: slate/steel-blue
+    surface: isDark ? '#3B5A69' : '#F8F4F0',         // Card/panel background (cream in light, slate in dark)
+    surfaceHover: isDark ? '#476F82' : '#E6E3DB',    // Hover state (clay-100 in light)
     surfaceSubtle: isDark ? 'rgba(59, 90, 105, 0.30)' : 'rgba(59, 90, 105, 0.06)',
 
     // === Text hierarchy (mode-aware) ===
