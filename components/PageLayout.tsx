@@ -97,7 +97,7 @@ export default function PageLayout({
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = THEME.colors.surfaceHover;
                 e.currentTarget.style.borderColor = THEME.colors.steel;
-                e.currentTarget.style.boxShadow = `0 0 16px rgba(59,90,105,0.3)`;
+                e.currentTarget.style.boxShadow = `0 0 16px ${THEME.colors.steel}4D`;
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = "transparent";
@@ -127,7 +127,7 @@ export default function PageLayout({
                     : i + 1 < step
                     ? `${THEME.colors.steel}66`
                     : THEME.colors.borderSubtle,
-                  boxShadow: isActive ? `0 0 8px rgba(59,90,105,0.6)` : "none",
+                  boxShadow: isActive ? `0 0 8px ${THEME.colors.steel}99` : "none",
                   transition: "all 300ms ease",
                 }}
               />
@@ -143,17 +143,17 @@ export default function PageLayout({
               style={{
                 color: "#FFFFFF",
                 backgroundColor: THEME.colors.steel,
-                boxShadow: `0 0 12px rgba(59,90,105,0.3)`,
+                boxShadow: `0 0 12px ${THEME.colors.steel}4D`,
                 transition: "all 200ms ease",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = THEME.colors.steelBlue900;
-                e.currentTarget.style.boxShadow = `0 0 24px rgba(59,90,105,0.5)`;
+                e.currentTarget.style.boxShadow = `0 0 24px ${THEME.colors.steel}80`;
                 e.currentTarget.style.transform = "translateY(-1px)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = THEME.colors.steel;
-                e.currentTarget.style.boxShadow = `0 0 12px rgba(59,90,105,0.3)`;
+                e.currentTarget.style.boxShadow = `0 0 12px ${THEME.colors.steel}4D`;
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >

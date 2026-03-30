@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useTheme } from "@/lib/theme-provider";
 
 interface QuizQuestion {
   id: string;
@@ -42,6 +43,7 @@ type QuizState = "idle" | "loading" | "active" | "submitting" | "results";
 
 export default function QuizSection({ topicSlug, topicTitle }: QuizSectionProps) {
   const { data: session } = useSession();
+  const { THEME } = useTheme();
   const [quizState, setQuizState] = useState<QuizState>("idle");
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
@@ -202,7 +204,13 @@ export default function QuizSection({ topicSlug, topicTitle }: QuizSectionProps)
   if (quizState === "idle" || quizState === "loading") {
     return (
       <section className="mt-12 mb-8">
-        <div className="rounded-xl border border-white/10 bg-[rgba(23,31,39,0.80)] backdrop-blur-md p-6 sm:p-8">
+        <div
+          className="rounded-xl backdrop-blur-md p-6 sm:p-8"
+          style={{
+            border: `1px solid ${THEME.colors.border}26`,
+            backgroundColor: `${THEME.colors.surface}CC`
+          }}
+        >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
               <h2 className="text-2xl font-semibold text-white font-sans">
@@ -301,7 +309,13 @@ export default function QuizSection({ topicSlug, topicTitle }: QuizSectionProps)
   if (quizState === "active" || quizState === "submitting") {
     return (
       <section className="mt-12 mb-8">
-        <div className="rounded-xl border border-white/10 bg-[rgba(23,31,39,0.80)] backdrop-blur-md p-6 sm:p-8">
+        <div
+          className="rounded-xl backdrop-blur-md p-6 sm:p-8"
+          style={{
+            border: `1px solid ${THEME.colors.border}26`,
+            backgroundColor: `${THEME.colors.surface}CC`
+          }}
+        >
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <h2 className="text-2xl font-semibold text-white font-sans">
@@ -417,7 +431,13 @@ export default function QuizSection({ topicSlug, topicTitle }: QuizSectionProps)
 
     return (
       <section className="mt-12 mb-8">
-        <div className="rounded-xl border border-white/10 bg-[rgba(23,31,39,0.80)] backdrop-blur-md p-6 sm:p-8">
+        <div
+          className="rounded-xl backdrop-blur-md p-6 sm:p-8"
+          style={{
+            border: `1px solid ${THEME.colors.border}26`,
+            backgroundColor: `${THEME.colors.surface}CC`
+          }}
+        >
           {/* Score Header */}
           <div className="text-center mb-8">
             <div
