@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useTheme } from '@/lib/theme-provider';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -16,7 +17,7 @@ const SUGGESTED_PROMPTS = [
   'Flag any high-risk deals I should know about',
 ];
 
-function MessageBubble({ message }: { message: Message }) {
+function MessageBubble({ message, THEME }: { message: Message; THEME: any }) {
   const isUser = message.role === 'user';
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
@@ -29,8 +30,12 @@ function MessageBubble({ message }: { message: Message }) {
         className={`max-w-[72%] px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
           isUser
             ? 'rounded-[18px_18px_4px_18px] bg-teal text-white'
-            : 'rounded-[18px_18px_18px_4px] glass-card text-cream'
+            : 'rounded-[18px_18px_18px_4px] text-cream'
         }`}
+        style={!isUser ? {
+          backgroundColor: THEME.colors.surface,
+          border: `1px solid ${THEME.colors.border}`
+        } : undefined}
       >
         {message.content}
       </div>
@@ -44,6 +49,7 @@ function MessageBubble({ message }: { message: Message }) {
  * Migrated to Tailwind utilities (removed all inline styles)
  */
 export default function AIAssistant() {
+  const { THEME } = useTheme();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -84,7 +90,13 @@ export default function AIAssistant() {
   return (
     <div className="flex flex-col h-screen bg-transparent font-sans">
       {/* Header */}
-      <div className="px-10 pt-6 pb-4 border-b border-cream-border glass-card">
+      <div
+        className="px-10 pt-6 pb-4 border-b"
+        style={{
+          backgroundColor: THEME.colors.surface,
+          borderColor: THEME.colors.border
+        }}
+      >
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-teal flex items-center justify-center text-base text-white">
             ✦
@@ -111,7 +123,11 @@ export default function AIAssistant() {
                 <button
                   key={prompt}
                   onClick={() => sendMessage(prompt)}
-                  className="px-3.5 py-1.5 rounded-full border border-cream-border glass-card text-slate text-xs cursor-pointer hover:bg-charcoal-600 hover:border-teal transition-smooth"
+                  className="px-3.5 py-1.5 rounded-full border text-slate text-xs cursor-pointer hover:bg-charcoal-600 hover:border-teal transition-smooth"
+                  style={{
+                    backgroundColor: THEME.colors.surface,
+                    borderColor: THEME.colors.border
+                  }}
                 >
                   {prompt}
                 </button>
@@ -120,14 +136,20 @@ export default function AIAssistant() {
           </div>
         )}
 
-        {messages.map((msg, i) => <MessageBubble key={i} message={msg} />)}
+        {messages.map((msg, i) => <MessageBubble key={i} message={msg} THEME={THEME} />)}
 
         {loading && (
           <div className="flex items-center gap-2.5 mb-4">
             <div className="w-8 h-8 rounded-full bg-teal flex items-center justify-center text-sm text-white">
               ✦
             </div>
-            <div className="px-4 py-3 rounded-[18px_18px_18px_4px] glass-card border border-cream-border">
+            <div
+              className="px-4 py-3 rounded-[18px_18px_18px_4px] border"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                borderColor: THEME.colors.border
+              }}
+            >
               <span className="text-slate text-xs">Thinking…</span>
             </div>
           </div>
@@ -136,7 +158,13 @@ export default function AIAssistant() {
       </div>
 
       {/* Input */}
-      <div className="px-10 py-4 pb-6 glass-card border-t border-cream-border">
+      <div
+        className="px-10 py-4 pb-6 border-t"
+        style={{
+          backgroundColor: THEME.colors.surface,
+          borderColor: THEME.colors.border
+        }}
+      >
         <form
           onSubmit={e => { e.preventDefault(); sendMessage(input); }}
           className="flex gap-3 items-end"

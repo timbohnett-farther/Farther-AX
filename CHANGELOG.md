@@ -6,6 +6,49 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Phase 2: Internal Tools Fixed — 2026-03-30
+
+**What**: Fixed 3 internal tool pages with theme system and undefined classes
+
+**Pages Fixed:**
+1. **Auth Error Page** - Hardcoded colors + narrow container
+   - Added useTheme hook
+   - Replaced all hardcoded colors with THEME.colors.*
+   - Widened container from max-w-md (448px) to max-w-xl (576px)
+   - Matched sign-in page styling and width
+   - Added footer text
+
+2. **AI Assistant** - 5 instances of undefined `glass-card` class
+   - Added useTheme import
+   - Fixed MessageBubble component to accept THEME prop
+   - Replaced glass-card with inline styles (5 locations):
+     * Assistant message bubbles
+     * Header section
+     * Suggested prompt buttons
+     * Thinking indicator
+     * Input section
+
+3. **RIA Hub** - 2 instances of undefined `glass-card` class
+   - Added useTheme import to main page and DealCard
+   - Replaced glass-card with inline styles:
+     * Individual deal cards
+     * Empty state card
+
+**Already Clean** (no changes needed):
+- Command Center - Complexity (proper Tailwind usage)
+- Command Center - Metrics (proper Tailwind usage)
+
+**Status**: ✅ Phase 2 complete - all internal tools now using theme system
+
+**Files**:
+- `app/auth/error/page.tsx` (complete rewrite)
+- `app/command-center/ai/page.tsx` (5 fixes)
+- `app/command-center/ria-hub/page.tsx` (2 fixes)
+
+**Next**: Phase 3 - Forms and other pages (Tech Intake, U4/2B, Home, UI Showcase)
+
+---
+
 ## [Completed] M&A Page Complete Rewrite — 2026-03-30
 
 **What**: Completely rewrote M&A page with 63 undefined Tailwind classes fixed

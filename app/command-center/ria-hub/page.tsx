@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Card, Text, Badge } from '@tremor/react';
 import { StatCard, DataCard, StatusBadge, TabGroup, FilterBar } from '@/components/ui';
 import { formatCompactCurrency } from '@/lib/theme';
+import { useTheme } from '@/lib/theme-provider';
 import {
   UserGroupIcon,
   EnvelopeIcon,
@@ -397,6 +398,7 @@ function OverviewTab({ deal }: { deal: Deal }) {
    Deal Card (expandable)
    ═══════════════════════════════════════════════════════════ */
 function DealCard({ deal, expanded, onToggle }: { deal: Deal; expanded: boolean; onToggle: () => void }) {
+  const { THEME } = useTheme();
   const p = deal.properties;
   const primaryContact = deal.contacts[0];
   const isLaunched = deal.stageLabel.includes('Step 7');
@@ -412,7 +414,13 @@ function DealCard({ deal, expanded, onToggle }: { deal: Deal; expanded: boolean;
   ];
 
   return (
-    <Card className={`glass-card overflow-hidden transition-smooth ${expanded ? 'shadow-glass-hover' : ''}`}>
+    <Card
+      className={`overflow-hidden transition-smooth ${expanded ? 'shadow-glass-hover' : ''}`}
+      style={{
+        backgroundColor: THEME.colors.surface,
+        border: `1px solid ${THEME.colors.border}`
+      }}
+    >
       {/* Header — always visible */}
       <div onClick={onToggle} className="cursor-pointer flex items-center justify-between -m-6 p-4 hover:bg-charcoal-600/30 transition-smooth">
         <div className="flex items-center gap-3">
@@ -452,6 +460,7 @@ function DealCard({ deal, expanded, onToggle }: { deal: Deal; expanded: boolean;
    Main Page
    ═══════════════════════════════════════════════════════════ */
 export default function RiaHubPage() {
+  const { THEME } = useTheme();
   const { data, error, isLoading } = useSWR<{ deals: Deal[] }>('/api/command-center/ria-hub', fetcher, { refreshInterval: 300_000 });
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -566,7 +575,13 @@ export default function RiaHubPage() {
       {/* Deal Cards */}
       <div className="flex flex-col gap-3">
         {filtered.length === 0 ? (
-          <Card className="glass-card text-center py-12">
+          <Card
+            className="text-center py-12"
+            style={{
+              backgroundColor: THEME.colors.surface,
+              border: `1px solid ${THEME.colors.border}`
+            }}
+          >
             <Text className="text-slate">No advisors match your search.</Text>
           </Card>
         ) : (
