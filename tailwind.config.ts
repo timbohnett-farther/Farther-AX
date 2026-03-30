@@ -1,9 +1,10 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Farther AX — Tailwind Config (Layout-Only)
- * All colors are driven by the THEME object in lib/theme.ts via inline styles.
- * Tailwind is used ONLY for layout utilities (flex, grid, spacing, responsive).
+ * Farther AX — Tailwind Config with Farther Brand Colors
+ *
+ * Colors are defined here to work with Tailwind utility classes (bg-*, text-*, border-*)
+ * while maintaining compatibility with the THEME object in lib/theme.ts
  */
 const config: Config = {
   darkMode: 'class',
@@ -14,7 +15,166 @@ const config: Config = {
     "./node_modules/@tremor/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        // === Farther Brand Palette ===
+
+        // Clay (warm sand/tan — brand anchor)
+        clay: {
+          25: '#FAFAFA',
+          50: '#F5F4F1',
+          100: '#E6E3DB',
+          200: '#CFC8B9',
+          300: '#B3A791',
+          400: '#9F8E75',
+          500: '#8E7B64',
+          600: '#7A6654',
+          700: '#625146',
+          800: '#55453E',
+          900: '#4A3E39',
+        },
+
+        // Limestone (warm cream)
+        limestone: {
+          50: '#F8F4F0',
+          100: '#F2EAE2',
+          200: '#E3D3C5',
+          300: '#D1B6A0',
+          400: '#BE9479',
+          500: '#B17B5E',
+        },
+
+        // Steel Blue (cool structure)
+        'steel-blue': {
+          25: '#FBFDFF',
+          50: '#F5F8FA',
+          100: '#EBF0F3',
+          200: '#D2DFE5',
+          300: '#94B5C3',
+          400: '#7CA4B4',
+          500: '#5B8A9C',
+          600: '#476F82',
+          700: '#3B5A69',
+          800: '#334D59',
+          900: '#2F424B',
+        },
+
+        // Slate Blue
+        'slate-blue': {
+          200: '#CCD2D5',
+          400: '#7C8D94',
+          500: '#5B6A71',
+        },
+
+        // Charcoal
+        charcoal: {
+          100: '#E7E7E7',
+          200: '#D1D1D1',
+          500: '#6D6D6D',
+          600: '#4F4F4F',
+          700: '#4F4F4F',
+          900: '#333333',
+        },
+
+        // Serene Aqua (accent)
+        'serene-aqua': {
+          400: '#5DCCDB',
+          600: '#289FAF',
+          700: '#1D7682',
+        },
+
+        // === Semantic Color Aliases ===
+
+        // Primary brand colors
+        teal: {
+          DEFAULT: '#3B5A69',  // steel-blue-700
+          light: '#94B5C3',     // steel-blue-300
+          dark: '#2F424B',      // steel-blue-900
+          glow: 'rgba(59, 90, 105, 0.18)',
+        },
+
+        // Background colors
+        cream: {
+          DEFAULT: '#F8F4F0',  // limestone-50
+          border: 'rgba(59, 90, 105, 0.15)',
+        },
+
+        // Text colors
+        slate: {
+          DEFAULT: '#7C8D94',  // slate-blue-400
+          200: '#CCD2D5',      // slate-blue-200
+          400: '#7C8D94',
+          500: '#5B6A71',      // slate-blue-500
+        },
+
+        // Support colors
+        ivory: '#F8F4F0',      // limestone-50
+        linen: '#F5F4F1',      // clay-50
+        mist: '#D2DFE5',       // steel-blue-200
+        sky: '#94B5C3',        // steel-blue-300
+        aqua: '#5DCCDB',       // serene-aqua-400
+        terra: '#9F8E75',      // clay-400
+        steel: '#3B5A69',      // steel-blue-700
+        graphite: '#2F424B',   // steel-blue-900
+        bronze: '#B68A4C',
+        pomegranate: '#CE3657',
+
+        // Status colors
+        success: '#6DBF7B',
+        warning: '#C49A5C',
+        error: '#D4736E',
+        danger: '#D4736E',
+        neutral: '#B0ACA4',
+        info: '#7CA4B4',
+      },
+
+      fontFamily: {
+        serif: ["'ABC Arizona Text'", 'Georgia', 'serif'],
+        sans: ["'Fakt'", "'Inter'", 'Arial', 'sans-serif'],
+        mono: ["'Fakt Mono'", "'DM Mono'", "'Courier New'", 'monospace'],
+      },
+
+      fontSize: {
+        xs: '11px',
+        sm: '13px',
+        base: '15px',
+        md: '16px',
+        lg: '18px',
+        xl: '22px',
+        '2xl': '28px',
+        '3xl': '36px',
+        '4xl': '48px',
+      },
+
+      spacing: {
+        xs: '4px',
+        sm: '8px',
+        md: '12px',
+        lg: '16px',
+        xl: '24px',
+        '2xl': '32px',
+        '3xl': '40px',
+        '4xl': '48px',
+        '5xl': '64px',
+      },
+
+      borderRadius: {
+        sm: '6px',
+        DEFAULT: '8px',
+        lg: '12px',
+        xl: '16px',
+      },
+
+      boxShadow: {
+        sm: '0 1px 2px rgba(59, 90, 105, 0.08)',
+        DEFAULT: '0 4px 8px rgba(59, 90, 105, 0.06), 0 1px 2px rgba(59, 90, 105, 0.04)',
+        md: '0 4px 8px rgba(59, 90, 105, 0.06), 0 1px 2px rgba(59, 90, 105, 0.04)',
+        lg: '0 12px 24px rgba(59, 90, 105, 0.08), 0 4px 8px rgba(59, 90, 105, 0.05)',
+        xl: '0 16px 32px rgba(0, 0, 0, 0.10), 0 8px 16px rgba(0, 0, 0, 0.06)',
+        'glow-steel': '0 0 20px rgba(59, 90, 105, 0.35)',
+        'glow-accent': '0 0 18px rgba(93, 204, 219, 0.40)',
+      },
+    },
   },
   plugins: [],
 };

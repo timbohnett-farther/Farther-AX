@@ -41,6 +41,56 @@
 }
 
 /* ============================================================================
+   Farther Brand Color CSS Variables (Light Mode Default)
+   ============================================================================ */
+
+:root {
+  /* Backgrounds */
+  --color-bg: #F8F4F0;
+  --color-bg-soft: #FFFFFF;
+  --color-bg-elevated: #FFFFFF;
+
+  /* Surfaces */
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F5F8FA;
+  --color-surface-subtle: rgba(59, 90, 105, 0.06);
+
+  /* Text */
+  --color-text: #333333;
+  --color-text-secondary: #5B6A71;
+  --color-text-muted: #7C8D94;
+
+  /* Borders */
+  --color-border: rgba(59, 90, 105, 0.15);
+  --color-border-strong: rgba(59, 90, 105, 0.25);
+}
+
+/* ============================================================================
+   Dark Mode Color Overrides
+   ============================================================================ */
+
+.dark {
+  /* Backgrounds */
+  --color-bg: #2F424B;
+  --color-bg-soft: #334D59;
+  --color-bg-elevated: #3F535F;
+
+  /* Surfaces */
+  --color-surface: #3B5A69;
+  --color-surface-hover: #476F82;
+  --color-surface-subtle: rgba(59, 90, 105, 0.30);
+
+  /* Text */
+  --color-text: #F8F4F0;
+  --color-text-secondary: #CCD2D5;
+  --color-text-muted: #7C8D94;
+
+  /* Borders */
+  --color-border: rgba(148, 181, 195, 0.18);
+  --color-border-strong: #5B8A9C;
+}
+
+/* ============================================================================
    HTML/Body Reset
    ============================================================================ */
 

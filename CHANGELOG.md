@@ -6,6 +6,59 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Brand Colors & Theme System — 2026-03-30
+
+**What**: Fixed broken color scheme by adding Farther brand colors to Tailwind config
+
+**Problem**:
+- Components using Tailwind color classes (`bg-teal`, `text-cream`, `border-slate`)
+- But Tailwind config was empty — no colors defined
+- Result: Wrong colors or no colors applied throughout app
+- Inconsistent styling: some components used inline styles, others Tailwind classes
+- Found 300+ instances of undefined Tailwind color classes
+
+**Root Cause**:
+- `tailwind.config.ts` was intentionally minimal (comment: "colors driven by THEME object via inline styles")
+- But developers naturally used Tailwind utilities (`bg-*`, `text-*`, `border-*`)
+- Created disconnect: theme system exists but wasn't integrated with Tailwind
+- 797 `useTheme()` calls but most components not using THEME colors
+
+**Solution**:
+- Added complete Farther brand palette to `tailwind.config.ts`:
+  - Clay (warm sand/tan) - full 25-900 scale
+  - Limestone (warm cream) - 50-500 scale
+  - Steel Blue (cool structure) - full 25-900 scale
+  - Semantic aliases: `teal`, `cream`, `slate`, `charcoal`, etc.
+  - Status colors: `success`, `warning`, `error`, `info`
+- Added CSS variables for mode-aware colors in `globals.css`
+- Maintained compatibility with existing THEME object in `lib/theme.ts`
+- Extended Tailwind theme with Farther typography, spacing, shadows
+
+**Impact**:
+- ✅ All Tailwind color classes now work correctly
+- ✅ Consistent Farther brand identity across all pages
+- ✅ Dark mode support via `.dark` class
+- ✅ AI chat interface now has proper colors
+- ✅ Alerts badges render correctly
+- ✅ Dashboard stages use brand colors
+- ✅ Sidebar maintains theme-based styling
+- ✅ Tremor components inherit correct colors
+
+**Technical Details**:
+- Added 100+ color definitions to Tailwind config
+- Mapped all THEME colors to Tailwind utilities
+- Preserved backward compatibility with inline styles
+- CSS variables provide runtime theme switching
+
+**Files**:
+- `tailwind.config.ts` - Added complete Farther brand palette (150+ lines)
+- `app/globals.css` - Added CSS variables for dark mode
+- `COLOR_THEME_AUDIT.md` - Comprehensive audit report
+
+**Status**: ✅ Complete — colors now working site-wide
+
+---
+
 ## [Completed] Comprehensive Site Audit & Critical Fixes — 2026-03-30
 
 **What**: Full site audit covering connections, performance, security, and optimization opportunities. Implemented Phase 1 critical fixes.
