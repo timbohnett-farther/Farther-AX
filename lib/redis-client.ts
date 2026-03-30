@@ -103,7 +103,11 @@ export async function invalidatePattern(pattern: string): Promise<void> {
   if (!client) return;
 
   try {
-    const keys = await client.keys(pattern);
+    // Use SCAN instead of KEYS for production safety (non-blocking)
+    const keys: string[] = [];
+    for await (const key of client.scanStream({ match: pattern })) {
+      keys.push(key);
+    }
     if (keys.length > 0) {
       await client.del(...keys);
     }
