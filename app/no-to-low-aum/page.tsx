@@ -75,12 +75,27 @@ export default function NoToLowAUMPage() {
           </div>
 
           {/* Informational callout */}
-          <div className="rounded-xl px-7 py-6 bg-blue-500/[0.15] border border-blue-500/30 border-l-4 border-l-blue-500 shadow-[0_0_12px_rgba(91,155,213,0.15)]">
+          <div
+            className="rounded-xl px-7 py-6"
+            style={{
+              backgroundColor: `${THEME.colors.steel}26`,
+              border: `1px solid ${THEME.colors.steel}4D`,
+              borderLeft: `4px solid ${THEME.colors.steel}`,
+              boxShadow: `0 0 12px ${THEME.colors.steel}26`
+            }}
+          >
             <div className="flex items-start gap-4">
-              <div className="shrink-0 w-8 h-8 flex items-center justify-center text-sm font-bold mt-0.5 shadow-[0_0_10px_rgba(91,155,213,0.4)] bg-blue-500 rounded-full" style={{ color: THEME.colors.charcoal900 }}>
+              <div
+                className="shrink-0 w-8 h-8 flex items-center justify-center text-sm font-bold mt-0.5 rounded-full"
+                style={{
+                  backgroundColor: THEME.colors.steel,
+                  color: '#FFFFFF',
+                  boxShadow: `0 0 10px ${THEME.colors.steel}66`
+                }}
+              >
                 i
               </div>
-              <p className="leading-relaxed text-sm text-blue-300">
+              <p className="leading-relaxed text-sm" style={{ color: THEME.colors.textSecondary }}>
                 This pathway is triggered when an advisor&apos;s projected AUM at launch is below $15-20M.
                 The exact threshold is assessed case-by-case with input from the Focus Team, which
                 evaluates the advisor&apos;s growth trajectory, client quality, and strategic fit.
@@ -102,14 +117,31 @@ export default function NoToLowAUMPage() {
             {keyCharacteristics.map((item, idx) => (
               <div
                 key={idx}
-                className="rounded-xl p-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+                className="rounded-xl p-6 transition-all duration-200"
                 style={{
                   backgroundColor: THEME.colors.surface,
-                  border: `1px solid ${THEME.colors.border}`
+                  border: `1px solid ${THEME.colors.border}`,
+                  boxShadow: '0 0 0 transparent',
+                  transform: 'translateY(0)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = `0 0 20px ${THEME.colors.teal}33`;
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 0 0 transparent';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 shadow-[0_0_10px_rgba(78,112,130,0.3)]" style={{ background: THEME.colors.teal, color: THEME.colors.charcoal900 }}>
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0"
+                    style={{
+                      backgroundColor: THEME.colors.teal,
+                      color: '#FFFFFF',
+                      boxShadow: `0 0 10px ${THEME.colors.teal}4D`
+                    }}
+                  >
                     {item.icon}
                   </div>
                   <h3 className="font-sans text-lg leading-tight" style={{ color: THEME.colors.text }}>
@@ -178,7 +210,15 @@ export default function NoToLowAUMPage() {
                   className="flex items-center gap-5 px-6 py-4 border-b last:border-b-0"
                   style={{ borderColor: THEME.colors.border }}
                 >
-                  <span className="shrink-0 w-7 h-7 flex items-center justify-center text-xs font-bold font-sans shadow-[0_0_8px_rgba(78,112,130,0.3)] rounded-full" style={{ background: THEME.colors.surface, color: THEME.colors.teal, border: `1px solid ${THEME.colors.border}` }}>
+                  <span
+                    className="shrink-0 w-7 h-7 flex items-center justify-center text-xs font-bold font-sans rounded-full"
+                    style={{
+                      backgroundColor: THEME.colors.surface,
+                      color: THEME.colors.teal,
+                      border: `1px solid ${THEME.colors.border}`,
+                      boxShadow: `0 0 8px ${THEME.colors.teal}4D`
+                    }}
+                  >
                     {String(idx + 1).padStart(2, "0")}
                   </span>
                   <span className="text-sm leading-relaxed" style={{ color: THEME.colors.text }}>

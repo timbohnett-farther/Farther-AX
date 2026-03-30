@@ -139,27 +139,39 @@ function Callout({ children, color = "teal", THEME }: { children: React.ReactNod
   );
 }
 
-function FlagList({ title, badge, badgeClass, dotClass, items, THEME }: { title: string; badge: string; badgeClass: string; dotClass: string; items: string[]; THEME: any }) {
+function FlagList({ title, badge, badgeColor, dotColor, items, THEME }: { title: string; badge: string; badgeColor: string; dotColor: string; items: string[]; THEME: any }) {
   return (
     <div
-      className="rounded-xl p-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)]"
+      className="rounded-xl p-6 transition-all duration-200"
       style={{
         backgroundColor: THEME.colors.surface,
-        border: `1px solid ${THEME.colors.border}`
+        border: `1px solid ${THEME.colors.border}`,
+        boxShadow: '0 0 0 transparent'
       }}
+      onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 20px ${THEME.colors.teal}33`}
+      onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 transparent'}
     >
       <div className="flex items-center gap-3 mb-4">
         <h4 className="font-serif text-base font-semibold" style={{ color: THEME.colors.text }}>
           {title}
         </h4>
-        <span className={`text-[10px] font-semibold tracking-wider uppercase text-white px-3 py-1 rounded-full ${badgeClass}`}>
+        <span
+          className="text-[10px] font-semibold tracking-wider uppercase text-white px-3 py-1 rounded-full"
+          style={{
+            backgroundColor: badgeColor,
+            boxShadow: `0 0 10px ${badgeColor}4D`
+          }}
+        >
           {badge}
         </span>
       </div>
       <ul className="space-y-2.5">
         {items.map((item, i) => (
           <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
-            <span className={`shrink-0 w-1.5 h-1.5 rounded-full mt-2 ${dotClass}`} />
+            <span
+              className="shrink-0 w-1.5 h-1.5 rounded-full mt-2"
+              style={{ backgroundColor: dotColor }}
+            />
             {item}
           </li>
         ))}
@@ -215,18 +227,29 @@ export default function MAPage() {
           {phases.map((p) => (
             <div
               key={p.num}
-              className="rounded-xl p-5 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+              className="rounded-xl p-5 transition-all duration-200"
               style={{
                 backgroundColor: THEME.colors.surface,
-                border: `1px solid ${THEME.colors.border}`
+                border: `1px solid ${THEME.colors.border}`,
+                boxShadow: '0 0 0 transparent',
+                transform: 'translateY(0)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = `0 0 20px ${THEME.colors.teal}33`;
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 0 transparent';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
               <div className="flex items-center gap-3 mb-3">
                 <span
-                  className="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold shadow-[0_0_10px_rgba(29,118,130,0.3)]"
+                  className="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold"
                   style={{
                     backgroundColor: THEME.colors.teal,
-                    color: '#FFFFFF'
+                    color: '#FFFFFF',
+                    boxShadow: `0 0 10px ${THEME.colors.teal}4D`
                   }}
                 >
                   {p.num}
@@ -291,11 +314,14 @@ export default function MAPage() {
           ].map((s) => (
             <div
               key={s.label}
-              className="rounded-lg p-4 transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
+              className="rounded-lg p-4 transition-all duration-200"
               style={{
                 backgroundColor: THEME.colors.surface,
-                border: `1px solid ${THEME.colors.border}`
+                border: `1px solid ${THEME.colors.border}`,
+                boxShadow: '0 0 0 transparent'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 16px ${THEME.colors.teal}26`}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 transparent'}
             >
               <p className="font-serif text-lg font-bold mb-1" style={{ color: THEME.colors.teal }}>
                 {s.label}
@@ -323,19 +349,25 @@ export default function MAPage() {
 
         {/* Form ADV */}
         <div
-          className="rounded-xl p-6 mb-6 transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
+          className="rounded-xl p-6 mb-6 transition-all duration-200"
           style={{
             backgroundColor: THEME.colors.surface,
-            border: `1px solid ${THEME.colors.border}`
+            border: `1px solid ${THEME.colors.border}`,
+            boxShadow: '0 0 0 transparent'
           }}
+          onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 16px ${THEME.colors.teal}26`}
+          onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 transparent'}
         >
           <div className="flex items-center gap-3 mb-4">
             <h3 className="font-serif text-base font-semibold" style={{ color: THEME.colors.text }}>
               Form ADV &mdash; The Foundation
             </h3>
             <span
-              className="text-[10px] font-semibold tracking-wider uppercase text-white px-3 py-1 rounded-full shadow-[0_0_10px_rgba(29,118,130,0.3)]"
-              style={{ backgroundColor: THEME.colors.teal }}
+              className="text-[10px] font-semibold tracking-wider uppercase text-white px-3 py-1 rounded-full"
+              style={{
+                backgroundColor: THEME.colors.teal,
+                boxShadow: `0 0 10px ${THEME.colors.teal}4D`
+              }}
             >
               Core Document
             </span>
@@ -350,13 +382,14 @@ export default function MAPage() {
               <div
                 key={a.part}
                 className="flex items-start gap-3 rounded-lg px-4 py-3"
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
+                style={{ backgroundColor: `${THEME.colors.border}1A` }}
               >
                 <span
-                  className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full shrink-0 shadow-[0_0_6px_rgba(29,118,130,0.2)]"
+                  className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full shrink-0"
                   style={{
                     color: THEME.colors.teal,
-                    backgroundColor: 'rgba(78, 112, 130, 0.15)'
+                    backgroundColor: `${THEME.colors.steel}26`,
+                    boxShadow: `0 0 6px ${THEME.colors.teal}33`
                   }}
                 >
                   {a.part}
@@ -429,17 +462,18 @@ export default function MAPage() {
                   {i + 1}
                 </div>
                 {i < complianceTimeline.length - 1 && (
-                  <div className="w-px flex-1 min-h-[1rem]" style={{ backgroundColor: 'rgba(78, 112, 130, 0.2)' }} />
+                  <div className="w-px flex-1 min-h-[1rem]" style={{ backgroundColor: `${THEME.colors.steel}33` }} />
                 )}
               </div>
               {/* Right: content */}
               <div className="pb-5 pt-0.5">
                 <div className="flex items-center gap-2 mb-1">
                   <span
-                    className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full shadow-[0_0_6px_rgba(29,118,130,0.2)]"
+                    className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full"
                     style={{
                       color: THEME.colors.teal,
-                      backgroundColor: 'rgba(78, 112, 130, 0.15)'
+                      backgroundColor: `${THEME.colors.steel}26`,
+                      boxShadow: `0 0 6px ${THEME.colors.teal}33`
                     }}
                   >
                     {step.days}
@@ -469,10 +503,20 @@ export default function MAPage() {
           {fartherCompliance.map((c) => (
             <div
               key={c.issue}
-              className="rounded-xl p-5 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+              className="rounded-xl p-5 transition-all duration-200"
               style={{
                 backgroundColor: THEME.colors.surface,
-                border: `1px solid ${THEME.colors.border}`
+                border: `1px solid ${THEME.colors.border}`,
+                boxShadow: '0 0 0 transparent',
+                transform: 'translateY(0)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = `0 0 20px ${THEME.colors.teal}33`;
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 0 transparent';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
               <h4 className="text-sm font-semibold mb-2" style={{ color: THEME.colors.text }}>
@@ -503,11 +547,14 @@ export default function MAPage() {
           ].map((s) => (
             <div
               key={s.label}
-              className="rounded-lg p-4 text-center transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
+              className="rounded-lg p-4 text-center transition-all duration-200"
               style={{
                 backgroundColor: THEME.colors.surface,
-                border: `1px solid ${THEME.colors.border}`
+                border: `1px solid ${THEME.colors.border}`,
+                boxShadow: '0 0 0 transparent'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 16px ${THEME.colors.teal}26`}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 transparent'}
             >
               <p className="font-serif text-xl font-bold mb-1" style={{ color: THEME.colors.teal }}>
                 {s.value}
@@ -557,11 +604,14 @@ export default function MAPage() {
 
         {/* Warm Handoff */}
         <div
-          className="rounded-xl p-6 mb-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)]"
+          className="rounded-xl p-6 mb-6 transition-all duration-200"
           style={{
             backgroundColor: THEME.colors.surface,
-            border: `1px solid ${THEME.colors.border}`
+            border: `1px solid ${THEME.colors.border}`,
+            boxShadow: '0 0 0 transparent'
           }}
+          onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 20px ${THEME.colors.teal}33`}
+          onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 transparent'}
         >
           <div className="flex items-center gap-3 mb-3">
             <h3 className="font-serif text-base font-semibold" style={{ color: THEME.colors.text }}>
@@ -607,16 +657,29 @@ export default function MAPage() {
           {techAdvantages.map((t) => (
             <div
               key={t.label}
-              className="rounded-xl p-5 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+              className="rounded-xl p-5 transition-all duration-200"
               style={{
                 backgroundColor: THEME.colors.surface,
-                border: `1px solid ${THEME.colors.border}`
+                border: `1px solid ${THEME.colors.border}`,
+                boxShadow: '0 0 0 transparent',
+                transform: 'translateY(0)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = `0 0 20px ${THEME.colors.teal}33`;
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 0 transparent';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
               <div className="flex items-center gap-2 mb-2">
                 <span
-                  className="w-2 h-2 rounded-full shadow-[0_0_6px_rgba(29,118,130,0.4)]"
-                  style={{ backgroundColor: THEME.colors.teal }}
+                  className="w-2 h-2 rounded-full"
+                  style={{
+                    backgroundColor: THEME.colors.teal,
+                    boxShadow: `0 0 6px ${THEME.colors.teal}66`
+                  }}
                 />
                 <h4 className="text-sm font-semibold" style={{ color: THEME.colors.text }}>
                   {t.label}
@@ -669,9 +732,9 @@ export default function MAPage() {
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-          <FlagList title="Financial" badge="Escalate" badgeClass="bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.3)]" dotClass="bg-red-600" items={financialFlags} THEME={THEME} />
-          <FlagList title="Compliance" badge="Escalate" badgeClass="bg-amber-600 shadow-[0_0_10px_rgba(217,119,6,0.3)]" dotClass="bg-amber-600" items={complianceFlags} THEME={THEME} />
-          <FlagList title="Cultural" badge="Monitor" badgeClass="bg-violet-600 shadow-[0_0_10px_rgba(124,58,237,0.3)]" dotClass="bg-violet-600" items={culturalFlags} THEME={THEME} />
+          <FlagList title="Financial" badge="Escalate" badgeColor="#DC2626" dotColor="#DC2626" items={financialFlags} THEME={THEME} />
+          <FlagList title="Compliance" badge="Escalate" badgeColor="#D97706" dotColor="#D97706" items={complianceFlags} THEME={THEME} />
+          <FlagList title="Cultural" badge="Monitor" badgeColor="#7C3AED" dotColor="#7C3AED" items={culturalFlags} THEME={THEME} />
         </div>
 
         {/* ──────────────────────────────────────────────────────────── */}
@@ -685,13 +748,14 @@ export default function MAPage() {
               <div
                 key={g.term}
                 className="flex items-start gap-3 rounded-lg px-4 py-3"
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
+                style={{ backgroundColor: `${THEME.colors.border}1A` }}
               >
                 <span
-                  className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap shadow-[0_0_6px_rgba(29,118,130,0.2)]"
+                  className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap"
                   style={{
                     color: THEME.colors.teal,
-                    backgroundColor: 'rgba(78, 112, 130, 0.15)'
+                    backgroundColor: `${THEME.colors.steel}26`,
+                    boxShadow: `0 0 6px ${THEME.colors.teal}33`
                   }}
                 >
                   {g.term}

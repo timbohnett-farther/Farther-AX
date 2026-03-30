@@ -77,19 +77,19 @@ export default function IntroductionPage() {
               style={{
                 backgroundColor: THEME.colors.surface,
                 border: `1px solid ${THEME.colors.border}`,
-                boxShadow: '0 0 0 rgba(29,118,130,0)'
+                boxShadow: `0 0 0 ${THEME.colors.teal}00`
               }}
-              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(29,118,130,0.2)'}
-              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 rgba(29,118,130,0)'}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 24px ${THEME.colors.teal}33`}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = `0 0 0 ${THEME.colors.teal}00`}
             >
               <div className="flex items-start justify-between mb-6">
                 <span className="font-serif text-5xl leading-none select-none" style={{ color: THEME.colors.gold, opacity: 0.25 }}>01</span>
                 <span
                   className="font-sans text-[10px] tracking-[0.2em] uppercase px-3 py-1 rounded-full"
                   style={{
-                    backgroundColor: 'rgba(182, 138, 76, 0.1)',
+                    backgroundColor: `${THEME.colors.gold}1A`,
                     color: THEME.colors.gold,
-                    border: `1px solid rgba(182, 138, 76, 0.2)`
+                    border: `1px solid ${THEME.colors.gold}33`
                   }}
                 >
                   High Compliance
@@ -112,10 +112,10 @@ export default function IntroductionPage() {
               style={{
                 backgroundColor: THEME.colors.surface,
                 border: `1px solid ${THEME.colors.border}`,
-                boxShadow: '0 0 0 rgba(16,185,129,0)'
+                boxShadow: `0 0 0 ${THEME.colors.teal}00`
               }}
-              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(16,185,129,0.15)'}
-              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 rgba(16,185,129,0)'}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 24px ${THEME.colors.teal}26`}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = `0 0 0 ${THEME.colors.teal}00`}
             >
               <div className="flex items-start justify-between mb-6">
                 <span className="font-serif text-5xl leading-none select-none" style={{ color: THEME.colors.gold, opacity: 0.25 }}>02</span>
@@ -146,10 +146,10 @@ export default function IntroductionPage() {
               style={{
                 backgroundColor: THEME.colors.surface,
                 border: `1px solid ${THEME.colors.border}`,
-                boxShadow: '0 0 0 rgba(59,130,246,0)'
+                boxShadow: `0 0 0 ${THEME.colors.steel}00`
               }}
-              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(59,130,246,0.15)'}
-              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 rgba(59,130,246,0)'}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 24px ${THEME.colors.steel}26`}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = `0 0 0 ${THEME.colors.steel}00`}
             >
               <div className="flex items-start justify-between mb-6">
                 <span className="font-serif text-5xl leading-none select-none" style={{ color: THEME.colors.gold, opacity: 0.25 }}>03</span>
@@ -180,10 +180,10 @@ export default function IntroductionPage() {
               style={{
                 backgroundColor: THEME.colors.surface,
                 border: `1px solid ${THEME.colors.border}`,
-                boxShadow: '0 0 0 rgba(245,158,11,0)'
+                boxShadow: `0 0 0 ${THEME.colors.gold}00`
               }}
-              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(245,158,11,0.15)'}
-              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 rgba(245,158,11,0)'}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 24px ${THEME.colors.gold}26`}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = `0 0 0 ${THEME.colors.gold}00`}
             >
               <div className="flex items-start justify-between mb-6">
                 <span className="font-serif text-5xl leading-none select-none" style={{ color: THEME.colors.gold, opacity: 0.25 }}>04</span>
@@ -232,9 +232,9 @@ export default function IntroductionPage() {
                   <span
                     className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase px-4 py-2 rounded-full whitespace-nowrap"
                     style={{
-                      backgroundColor: 'rgba(182, 138, 76, 0.1)',
+                      backgroundColor: `${THEME.colors.gold}1A`,
                       color: THEME.colors.gold,
-                      border: `1px solid rgba(182, 138, 76, 0.2)`
+                      border: `1px solid ${THEME.colors.gold}33`
                     }}
                   >
                     4–6 weeks
@@ -264,9 +264,9 @@ export default function IntroductionPage() {
                   <span
                     className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase px-4 py-2 rounded-full whitespace-nowrap"
                     style={{
-                      backgroundColor: 'rgba(182, 138, 76, 0.1)',
+                      backgroundColor: `${THEME.colors.gold}1A`,
                       color: THEME.colors.gold,
-                      border: `1px solid rgba(182, 138, 76, 0.2)`
+                      border: `1px solid ${THEME.colors.gold}33`
                     }}
                   >
                     6–8 weeks
@@ -296,9 +296,9 @@ export default function IntroductionPage() {
                   <span
                     className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase px-4 py-2 rounded-full whitespace-nowrap"
                     style={{
-                      backgroundColor: 'rgba(182, 138, 76, 0.1)',
+                      backgroundColor: `${THEME.colors.gold}1A`,
                       color: THEME.colors.gold,
-                      border: `1px solid rgba(182, 138, 76, 0.2)`
+                      border: `1px solid ${THEME.colors.gold}33`
                     }}
                   >
                     8–12 weeks
@@ -357,14 +357,14 @@ export default function IntroductionPage() {
             style={{
               backgroundColor: THEME.colors.gold,
               color: '#FFFFFF',
-              boxShadow: '0 0 16px rgba(29,118,130,0.3)'
+              boxShadow: `0 0 16px ${THEME.colors.teal}4D`
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 28px rgba(29,118,130,0.5)';
+              e.currentTarget.style.boxShadow = `0 0 28px ${THEME.colors.teal}80`;
               e.currentTarget.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 16px rgba(29,118,130,0.3)';
+              e.currentTarget.style.boxShadow = `0 0 16px ${THEME.colors.teal}4D`;
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >

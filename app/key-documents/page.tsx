@@ -299,7 +299,7 @@ export default function KeyDocumentsPage() {
             className="overflow-x-auto rounded-xl"
             style={{
               border: `1px solid ${THEME.colors.border}`,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              boxShadow: `0 2px 8px ${THEME.colors.border}66`
             }}
           >
             <table className="min-w-full text-sm border-collapse">
@@ -509,14 +509,14 @@ export default function KeyDocumentsPage() {
             style={{
               backgroundColor: THEME.colors.gold,
               color: '#FFFFFF',
-              boxShadow: '0 0 16px rgba(29,118,130,0.3)'
+              boxShadow: `0 0 16px ${THEME.colors.teal}4D`
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 28px rgba(29,118,130,0.5)';
+              e.currentTarget.style.boxShadow = `0 0 28px ${THEME.colors.teal}80`;
               e.currentTarget.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 16px rgba(29,118,130,0.3)';
+              e.currentTarget.style.boxShadow = `0 0 16px ${THEME.colors.teal}4D`;
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >

@@ -243,13 +243,16 @@ export default function IndependentRIAPage() {
           >
             {/* Dual */}
             <div
-              className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
+              className="transition-all duration-200"
               style={{
                 backgroundColor: THEME.colors.surface,
                 border: `1px solid ${THEME.colors.border}`,
                 borderRadius: "10px",
                 padding: "1.25rem",
+                boxShadow: '0 0 0 transparent'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 16px ${THEME.colors.teal}26`}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 transparent'}
             >
               <div
                 style={{
@@ -295,13 +298,16 @@ export default function IndependentRIAPage() {
             </div>
             {/* Non-Dual */}
             <div
-              className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
+              className="transition-all duration-200"
               style={{
                 backgroundColor: THEME.colors.surface,
                 border: `1px solid ${THEME.colors.border}`,
                 borderRadius: "10px",
                 padding: "1.25rem",
+                boxShadow: '0 0 0 transparent'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 16px ${THEME.colors.teal}26`}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 transparent'}
             >
               <div
                 style={{
@@ -361,13 +367,16 @@ export default function IndependentRIAPage() {
             Transition Considerations
           </h2>
           <div
-            className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
+            className="transition-all duration-200"
             style={{
               backgroundColor: THEME.colors.surface,
               border: `1px solid ${THEME.colors.border}`,
               borderRadius: "10px",
               padding: "1.25rem 1.5rem",
+              boxShadow: '0 0 0 transparent'
             }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 16px ${THEME.colors.teal}26`}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 transparent'}
           >
             <ul
               style={{
@@ -399,7 +408,7 @@ export default function IndependentRIAPage() {
                       borderRadius: "50%",
                       backgroundColor: THEME.colors.teal,
                       marginTop: "0.55rem",
-                      boxShadow: "0 0 12px rgba(29, 118, 130, 0.4)",
+                      boxShadow: `0 0 12px ${THEME.colors.teal}66`,
                     }}
                   />
                   {item}

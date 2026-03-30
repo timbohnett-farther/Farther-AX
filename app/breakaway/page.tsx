@@ -136,7 +136,7 @@ export default function BreakawayPage() {
             {characteristics.map((c) => (
               <div
                 key={c.label}
-                className="transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+                className="transition-all duration-200"
                 style={{
                   backgroundColor: THEME.colors.surface,
                   border: `1px solid ${THEME.colors.border}`,
@@ -145,6 +145,16 @@ export default function BreakawayPage() {
                   display: "flex",
                   flexDirection: "column",
                   gap: "0.625rem",
+                  boxShadow: '0 0 0 transparent',
+                  transform: 'translateY(0)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = `0 0 20px ${THEME.colors.teal}33`;
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 0 0 transparent';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
@@ -331,7 +341,7 @@ export default function BreakawayPage() {
                       fontWeight: 700,
                       flexShrink: 0,
                       zIndex: 1,
-                      boxShadow: "0 0 12px rgba(29, 118, 130, 0.4)",
+                      boxShadow: `0 0 12px ${THEME.colors.teal}66`,
                     }}
                   >
                     {step.num}
@@ -396,13 +406,16 @@ export default function BreakawayPage() {
             Common Pitfalls
           </h2>
           <div
-            className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(239,68,68,0.12)]"
+            className="transition-all duration-200"
             style={{
               backgroundColor: THEME.colors.surface,
               border: `1px solid ${THEME.colors.border}`,
               borderRadius: "10px",
               padding: "1.25rem 1.5rem",
+              boxShadow: '0 0 0 transparent'
             }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 16px ${THEME.colors.gold}1A`}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 transparent'}
           >
             <ul
               style={{

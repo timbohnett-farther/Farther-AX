@@ -67,10 +67,10 @@ export default function OnboardingVsTransitions() {
               style={{
                 backgroundColor: THEME.colors.surface,
                 border: `1px solid ${THEME.colors.border}`,
-                boxShadow: '0 0 0 rgba(29,118,130,0)'
+                boxShadow: `0 0 0 ${THEME.colors.teal}00`
               }}
-              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(29,118,130,0.2)'}
-              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 rgba(29,118,130,0)'}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 24px ${THEME.colors.teal}33`}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = `0 0 0 ${THEME.colors.teal}00`}
             >
               <div className="flex items-center gap-3 mb-5">
                 <div
@@ -78,7 +78,7 @@ export default function OnboardingVsTransitions() {
                   style={{
                     backgroundColor: THEME.colors.gold,
                     color: '#FFFFFF',
-                    boxShadow: '0 0 10px rgba(29,118,130,0.3)'
+                    boxShadow: `0 0 10px ${THEME.colors.teal}4D`
                   }}
                 >
                   ◈
@@ -99,10 +99,10 @@ export default function OnboardingVsTransitions() {
               style={{
                 backgroundColor: THEME.colors.surface,
                 border: `1px solid ${THEME.colors.border}`,
-                boxShadow: '0 0 0 rgba(29,118,130,0)'
+                boxShadow: `0 0 0 ${THEME.colors.teal}00`
               }}
-              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(29,118,130,0.2)'}
-              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 rgba(29,118,130,0)'}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 24px ${THEME.colors.teal}33`}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = `0 0 0 ${THEME.colors.teal}00`}
             >
               <div className="flex items-center gap-3 mb-5">
                 <div
@@ -111,7 +111,7 @@ export default function OnboardingVsTransitions() {
                     backgroundColor: THEME.colors.surface,
                     color: THEME.colors.text,
                     border: `1px solid ${THEME.colors.border}`,
-                    boxShadow: '0 0 10px rgba(29,118,130,0.15)'
+                    boxShadow: `0 0 10px ${THEME.colors.teal}26`
                   }}
                 >
                   ⇌
@@ -202,8 +202,8 @@ export default function OnboardingVsTransitions() {
                         key={rel}
                         className="text-xs px-3 py-1.5 rounded-full font-medium"
                         style={{
-                          border: `1px solid rgba(182, 138, 76, 0.3)`,
-                          backgroundColor: 'rgba(182, 138, 76, 0.1)',
+                          border: `1px solid ${THEME.colors.gold}4D`,
+                          backgroundColor: `${THEME.colors.gold}1A`,
                           color: THEME.colors.text
                         }}
                       >
@@ -313,8 +313,8 @@ export default function OnboardingVsTransitions() {
                         key={rel}
                         className="text-xs px-3 py-1.5 rounded-full font-medium"
                         style={{
-                          border: `1px solid rgba(182, 138, 76, 0.3)`,
-                          backgroundColor: 'rgba(182, 138, 76, 0.1)',
+                          border: `1px solid ${THEME.colors.gold}4D`,
+                          backgroundColor: `${THEME.colors.gold}1A`,
                           color: THEME.colors.text
                         }}
                       >
@@ -372,9 +372,9 @@ export default function OnboardingVsTransitions() {
                 <div
                   className="flex items-center gap-2 rounded-lg px-4 py-2"
                   style={{
-                    backgroundColor: 'rgba(182, 138, 76, 0.2)',
-                    border: `1px solid rgba(182, 138, 76, 0.4)`,
-                    boxShadow: '0 0 8px rgba(29,118,130,0.2)'
+                    backgroundColor: `${THEME.colors.gold}33`,
+                    border: `1px solid ${THEME.colors.gold}66`,
+                    boxShadow: `0 0 8px ${THEME.colors.teal}33`
                   }}
                 >
                   <span className="text-xs font-medium uppercase tracking-widest" style={{ color: THEME.colors.gold }}>Deal Signed</span>
@@ -385,8 +385,8 @@ export default function OnboardingVsTransitions() {
                 <div
                   className="flex items-center gap-2 rounded-lg px-3 py-2"
                   style={{
-                    backgroundColor: 'rgba(182, 138, 76, 0.1)',
-                    border: `1px solid rgba(182, 138, 76, 0.3)`
+                    backgroundColor: `${THEME.colors.gold}1A`,
+                    border: `1px solid ${THEME.colors.gold}4D`
                   }}
                 >
                   <span className="text-xs font-medium uppercase tracking-widest" style={{ color: THEME.colors.gold }}>Transition Initiated</span>
@@ -397,9 +397,9 @@ export default function OnboardingVsTransitions() {
                 <div
                   className="flex items-center gap-2 rounded-lg px-4 py-2"
                   style={{
-                    backgroundColor: 'rgba(182, 138, 76, 0.2)',
-                    border: `1px solid rgba(182, 138, 76, 0.4)`,
-                    boxShadow: '0 0 8px rgba(29,118,130,0.2)'
+                    backgroundColor: `${THEME.colors.gold}33`,
+                    border: `1px solid ${THEME.colors.gold}66`,
+                    boxShadow: `0 0 8px ${THEME.colors.teal}33`
                   }}
                 >
                   <span className="text-xs font-medium uppercase tracking-widest" style={{ color: THEME.colors.gold }}>Go Live</span>
@@ -410,8 +410,8 @@ export default function OnboardingVsTransitions() {
                 <div
                   className="flex items-center gap-2 rounded-lg px-4 py-2"
                   style={{
-                    backgroundColor: 'rgba(182, 138, 76, 0.1)',
-                    border: `1px solid rgba(182, 138, 76, 0.3)`
+                    backgroundColor: `${THEME.colors.gold}1A`,
+                    border: `1px solid ${THEME.colors.gold}4D`
                   }}
                 >
                   <span className="text-xs font-medium uppercase tracking-widest" style={{ color: THEME.colors.gold }}>Graduation</span>
@@ -464,14 +464,14 @@ export default function OnboardingVsTransitions() {
             style={{
               backgroundColor: THEME.colors.gold,
               color: '#FFFFFF',
-              boxShadow: '0 0 16px rgba(29,118,130,0.3)'
+              boxShadow: `0 0 16px ${THEME.colors.teal}4D`
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 28px rgba(29,118,130,0.5)';
+              e.currentTarget.style.boxShadow = `0 0 28px ${THEME.colors.teal}80`;
               e.currentTarget.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 16px rgba(29,118,130,0.3)';
+              e.currentTarget.style.boxShadow = `0 0 16px ${THEME.colors.teal}4D`;
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
