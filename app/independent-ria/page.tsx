@@ -4,29 +4,30 @@ import { useTheme } from '@/lib/theme-provider';
 import PageLayout from "@/components/PageLayout";
 import QuizSection from "@/components/QuizSection";
 
+// Badge colors will be applied from THEME in the component
 const characteristics = [
   {
     label: "Compliance Sensitivity",
     badge: "Lower",
-    badgeColor: "#16A34A",
+    colorKey: "teal" as const,
     body: "No wirehouse non-solicitation concerns. The advisor owns their book and client relationships. Client communication is generally unrestricted.",
   },
   {
     label: "ADV-W Required",
     badge: "Within 90 Days",
-    badgeColor: "#3B5A69",
+    colorKey: "steel" as const,
     body: "The advisor must file Form ADV-W (withdrawal of investment adviser registration) within 90 days of joining Farther. This formally dissolves their independent RIA registration with the SEC or state regulator.",
   },
   {
     label: "Dual vs. Non-Dual Registration",
     badge: "State-Dependent",
-    badgeColor: "#7C3AED",
+    colorKey: "gold" as const,
     body: "Some states require dual registration (both SEC and state). The compliance requirements and ADV-W process differ based on the advisor's registration type and the states where their clients reside.",
   },
   {
     label: "Book Ownership",
     badge: "Advisor-Owned",
-    badgeColor: "#0369A1",
+    colorKey: "teal" as const,
     body: "Since the advisor owns their client relationships, the transition of clients to Farther is typically smoother than Breakaway. No protocol constraints apply.",
   },
 ];
@@ -99,16 +100,20 @@ export default function IndependentRIAPage() {
             {characteristics.map((c) => (
               <div
                 key={c.label}
-                className="transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+                className="transition-all duration-200 hover:-translate-y-0.5"
                 style={{
-                  backgroundColor: "#2f2f2f",
+                  backgroundColor: THEME.colors.surface,
                   border: `1px solid ${THEME.colors.border}`,
                   borderRadius: "10px",
                   padding: "1.25rem",
                   display: "flex",
                   flexDirection: "column",
                   gap: "0.625rem",
+                  boxShadow: `0 0 0 ${THEME.colors.teal}00`,
+                  transition: "all 0.2s",
                 }}
+                onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 20px ${THEME.colors.teal}33`}
+                onMouseLeave={(e) => e.currentTarget.style.boxShadow = `0 0 0 ${THEME.colors.teal}00`}
               >
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
                   <span
@@ -128,11 +133,10 @@ export default function IndependentRIAPage() {
                       fontSize: "0.7rem",
                       fontWeight: 600,
                       color: "#fff",
-                      backgroundColor: c.badgeColor,
+                      backgroundColor: THEME.colors[c.colorKey],
                       borderRadius: "9999px",
                       padding: "3px 12px",
                       alignSelf: "flex-start",
-                      boxShadow: `0 0 10px ${c.badgeColor}40`,
                       letterSpacing: "0.03em",
                     }}
                   >
@@ -241,7 +245,7 @@ export default function IndependentRIAPage() {
             <div
               className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
               style={{
-                backgroundColor: "#2f2f2f",
+                backgroundColor: THEME.colors.surface,
                 border: `1px solid ${THEME.colors.border}`,
                 borderRadius: "10px",
                 padding: "1.25rem",
@@ -260,9 +264,9 @@ export default function IndependentRIAPage() {
                     width: "10px",
                     height: "10px",
                     borderRadius: "50%",
-                    backgroundColor: "#7C3AED",
+                    backgroundColor: THEME.colors.gold,
                     flexShrink: 0,
-                    boxShadow: "0 0 12px rgba(29, 118, 130, 0.4)",
+                    boxShadow: `0 0 12px ${THEME.colors.teal}66`,
                   }}
                 />
                 <span
@@ -293,7 +297,7 @@ export default function IndependentRIAPage() {
             <div
               className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
               style={{
-                backgroundColor: "#2f2f2f",
+                backgroundColor: THEME.colors.surface,
                 border: `1px solid ${THEME.colors.border}`,
                 borderRadius: "10px",
                 padding: "1.25rem",
@@ -312,9 +316,9 @@ export default function IndependentRIAPage() {
                     width: "10px",
                     height: "10px",
                     borderRadius: "50%",
-                    backgroundColor: "#16A34A",
+                    backgroundColor: THEME.colors.teal,
                     flexShrink: 0,
-                    boxShadow: "0 0 12px rgba(29, 118, 130, 0.4)",
+                    boxShadow: `0 0 12px ${THEME.colors.teal}66`,
                   }}
                 />
                 <span
@@ -359,7 +363,7 @@ export default function IndependentRIAPage() {
           <div
             className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
             style={{
-              backgroundColor: "#2f2f2f",
+              backgroundColor: THEME.colors.surface,
               border: `1px solid ${THEME.colors.border}`,
               borderRadius: "10px",
               padding: "1.25rem 1.5rem",
