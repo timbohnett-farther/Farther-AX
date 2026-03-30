@@ -1,8 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/design-tokens';
 import PageLayout from "@/components/PageLayout";
 import QuizSection from "@/components/QuizSection";
 
@@ -78,8 +76,7 @@ const pitfalls = [
 ];
 
 export default function BreakawayPage() {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   return (
     <PageLayout
@@ -96,18 +93,18 @@ export default function BreakawayPage() {
         {/* Intro */}
         <p
           style={{
-            color: C.slate,
+            color: THEME.colors.textSecondary,
             fontSize: "1rem",
             lineHeight: "1.75",
             marginBottom: "2.5rem",
-            borderLeft: `3px solid ${C.teal}`,
+            borderLeft: `3px solid ${THEME.colors.teal}`,
             paddingLeft: "1rem",
           }}
         >
           The Breakaway pathway applies to advisors departing a wirehouse
           (Merrill Lynch, Morgan Stanley, UBS, Wells Fargo, Raymond James, etc.)
           or other captive firm to join Farther. This pathway carries the{" "}
-          <strong style={{ color: C.dark }}>
+          <strong style={{ color: THEME.colors.text }}>
             highest compliance sensitivity
           </strong>{" "}
           of all four onboarding paths. Every step must be carefully sequenced
@@ -122,7 +119,7 @@ export default function BreakawayPage() {
               fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: "1.25rem",
               fontWeight: 700,
-              color: C.dark,
+              color: THEME.colors.text,
               marginBottom: "1.25rem",
               letterSpacing: "0.01em",
             }}
@@ -141,8 +138,8 @@ export default function BreakawayPage() {
                 key={c.label}
                 className="transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
                 style={{
-                  backgroundColor: "#2f2f2f",
-                  border: `1px solid ${C.border}`,
+                  backgroundColor: THEME.colors.surface,
+                  border: `1px solid ${THEME.colors.border}`,
                   borderRadius: "10px",
                   padding: "1.25rem",
                   display: "flex",
@@ -157,7 +154,7 @@ export default function BreakawayPage() {
                       fontWeight: 700,
                       letterSpacing: "0.08em",
                       textTransform: "uppercase",
-                      color: C.slate,
+                      color: THEME.colors.textSecondary,
                     }}
                   >
                     {c.label}
@@ -182,7 +179,7 @@ export default function BreakawayPage() {
                 <p
                   style={{
                     fontSize: "0.85rem",
-                    color: C.slate,
+                    color: THEME.colors.textSecondary,
                     lineHeight: "1.6",
                     margin: 0,
                   }}
@@ -201,7 +198,7 @@ export default function BreakawayPage() {
               fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: "1.25rem",
               fontWeight: 700,
-              color: C.dark,
+              color: THEME.colors.text,
               marginBottom: "1.25rem",
               letterSpacing: "0.01em",
             }}
@@ -210,9 +207,9 @@ export default function BreakawayPage() {
           </h2>
           <div
             style={{
-              backgroundColor: C.amberBg,
-              border: `1px solid ${C.amberBorder}`,
-              borderLeft: `4px solid ${C.amberBorder}`,
+              backgroundColor: THEME.colors.warningBg,
+              border: `1px solid ${THEME.colors.warning}`,
+              borderLeft: `4px solid ${THEME.colors.warning}`,
               borderRadius: "8px",
               padding: "1.25rem 1.5rem",
             }}
@@ -232,7 +229,7 @@ export default function BreakawayPage() {
                   fontWeight: 700,
                   letterSpacing: "0.07em",
                   textTransform: "uppercase",
-                  color: C.amber,
+                  color: THEME.colors.warning,
                 }}
               >
                 Protocol-Permitted Data Only
@@ -241,7 +238,7 @@ export default function BreakawayPage() {
             <p
               style={{
                 fontSize: "0.875rem",
-                color: C.amber,
+                color: THEME.colors.warning,
                 lineHeight: "1.65",
                 marginBottom: "0.875rem",
               }}
@@ -264,7 +261,7 @@ export default function BreakawayPage() {
                   key={i}
                   style={{
                     fontSize: "0.875rem",
-                    color: C.amber,
+                    color: THEME.colors.warning,
                     fontWeight: 500,
                   }}
                 >
@@ -275,7 +272,7 @@ export default function BreakawayPage() {
             <p
               style={{
                 fontSize: "0.85rem",
-                color: C.amber,
+                color: THEME.colors.warning,
                 lineHeight: "1.65",
                 marginTop: "0.875rem",
                 marginBottom: 0,
@@ -295,7 +292,7 @@ export default function BreakawayPage() {
               fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: "1.25rem",
               fontWeight: 700,
-              color: C.dark,
+              color: THEME.colors.text,
               marginBottom: "1.25rem",
               letterSpacing: "0.01em",
             }}
@@ -326,7 +323,7 @@ export default function BreakawayPage() {
                       width: "2.25rem",
                       height: "2.25rem",
                       borderRadius: "50%",
-                      backgroundColor: C.teal,
+                      backgroundColor: THEME.colors.teal,
                       color: "#fff",
                       display: "flex",
                       alignItems: "center",
@@ -346,7 +343,7 @@ export default function BreakawayPage() {
                         width: "2px",
                         flex: 1,
                         minHeight: "1.5rem",
-                        backgroundColor: C.border,
+                        backgroundColor: THEME.colors.border,
                         margin: "0.25rem 0",
                       }}
                     />
@@ -363,7 +360,7 @@ export default function BreakawayPage() {
                     style={{
                       fontWeight: 700,
                       fontSize: "0.95rem",
-                      color: C.dark,
+                      color: THEME.colors.text,
                       margin: "0 0 0.25rem 0",
                     }}
                   >
@@ -372,7 +369,7 @@ export default function BreakawayPage() {
                   <p
                     style={{
                       fontSize: "0.875rem",
-                      color: C.slate,
+                      color: THEME.colors.textSecondary,
                       lineHeight: "1.6",
                       margin: 0,
                     }}
@@ -392,7 +389,7 @@ export default function BreakawayPage() {
               fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: "1.25rem",
               fontWeight: 700,
-              color: C.dark,
+              color: THEME.colors.text,
               marginBottom: "1.25rem",
               letterSpacing: "0.01em",
             }}
@@ -403,7 +400,7 @@ export default function BreakawayPage() {
             className="transition-all duration-200 hover:shadow-[0_0_16px_rgba(239,68,68,0.12)]"
             style={{
               backgroundColor: "#2f2f2f",
-              border: `1px solid ${C.border}`,
+              border: `1px solid ${THEME.colors.border}`,
               borderRadius: "10px",
               padding: "1.25rem 1.5rem",
             }}
@@ -426,7 +423,7 @@ export default function BreakawayPage() {
                     alignItems: "flex-start",
                     gap: "0.625rem",
                     fontSize: "0.875rem",
-                    color: C.slate,
+                    color: THEME.colors.textSecondary,
                     lineHeight: "1.6",
                   }}
                 >

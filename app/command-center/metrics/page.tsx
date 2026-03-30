@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { useState } from 'react';
 import Image from 'next/image';
 import { StatCard, MetricBar, DataCard } from '@/components/ui';
-import { formatCompactCurrency } from '@/lib/design-tokens';
+import { formatCompactCurrency } from '@/lib/theme';
 import {
   UserGroupIcon,
   CurrencyDollarIcon,

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTheme } from "@/lib/theme-provider";
 
 interface PageLayoutProps {
   step: number;
@@ -15,7 +18,7 @@ interface PageLayoutProps {
 /**
  * PageLayout - Multi-step form layout with progress indicator
  *
- * Migrated to Tailwind utilities (removed all inline styles)
+ * Migrated to inline styles via THEME
  */
 export default function PageLayout({
   step,
@@ -28,29 +31,42 @@ export default function PageLayout({
   nextLabel = "Next",
   children,
 }: PageLayoutProps) {
+  const { THEME } = useTheme();
   const stepStr = String(step).padStart(2, "0");
   const totalStr = String(totalSteps).padStart(2, "0");
 
   return (
-    <div className="min-h-screen flex flex-col bg-transparent">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: THEME.colors.bg }}>
       {/* Top bar */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b border-cream-border bg-charcoal/80 backdrop-blur-md">
+      <header
+        className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b backdrop-blur-md"
+        style={{
+          borderColor: THEME.colors.border,
+          backgroundColor: `${THEME.colors.surface}CC`,
+        }}
+      >
         <div>
-          <h1 className="text-2xl font-bold font-serif text-cream leading-tight">
+          <h1
+            className="text-2xl font-bold leading-tight"
+            style={{ ...THEME.typography.fontFamily, color: THEME.colors.textHeading }}
+          >
             {title}
           </h1>
           {subtitle && (
-            <p className="text-sm mt-0.5 text-white/70">
+            <p className="text-sm mt-0.5" style={{ color: THEME.colors.textSecondary }}>
               {subtitle}
             </p>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold font-serif text-cream">
+          <span
+            className="text-2xl font-bold"
+            style={{ fontFamily: THEME.typography.fontFamily.serif, color: THEME.colors.textHeading }}
+          >
             {stepStr}
           </span>
-          <span className="text-lg text-white/40">/</span>
-          <span className="text-lg font-medium text-white/70">
+          <span className="text-lg" style={{ color: THEME.colors.textMuted }}>/</span>
+          <span className="text-lg font-medium" style={{ color: THEME.colors.textSecondary }}>
             {totalStr}
           </span>
         </div>
@@ -60,12 +76,34 @@ export default function PageLayout({
       <div className="flex-1 px-10 py-8">{children}</div>
 
       {/* Bottom navigation */}
-      <footer className="px-10 py-6 border-t border-cream-border bg-charcoal-700 flex items-center justify-between">
+      <footer
+        className="px-10 py-6 border-t flex items-center justify-between"
+        style={{
+          borderColor: THEME.colors.border,
+          backgroundColor: THEME.colors.surface,
+        }}
+      >
         <div>
           {backHref ? (
             <Link
               href={backHref}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border border-white/20 text-white/80 bg-transparent hover:bg-white/5 hover:border-teal hover:shadow-[0_0_16px_rgba(59,90,105,0.3)]"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium"
+              style={{
+                border: `1px solid ${THEME.colors.borderSubtle}`,
+                color: THEME.colors.textSecondary,
+                backgroundColor: "transparent",
+                transition: "all 200ms ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = THEME.colors.surfaceHover;
+                e.currentTarget.style.borderColor = THEME.colors.steel;
+                e.currentTarget.style.boxShadow = `0 0 16px rgba(59,90,105,0.3)`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.borderColor = THEME.colors.borderSubtle;
+                e.currentTarget.style.boxShadow = "none";
+              }}
             >
               ← {backLabel}
             </Link>
@@ -81,14 +119,17 @@ export default function PageLayout({
             return (
               <div
                 key={i}
-                className={`rounded-full transition-all duration-300 h-1.5 ${
-                  isActive
-                    ? 'bg-teal shadow-[0_0_8px_rgba(59,90,105,0.6)]'
+                className="rounded-full h-1.5"
+                style={{
+                  width: isActive ? "20px" : "6px",
+                  backgroundColor: isActive
+                    ? THEME.colors.steel
                     : i + 1 < step
-                    ? 'bg-teal/40'
-                    : 'bg-white/20'
-                }`}
-                style={{ width: isActive ? "20px" : "6px" }}
+                    ? `${THEME.colors.steel}66`
+                    : THEME.colors.borderSubtle,
+                  boxShadow: isActive ? `0 0 8px rgba(59,90,105,0.6)` : "none",
+                  transition: "all 300ms ease",
+                }}
               />
             );
           })}
@@ -98,7 +139,23 @@ export default function PageLayout({
           {nextHref ? (
             <Link
               href={nextHref}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-white bg-teal hover:bg-teal-dark shadow-[0_0_12px_rgba(59,90,105,0.3)] hover:shadow-[0_0_24px_rgba(59,90,105,0.5)] hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium"
+              style={{
+                color: "#FFFFFF",
+                backgroundColor: THEME.colors.steel,
+                boxShadow: `0 0 12px rgba(59,90,105,0.3)`,
+                transition: "all 200ms ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = THEME.colors.steelBlue900;
+                e.currentTarget.style.boxShadow = `0 0 24px rgba(59,90,105,0.5)`;
+                e.currentTarget.style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = THEME.colors.steel;
+                e.currentTarget.style.boxShadow = `0 0 12px rgba(59,90,105,0.3)`;
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
             >
               {nextLabel} →
             </Link>

@@ -3,16 +3,14 @@
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { Suspense, useMemo } from "react";
+import { Suspense } from "react";
 import { useTheme } from "@/lib/theme-provider";
-import { getThemeColors } from "@/lib/design-tokens";
 
 function SignInContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/introduction";
   const error = searchParams.get("error");
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === "dark"), [theme]);
+  const { THEME } = useTheme();
 
   const errorMessages: Record<string, string> = {
     AccessDenied: "Access denied. Only @farther.com email addresses are permitted.",
@@ -29,8 +27,8 @@ function SignInContent() {
       <div
         className="w-full max-w-md rounded-2xl p-10"
         style={{
-          backgroundColor: C.cardBg,
-          border: `1px solid ${C.border}`,
+          backgroundColor: THEME.colors.surface,
+          border: `1px solid ${THEME.colors.border}`,
           boxShadow: "0 4px 32px rgba(0,0,0,0.3)",
         }}
       >

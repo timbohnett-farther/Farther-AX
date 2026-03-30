@@ -5,8 +5,7 @@ import useSWR from 'swr';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors, getStageColors, type ThemeColors } from '@/lib/design-tokens';
-
+import { getStageColors } from '@/lib/theme';
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 const SWR_OPTS = {
@@ -109,14 +108,13 @@ const TABS: { key: TabKey; label: string; icon: string }[] = [
 
 // ── Sentiment Badge Component ────────────────────────────────────────────────
 function SentimentBadge({ score, tier }: { score: number | null; tier: string | null }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   if (!tier || score === null) {
     return (
       <span style={{
         display: 'inline-block', padding: '4px 10px', borderRadius: 4,
-        fontSize: 10, color: C.slate, background: 'rgba(91,106,113,0.06)',
+        fontSize: 10, color: THEME.colors.textSecondary, background: 'rgba(91,106,113,0.06)',
         fontStyle: 'italic',
       }}>
         Not scored
@@ -124,7 +122,7 @@ function SentimentBadge({ score, tier }: { score: number | null; tier: string | 
     );
   }
 
-  const config = TIER_CONFIG[tier] || { color: C.slate, bgColor: 'rgba(91,106,113,0.08)', icon: '●' };
+  const config = TIER_CONFIG[tier] || { color: THEME.colors.textSecondary, bgColor: 'rgba(91,106,113,0.08)', icon: '●' };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -137,7 +135,7 @@ function SentimentBadge({ score, tier }: { score: number | null; tier: string | 
         <span style={{ fontSize: 10 }}>{config.icon}</span>
         {tier}
       </span>
-      <span style={{ fontSize: 10, color: C.slate, paddingLeft: 2 }}>
+      <span style={{ fontSize: 10, color: THEME.colors.textSecondary, paddingLeft: 2 }}>
         {Math.round(score)}/100
       </span>
     </div>
@@ -146,21 +144,20 @@ function SentimentBadge({ score, tier }: { score: number | null; tier: string | 
 
 // ── AUM Progress Bar Component ───────────────────────────────────────────────
 function AumProgressBar({ expected, actual }: { expected: number | null; actual: number | null }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   if (!expected || !actual) {
-    return <span style={{ fontSize: 11, color: C.slate, fontStyle: 'italic' }}>—</span>;
+    return <span style={{ fontSize: 11, color: THEME.colors.textSecondary, fontStyle: 'italic' }}>—</span>;
   }
   const pct = Math.min(Math.round((actual / expected) * 100), 200);
   const displayPct = Math.min(pct, 100); // cap bar at 100%
-  const color = pct >= 90 ? C.green : pct >= 60 ? C.gold : pct >= 30 ? C.amber : C.red;
+  const color = pct >= 90 ? THEME.colors.success : pct >= 60 ? THEME.colors.bronze400 : pct >= 30 ? THEME.colors.warning : THEME.colors.error;
 
   return (
     <div style={{ minWidth: 100 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
         <span style={{ fontSize: 12, fontWeight: 600, color }}>{pct}%</span>
-        <span style={{ fontSize: 10, color: C.slate, fontVariantNumeric: 'tabular-nums' }}>{formatAUM(actual)}</span>
+        <span style={{ fontSize: 10, color: THEME.colors.textSecondary, fontVariantNumeric: 'tabular-nums' }}>{formatAUM(actual)}</span>
       </div>
       <div style={{ height: 6, borderRadius: 3, background: 'rgba(91,106,113,0.1)', overflow: 'hidden' }}>
         <div style={{
@@ -332,12 +329,11 @@ const PACE_STYLES: Record<PaceStatus, { color: string; bg: string; icon: string 
 
 // ── AUM Tracker Tab Component ───────────────────────────────────────────────
 function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading: boolean; search: string }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: 60, color: C.slate, fontSize: 14 }}>
+      <div style={{ textAlign: 'center', padding: 60, color: THEME.colors.textSecondary, fontSize: 14 }}>
         Loading AUM data...
       </div>
     );
@@ -345,7 +341,7 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
 
   if (advisors.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: 60, color: C.slate, fontSize: 14 }}>
+      <div style={{ textAlign: 'center', padding: 60, color: THEME.colors.textSecondary, fontSize: 14 }}>
         No launched advisors found
       </div>
     );
@@ -367,7 +363,7 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
           borderRadius: 8, alignItems: 'center',
         }}>
           <span style={{ fontSize: 16 }}>{behindCount > 0 ? '⚠' : '◈'}</span>
-          <span style={{ fontSize: 13, color: C.dark }}>
+          <span style={{ fontSize: 13, color: THEME.colors.text }}>
             {behindCount > 0 && <strong style={{ color: '#c0392b' }}>{behindCount} advisor{behindCount > 1 ? 's' : ''} behind target</strong>}
             {behindCount > 0 && warningCount > 0 && ' · '}
             {warningCount > 0 && <span style={{ color: '#e67e22' }}>{warningCount} off pace</span>}
@@ -381,7 +377,7 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
         gridTemplateColumns: '1.5fr 0.9fr 0.7fr 1fr 1fr 0.6fr 0.7fr 0.8fr 1.1fr',
         gap: 12, padding: '12px 20px',
         fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em',
-        color: C.slate, borderBottom: `1px solid ${C.border}`,
+        color: THEME.colors.textSecondary, borderBottom: `1px solid ${THEME.colors.border}`,
       }}>
         <span>Advisor</span>
         <span>Prior Firm</span>
@@ -403,31 +399,31 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
             display: 'grid',
             gridTemplateColumns: '1.5fr 0.9fr 0.7fr 1fr 1fr 0.6fr 0.7fr 0.8fr 1.1fr',
             gap: 12, padding: '16px 20px', alignItems: 'center',
-            background: C.cardBg,
-            border: `1px solid ${pace.status === 'behind' ? 'rgba(192,57,43,0.2)' : C.border}`,
+            background: THEME.colors.surface,
+            border: `1px solid ${pace.status === 'behind' ? 'rgba(192,57,43,0.2)' : THEME.colors.border}`,
             borderRadius: 8,
             transition: 'border-color 150ms ease, box-shadow 150ms ease',
           }}
             onMouseEnter={e => {
-              e.currentTarget.style.borderColor = C.teal;
+              e.currentTarget.style.borderColor = THEME.colors.teal;
               e.currentTarget.style.background = 'rgba(78,112,130,0.04)';
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.borderColor = pace.status === 'behind' ? 'rgba(192,57,43,0.2)' : C.border;
-              e.currentTarget.style.background = C.cardBg;
+              e.currentTarget.style.borderColor = pace.status === 'behind' ? 'rgba(192,57,43,0.2)' : THEME.colors.border;
+              e.currentTarget.style.background = THEME.colors.surface;
             }}
           >
             {/* Advisor Name */}
             <Link href={`/command-center/advisor/${advisor.deal_id}`} style={{ textDecoration: 'none' }}>
               <div>
                 <p style={{
-                  fontSize: 15, fontWeight: 600, color: C.dark,
+                  fontSize: 15, fontWeight: 600, color: THEME.colors.text,
                   fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer',
                 }}>
                   {advisor.advisor_name}
                 </p>
                 {advisor.households && (
-                  <p style={{ fontSize: 11, color: C.slate, marginTop: 2 }}>
+                  <p style={{ fontSize: 11, color: THEME.colors.textSecondary, marginTop: 2 }}>
                     {advisor.households} household{advisor.households !== 1 ? 's' : ''}
                   </p>
                 )}
@@ -435,7 +431,7 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
             </Link>
 
             {/* Prior Firm */}
-            <p style={{ fontSize: 13, color: C.dark }}>
+            <p style={{ fontSize: 13, color: THEME.colors.text }}>
               {advisor.prior_firm || '—'}
             </p>
 
@@ -445,19 +441,19 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
                 <span style={{
                   display: 'inline-block', padding: '3px 8px', borderRadius: 4,
                   fontSize: 10, fontWeight: 600,
-                  background: 'rgba(78,112,130,0.08)', color: C.teal,
+                  background: 'rgba(78,112,130,0.08)', color: THEME.colors.teal,
                   whiteSpace: 'nowrap',
                 }}>
                   {advisor.transition_type}
                 </span>
               ) : (
-                <span style={{ fontSize: 11, color: C.slate, fontStyle: 'italic' }}>—</span>
+                <span style={{ fontSize: 11, color: THEME.colors.textSecondary, fontStyle: 'italic' }}>—</span>
               )}
             </div>
 
             {/* Expected AUM */}
             <p style={{
-              fontSize: 14, fontWeight: 600, color: C.dark, textAlign: 'right',
+              fontSize: 14, fontWeight: 600, color: THEME.colors.text, textAlign: 'right',
               fontFamily: "'Inter', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums',
             }}>
               {formatAUM(advisor.expected_aum)}
@@ -467,26 +463,26 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
             <AumProgressBar expected={advisor.expected_aum} actual={advisor.actual_aum} />
 
             {/* Days Since Launch */}
-            <p style={{ fontSize: 13, color: C.slate, textAlign: 'center' }}>
+            <p style={{ fontSize: 13, color: THEME.colors.textSecondary, textAlign: 'center' }}>
               {advisor.days_since_launch !== null ? (
                 <span>
                   {advisor.days_since_launch}
-                  <span style={{ fontSize: 10, color: C.slate, marginLeft: 2 }}>d</span>
+                  <span style={{ fontSize: 10, color: THEME.colors.textSecondary, marginLeft: 2 }}>d</span>
                 </span>
               ) : '—'}
             </p>
 
             {/* Fee Rate BPS */}
-            <p style={{ fontSize: 13, fontWeight: 500, color: C.dark, textAlign: 'right' }}>
+            <p style={{ fontSize: 13, fontWeight: 500, color: THEME.colors.text, textAlign: 'right' }}>
               {advisor.fee_rate_bps != null ? `${advisor.fee_rate_bps}` : '—'}
               {advisor.fee_rate_bps != null && (
-                <span style={{ fontSize: 10, color: C.slate, marginLeft: 2 }}>bps</span>
+                <span style={{ fontSize: 10, color: THEME.colors.textSecondary, marginLeft: 2 }}>bps</span>
               )}
             </p>
 
             {/* Current Revenue */}
             <p style={{
-              fontSize: 13, fontWeight: 600, color: advisor.current_revenue ? C.green : C.slate,
+              fontSize: 13, fontWeight: 600, color: advisor.current_revenue ? THEME.colors.success : THEME.colors.textSecondary,
               textAlign: 'right', fontFamily: "'Inter', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums',
             }}>
               {advisor.current_revenue ? formatAUM(advisor.current_revenue) : '—'}
@@ -504,7 +500,7 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
                 {pace.label}
               </span>
               {pace.detail && pace.status !== 'unknown' && (
-                <span style={{ fontSize: 10, color: C.slate, paddingLeft: 2, lineHeight: 1.3 }}>
+                <span style={{ fontSize: 10, color: THEME.colors.textSecondary, paddingLeft: 2, lineHeight: 1.3 }}>
                   {pace.detail}
                 </span>
               )}
@@ -518,9 +514,8 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
 
 // ── Main Component ───────────────────────────────────────────────────────────
 export default function AdvisorHubPage() {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
-  const STAGE_COLORS = useMemo(() => getStageColors(C.teal, C.gold), [C.teal, C.gold]);
+  const { THEME } = useTheme();
+  const STAGE_COLORS = useMemo(() => getStageColors(), []);
   const { data, isLoading, error } = useSWR('/api/command-center/pipeline', fetcher, SWR_OPTS);
   const { data: sentimentData, mutate: mutateSentiment } = useSWR('/api/command-center/sentiment/scores', fetcher, SWR_OPTS);
   const { data: aumData, isLoading: aumLoading } = useSWR('/api/command-center/aum-tracker', fetcher, SWR_OPTS);
@@ -753,10 +748,10 @@ export default function AdvisorHubPage() {
           style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5, width: '120px', height: 'auto' }}
         />
         <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: 32, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 6 }}>
+          <h1 style={{ fontSize: 32, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 6 }}>
             Advisor Hub
           </h1>
-          <p style={{ fontSize: 14, color: C.slate }}>
+          <p style={{ fontSize: 14, color: THEME.colors.textSecondary }}>
             Full directory of advisors across all pipeline stages
           </p>
         </div>
@@ -765,24 +760,24 @@ export default function AdvisorHubPage() {
       {/* Summary Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
         {[
-          { label: 'Launch to Graduation', value: String(launchDeals.length), sub: undefined, color: C.teal, icon: '▲' },
+          { label: 'Launch to Graduation', value: String(launchDeals.length), sub: undefined, color: THEME.colors.teal, icon: '▲' },
           { label: 'Early Deals', value: String(earlyDeals.length), sub: undefined, color: '#4383b4', icon: '◈' },
-          { label: 'Completed Transitions', value: String(completedDeals.length), sub: undefined, color: C.green, icon: '✓' },
+          { label: 'Completed Transitions', value: String(completedDeals.length), sub: undefined, color: THEME.colors.success, icon: '✓' },
         ].map(card => (
           <div key={card.label} style={{
-            background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+            background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8,
             padding: '20px 24px', position: 'relative',
           }}>
             <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.25, color: card.color }}>
               {card.icon}
             </span>
-            <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+            <p style={{ fontSize: 11, color: THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
               {card.label}
             </p>
-            <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>
+            <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" }}>
               {card.value}
             </p>
-            {card.sub && <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>{card.sub}</p>}
+            {card.sub && <p style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 4 }}>{card.sub}</p>}
           </div>
         ))}
       </div>
@@ -803,43 +798,43 @@ export default function AdvisorHubPage() {
               label: 'AUM Transfer Rate',
               value: aumData?.summary?.overall_transfer_pct != null ? `${aumData.summary.overall_transfer_pct}%` : '—',
               sub: aumData?.summary ? `${formatAUM(aumData.summary.total_actual_aum)} of ${formatAUM(aumData.summary.total_expected_aum)}` : undefined,
-              color: C.gold, icon: '◎',
+              color: THEME.colors.bronze400, icon: '◎',
             },
             {
               label: 'On Book Revenue',
               value: aumData?.summary?.total_current_revenue ? formatAUM(aumData.summary.total_current_revenue) : '—',
               sub: aumData?.summary?.advisors_with_actual ? `${aumData.summary.advisors_with_actual} advisor${aumData.summary.advisors_with_actual > 1 ? 's' : ''} reporting` : undefined,
-              color: C.green, icon: '$',
+              color: THEME.colors.success, icon: '$',
             },
             {
               label: 'Expected Revenue',
               value: totalExpectedRevenue > 0 ? formatAUM(Math.round(totalExpectedRevenue)) : '—',
               sub: realizedPct != null ? `${realizedPct}% realized` : 'At full AUM transfer',
-              color: C.gold, icon: '★',
+              color: THEME.colors.bronze400, icon: '★',
             },
           ];
         })().map(card => (
           <div key={card.label} style={{
-            background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+            background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8,
             padding: '20px 24px', position: 'relative',
           }}>
             <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.25, color: card.color }}>
               {card.icon}
             </span>
-            <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+            <p style={{ fontSize: 11, color: THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
               {card.label}
             </p>
-            <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>
+            <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" }}>
               {card.value}
             </p>
-            {card.sub && <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>{card.sub}</p>}
+            {card.sub && <p style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 4 }}>{card.sub}</p>}
           </div>
         ))}
       </div>
 
       {/* Tabs + Search + Score All */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${C.border}` }}>
+        <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${THEME.colors.border}` }}>
           {TABS.map(tab => {
             const isActive = activeTab === tab.key;
             const count = tab.key === 'launch' ? launchDeals.length : tab.key === 'early' ? earlyDeals.length : tab.key === 'completed' ? completedDeals.length : (aumData?.total ?? 0);
@@ -849,8 +844,8 @@ export default function AdvisorHubPage() {
                 onClick={() => setActiveTab(tab.key)}
                 style={{
                   padding: '12px 24px', fontSize: 13, fontWeight: isActive ? 600 : 400,
-                  color: isActive ? C.teal : C.slate, background: 'none', border: 'none',
-                  borderBottom: isActive ? `2px solid ${C.teal}` : '2px solid transparent',
+                  color: isActive ? THEME.colors.teal : THEME.colors.textSecondary, background: 'none', border: 'none',
+                  borderBottom: isActive ? `2px solid ${THEME.colors.teal}` : '2px solid transparent',
                   marginBottom: -2, cursor: 'pointer',
                   fontFamily: "'Inter', system-ui, sans-serif",
                   transition: 'color 150ms ease, border-color 150ms ease',
@@ -862,7 +857,7 @@ export default function AdvisorHubPage() {
                   marginLeft: 8, fontSize: 11, fontWeight: 600,
                   padding: '2px 8px', borderRadius: 10,
                   background: isActive ? 'rgba(78,112,130,0.1)' : 'rgba(91,106,113,0.08)',
-                  color: isActive ? C.teal : C.slate,
+                  color: isActive ? THEME.colors.teal : THEME.colors.textSecondary,
                 }}>
                   {count}
                 </span>
@@ -878,7 +873,7 @@ export default function AdvisorHubPage() {
               disabled={batchScoring}
               style={{
                 padding: '8px 16px', fontSize: 12, fontWeight: 600, borderRadius: 6,
-                background: batchScoring ? C.border : C.teal, color: C.white,
+                background: batchScoring ? THEME.colors.border : THEME.colors.teal, color: "#FFFFFF",
                 border: 'none', cursor: batchScoring ? 'not-allowed' : 'pointer',
                 fontFamily: "'Inter', system-ui, sans-serif",
                 transition: 'background 150ms ease',
@@ -894,7 +889,7 @@ export default function AdvisorHubPage() {
             onChange={e => setSearch(e.target.value)}
             style={{
               width: 240, padding: '10px 16px', fontSize: 13, borderRadius: 8,
-              border: `1px solid ${C.border}`, background: C.cardBg, color: C.dark,
+              border: `1px solid ${THEME.colors.border}`, background: THEME.colors.surface, color: THEME.colors.text,
               fontFamily: "'Inter', system-ui, sans-serif",
               outline: 'none',
             }}
@@ -906,8 +901,8 @@ export default function AdvisorHubPage() {
       <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
         {/* Transition Type */}
         <select value={transitionFilter} onChange={e => setTransitionFilter(e.target.value)} style={{
-          padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
-          fontSize: 12, background: C.cardBg, color: C.dark, cursor: 'pointer', outline: 'none',
+          padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
+          fontSize: 12, background: THEME.colors.surface, color: THEME.colors.text, cursor: 'pointer', outline: 'none',
         }}>
           <option value="all">All Merge Types</option>
           {(() => {
@@ -919,8 +914,8 @@ export default function AdvisorHubPage() {
 
         {/* AUM Tier */}
         <select value={aumTierFilter} onChange={e => setAumTierFilter(e.target.value)} style={{
-          padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
-          fontSize: 12, background: C.cardBg, color: C.dark, cursor: 'pointer', outline: 'none',
+          padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
+          fontSize: 12, background: THEME.colors.surface, color: THEME.colors.text, cursor: 'pointer', outline: 'none',
         }}>
           <option value="all">All AUM Tiers</option>
           <option value="0-50">$0 - $50M</option>
@@ -932,8 +927,8 @@ export default function AdvisorHubPage() {
         {/* Sentiment */}
         {showSentiment && (
           <select value={sentimentFilter} onChange={e => setSentimentFilter(e.target.value)} style={{
-            padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
-            fontSize: 12, background: C.cardBg, color: C.dark, cursor: 'pointer', outline: 'none',
+            padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
+            fontSize: 12, background: THEME.colors.surface, color: THEME.colors.text, cursor: 'pointer', outline: 'none',
           }}>
             <option value="all">All Sentiment</option>
             <option value="Advocate">Advocate</option>
@@ -947,8 +942,8 @@ export default function AdvisorHubPage() {
 
         {/* Task Phase */}
         <select value={taskPhaseFilter} onChange={e => setTaskPhaseFilter(e.target.value)} style={{
-          padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
-          fontSize: 12, background: C.cardBg, color: C.dark, cursor: 'pointer', outline: 'none',
+          padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
+          fontSize: 12, background: THEME.colors.surface, color: THEME.colors.text, cursor: 'pointer', outline: 'none',
         }}>
           <option value="all">All Task Phases</option>
           <option value="phase_0">Phase 0 - Sales Handoff</option>
@@ -963,8 +958,8 @@ export default function AdvisorHubPage() {
 
         {/* Open Alerts */}
         <select value={alertFilter} onChange={e => setAlertFilter(e.target.value)} style={{
-          padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
-          fontSize: 12, background: C.cardBg, color: C.dark, cursor: 'pointer', outline: 'none',
+          padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
+          fontSize: 12, background: THEME.colors.surface, color: THEME.colors.text, cursor: 'pointer', outline: 'none',
         }}>
           <option value="all">All Alerts</option>
           <option value="has_alerts">Has Alerts</option>
@@ -972,7 +967,7 @@ export default function AdvisorHubPage() {
         </select>
 
         {/* Result count */}
-        <span style={{ fontSize: 12, color: C.slate, padding: '8px 0', marginLeft: 'auto' }}>
+        <span style={{ fontSize: 12, color: THEME.colors.textSecondary, padding: '8px 0', marginLeft: 'auto' }}>
           {currentDeals.length} advisor{currentDeals.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -984,7 +979,7 @@ export default function AdvisorHubPage() {
         </div>
       )}
       {error && activeTab !== 'aum' && (
-        <div style={{ textAlign: 'center', padding: 60, color: C.red, fontSize: 14 }}>
+        <div style={{ textAlign: 'center', padding: 60, color: THEME.colors.error, fontSize: 14 }}>
           Failed to load pipeline data
         </div>
       )}
@@ -1020,7 +1015,7 @@ export default function AdvisorHubPage() {
                 display: 'grid', gridTemplateColumns: gridCols,
                 gap: 16, padding: '12px 20px',
                 fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em',
-                color: C.slate, borderBottom: `1px solid ${C.border}`,
+                color: THEME.colors.textSecondary, borderBottom: `1px solid ${THEME.colors.border}`,
               }}>
                 {cols.map(col => (
                   <span
@@ -1036,13 +1031,13 @@ export default function AdvisorHubPage() {
           })()}
 
           {currentDeals.length === 0 && (
-            <div style={{ textAlign: 'center', padding: 40, color: C.slate, fontSize: 14 }}>
+            <div style={{ textAlign: 'center', padding: 40, color: THEME.colors.textSecondary, fontSize: 14 }}>
               {search ? 'No advisors match your search' : 'No advisors in this category'}
             </div>
           )}
 
           {currentDeals.map(deal => {
-            const stageColor = STAGE_COLORS[deal.dealstage] ?? C.slate;
+            const stageColor = STAGE_COLORS[deal.dealstage] ?? THEME.colors.textSecondary;
             const stageLabel = STAGE_LABELS[deal.dealstage] ?? deal.dealstage;
             const shortStage = stageLabel.replace(/Step \d+ – /, '');
             const aum = deal.transferable_aum ? Number(deal.transferable_aum) : null;
@@ -1057,37 +1052,37 @@ export default function AdvisorHubPage() {
                 display: 'grid',
                 gridTemplateColumns: gridCols,
                 gap: 16, padding: '16px 20px', alignItems: 'center',
-                background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+                background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8,
                 transition: 'border-color 150ms ease, box-shadow 150ms ease',
               }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = C.teal;
+                  e.currentTarget.style.borderColor = THEME.colors.teal;
                   e.currentTarget.style.background = 'rgba(78,112,130,0.04)';
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = C.border;
-                  e.currentTarget.style.background = C.cardBg;
+                  e.currentTarget.style.borderColor = THEME.colors.border;
+                  e.currentTarget.style.background = THEME.colors.surface;
                 }}
               >
                 {/* Name — clickable link */}
                 <Link href={`/command-center/advisor/${deal.id}`} style={{ textDecoration: 'none' }}>
                   <div>
-                    <p style={{ fontSize: 15, fontWeight: 600, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer' }}>
+                    <p style={{ fontSize: 15, fontWeight: 600, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer' }}>
                       {deal.dealname || '—'}
                     </p>
                     {deal.firm_type && (
-                      <p style={{ fontSize: 11, color: C.slate, marginTop: 2 }}>{deal.firm_type}</p>
+                      <p style={{ fontSize: 11, color: THEME.colors.textSecondary, marginTop: 2 }}>{deal.firm_type}</p>
                     )}
                   </div>
                 </Link>
 
                 {/* Current Firm */}
-                <p style={{ fontSize: 13, color: C.dark }}>
+                <p style={{ fontSize: 13, color: THEME.colors.text }}>
                   {deal.current_firm__cloned_ || '—'}
                 </p>
 
                 {/* AUM */}
-                <p style={{ fontSize: 14, fontWeight: 600, color: C.dark, textAlign: 'right', fontFamily: "'Inter', system-ui, sans-serif" }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: THEME.colors.text, textAlign: 'right', fontFamily: "'Inter', system-ui, sans-serif" }}>
                   {formatAUM(aum)}
                 </p>
 
@@ -1101,12 +1096,12 @@ export default function AdvisorHubPage() {
                     {shortStage}
                   </span>
                   {activeTab === 'launch' && deal.daysSinceLaunch !== null && (
-                    <p style={{ fontSize: 10, color: C.slate, marginTop: 3 }}>
+                    <p style={{ fontSize: 10, color: THEME.colors.textSecondary, marginTop: 3 }}>
                       Day {deal.daysSinceLaunch}
                     </p>
                   )}
                   {activeTab === 'completed' && deal.daysSinceLaunch !== null && (
-                    <p style={{ fontSize: 10, color: C.green, marginTop: 3 }}>
+                    <p style={{ fontSize: 10, color: THEME.colors.success, marginTop: 3 }}>
                       {deal.daysSinceLaunch} days
                     </p>
                   )}
@@ -1116,7 +1111,7 @@ export default function AdvisorHubPage() {
                 {showSentiment && (
                   <div>
                     {isScoring ? (
-                      <span style={{ fontSize: 11, color: C.teal, fontStyle: 'italic' }}>
+                      <span style={{ fontSize: 11, color: THEME.colors.teal, fontStyle: 'italic' }}>
                         Analyzing...
                       </span>
                     ) : sentiment ? (
@@ -1129,13 +1124,13 @@ export default function AdvisorHubPage() {
                         onClick={(e) => { e.preventDefault(); scoreAdvisor(deal.id); }}
                         style={{
                           padding: '4px 10px', fontSize: 10, fontWeight: 600,
-                          borderRadius: 4, border: `1px solid ${C.border}`,
-                          background: 'none', color: C.slate, cursor: 'pointer',
+                          borderRadius: 4, border: `1px solid ${THEME.colors.border}`,
+                          background: 'none', color: THEME.colors.textSecondary, cursor: 'pointer',
                           fontFamily: "'Inter', system-ui, sans-serif",
                           transition: 'color 150ms ease, border-color 150ms ease',
                         }}
-                        onMouseEnter={e => { e.currentTarget.style.color = C.teal; e.currentTarget.style.borderColor = C.teal; }}
-                        onMouseLeave={e => { e.currentTarget.style.color = C.slate; e.currentTarget.style.borderColor = C.border; }}
+                        onMouseEnter={e => { e.currentTarget.style.color = THEME.colors.teal; e.currentTarget.style.borderColor = THEME.colors.teal; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = THEME.colors.textSecondary; e.currentTarget.style.borderColor = THEME.colors.border; }}
                       >
                         ✦ Score
                       </button>
@@ -1146,14 +1141,14 @@ export default function AdvisorHubPage() {
                 {/* Tasks */}
                 {(() => {
                   const t = taskMap[deal.id];
-                  if (!t) return <span style={{ fontSize: 11, color: C.slate, fontStyle: 'italic' }}>—</span>;
+                  if (!t) return <span style={{ fontSize: 11, color: THEME.colors.textSecondary, fontStyle: 'italic' }}>—</span>;
                   const phaseLabel = t.current_phase ? t.current_phase.replace('phase_', 'P') : '—';
                   return (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: t.open_tasks > 0 ? C.amber : C.green }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: t.open_tasks > 0 ? THEME.colors.warning : THEME.colors.success }}>
                         {t.open_tasks} open
                       </span>
-                      <span style={{ fontSize: 10, color: C.slate }}>
+                      <span style={{ fontSize: 10, color: THEME.colors.textSecondary }}>
                         {phaseLabel} · {t.completed_tasks}/{t.total_tasks}
                       </span>
                     </div>
@@ -1163,12 +1158,12 @@ export default function AdvisorHubPage() {
                 {/* Alerts */}
                 {(() => {
                   const count = alertMap[deal.id] ?? 0;
-                  if (count === 0) return <span style={{ fontSize: 11, color: C.slate }}>—</span>;
+                  if (count === 0) return <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>—</span>;
                   return (
                     <span style={{
                       display: 'inline-flex', alignItems: 'center', gap: 4,
                       padding: '3px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600,
-                      background: C.redBg, color: C.red,
+                      background: THEME.colors.errorBg, color: THEME.colors.error,
                     }}>
                       {count}
                     </span>
@@ -1176,12 +1171,12 @@ export default function AdvisorHubPage() {
                 })()}
 
                 {/* Date */}
-                <p style={{ fontSize: 13, color: C.slate }}>
+                <p style={{ fontSize: 13, color: THEME.colors.textSecondary }}>
                   {formatDate(dateVal)}
                 </p>
 
                 {/* Recruiter */}
-                <p style={{ fontSize: 13, color: C.slate }}>
+                <p style={{ fontSize: 13, color: THEME.colors.textSecondary }}>
                   {deal.ownerName || '—'}
                 </p>
               </div>
@@ -1194,8 +1189,8 @@ export default function AdvisorHubPage() {
       {activeTab !== 'aum' && !isLoading && !error && data?.deals && (
         <div style={{
           marginTop: 24, padding: '12px 20px',
-          fontSize: 12, color: C.slate, textAlign: 'right',
-          borderTop: `1px solid ${C.border}`,
+          fontSize: 12, color: THEME.colors.textSecondary, textAlign: 'right',
+          borderTop: `1px solid ${THEME.colors.border}`,
         }}>
           {data.deals.length} total advisors across all stages
         </div>

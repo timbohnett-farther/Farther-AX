@@ -5,20 +5,12 @@ import useSWR from 'swr';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { PHASES, PHASE_ORDER, type Phase } from '@/lib/onboarding-tasks-v2';
+import { useTheme } from '@/lib/theme-provider';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-const C = {
-  dark: '#F8F4F0', white: '#595959', slate: 'rgba(248,244,240,0.5)',
-  lightBlue: '#7CA4B4',
-  teal: '#3B5A69', bg: '#2C3B4E',
-  cardBg: '#F8F4F0', border: 'rgba(248,244,240,0.08)',
-  green: '#10b981', greenBg: 'rgba(16,185,129,0.15)',
-  amber: '#f59e0b', amberBg: 'rgba(245,158,11,0.15)', amberBorder: 'rgba(245,158,11,0.3)',
-  red: '#ef4444', redBg: 'rgba(239,68,68,0.15)', redBorder: 'rgba(239,68,68,0.3)',
-  gold: '#f59e0b', goldBg: 'rgba(245,158,11,0.15)',
-};
+
 
 const STAGE_LABELS: Record<string, string> = {
   '2496931': 'Step 1 – First Meeting',
@@ -56,19 +48,20 @@ function formatPct(n: string | number | null | undefined): string {
 
 // ── Shared UI Components ──────────────────────────────────────────────────────
 function Section({ title, children, highlight, icon }: { title: string; children: React.ReactNode; highlight?: boolean; icon?: string }) {
+  const { THEME } = useTheme();
   return (
     <div style={{
-      background: C.cardBg, border: `1px solid ${highlight ? C.teal : C.border}`,
+      background: THEME.colors.surface, border: `1px solid ${highlight ? THEME.colors.teal : THEME.colors.border}`,
       borderRadius: 10, marginBottom: 20, overflow: 'hidden',
       boxShadow: highlight ? '0 0 0 1px rgba(29,118,130,0.2)' : undefined,
     }}>
       <div style={{
-        padding: '12px 20px', borderBottom: `1px solid ${highlight ? 'rgba(29,118,130,0.15)' : C.border}`,
+        padding: '12px 20px', borderBottom: `1px solid ${highlight ? 'rgba(29,118,130,0.15)' : THEME.colors.border}`,
         background: highlight ? 'rgba(29,118,130,0.05)' : '#2a2a2a',
         display: 'flex', alignItems: 'center', gap: 8,
       }}>
         {icon && <span style={{ fontSize: 14 }}>{icon}</span>}
-        <h3 style={{ fontSize: 12, fontWeight: 700, color: highlight ? C.teal : C.slate, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <h3 style={{ fontSize: 12, fontWeight: 700, color: highlight ? THEME.colors.teal : THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           {title}
         </h3>
       </div>
@@ -78,16 +71,18 @@ function Section({ title, children, highlight, icon }: { title: string; children
 }
 
 function Field({ label, value, wide, highlight }: { label: string; value: React.ReactNode; wide?: boolean; highlight?: boolean }) {
+  const { THEME } = useTheme();
   if (!value || value === '—' || value === 'null') return null;
   return (
     <div style={{ marginBottom: 12, gridColumn: wide ? 'span 2' : undefined }}>
-      <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</p>
-      <p style={{ fontSize: 14, color: highlight ? C.teal : C.dark, fontWeight: highlight ? 600 : 400, lineHeight: 1.5 }}>{value}</p>
+      <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</p>
+      <p style={{ fontSize: 14, color: highlight ? THEME.colors.teal : THEME.colors.text, fontWeight: highlight ? 600 : 400, lineHeight: 1.5 }}>{value}</p>
     </div>
   );
 }
 
 function Grid({ children, cols = 3 }: { children: React.ReactNode; cols?: number }) {
+  const { THEME } = useTheme();
   return (
     <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '0 24px' }}>
       {children}
@@ -96,7 +91,8 @@ function Grid({ children, cols = 3 }: { children: React.ReactNode; cols?: number
 }
 
 function Badge({ label, color }: { label: string; color?: string }) {
-  const c = color ?? C.teal;
+  const { THEME } = useTheme();
+  const c = color ?? THEME.colors.teal;
   return (
     <span style={{
       display: 'inline-block', padding: '3px 10px', borderRadius: 6,
@@ -107,12 +103,13 @@ function Badge({ label, color }: { label: string; color?: string }) {
 }
 
 function StageBadge({ stageId }: { stageId: string }) {
+  const { THEME } = useTheme();
   const isLate = ['2496936', '100411705'].includes(stageId);
   return (
     <span style={{
       display: 'inline-block', padding: '4px 12px', borderRadius: 20,
       background: isLate ? 'rgba(29,118,130,0.22)' : 'rgba(91,106,113,0.18)',
-      color: isLate ? '#5ec4cf' : C.dark, fontSize: 12, fontWeight: 600,
+      color: isLate ? '#5ec4cf' : THEME.colors.text, fontSize: 12, fontWeight: 600,
       border: `1px solid ${isLate ? 'rgba(29,118,130,0.35)' : 'rgba(91,106,113,0.25)'}`,
     }}>
       {STAGE_LABELS[stageId] ?? stageId}
@@ -121,6 +118,7 @@ function StageBadge({ stageId }: { stageId: string }) {
 }
 
 function IntelCard({ label, items, color, icon }: { label: string; items: string[]; color: string; icon: string }) {
+  const { THEME } = useTheme();
   if (!items || items.length === 0) return null;
   return (
     <div style={{
@@ -132,7 +130,7 @@ function IntelCard({ label, items, color, icon }: { label: string; items: string
       </p>
       <ul style={{ margin: 0, paddingLeft: 18 }}>
         {items.map((item, i) => (
-          <li key={i} style={{ fontSize: 13, color: C.dark, lineHeight: 1.6, marginBottom: 4 }}>{item}</li>
+          <li key={i} style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.6, marginBottom: 4 }}>{item}</li>
         ))}
       </ul>
     </div>
@@ -140,17 +138,19 @@ function IntelCard({ label, items, color, icon }: { label: string; items: string
 }
 
 function EmptyState({ message }: { message: string }) {
-  return <p style={{ fontSize: 13, color: C.slate, textAlign: 'center', padding: '24px 0' }}>{message}</p>;
+  const { THEME } = useTheme();
+  return <p style={{ fontSize: 13, color: THEME.colors.textMuted, textAlign: 'center', padding: '24px 0' }}>{message}</p>;
 }
 
 function StatCard({ label, value, color }: { label: string; value: string | number; color?: string }) {
+  const { THEME } = useTheme();
   return (
     <div style={{
       padding: '16px 20px', borderRadius: 8, background: 'rgba(91,106,113,0.04)',
-      border: `1px solid ${C.border}`, textAlign: 'center',
+      border: `1px solid ${THEME.colors.border}`, textAlign: 'center',
     }}>
-      <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</p>
-      <p style={{ fontSize: 24, fontWeight: 700, color: color ?? C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>{value}</p>
+      <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</p>
+      <p style={{ fontSize: 24, fontWeight: 700, color: color ?? THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" }}>{value}</p>
     </div>
   );
 }
@@ -160,6 +160,7 @@ interface ComplexityFactor { category: string; factor: string; points: number; m
 interface ComplexityData { score: number; tier: string; tierColor: string; factors: ComplexityFactor[]; staffingRec: string; estimatedDays: number; }
 
 function ComplexityPanel({ dealId }: { dealId: string }) {
+  const { THEME } = useTheme();
   const { data, isLoading } = useSWR<ComplexityData>(
     dealId ? `/api/command-center/complexity?dealId=${dealId}` : null, fetcher
   );
@@ -180,26 +181,26 @@ function ComplexityPanel({ dealId }: { dealId: string }) {
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <span style={{ fontSize: 12, color: C.slate }}>Est. {estimatedDays} days</span>
-          <span style={{ fontSize: 14, color: C.slate }}>{expanded ? '▲' : '▼'}</span>
+          <span style={{ fontSize: 12, color: THEME.colors.textMuted }}>Est. {estimatedDays} days</span>
+          <span style={{ fontSize: 14, color: THEME.colors.textMuted }}>{expanded ? '▲' : '▼'}</span>
         </div>
       </div>
       {expanded && (
         <>
           <div style={{ padding: '10px 14px', borderRadius: 6, marginBottom: 16, background: `${tierColor}08`, border: `1px solid ${tierColor}15` }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: tierColor, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Staffing Recommendation</p>
-            <p style={{ fontSize: 13, color: C.dark, lineHeight: 1.5 }}>{staffingRec}</p>
+            <p style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.5 }}>{staffingRec}</p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {factors.map((f, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0', borderBottom: i < factors.length - 1 ? `1px solid ${C.border}` : 'none' }}>
-                <div style={{ width: 90, fontSize: 10, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{f.category}</div>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0', borderBottom: i < factors.length - 1 ? `1px solid ${THEME.colors.border}` : 'none' }}>
+                <div style={{ width: 90, fontSize: 10, fontWeight: 600, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{f.category}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: C.dark }}>{f.factor}</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: f.points > 0 ? tierColor : C.slate }}>{f.points}/{f.maxPoints}</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: THEME.colors.text }}>{f.factor}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: f.points > 0 ? tierColor : THEME.colors.textMuted }}>{f.points}/{f.maxPoints}</span>
                   </div>
-                  <p style={{ fontSize: 11, color: C.slate, lineHeight: 1.4 }}>{f.detail}</p>
+                  <p style={{ fontSize: 11, color: THEME.colors.textMuted, lineHeight: 1.4 }}>{f.detail}</p>
                 </div>
                 <div style={{ width: 50, height: 4, background: 'rgba(91,106,113,0.08)', borderRadius: 2, overflow: 'hidden', flexShrink: 0 }}>
                   <div style={{ height: '100%', borderRadius: 2, width: f.maxPoints > 0 ? `${(f.points / f.maxPoints) * 100}%` : '0%', background: f.points > 0 ? tierColor : 'transparent' }} />
@@ -216,13 +217,14 @@ function ComplexityPanel({ dealId }: { dealId: string }) {
 // ── Team Assignment Panel ─────────────────────────────────────────────────────
 const ASSIGNMENT_ROLES = ['AXM', 'AXA', 'CTM', 'CTA'] as const;
 const ROLE_LABELS: Record<string, string> = { 'AXM': 'Advisor Experience Manager', 'AXA': 'Advisor Experience Associate', 'CTM': 'Customer Transition Manager', 'CTA': 'Customer Transition Associate' };
-const ROLE_COLORS_MAP: Record<string, string> = { 'AXM': C.teal, 'AXA': C.teal, 'CTM': '#c8a951', 'CTA': '#c8a951' };
 
 interface AssignmentRow { deal_id: string; role: string; member_id: string; member_name: string; member_email: string; member_phone: string | null; member_calendar: string | null; member_role: string; }
 interface AssignmentMember { id: string; name: string; email: string; role: string; phone: string | null; calendar_link: string | null; }
 interface StaffRec { role: string; recommended: AssignmentMember | null; alternatives: AssignmentMember[]; reason: string; current_load: number; projected_load: number; capacity_status: 'green' | 'amber' | 'red'; }
 
 function TeamAssignmentPanel({ dealId }: { dealId: string }) {
+  const { THEME } = useTheme();
+  const ROLE_COLORS_MAP: Record<string, string> = { 'AXM': THEME.colors.teal, 'AXA': THEME.colors.teal, 'CTM': '#c8a951', 'CTA': '#c8a951' };
   const { data: assignmentData, mutate: mutateAssignments } = useSWR<{ assignments: AssignmentRow[] }>(`/api/command-center/assignments?dealId=${dealId}`, fetcher);
   const { data: teamData } = useSWR<{ members: AssignmentMember[] }>('/api/command-center/team?active=true', fetcher);
   const { data: recData } = useSWR<{ recommendations: StaffRec[] }>(`/api/command-center/staff-recommendation?dealId=${dealId}`, fetcher);
@@ -268,14 +270,14 @@ function TeamAssignmentPanel({ dealId }: { dealId: string }) {
               {recommendations.map(rec => (
                 <div key={rec.role} style={{ padding: '10px 14px', borderRadius: 6, background: rec.capacity_status === 'red' ? 'rgba(192,57,43,0.04)' : rec.capacity_status === 'amber' ? 'rgba(178,125,46,0.04)' : 'rgba(39,174,96,0.04)', border: `1px solid ${rec.capacity_status === 'red' ? 'rgba(192,57,43,0.15)' : rec.capacity_status === 'amber' ? 'rgba(178,125,46,0.15)' : 'rgba(39,174,96,0.15)'}` }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: ROLE_COLORS_MAP[rec.role] || C.slate }}>{rec.role}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: ROLE_COLORS_MAP[rec.role] || THEME.colors.textMuted }}>{rec.role}</span>
                     {rec.recommended && (
-                      <button onClick={() => handleAssign(rec.role, rec.recommended!.id)} style={{ padding: '3px 10px', borderRadius: 4, fontSize: 11, fontWeight: 600, background: C.teal, color: C.white, border: 'none', cursor: 'pointer' }}>
+                      <button onClick={() => handleAssign(rec.role, rec.recommended!.id)} style={{ padding: '3px 10px', borderRadius: 4, fontSize: 11, fontWeight: 600, background: THEME.colors.teal, color: THEME.colors.textSecondary, border: 'none', cursor: 'pointer' }}>
                         Assign {rec.recommended.name.split(' ')[0]}
                       </button>
                     )}
                   </div>
-                  <p style={{ fontSize: 11, color: C.slate, lineHeight: 1.4 }}>{rec.reason}</p>
+                  <p style={{ fontSize: 11, color: THEME.colors.textMuted, lineHeight: 1.4 }}>{rec.reason}</p>
                 </div>
               ))}
             </div>
@@ -286,26 +288,26 @@ function TeamAssignmentPanel({ dealId }: { dealId: string }) {
         {ASSIGNMENT_ROLES.map(role => {
           const currentMemberId = getAssignedMemberId(role);
           const roleMembers = allMembers.filter(m => m.role === role);
-          const roleColor = ROLE_COLORS_MAP[role] || C.slate;
+          const roleColor = ROLE_COLORS_MAP[role] || THEME.colors.textMuted;
           const currentAssignment = assignments.find(a => a.role === role);
           return (
-            <div key={role} style={{ padding: '12px 14px', borderRadius: 8, background: currentMemberId ? `${roleColor}08` : C.cardBg, border: `1px solid ${currentMemberId ? `${roleColor}25` : C.border}` }}>
+            <div key={role} style={{ padding: '12px 14px', borderRadius: 8, background: currentMemberId ? `${roleColor}08` : THEME.colors.surface, border: `1px solid ${currentMemberId ? `${roleColor}25` : THEME.colors.border}` }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                 <div>
                   <span style={{ fontSize: 11, fontWeight: 700, color: roleColor, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{role}</span>
-                  <p style={{ fontSize: 10, color: C.slate }}>{ROLE_LABELS[role]}</p>
+                  <p style={{ fontSize: 10, color: THEME.colors.textMuted }}>{ROLE_LABELS[role]}</p>
                 </div>
-                {currentMemberId && <button onClick={() => handleRemove(role)} style={{ fontSize: 10, color: C.red, background: 'none', border: 'none', cursor: 'pointer' }}>Remove</button>}
+                {currentMemberId && <button onClick={() => handleRemove(role)} style={{ fontSize: 10, color: THEME.colors.error, background: 'none', border: 'none', cursor: 'pointer' }}>Remove</button>}
               </div>
-              <select value={currentMemberId ?? ''} onChange={e => { const val = e.target.value || null; if (val) handleAssign(role, val); }} disabled={saving === role} style={{ width: '100%', padding: '7px 10px', borderRadius: 5, border: `1px solid ${C.border}`, background: C.white, fontSize: 13, color: C.dark, cursor: 'pointer' }}>
+              <select value={currentMemberId ?? ''} onChange={e => { const val = e.target.value || null; if (val) handleAssign(role, val); }} disabled={saving === role} style={{ width: '100%', padding: '7px 10px', borderRadius: 5, border: `1px solid ${THEME.colors.border}`, background: THEME.colors.textSecondary, fontSize: 13, color: THEME.colors.text, cursor: 'pointer' }}>
                 <option value="">— Select {role} —</option>
                 {roleMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
               </select>
               {currentAssignment && (
                 <div style={{ marginTop: 6, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {currentAssignment.member_email && <a href={`mailto:${currentAssignment.member_email}`} style={{ fontSize: 10, color: C.teal, textDecoration: 'none' }}>Email</a>}
-                  {currentAssignment.member_phone && <a href={`tel:${currentAssignment.member_phone}`} style={{ fontSize: 10, color: C.teal, textDecoration: 'none' }}>{currentAssignment.member_phone}</a>}
-                  {currentAssignment.member_calendar && <a href={currentAssignment.member_calendar} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: C.teal, textDecoration: 'none' }}>Calendar</a>}
+                  {currentAssignment.member_email && <a href={`mailto:${currentAssignment.member_email}`} style={{ fontSize: 10, color: THEME.colors.teal, textDecoration: 'none' }}>Email</a>}
+                  {currentAssignment.member_phone && <a href={`tel:${currentAssignment.member_phone}`} style={{ fontSize: 10, color: THEME.colors.teal, textDecoration: 'none' }}>{currentAssignment.member_phone}</a>}
+                  {currentAssignment.member_calendar && <a href={currentAssignment.member_calendar} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: THEME.colors.teal, textDecoration: 'none' }}>Calendar</a>}
                 </div>
               )}
             </div>
@@ -318,6 +320,7 @@ function TeamAssignmentPanel({ dealId }: { dealId: string }) {
 
 // ── U4 & 2B Intake Card ──────────────────────────────────────────────────────
 function U4Card({ dealId, contactId, contactEmail, advisorName }: { dealId: string; contactId: string | null; contactEmail: string | null; advisorName: string }) {
+  const { THEME } = useTheme();
   const { data, mutate } = useSWR(dealId ? `/api/command-center/advisor/${dealId}/u4-2b` : null, fetcher);
   const [sending, setSending] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -359,7 +362,7 @@ function U4Card({ dealId, contactId, contactEmail, advisorName }: { dealId: stri
     <Section title="U4 & 2B Intake Form" highlight icon="✦">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: C.slate }}>Status:</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: THEME.colors.textMuted }}>Status:</span>
           <span style={{
             display: 'inline-block', padding: '4px 12px', borderRadius: 6,
             background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 700,
@@ -371,7 +374,7 @@ function U4Card({ dealId, contactId, contactEmail, advisorName }: { dealId: stri
           <button onClick={handleSend} disabled={sending}
             style={{
               padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: sending ? 'not-allowed' : 'pointer',
-              border: 'none', background: `linear-gradient(135deg, ${C.teal}, #3B5A69)`, color: '#fff',
+              border: 'none', background: `linear-gradient(135deg, ${THEME.colors.teal}, #3B5A69)`, color: '#fff',
               boxShadow: '0 4px 16px rgba(29,118,130,0.3)', opacity: sending ? 0.7 : 1,
             }}>
             {sending ? 'Sending...' : (status === 'expired' ? 'Resend Form' : 'Send U4 & 2B Form')}
@@ -379,7 +382,7 @@ function U4Card({ dealId, contactId, contactEmail, advisorName }: { dealId: stri
         )}
 
         {!contactEmail && status === 'not_sent' && (
-          <span style={{ fontSize: 12, color: C.amber }}>No email on file — cannot send form</span>
+          <span style={{ fontSize: 12, color: THEME.colors.warning }}>No email on file — cannot send form</span>
         )}
       </div>
 
@@ -387,20 +390,20 @@ function U4Card({ dealId, contactId, contactEmail, advisorName }: { dealId: stri
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0 20px' }}>
           {data?.sentAt && (
             <div style={{ marginBottom: 8 }}>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Sent</p>
-              <p style={{ fontSize: 13, color: C.dark }}>{new Date(data.sentAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+              <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Sent</p>
+              <p style={{ fontSize: 13, color: THEME.colors.text }}>{new Date(data.sentAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
             </div>
           )}
           {data?.sentBy && (
             <div style={{ marginBottom: 8 }}>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Sent By</p>
-              <p style={{ fontSize: 13, color: C.dark }}>{data.sentBy}</p>
+              <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Sent By</p>
+              <p style={{ fontSize: 13, color: THEME.colors.text }}>{data.sentBy}</p>
             </div>
           )}
           {data?.completedAt && (
             <div style={{ marginBottom: 8 }}>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Received</p>
-              <p style={{ fontSize: 13, color: C.green, fontWeight: 600 }}>{new Date(data.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+              <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Received</p>
+              <p style={{ fontSize: 13, color: THEME.colors.success, fontWeight: 600 }}>{new Date(data.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
             </div>
           )}
         </div>
@@ -411,8 +414,8 @@ function U4Card({ dealId, contactId, contactEmail, advisorName }: { dealId: stri
           <button onClick={handleCopyLink}
             style={{
               padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-              border: `1px solid ${C.border}`, background: copied ? C.greenBg : C.cardBg,
-              color: copied ? C.green : C.slate,
+              border: `1px solid ${THEME.colors.border}`, background: copied ? THEME.colors.successBg : THEME.colors.surface,
+              color: copied ? THEME.colors.success : THEME.colors.textMuted,
             }}>
             {copied ? '✓ Copied!' : 'Copy Form Link'}
           </button>
@@ -420,7 +423,7 @@ function U4Card({ dealId, contactId, contactEmail, advisorName }: { dealId: stri
             <button onClick={handleSend} disabled={sending}
               style={{
                 padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                border: `1px solid ${C.border}`, background: C.cardBg, color: C.slate,
+                border: `1px solid ${THEME.colors.border}`, background: THEME.colors.surface, color: THEME.colors.textMuted,
                 opacity: sending ? 0.7 : 1,
               }}>
               {sending ? 'Resending...' : 'Resend Email'}
@@ -434,6 +437,7 @@ function U4Card({ dealId, contactId, contactEmail, advisorName }: { dealId: stri
 
 // ── Tech Intake Card ──────────────────────────────────────────────────────────
 function TechIntakeCard({ dealId, contactId, contactEmail, advisorName }: { dealId: string; contactId: string | null; contactEmail: string | null; advisorName: string }) {
+  const { THEME } = useTheme();
   const { data, mutate } = useSWR(dealId ? `/api/command-center/advisor/${dealId}/tech-intake` : null, fetcher);
   const [sending, setSending] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -475,7 +479,7 @@ function TechIntakeCard({ dealId, contactId, contactEmail, advisorName }: { deal
     <Section title="Technology Intake Form" highlight icon="◎">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: C.slate }}>Status:</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: THEME.colors.textMuted }}>Status:</span>
           <span style={{
             display: 'inline-block', padding: '4px 12px', borderRadius: 6,
             background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 700,
@@ -487,7 +491,7 @@ function TechIntakeCard({ dealId, contactId, contactEmail, advisorName }: { deal
           <button onClick={handleSend} disabled={sending}
             style={{
               padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: sending ? 'not-allowed' : 'pointer',
-              border: 'none', background: `linear-gradient(135deg, ${C.teal}, #3B5A69)`, color: '#fff',
+              border: 'none', background: `linear-gradient(135deg, ${THEME.colors.teal}, #3B5A69)`, color: '#fff',
               boxShadow: '0 4px 16px rgba(29,118,130,0.3)', opacity: sending ? 0.7 : 1,
             }}>
             {sending ? 'Sending...' : (status === 'expired' ? 'Resend Form' : 'Send Tech Intake')}
@@ -495,7 +499,7 @@ function TechIntakeCard({ dealId, contactId, contactEmail, advisorName }: { deal
         )}
 
         {!contactEmail && status === 'not_sent' && (
-          <span style={{ fontSize: 12, color: C.amber }}>No email on file — cannot send form</span>
+          <span style={{ fontSize: 12, color: THEME.colors.warning }}>No email on file — cannot send form</span>
         )}
       </div>
 
@@ -503,20 +507,20 @@ function TechIntakeCard({ dealId, contactId, contactEmail, advisorName }: { deal
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0 20px' }}>
           {data?.sentAt && (
             <div style={{ marginBottom: 8 }}>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Sent</p>
-              <p style={{ fontSize: 13, color: C.dark }}>{new Date(data.sentAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+              <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Sent</p>
+              <p style={{ fontSize: 13, color: THEME.colors.text }}>{new Date(data.sentAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
             </div>
           )}
           {data?.sentBy && (
             <div style={{ marginBottom: 8 }}>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Sent By</p>
-              <p style={{ fontSize: 13, color: C.dark }}>{data.sentBy}</p>
+              <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Sent By</p>
+              <p style={{ fontSize: 13, color: THEME.colors.text }}>{data.sentBy}</p>
             </div>
           )}
           {data?.completedAt && (
             <div style={{ marginBottom: 8 }}>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Received</p>
-              <p style={{ fontSize: 13, color: C.green, fontWeight: 600 }}>{new Date(data.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+              <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Received</p>
+              <p style={{ fontSize: 13, color: THEME.colors.success, fontWeight: 600 }}>{new Date(data.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
             </div>
           )}
         </div>
@@ -527,8 +531,8 @@ function TechIntakeCard({ dealId, contactId, contactEmail, advisorName }: { deal
           <button onClick={handleCopyLink}
             style={{
               padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-              border: `1px solid ${C.border}`, background: copied ? C.greenBg : C.cardBg,
-              color: copied ? C.green : C.slate,
+              border: `1px solid ${THEME.colors.border}`, background: copied ? THEME.colors.successBg : THEME.colors.surface,
+              color: copied ? THEME.colors.success : THEME.colors.textMuted,
             }}>
             {copied ? '✓ Copied!' : 'Copy Form Link'}
           </button>
@@ -536,7 +540,7 @@ function TechIntakeCard({ dealId, contactId, contactEmail, advisorName }: { deal
             <button onClick={handleSend} disabled={sending}
               style={{
                 padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                border: `1px solid ${C.border}`, background: C.cardBg, color: C.slate,
+                border: `1px solid ${THEME.colors.border}`, background: THEME.colors.surface, color: THEME.colors.textMuted,
                 opacity: sending ? 0.7 : 1,
               }}>
               {sending ? 'Resending...' : 'Resend Email'}
@@ -554,6 +558,7 @@ function TechIntakeCard({ dealId, contactId, contactEmail, advisorName }: { deal
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function OverviewTab({ deal, contact, extracted, dealId }: { deal: Record<string, any>; contact: Record<string, any> | null; extracted: Record<string, any> | null; dealId: string }) {
+  const { THEME } = useTheme();
   const cp = extracted?.candidate_profile;
   const motives = extracted?.motives;
   const personal = extracted?.personal;
@@ -581,7 +586,7 @@ function OverviewTab({ deal, contact, extracted, dealId }: { deal: Record<string
           <Field label="Location" value={cp?.location || (contact?.city && contact?.state ? `${contact.city}, ${contact.state}` : contact?.city || contact?.state)} />
           <Field label="Current Firm" value={cp?.current_firm || deal.current_firm__cloned_} />
           <Field label="Title" value={cp?.title} />
-          <Field label="Website" value={cp?.website ? <a href={cp.website} target="_blank" rel="noopener noreferrer" style={{ color: C.teal, textDecoration: 'none' }}>{cp.website}</a> : null} />
+          <Field label="Website" value={cp?.website ? <a href={cp.website} target="_blank" rel="noopener noreferrer" style={{ color: THEME.colors.teal, textDecoration: 'none' }}>{cp.website}</a> : null} />
           <Field label="CRD Number" value={cp?.crd_number} highlight />
           <Field label="Length of Experience" value={cp?.loe_years ? `${cp.loe_years} years` : null} />
           <Field label="Length of Service" value={cp?.los_years ? `${cp.los_years} years at current firm` : null} />
@@ -593,14 +598,14 @@ function OverviewTab({ deal, contact, extracted, dealId }: { deal: Record<string
           <div style={{ marginTop: 12 }}>
             {cp?.licenses?.length > 0 && (
               <div style={{ marginBottom: 8 }}>
-                <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Licenses</p>
-                {cp.licenses.map((l: string, i: number) => <Badge key={i} label={l.match(/\d/) ? `Series ${l}` : l} color={C.teal} />)}
+                <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Licenses</p>
+                {cp.licenses.map((l: string, i: number) => <Badge key={i} label={l.match(/\d/) ? `Series ${l}` : l} color={THEME.colors.teal} />)}
               </div>
             )}
             {cp?.designations?.length > 0 && (
               <div>
-                <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Designations</p>
-                {cp.designations.map((d: string, i: number) => <Badge key={i} label={d} color={C.gold} />)}
+                <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Designations</p>
+                {cp.designations.map((d: string, i: number) => <Badge key={i} label={d} color={THEME.colors.bronze400} />)}
               </div>
             )}
           </div>
@@ -611,12 +616,12 @@ function OverviewTab({ deal, contact, extracted, dealId }: { deal: Record<string
         <Section title="Professional Experience" icon="▸">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {cp.previous_experience.map((exp: { firm: string; role: string; years: number | null; notes: string | null }, i: number) => (
-              <div key={i} style={{ display: 'flex', gap: 16, padding: '10px 14px', borderRadius: 6, background: i === 0 ? 'rgba(29,118,130,0.04)' : 'transparent', border: `1px solid ${i === 0 ? 'rgba(29,118,130,0.12)' : C.border}` }}>
-                <div style={{ width: 40, height: 40, borderRadius: 8, background: `${C.teal}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: C.teal, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
+              <div key={i} style={{ display: 'flex', gap: 16, padding: '10px 14px', borderRadius: 6, background: i === 0 ? 'rgba(29,118,130,0.04)' : 'transparent', border: `1px solid ${i === 0 ? 'rgba(29,118,130,0.12)' : THEME.colors.border}` }}>
+                <div style={{ width: 40, height: 40, borderRadius: 8, background: `${THEME.colors.teal}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: THEME.colors.teal, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
                 <div>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: C.dark }}>{exp.firm}</p>
-                  <p style={{ fontSize: 12, color: C.slate }}>{exp.role}{exp.years ? ` · ${exp.years} years` : ''}</p>
-                  {exp.notes && <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>{exp.notes}</p>}
+                  <p style={{ fontSize: 14, fontWeight: 600, color: THEME.colors.text }}>{exp.firm}</p>
+                  <p style={{ fontSize: 12, color: THEME.colors.textMuted }}>{exp.role}{exp.years ? ` · ${exp.years} years` : ''}</p>
+                  {exp.notes && <p style={{ fontSize: 12, color: THEME.colors.textMuted, marginTop: 4 }}>{exp.notes}</p>}
                 </div>
               </div>
             ))}
@@ -629,23 +634,23 @@ function OverviewTab({ deal, contact, extracted, dealId }: { deal: Record<string
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                <tr style={{ borderBottom: `1px solid ${THEME.colors.border}` }}>
                   {['Name', 'Title', 'Licenses', 'Compensation', 'Notes'].map(h => (
-                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', color: C.slate, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
+                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', color: THEME.colors.textMuted, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {(extracted.team_members as Array<{ name: string; title: string | null; licenses: string | null; compensation: string | null; notes: string | null; staying: boolean | null }>).map((m, i) => (
-                  <tr key={i} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? C.cardBg : '#262626' }}>
+                  <tr key={i} style={{ borderBottom: `1px solid ${THEME.colors.border}`, background: i % 2 === 0 ? THEME.colors.surface : '#262626' }}>
                     <td style={{ padding: '8px 12px', fontWeight: 500 }}>{m.name}</td>
-                    <td style={{ padding: '8px 12px', color: C.slate }}>{m.title ?? '—'}</td>
+                    <td style={{ padding: '8px 12px', color: THEME.colors.textMuted }}>{m.title ?? '—'}</td>
                     <td style={{ padding: '8px 12px' }}>{m.licenses ? <Badge label={m.licenses} /> : '—'}</td>
-                    <td style={{ padding: '8px 12px', color: C.slate }}>{m.compensation ?? '—'}</td>
-                    <td style={{ padding: '8px 12px', color: C.slate, fontSize: 12 }}>
+                    <td style={{ padding: '8px 12px', color: THEME.colors.textMuted }}>{m.compensation ?? '—'}</td>
+                    <td style={{ padding: '8px 12px', color: THEME.colors.textMuted, fontSize: 12 }}>
                       {m.notes ?? '—'}
-                      {m.staying === false && <span style={{ color: C.red, fontWeight: 600, marginLeft: 6 }}>May leave</span>}
-                      {m.staying === true && <span style={{ color: C.green, fontWeight: 600, marginLeft: 6 }}>Staying</span>}
+                      {m.staying === false && <span style={{ color: THEME.colors.error, fontWeight: 600, marginLeft: 6 }}>May leave</span>}
+                      {m.staying === true && <span style={{ color: THEME.colors.success, fontWeight: 600, marginLeft: 6 }}>Staying</span>}
                     </td>
                   </tr>
                 ))}
@@ -657,9 +662,9 @@ function OverviewTab({ deal, contact, extracted, dealId }: { deal: Record<string
 
       {motives && (motives.pain_points?.length > 0 || motives.top_care_abouts?.length > 0 || motives.goals?.length > 0) && (
         <Section title="Motives & Goals" icon="◎">
-          <IntelCard label="Pain Points / Concerns" items={motives.pain_points} color={C.amber} icon="⚠" />
-          <IntelCard label="Top Care Abouts" items={motives.top_care_abouts} color={C.teal} icon="★" />
-          <IntelCard label="Goals" items={motives.goals} color={C.green} icon="◎" />
+          <IntelCard label="Pain Points / Concerns" items={motives.pain_points} color={THEME.colors.warning} icon="⚠" />
+          <IntelCard label="Top Care Abouts" items={motives.top_care_abouts} color={THEME.colors.teal} icon="★" />
+          <IntelCard label="Goals" items={motives.goals} color={THEME.colors.success} icon="◎" />
         </Section>
       )}
 
@@ -672,7 +677,7 @@ function OverviewTab({ deal, contact, extracted, dealId }: { deal: Record<string
           {personal.notes?.length > 0 && (
             <div style={{ marginTop: 8 }}>
               {personal.notes.map((n: string, i: number) => (
-                <p key={i} style={{ fontSize: 13, color: C.dark, lineHeight: 1.6, marginBottom: 4 }}>{n}</p>
+                <p key={i} style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.6, marginBottom: 4 }}>{n}</p>
               ))}
             </div>
           )}
@@ -684,6 +689,7 @@ function OverviewTab({ deal, contact, extracted, dealId }: { deal: Record<string
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function FinancialsTab({ deal, team, extracted }: { deal: Record<string, any>; team: Record<string, any> | null; extracted: Record<string, any> | null }) {
+  const { THEME } = useTheme();
   const book = extracted?.book_analysis;
   const fin = extracted?.financials;
   const port = extracted?.portability;
@@ -710,9 +716,9 @@ function FinancialsTab({ deal, team, extracted }: { deal: Record<string, any>; t
           <Field label="Alt Assets %" value={book?.alt_assets_pct != null ? `${book.alt_assets_pct}%` : formatPct(team?.alternative_assets__)} />
         </Grid>
         {book?.obas && (
-          <div style={{ marginTop: 12, padding: '12px 14px', background: C.amberBg, border: `1px solid ${C.amberBorder}`, borderRadius: 8 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: C.amber, marginBottom: 4 }}>OBAs</p>
-            <p style={{ fontSize: 13, color: C.dark, lineHeight: 1.6 }}>{book.obas}</p>
+          <div style={{ marginTop: 12, padding: '12px 14px', background: THEME.colors.warningBg, border: `1px solid ${THEME.colors.warningBorder}`, borderRadius: 8 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: THEME.colors.warning, marginBottom: 4 }}>OBAs</p>
+            <p style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.6 }}>{book.obas}</p>
           </div>
         )}
       </Section>
@@ -731,10 +737,10 @@ function FinancialsTab({ deal, team, extracted }: { deal: Record<string, any>; t
         </Grid>
         {fin?.expense_details?.length > 0 && (
           <div style={{ marginTop: 8 }}>
-            <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Expense Breakdown</p>
+            <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Expense Breakdown</p>
             <ul style={{ margin: 0, paddingLeft: 18 }}>
               {fin.expense_details.map((e: string, i: number) => (
-                <li key={i} style={{ fontSize: 13, color: C.dark, lineHeight: 1.6 }}>{e}</li>
+                <li key={i} style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.6 }}>{e}</li>
               ))}
             </ul>
           </div>
@@ -745,14 +751,14 @@ function FinancialsTab({ deal, team, extracted }: { deal: Record<string, any>; t
         <Section title="Competition" icon="⚑">
           {fin.competing_firms?.length > 0 && (
             <div style={{ marginBottom: 12 }}>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Competing Firms</p>
-              {fin.competing_firms.map((f: string, i: number) => <p key={i} style={{ fontSize: 13, color: C.dark, lineHeight: 1.6 }}>{f}</p>)}
+              <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Competing Firms</p>
+              {fin.competing_firms.map((f: string, i: number) => <p key={i} style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.6 }}>{f}</p>)}
             </div>
           )}
           {fin.competing_offers?.length > 0 && (
             <div>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Competing Offers</p>
-              {fin.competing_offers.map((o: string, i: number) => <p key={i} style={{ fontSize: 13, color: C.dark, lineHeight: 1.6 }}>{o}</p>)}
+              <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Competing Offers</p>
+              {fin.competing_offers.map((o: string, i: number) => <p key={i} style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.6 }}>{o}</p>)}
             </div>
           )}
         </Section>
@@ -760,7 +766,7 @@ function FinancialsTab({ deal, team, extracted }: { deal: Record<string, any>; t
 
       {extracted?.deal_structure_notes && (
         <Section title="Deal Structure Notes" icon="✦">
-          <p style={{ fontSize: 14, color: C.dark, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{extracted.deal_structure_notes}</p>
+          <p style={{ fontSize: 14, color: THEME.colors.text, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{extracted.deal_structure_notes}</p>
         </Section>
       )}
 
@@ -801,6 +807,7 @@ function FinancialsTab({ deal, team, extracted }: { deal: Record<string, any>; t
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function EngagementsTab({ engagements, extracted, notes }: { engagements: any[]; extracted: Record<string, any> | null; notes: any[] }) {
+  const { THEME } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
@@ -819,7 +826,7 @@ function EngagementsTab({ engagements, extracted, notes }: { engagements: any[];
   });
 
   const salesProcess = extracted?.sales_process;
-  const typeColors: Record<string, string> = { email: '#3b82f6', call: C.green, meeting: C.teal };
+  const typeColors: Record<string, string> = { email: '#3b82f6', call: THEME.colors.success, meeting: THEME.colors.teal };
   const typeIcons: Record<string, string> = { email: '✉', call: '☎', meeting: '◈' };
 
   function getTitle(e: { type: string; properties: Record<string, string> }): string {
@@ -839,20 +846,20 @@ function EngagementsTab({ engagements, extracted, notes }: { engagements: any[];
   return (
     <>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
-        <StatCard label="Total Activities" value={engagements.length} color={C.teal} />
+        <StatCard label="Total Activities" value={engagements.length} color={THEME.colors.teal} />
         <StatCard label="Emails" value={emailCount} color="#3b82f6" />
-        <StatCard label="Calls" value={callCount} color={C.green} />
-        <StatCard label="Meetings" value={meetingCount} color={C.teal} />
+        <StatCard label="Calls" value={callCount} color={THEME.colors.success} />
+        <StatCard label="Meetings" value={meetingCount} color={THEME.colors.teal} />
       </div>
 
       {salesProcess?.next_steps?.length > 0 && (
         <Section title="Sales Process Timeline" icon="▸">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {salesProcess.next_steps.map((step: { step: string; date: string | null }, i: number) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', borderRadius: 6, background: i === salesProcess.next_steps.length - 1 ? 'rgba(29,118,130,0.06)' : 'transparent', border: `1px solid ${i === salesProcess.next_steps.length - 1 ? 'rgba(29,118,130,0.15)' : C.border}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: `${C.teal}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: C.teal, flexShrink: 0 }}>{i + 1}</div>
-                <p style={{ fontSize: 13, color: C.dark, fontWeight: 500, flex: 1 }}>{step.step}</p>
-                {step.date && <span style={{ fontSize: 12, color: C.slate, flexShrink: 0 }}>{step.date}</span>}
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', borderRadius: 6, background: i === salesProcess.next_steps.length - 1 ? 'rgba(29,118,130,0.06)' : 'transparent', border: `1px solid ${i === salesProcess.next_steps.length - 1 ? 'rgba(29,118,130,0.15)' : THEME.colors.border}` }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: `${THEME.colors.teal}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: THEME.colors.teal, flexShrink: 0 }}>{i + 1}</div>
+                <p style={{ fontSize: 13, color: THEME.colors.text, fontWeight: 500, flex: 1 }}>{step.step}</p>
+                {step.date && <span style={{ fontSize: 12, color: THEME.colors.textMuted, flexShrink: 0 }}>{step.date}</span>}
               </div>
             ))}
           </div>
@@ -871,16 +878,16 @@ function EngagementsTab({ engagements, extracted, notes }: { engagements: any[];
       <Section title="Activity Timeline" icon="◉">
         <div style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'center' }}>
           <div style={{ position: 'relative', flex: 1, maxWidth: 300 }}>
-            <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search activities..." style={{ width: '100%', padding: '8px 12px 8px 32px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, color: C.dark, background: C.cardBg, outline: 'none', fontFamily: "'Inter', system-ui, sans-serif" }} />
-            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: C.slate }}>⌕</span>
+            <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search activities..." style={{ width: '100%', padding: '8px 12px 8px 32px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`, fontSize: 13, color: THEME.colors.text, background: THEME.colors.surface, outline: 'none', fontFamily: "'Inter', system-ui, sans-serif" }} />
+            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: THEME.colors.textMuted }}>⌕</span>
           </div>
-          <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 12, color: C.dark, background: C.cardBg, cursor: 'pointer' }}>
+          <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`, fontSize: 12, color: THEME.colors.text, background: THEME.colors.surface, cursor: 'pointer' }}>
             <option value="all">All Types</option>
             <option value="email">Emails</option>
             <option value="call">Calls</option>
             <option value="meeting">Meetings</option>
           </select>
-          <span style={{ fontSize: 12, color: C.slate }}>{filtered.length} activities</span>
+          <span style={{ fontSize: 12, color: THEME.colors.textMuted }}>{filtered.length} activities</span>
         </div>
         {filtered.length === 0 ? (
           <EmptyState message="No engagements found" />
@@ -889,14 +896,14 @@ function EngagementsTab({ engagements, extracted, notes }: { engagements: any[];
             {filtered.map((e, i) => {
               const body = getBody(e).replace(/<[^>]+>/g, '').trim();
               return (
-                <div key={e.id || i} style={{ padding: '12px 16px', borderRadius: 8, border: `1px solid ${C.border}`, background: i % 2 === 0 ? C.cardBg : '#262626' }}>
+                <div key={e.id || i} style={{ padding: '12px 16px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`, background: i % 2 === 0 ? THEME.colors.surface : '#262626' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: body ? 6 : 0 }}>
-                    <span style={{ width: 24, height: 24, borderRadius: '50%', background: `${typeColors[e.type] || C.slate}15`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: typeColors[e.type] || C.slate }}>{typeIcons[e.type] || '●'}</span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: C.dark, flex: 1 }}>{getTitle(e)}</span>
-                    <span style={{ fontSize: 11, color: C.slate }}>{e.timestamp ? new Date(e.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}</span>
+                    <span style={{ width: 24, height: 24, borderRadius: '50%', background: `${typeColors[e.type] || THEME.colors.textMuted}15`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: typeColors[e.type] || THEME.colors.textMuted }}>{typeIcons[e.type] || '●'}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: THEME.colors.text, flex: 1 }}>{getTitle(e)}</span>
+                    <span style={{ fontSize: 11, color: THEME.colors.textMuted }}>{e.timestamp ? new Date(e.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}</span>
                     <Badge label={e.type} color={typeColors[e.type]} />
                   </div>
-                  {body && <p style={{ fontSize: 12, color: C.slate, lineHeight: 1.5, maxHeight: 60, overflow: 'hidden' }}>{body.slice(0, 300)}{body.length > 300 ? '...' : ''}</p>}
+                  {body && <p style={{ fontSize: 12, color: THEME.colors.textMuted, lineHeight: 1.5, maxHeight: 60, overflow: 'hidden' }}>{body.slice(0, 300)}{body.length > 300 ? '...' : ''}</p>}
                 </div>
               );
             })}
@@ -908,9 +915,9 @@ function EngagementsTab({ engagements, extracted, notes }: { engagements: any[];
         <Section title={`HubSpot Notes (${notes.length})`} icon="✎">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {notes.slice(0, 10).map((note: { properties: { hs_note_body: string; hs_timestamp: string } }, i: number) => (
-              <div key={i} style={{ borderBottom: i < Math.min(notes.length, 10) - 1 ? `1px solid ${C.border}` : 'none', paddingBottom: i < Math.min(notes.length, 10) - 1 ? 16 : 0 }}>
-                <p style={{ fontSize: 11, color: C.slate, marginBottom: 6 }}>{note.properties.hs_timestamp ? new Date(note.properties.hs_timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Date unknown'}</p>
-                <p style={{ fontSize: 13, color: C.dark, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{note.properties.hs_note_body?.replace(/<[^>]+>/g, '') ?? ''}</p>
+              <div key={i} style={{ borderBottom: i < Math.min(notes.length, 10) - 1 ? `1px solid ${THEME.colors.border}` : 'none', paddingBottom: i < Math.min(notes.length, 10) - 1 ? 16 : 0 }}>
+                <p style={{ fontSize: 11, color: THEME.colors.textMuted, marginBottom: 6 }}>{note.properties.hs_timestamp ? new Date(note.properties.hs_timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Date unknown'}</p>
+                <p style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{note.properties.hs_note_body?.replace(/<[^>]+>/g, '') ?? ''}</p>
               </div>
             ))}
           </div>
@@ -922,6 +929,7 @@ function EngagementsTab({ engagements, extracted, notes }: { engagements: any[];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function TechComplexityTab({ deal, team, extracted, dealId }: { deal: Record<string, any>; team: Record<string, any> | null; extracted: Record<string, any> | null; dealId: string }) {
+  const { THEME } = useTheme();
   const ts = extracted?.tech_stack;
   const custodian = ts?.custodian || team?.custodian || deal.custodian__cloned_;
   const crm = ts?.crm_platform || team?.crm_platform || deal.crm_platform__cloned_;
@@ -942,22 +950,22 @@ function TechComplexityTab({ deal, team, extracted, dealId }: { deal: Record<str
             { label: 'Performance Reporting', value: perf },
             { label: 'TAMP', value: tamp },
           ].filter(item => item.value).map(item => (
-            <div key={item.label} style={{ padding: '12px 14px', borderRadius: 8, background: item.accent ? 'rgba(29,118,130,0.04)' : 'rgba(91,106,113,0.04)', border: `1px solid ${item.accent ? 'rgba(29,118,130,0.12)' : C.border}` }}>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{item.label}</p>
-              <p style={{ fontSize: 14, fontWeight: item.accent ? 600 : 500, color: item.accent ? C.teal : C.dark }}>{item.value}</p>
+            <div key={item.label} style={{ padding: '12px 14px', borderRadius: 8, background: item.accent ? 'rgba(29,118,130,0.04)' : 'rgba(91,106,113,0.04)', border: `1px solid ${item.accent ? 'rgba(29,118,130,0.12)' : THEME.colors.border}` }}>
+              <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{item.label}</p>
+              <p style={{ fontSize: 14, fontWeight: item.accent ? 600 : 500, color: item.accent ? THEME.colors.teal : THEME.colors.text }}>{item.value}</p>
             </div>
           ))}
         </div>
         {additional && (
           <div style={{ marginBottom: techNotes ? 12 : 0 }}>
-            <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>All Platforms</p>
-            <p style={{ fontSize: 13, color: C.dark, lineHeight: 1.6 }}>{additional}</p>
+            <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>All Platforms</p>
+            <p style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.6 }}>{additional}</p>
           </div>
         )}
         {techNotes && (
           <div>
-            <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Additional Notes</p>
-            <p style={{ fontSize: 13, color: C.dark, lineHeight: 1.6 }}>{techNotes}</p>
+            <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Additional Notes</p>
+            <p style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.6 }}>{techNotes}</p>
           </div>
         )}
       </Section>
@@ -968,6 +976,7 @@ function TechComplexityTab({ deal, team, extracted, dealId }: { deal: Record<str
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function TeamContactsTab({ dealId, allContacts }: { dealId: string; allContacts: any[] }) {
+  const { THEME } = useTheme();
   return (
     <>
       <TeamAssignmentPanel dealId={dealId} />
@@ -975,19 +984,19 @@ function TeamContactsTab({ dealId, allContacts }: { dealId: string; allContacts:
         <Section title={`Associated Contacts (${allContacts.length})`} icon="●">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
             {allContacts.map((c, i) => (
-              <div key={c.id || i} style={{ padding: '14px 16px', borderRadius: 8, border: `1px solid ${C.border}`, background: i === 0 ? 'rgba(29,118,130,0.04)' : C.cardBg }}>
+              <div key={c.id || i} style={{ padding: '14px 16px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`, background: i === 0 ? 'rgba(29,118,130,0.04)' : THEME.colors.surface }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: `${C.teal}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: C.teal }}>{(c.firstname?.[0] ?? '').toUpperCase()}{(c.lastname?.[0] ?? '').toUpperCase()}</div>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: `${THEME.colors.teal}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: THEME.colors.teal }}>{(c.firstname?.[0] ?? '').toUpperCase()}{(c.lastname?.[0] ?? '').toUpperCase()}</div>
                   <div>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: C.dark }}>{[c.firstname, c.lastname].filter(Boolean).join(' ') || 'Unknown'}</p>
-                    {c.company && <p style={{ fontSize: 12, color: C.slate }}>{c.company}</p>}
+                    <p style={{ fontSize: 14, fontWeight: 600, color: THEME.colors.text }}>{[c.firstname, c.lastname].filter(Boolean).join(' ') || 'Unknown'}</p>
+                    {c.company && <p style={{ fontSize: 12, color: THEME.colors.textMuted }}>{c.company}</p>}
                   </div>
-                  {i === 0 && <Badge label="Primary" color={C.teal} />}
+                  {i === 0 && <Badge label="Primary" color={THEME.colors.teal} />}
                 </div>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                  {c.email && <a href={`mailto:${c.email}`} style={{ fontSize: 12, color: C.teal, textDecoration: 'none' }}>✉ {c.email}</a>}
-                  {c.phone && <a href={`tel:${c.phone}`} style={{ fontSize: 12, color: C.teal, textDecoration: 'none' }}>☎ {c.phone}</a>}
-                  {c.city && c.state && <span style={{ fontSize: 12, color: C.slate }}>{c.city}, {c.state}</span>}
+                  {c.email && <a href={`mailto:${c.email}`} style={{ fontSize: 12, color: THEME.colors.teal, textDecoration: 'none' }}>✉ {c.email}</a>}
+                  {c.phone && <a href={`tel:${c.phone}`} style={{ fontSize: 12, color: THEME.colors.teal, textDecoration: 'none' }}>☎ {c.phone}</a>}
+                  {c.city && c.state && <span style={{ fontSize: 12, color: THEME.colors.textMuted }}>{c.city}, {c.state}</span>}
                 </div>
               </div>
             ))}
@@ -1024,6 +1033,7 @@ interface ChecklistTask {
 }
 
 function OnboardingTasksTab({ dealId }: { dealId: string }) {
+  const { THEME } = useTheme();
   const { data, error, isLoading, mutate } = useSWR<{ dealId: string; tasks: ChecklistTask[] }>(
     dealId ? `/api/command-center/checklist/${dealId}` : null, fetcher
   );
@@ -1074,11 +1084,11 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
   return (
     <>
       {/* Summary row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 24, padding: '18px 24px', borderRadius: 10, background: C.cardBg, border: `1px solid ${C.border}` }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 24, padding: '18px 24px', borderRadius: 10, background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
         {/* Progress ring */}
         <div style={{ position: 'relative', width: 56, height: 56, flexShrink: 0 }}>
           <svg width="56" height="56" viewBox="0 0 56 56">
-            <circle cx="28" cy="28" r="24" fill="none" stroke={C.border} strokeWidth="4" />
+            <circle cx="28" cy="28" r="24" fill="none" stroke={THEME.colors.border} strokeWidth="4" />
             <circle cx="28" cy="28" r="24" fill="none" stroke="#f59e0b" strokeWidth="4"
               strokeDasharray={`${(pctComplete / 100) * 150.8} 150.8`}
               strokeLinecap="round" transform="rotate(-90 28 28)" style={{ transition: 'stroke-dasharray 0.4s ease' }} />
@@ -1086,8 +1096,8 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
           <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: '#f59e0b' }}>{pctComplete}%</span>
         </div>
         <div>
-          <p style={{ fontSize: 18, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>{totalCompleted} / {totalTasks} Tasks Complete</p>
-          <p style={{ fontSize: 12, color: C.slate, marginTop: 2 }}>Advisor onboarding checklist progress</p>
+          <p style={{ fontSize: 18, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" }}>{totalCompleted} / {totalTasks} Tasks Complete</p>
+          <p style={{ fontSize: 12, color: THEME.colors.textMuted, marginTop: 2 }}>Advisor onboarding checklist progress</p>
         </div>
         {/* Phase mini stats */}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 16 }}>
@@ -1097,7 +1107,7 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
             return (
               <div key={p.key} style={{ textAlign: 'center' }}>
                 <p style={{ fontSize: 11, color: cfg.color, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{cfg.label}</p>
-                <p style={{ fontSize: 16, fontWeight: 700, color: C.dark }}>{done}/{p.tasks.length}</p>
+                <p style={{ fontSize: 16, fontWeight: 700, color: THEME.colors.text }}>{done}/{p.tasks.length}</p>
               </div>
             );
           })}
@@ -1112,7 +1122,7 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
         const isCollapsed = collapsed[p.key] ?? false;
 
         return (
-          <div key={p.key} style={{ marginBottom: 16, borderRadius: 10, border: `1px solid ${cfg.border}`, overflow: 'hidden', background: C.cardBg }}>
+          <div key={p.key} style={{ marginBottom: 16, borderRadius: 10, border: `1px solid ${cfg.border}`, overflow: 'hidden', background: THEME.colors.surface }}>
             {/* Phase header */}
             <button onClick={() => togglePhase(p.key)} style={{
               width: '100%', padding: '14px 20px', background: cfg.bg, border: 'none',
@@ -1120,7 +1130,7 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
             }}>
               <span style={{ fontSize: 14, color: cfg.color, transition: 'transform 0.2s', transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)' }}>▼</span>
               <span style={{ fontSize: 13, fontWeight: 700, color: cfg.color, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{cfg.label}</span>
-              <span style={{ fontSize: 12, color: C.slate }}>{done} / {p.tasks.length}</span>
+              <span style={{ fontSize: 12, color: THEME.colors.textMuted }}>{done} / {p.tasks.length}</span>
               {/* Progress bar */}
               <div style={{ flex: 1, height: 5, background: 'rgba(91,106,113,0.08)', borderRadius: 3, overflow: 'hidden', marginLeft: 8 }}>
                 <div style={{ height: '100%', width: `${phasePct}%`, background: cfg.color, borderRadius: 3, transition: 'width 0.3s ease' }} />
@@ -1134,19 +1144,19 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
                 {p.tasks.map((task, ti) => {
                   // Determine status color and styling
                   const statusColors = {
-                    upcoming: { color: C.slate, bg: 'rgba(91,106,113,0.08)', border: 'rgba(91,106,113,0.15)' },
+                    upcoming: { color: THEME.colors.textMuted, bg: 'rgba(91,106,113,0.08)', border: 'rgba(91,106,113,0.15)' },
                     due_soon: { color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.3)' },
                     overdue: { color: '#ef4444', bg: 'rgba(239,68,68,0.15)', border: 'rgba(239,68,68,0.3)' },
                     critical: { color: '#dc2626', bg: 'rgba(220,38,38,0.2)', border: 'rgba(220,38,38,0.4)' },
                     completed: { color: '#10b981', bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.3)' },
-                    no_due_date: { color: C.slate, bg: 'rgba(91,106,113,0.08)', border: 'rgba(91,106,113,0.15)' },
+                    no_due_date: { color: THEME.colors.textMuted, bg: 'rgba(91,106,113,0.08)', border: 'rgba(91,106,113,0.15)' },
                   };
                   const statusStyle = statusColors[task.status] || statusColors.no_due_date;
 
                   return (
                     <div key={task.id} style={{
                       display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px',
-                      borderBottom: ti < p.tasks.length - 1 ? `1px solid ${C.border}` : 'none',
+                      borderBottom: ti < p.tasks.length - 1 ? `1px solid ${THEME.colors.border}` : 'none',
                       opacity: toggling === task.id ? 0.6 : 1, transition: 'opacity 0.15s',
                     }}>
                       {/* Checkbox */}
@@ -1163,13 +1173,13 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
                       {/* Label and details */}
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                         <span style={{
-                          fontSize: 13, color: task.completed ? C.slate : C.dark,
+                          fontSize: 13, color: task.completed ? THEME.colors.textMuted : THEME.colors.text,
                           textDecoration: task.completed ? 'line-through' : 'none',
                           textDecorationColor: 'rgba(248,244,240,0.3)',
                         }}>{task.label}</span>
 
                         {/* Responsible person and countdown */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: C.slate }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: THEME.colors.textMuted }}>
                           {task.responsible_person && (
                             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                               <span style={{ opacity: 0.6 }}>👤</span>
@@ -1205,12 +1215,12 @@ function OnboardingTasksTab({ dealId }: { dealId: string }) {
 
                         {/* Optional badge (for non-hard-gate tasks) */}
                         {!task.is_hard_gate && (
-                          <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: 'rgba(91,106,113,0.08)', color: C.slate, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Optional</span>
+                          <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: 'rgba(91,106,113,0.08)', color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Optional</span>
                         )}
 
                         {/* Completed info */}
                         {task.completed && task.completed_at && (
-                          <span style={{ fontSize: 11, color: C.slate, whiteSpace: 'nowrap' }}>
+                          <span style={{ fontSize: 11, color: THEME.colors.textMuted, whiteSpace: 'nowrap' }}>
                             {new Date(task.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                             {task.completed_by && task.completed_by !== 'you' && task.completed_by !== 'system-auto' && ` · ${task.completed_by.split('@')[0]}`}
                           </span>
@@ -1242,6 +1252,7 @@ const PILL_COLORS: Record<string, { color: string; bg: string }> = {
 };
 
 function StatusPill({ status }: { status: string | null | undefined }) {
+  const { THEME } = useTheme();
   const s = (status ?? '').toLowerCase().trim();
   const match = PILL_COLORS[s];
   const color = match?.color ?? '#94a3b8';
@@ -1277,6 +1288,7 @@ function latestEnvelopeDate(envelopes: Array<{ statusChangedDateTime?: string; c
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function ClientOnboardingTab({ data, isLoading }: { data: any; isLoading: boolean }) {
+  const { THEME } = useTheme();
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
 
   if (isLoading) {
@@ -1299,11 +1311,11 @@ function ClientOnboardingTab({ data, isLoading }: { data: any; isLoading: boolea
       {!docusign_connected && (
         <div style={{
           padding: '12px 16px', borderRadius: 8, marginBottom: 20,
-          background: C.amberBg, border: `1px solid ${C.amberBorder}`,
+          background: THEME.colors.warningBg, border: `1px solid ${THEME.colors.warningBorder}`,
           display: 'flex', alignItems: 'center', gap: 10,
         }}>
           <span style={{ fontSize: 16 }}>⚠</span>
-          <span style={{ fontSize: 13, color: C.amber, fontWeight: 500 }}>
+          <span style={{ fontSize: 13, color: THEME.colors.warning, fontWeight: 500 }}>
             DocuSign not connected — showing sheet data only. Connect via Transitions page for signing status.
           </span>
         </div>
@@ -1311,10 +1323,10 @@ function ClientOnboardingTab({ data, isLoading }: { data: any; isLoading: boolea
 
       {/* Summary Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
-        <StatCard label="Total Accounts" value={summary?.total_accounts ?? 0} color={C.teal} />
-        <StatCard label="IAAs Signed" value={summary?.iaa_signed ?? 0} color={C.green} />
-        <StatCard label="Paperwork Complete" value={summary?.paperwork_complete ?? 0} color={C.green} />
-        <StatCard label="Pending" value={summary?.pending ?? 0} color={C.amber} />
+        <StatCard label="Total Accounts" value={summary?.total_accounts ?? 0} color={THEME.colors.teal} />
+        <StatCard label="IAAs Signed" value={summary?.iaa_signed ?? 0} color={THEME.colors.success} />
+        <StatCard label="Paperwork Complete" value={summary?.paperwork_complete ?? 0} color={THEME.colors.success} />
+        <StatCard label="Pending" value={summary?.pending ?? 0} color={THEME.colors.warning} />
       </div>
 
       {/* Client Table */}
@@ -1325,9 +1337,9 @@ function ClientOnboardingTab({ data, isLoading }: { data: any; isLoading: boolea
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                <tr style={{ borderBottom: `1px solid ${THEME.colors.border}` }}>
                   {['Client Name', 'Account Type', 'Custodian', 'IAA Status', 'Paperwork', 'DocuSign', 'Last Updated'].map(h => (
-                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', color: C.slate, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
+                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', color: THEME.colors.textMuted, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -1344,27 +1356,27 @@ function ClientOnboardingTab({ data, isLoading }: { data: any; isLoading: boolea
                         key={client.id}
                         onClick={() => setExpandedRow(isExpanded ? null : client.id)}
                         style={{
-                          borderBottom: `1px solid ${C.border}`,
-                          background: isExpanded ? 'rgba(29,118,130,0.04)' : (i % 2 === 0 ? C.cardBg : '#262626'),
+                          borderBottom: `1px solid ${THEME.colors.border}`,
+                          background: isExpanded ? 'rgba(29,118,130,0.04)' : (i % 2 === 0 ? THEME.colors.surface : '#262626'),
                           cursor: 'pointer', transition: 'background 0.15s',
                         }}
                       >
                         <td style={{ padding: '10px 12px' }}>
-                          <div style={{ fontWeight: 600, color: C.dark }}>
+                          <div style={{ fontWeight: 600, color: THEME.colors.text }}>
                             {[client.primary_first_name, client.primary_last_name].filter(Boolean).join(' ') || '—'}
                           </div>
                           {client.household_name && (
-                            <div style={{ fontSize: 11, color: C.slate, marginTop: 2 }}>{client.household_name}</div>
+                            <div style={{ fontSize: 11, color: THEME.colors.textMuted, marginTop: 2 }}>{client.household_name}</div>
                           )}
                         </td>
-                        <td style={{ padding: '10px 12px', color: C.slate }}>{client.account_type ?? '—'}</td>
-                        <td style={{ padding: '10px 12px', color: C.slate }}>{client.custodian ?? '—'}</td>
+                        <td style={{ padding: '10px 12px', color: THEME.colors.textMuted }}>{client.account_type ?? '—'}</td>
+                        <td style={{ padding: '10px 12px', color: THEME.colors.textMuted }}>{client.custodian ?? '—'}</td>
                         <td style={{ padding: '10px 12px' }}><StatusPill status={iaaDisplayStatus} /></td>
                         <td style={{ padding: '10px 12px' }}><StatusPill status={client.status_of_account_paperwork} /></td>
                         <td style={{ padding: '10px 12px' }}>
-                          {docusign_connected ? <StatusPill status={dsStatus} /> : <span style={{ fontSize: 12, color: C.slate }}>—</span>}
+                          {docusign_connected ? <StatusPill status={dsStatus} /> : <span style={{ fontSize: 12, color: THEME.colors.textMuted }}>—</span>}
                         </td>
-                        <td style={{ padding: '10px 12px', fontSize: 12, color: C.slate }}>
+                        <td style={{ padding: '10px 12px', fontSize: 12, color: THEME.colors.textMuted }}>
                           {latestEnvelopeDate(client.envelopes ?? [])}
                         </td>
                       </tr>
@@ -1377,68 +1389,68 @@ function ClientOnboardingTab({ data, isLoading }: { data: any; isLoading: boolea
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px 20px', marginBottom: 16 }}>
                               {client.primary_email && (
                                 <div>
-                                  <span style={{ fontSize: 10, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Email</span>
-                                  <p style={{ fontSize: 13, color: C.teal }}>{client.primary_email}</p>
+                                  <span style={{ fontSize: 10, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Email</span>
+                                  <p style={{ fontSize: 13, color: THEME.colors.teal }}>{client.primary_email}</p>
                                 </div>
                               )}
                               {client.primary_phone && (
                                 <div>
-                                  <span style={{ fontSize: 10, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Phone</span>
-                                  <p style={{ fontSize: 13, color: C.dark }}>{client.primary_phone}</p>
+                                  <span style={{ fontSize: 10, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Phone</span>
+                                  <p style={{ fontSize: 13, color: THEME.colors.text }}>{client.primary_phone}</p>
                                 </div>
                               )}
                               {client.fee_schedule && (
                                 <div>
-                                  <span style={{ fontSize: 10, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fee Schedule</span>
-                                  <p style={{ fontSize: 13, color: C.dark }}>{client.fee_schedule}</p>
+                                  <span style={{ fontSize: 10, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fee Schedule</span>
+                                  <p style={{ fontSize: 13, color: THEME.colors.text }}>{client.fee_schedule}</p>
                                 </div>
                               )}
                               {client.document_readiness && (
                                 <div>
-                                  <span style={{ fontSize: 10, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Doc Readiness</span>
-                                  <p style={{ fontSize: 13, color: C.dark }}>{client.document_readiness}</p>
+                                  <span style={{ fontSize: 10, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Doc Readiness</span>
+                                  <p style={{ fontSize: 13, color: THEME.colors.text }}>{client.document_readiness}</p>
                                 </div>
                               )}
                               {client.notes && (
                                 <div style={{ gridColumn: 'span 4' }}>
-                                  <span style={{ fontSize: 10, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Notes</span>
-                                  <p style={{ fontSize: 13, color: C.dark, lineHeight: 1.5 }}>{client.notes}</p>
+                                  <span style={{ fontSize: 10, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Notes</span>
+                                  <p style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.5 }}>{client.notes}</p>
                                 </div>
                               )}
                             </div>
 
                             {/* DocuSign envelope details */}
                             {!docusign_connected ? (
-                              <div style={{ padding: '10px 14px', borderRadius: 6, background: C.amberBg, border: `1px solid ${C.amberBorder}` }}>
-                                <span style={{ fontSize: 12, color: C.amber }}>DocuSign not connected</span>
+                              <div style={{ padding: '10px 14px', borderRadius: 6, background: THEME.colors.warningBg, border: `1px solid ${THEME.colors.warningBorder}` }}>
+                                <span style={{ fontSize: 12, color: THEME.colors.warning }}>DocuSign not connected</span>
                               </div>
                             ) : (!client.envelopes || client.envelopes.length === 0) ? (
-                              <div style={{ padding: '10px 14px', borderRadius: 6, background: 'rgba(91,106,113,0.04)', border: `1px solid ${C.border}` }}>
-                                <span style={{ fontSize: 12, color: C.slate }}>No DocuSign envelopes found for this client</span>
+                              <div style={{ padding: '10px 14px', borderRadius: 6, background: 'rgba(91,106,113,0.04)', border: `1px solid ${THEME.colors.border}` }}>
+                                <span style={{ fontSize: 12, color: THEME.colors.textMuted }}>No DocuSign envelopes found for this client</span>
                               </div>
                             ) : (
                               <div>
-                                <p style={{ fontSize: 11, fontWeight: 700, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                                <p style={{ fontSize: 11, fontWeight: 700, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
                                   DocuSign Envelopes ({client.envelopes.length})
                                 </p>
                                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                                   <thead>
-                                    <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                                    <tr style={{ borderBottom: `1px solid ${THEME.colors.border}` }}>
                                       {['Subject', 'Status', 'Sent', 'Completed'].map(h => (
-                                        <th key={h} style={{ padding: '6px 10px', textAlign: 'left', color: C.slate, fontSize: 10, fontWeight: 600, textTransform: 'uppercase' }}>{h}</th>
+                                        <th key={h} style={{ padding: '6px 10px', textAlign: 'left', color: THEME.colors.textMuted, fontSize: 10, fontWeight: 600, textTransform: 'uppercase' }}>{h}</th>
                                       ))}
                                     </tr>
                                   </thead>
                                   <tbody>
                                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                     {client.envelopes.map((env: any) => (
-                                      <tr key={env.envelopeId} style={{ borderBottom: `1px solid ${C.border}` }}>
-                                        <td style={{ padding: '6px 10px', color: C.dark }}>{env.emailSubject || '—'}</td>
+                                      <tr key={env.envelopeId} style={{ borderBottom: `1px solid ${THEME.colors.border}` }}>
+                                        <td style={{ padding: '6px 10px', color: THEME.colors.text }}>{env.emailSubject || '—'}</td>
                                         <td style={{ padding: '6px 10px' }}><StatusPill status={env.status} /></td>
-                                        <td style={{ padding: '6px 10px', color: C.slate }}>
+                                        <td style={{ padding: '6px 10px', color: THEME.colors.textMuted }}>
                                           {env.sentDateTime ? new Date(env.sentDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'}
                                         </td>
-                                        <td style={{ padding: '6px 10px', color: C.slate }}>
+                                        <td style={{ padding: '6px 10px', color: THEME.colors.textMuted }}>
                                           {env.completedDateTime ? new Date(env.completedDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'}
                                         </td>
                                       </tr>
@@ -1449,13 +1461,13 @@ function ClientOnboardingTab({ data, isLoading }: { data: any; isLoading: boolea
                                 {/* Signers for the first envelope */}
                                 {client.envelopes[0]?.signers?.length > 0 && (
                                   <div style={{ marginTop: 10 }}>
-                                    <p style={{ fontSize: 10, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Signers</p>
+                                    <p style={{ fontSize: 10, fontWeight: 600, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Signers</p>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                       {client.envelopes[0].signers.map((signer: any, si: number) => (
                                         <div key={si} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 8px', borderRadius: 4, background: 'rgba(91,106,113,0.04)' }}>
-                                          <span style={{ fontSize: 12, color: C.dark, fontWeight: 500, flex: 1 }}>{signer.name}</span>
-                                          <span style={{ fontSize: 11, color: C.slate }}>{signer.email}</span>
+                                          <span style={{ fontSize: 12, color: THEME.colors.text, fontWeight: 500, flex: 1 }}>{signer.name}</span>
+                                          <span style={{ fontSize: 11, color: THEME.colors.textMuted }}>{signer.email}</span>
                                           <StatusPill status={signer.signedDateTime ? 'signed' : signer.status} />
                                         </div>
                                       ))}
@@ -1485,6 +1497,8 @@ function ClientOnboardingTab({ data, isLoading }: { data: any; isLoading: boolea
 type ProfileTab = 'overview' | 'financials' | 'engagements' | 'tech' | 'team' | 'tasks' | 'onboarding';
 
 export default function AdvisorProfilePage() {
+  const { THEME } = useTheme();
+
   const params = useParams();
   const id = params.id as string;
   const { data, error, isLoading } = useSWR(id ? `/api/command-center/advisor/${id}` : null, fetcher);
@@ -1522,8 +1536,8 @@ export default function AdvisorProfilePage() {
     fetcher,
   );
 
-  if (isLoading) return <div style={{ padding: '60px 40px', color: C.slate }}>Loading advisor profile...</div>;
-  if (error || data?.error) return <div style={{ padding: '60px 40px', color: C.red }}>Failed to load advisor data.</div>;
+  if (isLoading) return <div style={{ padding: '60px 40px', color: THEME.colors.textMuted }}>Loading advisor profile...</div>;
+  if (error || data?.error) return <div style={{ padding: '60px 40px', color: THEME.colors.error }}>Failed to load advisor data.</div>;
 
   const deal = { ...(data?.deal?.properties ?? {}), id: data?.deal?.id };
   const team = data?.team ?? null;
@@ -1552,7 +1566,7 @@ export default function AdvisorProfilePage() {
     <div style={{ padding: '32px 40px', minHeight: '100vh', fontFamily: "'Inter', system-ui, sans-serif", maxWidth: '100vw', overflowX: 'hidden' }}>
       {/* Navigation: Back + Next Advisor */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <Link href="/command-center/advisor-hub" style={{ fontSize: 13, color: C.slate, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <Link href="/command-center/advisor-hub" style={{ fontSize: 13, color: THEME.colors.textMuted, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           &larr; Back to Advisor Hub
         </Link>
         {(() => {
@@ -1565,8 +1579,8 @@ export default function AdvisorProfilePage() {
           if (!next || next.id === id) return null;
           return (
             <Link href={`/command-center/advisor/${next.id}`} style={{ textDecoration: 'none', textAlign: 'right' }}>
-              <span style={{ fontSize: 12, color: C.slate, display: 'block' }}>Next Advisor &rarr;</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: C.teal }}>{next.dealname}</span>
+              <span style={{ fontSize: 12, color: THEME.colors.textMuted, display: 'block' }}>Next Advisor &rarr;</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: THEME.colors.teal }}>{next.dealname}</span>
             </Link>
           );
         })()}
@@ -1575,32 +1589,32 @@ export default function AdvisorProfilePage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
         <div>
-          <h1 style={{ fontSize: 30, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 8 }}>
+          <h1 style={{ fontSize: 30, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 8 }}>
             {deal.dealname ?? 'Advisor Profile'}
           </h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <StageBadge stageId={stageId} />
-            {deal.current_firm__cloned_ && <span style={{ fontSize: 13, color: C.slate }}>from {deal.current_firm__cloned_}</span>}
-            {deal.firm_type && <span style={{ fontSize: 13, color: C.slate }}>· {deal.firm_type}</span>}
+            {deal.current_firm__cloned_ && <span style={{ fontSize: 13, color: THEME.colors.textMuted }}>from {deal.current_firm__cloned_}</span>}
+            {deal.firm_type && <span style={{ fontSize: 13, color: THEME.colors.textMuted }}>· {deal.firm_type}</span>}
           </div>
           <div style={{ display: 'flex', gap: 16, marginTop: 10, flexWrap: 'wrap' }}>
-            {contact?.email && <a href={`mailto:${contact.email}`} style={{ fontSize: 13, color: C.teal, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>✉ {contact.email}</a>}
-            {(contact?.phone || contact?.mobilephone) && <a href={`tel:${contact.phone || contact.mobilephone}`} style={{ fontSize: 13, color: C.teal, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>☎ {contact.phone || contact.mobilephone}</a>}
-            {(contact?.city || contact?.state) && <span style={{ fontSize: 13, color: C.slate }}>{[contact.city, contact.state].filter(Boolean).join(', ')}</span>}
+            {contact?.email && <a href={`mailto:${contact.email}`} style={{ fontSize: 13, color: THEME.colors.teal, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>✉ {contact.email}</a>}
+            {(contact?.phone || contact?.mobilephone) && <a href={`tel:${contact.phone || contact.mobilephone}`} style={{ fontSize: 13, color: THEME.colors.teal, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>☎ {contact.phone || contact.mobilephone}</a>}
+            {(contact?.city || contact?.state) && <span style={{ fontSize: 13, color: THEME.colors.textMuted }}>{[contact.city, contact.state].filter(Boolean).join(', ')}</span>}
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <p style={{ fontSize: 28, fontWeight: 700, color: C.teal, fontFamily: "'Inter', system-ui, sans-serif" }}>
+          <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.teal, fontFamily: "'Inter', system-ui, sans-serif" }}>
             {formatAUM(deal.transferable_aum || team?.transferable_aum)}
           </p>
-          <p style={{ fontSize: 12, color: C.slate }}>Transferable AUM</p>
+          <p style={{ fontSize: 12, color: THEME.colors.textMuted }}>Transferable AUM</p>
         </div>
       </div>
 
       {/* Stage Progress */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
         {STAGE_ORDER.map((s, i) => (
-          <div key={s} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= si ? C.teal : C.border, transition: 'background 0.3s' }} />
+          <div key={s} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= si ? THEME.colors.teal : THEME.colors.border, transition: 'background 0.3s' }} />
         ))}
       </div>
 
@@ -1608,31 +1622,31 @@ export default function AdvisorProfilePage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {parseLoading && (
-            <span style={{ fontSize: 12, color: C.teal, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ display: 'inline-block', width: 12, height: 12, border: `2px solid ${C.teal}`, borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+            <span style={{ fontSize: 12, color: THEME.colors.teal, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ display: 'inline-block', width: 12, height: 12, border: `2px solid ${THEME.colors.teal}`, borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
               AI extracting recruiter notes...
             </span>
           )}
-          {parseError && <span style={{ fontSize: 12, color: C.amber }}>Note parsing: {parseError}</span>}
-          {extracted && !parseLoading && <span style={{ fontSize: 12, color: C.green }}>✓ Recruiter notes parsed</span>}
-          {!pinnedNoteBody && !parseLoading && <span style={{ fontSize: 12, color: C.slate }}>No pinned note found</span>}
+          {parseError && <span style={{ fontSize: 12, color: THEME.colors.warning }}>Note parsing: {parseError}</span>}
+          {extracted && !parseLoading && <span style={{ fontSize: 12, color: THEME.colors.success }}>✓ Recruiter notes parsed</span>}
+          {!pinnedNoteBody && !parseLoading && <span style={{ fontSize: 12, color: THEME.colors.textMuted }}>No pinned note found</span>}
         </div>
         {rawNoteText && (
-          <button onClick={() => setShowRawNote(!showRawNote)} style={{ padding: '5px 12px', borderRadius: 6, fontSize: 12, fontWeight: 500, background: showRawNote ? C.teal : C.cardBg, color: showRawNote ? C.white : C.slate, border: `1px solid ${showRawNote ? C.teal : C.border}`, cursor: 'pointer' }}>
+          <button onClick={() => setShowRawNote(!showRawNote)} style={{ padding: '5px 12px', borderRadius: 6, fontSize: 12, fontWeight: 500, background: showRawNote ? THEME.colors.teal : THEME.colors.surface, color: showRawNote ? THEME.colors.textSecondary : THEME.colors.textMuted, border: `1px solid ${showRawNote ? THEME.colors.teal : THEME.colors.border}`, cursor: 'pointer' }}>
             {showRawNote ? 'Hide Raw Note' : 'View Raw Note'}
           </button>
         )}
       </div>
 
       {showRawNote && rawNoteText && (
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 10, padding: '20px 24px', marginBottom: 20, maxHeight: 500, overflowY: 'auto' }}>
-          <h3 style={{ fontSize: 12, fontWeight: 700, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Pinned Note (Raw)</h3>
-          <pre style={{ fontSize: 13, color: C.dark, lineHeight: 1.6, whiteSpace: 'pre-wrap', fontFamily: "'Inter', system-ui, sans-serif", margin: 0 }}>{rawNoteText}</pre>
+        <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 10, padding: '20px 24px', marginBottom: 20, maxHeight: 500, overflowY: 'auto' }}>
+          <h3 style={{ fontSize: 12, fontWeight: 700, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Pinned Note (Raw)</h3>
+          <pre style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.6, whiteSpace: 'pre-wrap', fontFamily: "'Inter', system-ui, sans-serif", margin: 0 }}>{rawNoteText}</pre>
         </div>
       )}
 
       {/* Tab Bar */}
-      <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${C.border}`, marginBottom: 24 }}>
+      <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${THEME.colors.border}`, marginBottom: 24 }}>
         {tabs.map(tab => {
           const isActive = activeTab === tab.key;
           return (
@@ -1643,7 +1657,7 @@ export default function AdvisorProfilePage() {
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
               <span style={{ fontSize: 14, color: tab.color, opacity: isActive ? 1 : 0.5 }}>{tab.icon}</span>
-              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? tab.color : C.slate, fontFamily: "'Inter', system-ui, sans-serif" }}>{tab.label}</span>
+              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? tab.color : THEME.colors.textMuted, fontFamily: "'Inter', system-ui, sans-serif" }}>{tab.label}</span>
             </button>
           );
         })}

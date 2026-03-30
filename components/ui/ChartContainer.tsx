@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import { Card, Title, Text } from '@tremor/react';
+import { useTheme } from '@/lib/theme-provider';
 
 export interface ChartContainerProps {
   title: string;
@@ -10,7 +13,7 @@ export interface ChartContainerProps {
 }
 
 /**
- * ChartContainer - Premium chart wrapper with frosted glass effect
+ * ChartContainer - Premium chart wrapper
  *
  * Wraps Tremor charts with consistent styling and headers
  */
@@ -21,13 +24,19 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
   className = '',
   action,
 }) => {
+  const { STYLES, THEME } = useTheme();
+
   return (
-    <Card className={`chart-card chart-glow ${className}`}>
+    <Card className={className} style={{ ...STYLES.card, padding: '24px' }}>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <Title className="text-xl font-serif text-cream">{title}</Title>
+          <Title style={{ ...STYLES.heading, fontSize: '20px', color: THEME.colors.textHeading }}>
+            {title}
+          </Title>
           {subtitle && (
-            <Text className="mt-1 text-sm text-slate">{subtitle}</Text>
+            <Text className="mt-1 text-sm" style={{ color: THEME.colors.textSecondary }}>
+              {subtitle}
+            </Text>
           )}
         </div>
         {action && <div>{action}</div>}

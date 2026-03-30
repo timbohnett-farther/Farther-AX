@@ -5,168 +5,22 @@
 @source '../node_modules/@tremor/**/*.{js,ts,jsx,tsx}';
 
 /* ============================================================================
-   FARTHER AX DESIGN SYSTEM — Semantic Tokens
-   Brand Colors: Limestone (#F8F4F0), Steel Blue (#3B5A69), Granite Blue (#2C3B4E), Clay (#9F8E75)
+   FARTHER AX — Global Base Styles
+   All colors are driven by THEME object via inline styles.
+   This CSS only handles: animations, scrollbar, resets, tabular-nums.
    ============================================================================ */
 
 @theme {
-  /* ──────────────────────────────────────────────────────────────────────
-     SEMANTIC COLOR SYSTEM
-     Using semantic names that describe purpose, not appearance
-     ────────────────────────────────────────────────────────────────── */
+  /* Typography */
+  --font-sans: 'Fakt', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'ABC Arizona Text', 'Inter', Georgia, serif;
+  --font-mono: 'Fakt Mono', 'DM Mono', 'Courier New', Courier, monospace;
 
-  /* ── Brand Colors (Teal) ────────────────────────────────────────────── */
-  --color-brand-50: #f0f4f6;
-  --color-brand-100: #d4dfe5;
-  --color-brand-200: #a8ced3;
-  --color-brand-300: #99b6c3;
-  --color-brand-400: #6b8fa1;
-  --color-brand-500: #3B5A69;     /* Primary brand - Teal */
-  --color-brand-600: #405b69;
-  --color-brand-700: #374e59;
-  --color-brand-800: #2d3e47;
-  --color-brand-900: #1a2830;
-
-  /* ── Accent Colors ──────────────────────────────────────────────────── */
-  --color-accent-1: #9F8E75;      /* Terracotta/brown */
-  --color-accent-2: #E3D3C5;      /* Light blue/grey */
-  --color-accent-3: #E3D3C5;      /* Beige/cream */
-
-  /* ── Surface Colors (Backgrounds) ───────────────────────────────────── */
-  --color-surface: #2C3B4E;              /* Main background */
-  --color-surface-muted: #344F5D;        /* Secondary background */
-  --color-surface-subtle: #3B5A69;       /* Tertiary background */
-  --color-surface-elevated: rgba(59, 90, 105, 0.80);  /* Cards/modals */
-  --color-surface-inverse: #F8F4F0;      /* Cream for inverted elements */
-
-  /* ── Text Colors (Cream-based) ──────────────────────────────────────── */
-  --color-text-primary: #F8F4F0;                    /* Cream - primary text */
-  --color-text-secondary: rgba(248, 244, 240, 0.7); /* Dimmed cream */
-  --color-text-muted: rgba(248, 244, 240, 0.5);     /* Even more dimmed */
-  --color-text-subtle: rgba(248, 244, 240, 0.35);   /* Very subtle */
-  --color-text-inverse: #1a1a1a;                    /* For light backgrounds */
-
-  /* ── Border Colors ──────────────────────────────────────────────────── */
-  --color-border: rgba(212, 223, 229, 0.08);        /* Default borders */
-  --color-border-subtle: rgba(212, 223, 229, 0.05); /* Subtle borders */
-  --color-border-strong: rgba(212, 223, 229, 0.16); /* Emphasized borders */
-
-  /* ── Status Colors ──────────────────────────────────────────────────── */
-  --color-success-50: #d1fae5;
-  --color-success-100: #a7f3d0;
-  --color-success-200: #6ee7b7;
-  --color-success-300: #34d399;
-  --color-success-400: #10b981;
-  --color-success-500: #059669;
-  --color-success-600: #047857;
-  --color-success-700: #065f46;
-  --color-success-800: #064e3b;
-  --color-success-900: #022c22;
-
-  --color-warning-50: #fef3c7;
-  --color-warning-100: #fde68a;
-  --color-warning-200: #fcd34d;
-  --color-warning-300: #fbbf24;
-  --color-warning-400: #f59e0b;
-  --color-warning-500: #d97706;
-  --color-warning-600: #b45309;
-  --color-warning-700: #92400e;
-  --color-warning-800: #78350f;
-  --color-warning-900: #451a03;
-
-  --color-error-50: #fee2e2;
-  --color-error-100: #fecaca;
-  --color-error-200: #fca5a5;
-  --color-error-300: #f87171;
-  --color-error-400: #ef4444;
-  --color-error-500: #dc2626;
-  --color-error-600: #b91c1c;
-  --color-error-700: #991b1b;
-  --color-error-800: #7f1d1d;
-  --color-error-900: #450a0a;
-
-  --color-info-50: #dbeafe;
-  --color-info-100: #bfdbfe;
-  --color-info-200: #93c5fd;
-  --color-info-300: #60a5fa;
-  --color-info-400: #3b82f6;
-  --color-info-500: #2563eb;
-  --color-info-600: #1d4ed8;
-  --color-info-700: #1e40af;
-  --color-info-800: #1e3a8a;
-  --color-info-900: #172554;
-
-  /* ── Neutral Gray Scale ─────────────────────────────────────────────── */
-  --color-neutral-50: #f5f5f5;
-  --color-neutral-100: #e0e0e0;
-  --color-neutral-200: #bdbdbd;
-  --color-neutral-300: #9e9e9e;
-  --color-neutral-400: #757575;
-  --color-neutral-500: #5b6a71;
-  --color-neutral-600: #444444;
-  --color-neutral-700: #333333;
-  --color-neutral-800: #2a2a2a;
-  --color-neutral-900: #1a1a1a;
-
-  /* ── Tremor Integration (Mapped to Semantic Tokens) ────────────────── */
-  --color-tremor-brand-faint: #091e1a;
-  --color-tremor-brand-muted: #0e3434;
-  --color-tremor-brand-subtle: #134a4e;
-  --color-tremor-brand: var(--color-brand-500);
-  --color-tremor-brand-emphasis: var(--color-brand-700);
-  --color-tremor-brand-inverted: var(--color-surface-inverse);
-
-  --color-tremor-background-muted: var(--color-surface);
-  --color-tremor-background-subtle: var(--color-surface-muted);
-  --color-tremor-background: var(--color-surface-subtle);
-  --color-tremor-background-emphasis: var(--color-text-primary);
-
-  --color-tremor-border: var(--color-border);
-  --color-tremor-ring: var(--color-brand-500);
-
-  --color-tremor-content-subtle: var(--color-text-subtle);
-  --color-tremor-content: var(--color-text-muted);
-  --color-tremor-content-emphasis: var(--color-text-secondary);
-  --color-tremor-content-strong: var(--color-text-primary);
-  --color-tremor-content-inverted: var(--color-surface);
-
-  /* ── Typography (Font Gold Standard: Inter + DM Mono) ───────────────── */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-serif: 'Inter', system-ui, sans-serif;
-  --font-mono: 'DM Mono', 'Courier New', Courier, monospace;
-
-  /* ── Gradients ──────────────────────────────────────────────────────── */
-  --background-image-gradient-brand: linear-gradient(135deg, var(--color-brand-500) 0%, var(--color-brand-200) 100%);
-  --background-image-gradient-success: linear-gradient(135deg, var(--color-success-400) 0%, var(--color-success-600) 100%);
-  --background-image-gradient-error: linear-gradient(135deg, var(--color-error-400) 0%, var(--color-error-600) 100%);
-  --background-image-gradient-warning: linear-gradient(135deg, var(--color-warning-400) 0%, var(--color-warning-600) 100%);
-  --background-image-gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.05) 100%);
-  --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
-
-  /* ── Shadows ────────────────────────────────────────────────────────── */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-
-  /* Glass-specific shadows */
-  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
-  --shadow-glass-hover: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
-  --shadow-glass-sm: 0 4px 16px 0 rgba(0, 0, 0, 0.25);
-
-  /* Glow shadows */
-  --shadow-glow-brand: 0 0 20px rgba(59, 90, 105, 0.3);
-  --shadow-glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
-  --shadow-glow-error: 0 0 20px rgba(239, 68, 68, 0.4);
-
-  /* ── Animations ─────────────────────────────────────────────────────── */
+  /* Animations */
   --animate-shimmer: shimmer 2s infinite linear;
   --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
   --animate-slide-up: slideUp 0.5s ease-out;
   --animate-fade-in: fadeIn 0.5s ease-out;
-
-  --backdrop-blur-xs: 2px;
 
   @keyframes shimmer {
     0% { background-position: -200% 0; }
@@ -187,82 +41,7 @@
 }
 
 /* ============================================================================
-   LIGHT MODE THEME
-   Warm cream palette with slate text
-   ============================================================================ */
-
-@media (prefers-color-scheme: light) {
-  :root:not(.dark) {
-    /* ── Surface Colors (Light Mode) ──────────────────────────────────── */
-    --color-surface: #F8F4F0;           /* Warm cream background */
-    --color-surface-muted: #F8F4F0;
-    --color-surface-subtle: #F8F4F0;
-    --color-surface-elevated: #E3D3C5;  /* Beige/brown for cards — cream dominant */
-    --color-surface-inverse: #1a1a1a;
-
-    /* ── Text Colors (Light Mode) ─────────────────────────────────────── */
-    --color-text-primary: #595959;      /* Charcoal — page body text */
-    --color-text-secondary: #595959;
-    --color-text-muted: #595959;
-    --color-text-subtle: rgba(89, 89, 89, 0.6);
-    --color-text-inverse: #595959;      /* Charcoal on card surfaces (cards are now light) */
-
-    /* ── Border Colors (Light Mode — subtle brown, not dominant teal) ─── */
-    --color-border: rgba(159, 142, 117, 0.25);        /* Subtle terracotta */
-    --color-border-subtle: rgba(159, 142, 117, 0.12);
-    --color-border-strong: rgba(159, 142, 117, 0.4);
-
-    /* ── Tremor (Light Mode) ──────────────────────────────────────────── */
-    --color-tremor-background-muted: #F8F4F0;
-    --color-tremor-background-subtle: #F8F4F0;
-    --color-tremor-background: #E3D3C5;     /* Cards use beige */
-    --color-tremor-background-emphasis: #595959;
-
-    --color-tremor-content-subtle: rgba(89, 89, 89, 0.6);
-    --color-tremor-content: #595959;
-    --color-tremor-content-emphasis: #595959;
-    --color-tremor-content-strong: #595959;
-    --color-tremor-content-inverted: #F8F4F0;
-
-    --color-tremor-border: rgba(159, 142, 117, 0.25);
-
-    /* ── Shadows (Light Mode — warm brown tones) ──────────────────────── */
-    --shadow-glass: 0 1px 3px rgba(159, 142, 117, 0.15);
-    --shadow-glass-hover: 0 4px 6px rgba(159, 142, 117, 0.2);
-    --shadow-glass-sm: 0 2px 4px rgba(159, 142, 117, 0.1);
-
-    /* ── Brown accent colors (dominant in light mode) ─────────────────── */
-    --color-brown-deep: #9F8E75;       /* Headings, strong emphasis */
-    --color-brown-mid: #9F8E75;        /* Labels, secondary accents */
-    --color-brown-light: #E3D3C5;      /* Card backgrounds, subtle fills */
-  }
-}
-
-/* ============================================================================
-   DARK MODE (explicit .dark class)
-   Ensures dark theme when .dark class is present - REVERSED from light mode
-   ============================================================================ */
-
-html.dark {
-  /* Reaffirm dark mode tokens - REVERSED */
-  --color-surface: #2C3B4E;              /* Teal background (was cream in light) */
-  --color-surface-muted: #2C3B4E;
-  --color-surface-subtle: #2C3B4E;
-  --color-surface-elevated: #F8F4F0;     /* Cream cards (was teal in light) */
-  --color-text-primary: #F8F4F0;         /* Cream text (was grey in light) */
-  --color-text-secondary: #F8F4F0;
-  --color-text-muted: #F8F4F0;
-  --color-text-inverse: #595959;         /* Grey for cards (was cream in light) */
-
-  /* Tremor */
-  --color-tremor-background: #F8F4F0;    /* Cards use cream */
-  --color-tremor-content: #595959;       /* Text on cards is grey */
-  --color-tremor-content-strong: #595959;
-  --color-tremor-content-emphasis: #595959;
-}
-
-/* ============================================================================
-   GLOBAL BODY STYLES
+   HTML/Body Reset
    ============================================================================ */
 
 html {
@@ -272,25 +51,10 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Dark mode background - REVERSED (teal instead of cream) */
-html.dark body {
-  background-color: #2C3B4E;
-  font-family: var(--font-sans);
-  color: #F8F4F0;
-}
-
-/* Light mode background */
-html:not(.dark) body {
-  background-color: #F8F4F0;
-  font-family: var(--font-sans);
-  color: var(--color-text-primary);
-}
-
 /* ============================================================================
-   TABULAR NUMBERS (Financial Data)
+   Tabular Numbers (Financial Data)
    ============================================================================ */
 
-/* Font Gold Standard: All numbers use tabular-nums for alignment */
 input[type="number"],
 .tabular-nums,
 .currency,
@@ -302,298 +66,45 @@ input[type="number"],
 }
 
 /* ============================================================================
-   COMPONENT UTILITIES
+   Loading Shimmer
    ============================================================================ */
 
-/* ── Glass Card ────────────────────────────────────────────────────────── */
-.glass-card {
-  background: var(--color-surface-elevated);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  box-shadow: var(--shadow-glass);
-  transition: all 300ms ease;
-}
-
-html:not(.dark) .glass-card {
-  background: var(--color-surface-elevated);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-glass);
-  color: #595959;
-}
-
-html:not(.dark) .glass-card * {
-  color: #595959;
-}
-
-.glass-card:hover {
-  box-shadow: var(--shadow-glass-hover);
-  transform: translateY(-2px);
-}
-
-/* ── Stat Card ─────────────────────────────────────────────────────────── */
-.stat-card {
-  background: var(--color-surface-elevated);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 1.25rem;
-  box-shadow: var(--shadow-glass-sm);
-  transition: all 200ms ease;
-}
-
-html:not(.dark) .stat-card {
-  background: var(--color-surface-elevated);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-glass-sm);
-  color: #595959;
-}
-
-html:not(.dark) .stat-card * {
-  color: #595959;
-}
-
-.stat-card:hover {
-  border-color: var(--color-brand-500);
-  box-shadow: var(--shadow-glow-brand);
-}
-
-/* ── Chart Card ────────────────────────────────────────────────────────── */
-.chart-card {
-  background: var(--color-surface-elevated);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: var(--shadow-glass);
-}
-
-html:not(.dark) .chart-card {
-  background: var(--color-surface-elevated);
-  border: 1px solid var(--color-border);
-  color: #595959;
-}
-
-html:not(.dark) .chart-card * {
-  color: #595959;
-}
-
-/* ── Card Text Colors (Dark Mode - REVERSED) ───────────────────────────── */
-html.dark .glass-card {
-  background: var(--color-surface-elevated);
-  color: #595959;
-}
-
-html.dark .glass-card * {
-  color: #595959;
-}
-
-html.dark .stat-card {
-  background: var(--color-surface-elevated);
-  color: #595959;
-}
-
-html.dark .stat-card * {
-  color: #595959;
-}
-
-html.dark .chart-card {
-  background: var(--color-surface-elevated);
-  color: #595959;
-}
-
-html.dark .chart-card * {
-  color: #595959;
-}
-
-/* ── Badges ────────────────────────────────────────────────────────────── */
-.badge-glass {
-  background: rgba(59, 90, 105, 0.15);
-  border: 1px solid var(--color-brand-500);
-  color: var(--color-brand-200);
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  box-shadow: var(--shadow-glow-brand);
-}
-
-.badge-success {
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid var(--color-success-400);
-  color: var(--color-success-300);
-}
-
-.badge-warning {
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid var(--color-warning-400);
-  color: var(--color-warning-300);
-}
-
-.badge-danger {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid var(--color-error-400);
-  color: var(--color-error-300);
-}
-
-/* ── Buttons ───────────────────────────────────────────────────────────── */
-.glass-btn-primary {
-  background: var(--background-image-gradient-brand);
-  color: var(--color-text-primary);
-  border: none;
-  padding: 0.625rem 1.25rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 200ms ease;
-  box-shadow: var(--shadow-glow-brand);
-}
-
-.glass-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-glass-hover);
-}
-
-.glass-btn-secondary {
-  background: var(--color-surface-elevated);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
-  padding: 0.625rem 1.25rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 200ms ease;
-}
-
-.glass-btn-secondary:hover {
-  border-color: var(--color-brand-500);
-  box-shadow: var(--shadow-glow-brand);
-}
-
-.glass-btn-ghost {
-  background: transparent;
-  color: var(--color-text-secondary);
-  border: none;
-  padding: 0.625rem 1.25rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 200ms ease;
-}
-
-.glass-btn-ghost:hover {
-  background: var(--color-surface-muted);
-  color: var(--color-text-primary);
-}
-
-/* ── Loading Shimmer ───────────────────────────────────────────────────── */
 .shimmer {
-  animation: var(--animate-shimmer);
+  animation: shimmer 2s infinite linear;
   background: linear-gradient(90deg,
-    var(--color-surface-muted) 25%,
-    var(--color-surface-subtle) 50%,
-    var(--color-surface-muted) 75%
+    rgba(59, 90, 105, 0.15) 25%,
+    rgba(59, 90, 105, 0.25) 50%,
+    rgba(59, 90, 105, 0.15) 75%
   );
   background-size: 200% 100%;
 }
 
-/* ── Transition Smooth ─────────────────────────────────────────────────── */
+/* ============================================================================
+   Smooth Transitions
+   ============================================================================ */
+
 .transition-smooth {
   transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Table Alternating Rows (Light Mode — cream/brown dominant) ───────── */
-/* Even: #F8F4F0 + charcoal → 6.40:1 ✅  |  Odd: #E3D3C5 + charcoal → 4.75:1 ✅ */
-html:not(.dark) table tbody tr:nth-child(even) {
-  background-color: #F8F4F0 !important;  /* Cream */
-}
+/* ============================================================================
+   Scrollbar Styling
+   ============================================================================ */
 
-html:not(.dark) table tbody tr:nth-child(odd) {
-  background-color: #E3D3C5 !important;  /* Beige/brown — 4.75:1 with #595959 ✅ */
-}
-
-html:not(.dark) table tbody tr td {
-  color: #595959 !important;             /* Charcoal text */
-}
-
-html:not(.dark) table thead th {
-  background-color: #9F8E75 !important;  /* Terracotta brown header */
-  color: #F8F4F0 !important;             /* Cream text on brown — 3.71:1 (large/bold) */
-}
-
-/* ── Table Alternating Rows (Dark Mode - REVERSED) ────────────────────── */
-/* Even: #F8F4F0 + grey → 6.40:1 ✅  |  Odd: #E3D3C5 + grey → 4.86:1 ✅ */
-html.dark table tbody tr:nth-child(even) {
-  background-color: #F8F4F0 !important;
-}
-
-html.dark table tbody tr:nth-child(odd) {
-  background-color: #E3D3C5 !important;
-}
-
-html.dark table tbody tr td {
-  color: #595959 !important;
-}
-
-html.dark table thead th {
-  background-color: #F8F4F0 !important;
-  color: #595959 !important;
-}
-
-/* ── Chart Axis Styling (Light Mode — charcoal on cream) ──────────────── */
-html:not(.dark) .recharts-cartesian-axis-tick-value,
-html:not(.dark) .recharts-label {
-  fill: #595959 !important;
-}
-
-html:not(.dark) .recharts-text {
-  fill: #595959 !important;
-}
-
-/* ── Chart Axis Styling (Dark Mode - REVERSED) ────────────────────────── */
-html.dark .recharts-cartesian-axis-tick-value,
-html.dark .recharts-label {
-  fill: #595959 !important;
-}
-
-html.dark .recharts-text {
-  fill: #595959 !important;
-}
-
-/* ── Light Mode: Gold → Deep Brown Override ────────────────────────────── */
-/* Gold (#fbbf24) must never appear as visible text in light mode.
-   Deep brown (#7A5042) on cream (#F8F4F0) = ~7:1 contrast ratio ✅        */
-html:not(.dark) .text-gold {
-  color: #7A5042 !important;
-}
-html:not(.dark) .text-gold-dark {
-  color: #9F8E75 !important;
-}
-html:not(.dark) [class*="bg-gold"] {
-  background-color: rgba(159, 142, 117, 0.12) !important;
-}
-html:not(.dark) [class*="border-gold"] {
-  border-color: rgba(159, 142, 117, 0.25) !important;
-}
-
-/* ── Scrollbar Styling ─────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-surface-muted);
+  background: rgba(59, 90, 105, 0.1);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-brand-500);
+  background: rgba(59, 90, 105, 0.4);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-brand-600);
+  background: rgba(59, 90, 105, 0.6);
 }

@@ -8,8 +8,6 @@ import { ONBOARDING_STAGE_IDS, STAGE_LABELS, PHASE_ORDER, PHASE_META } from '@/l
 import type { OnboardingTask, Phase, TaskRole } from '@/lib/onboarding-tasks';
 import { StatCard, ProgressIndicator, DataCard, ScoreBadge } from '@/components/ui';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/design-tokens';
-
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // ── Task row type (definition + saved state + computed due date) ─────────────
@@ -102,8 +100,7 @@ function formatDueDate(dueDate: string | null): string {
 
 // ── Capacity Planning Dashboard ─────────────────────────────────────────────
 function WorkloadDashboard() {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   const [activeRole, setActiveRole] = useState<string>('AXM');
   const { data, isLoading } = useSWR(`/api/command-center/workload?role=${activeRole}`, fetcher, { refreshInterval: 43_200_000 });
@@ -141,7 +138,7 @@ function WorkloadDashboard() {
   return (
     <div className="mb-7">
       {/* Role Tabs */}
-      <div className="flex gap-0 border-b-2 mb-5" style={{ borderColor: C.borderSubtle }}>
+      <div className="flex gap-0 border-b-2 mb-5" style={{ borderColor: THEME.colors.borderSubtle }}>
         {CAPACITY_ROLES.map(role => {
           const isActive = activeRole === role;
           return (
@@ -150,14 +147,14 @@ function WorkloadDashboard() {
               onClick={() => { setActiveRole(role); setExpandedMember(null); }}
               className="px-5 py-2.5 text-sm font-medium border-b-2 -mb-0.5 cursor-pointer bg-transparent transition-all"
               style={{
-                color: isActive ? C.teal : C.slate,
-                borderColor: isActive ? C.teal : 'transparent'
+                color: isActive ? THEME.colors.teal : THEME.colors.textSecondary,
+                borderColor: isActive ? THEME.colors.teal : 'transparent'
               }}
               onMouseEnter={(e) => {
-                if (!isActive) e.currentTarget.style.color = C.cream;
+                if (!isActive) e.currentTarget.style.color = THEME.colors.text;
               }}
               onMouseLeave={(e) => {
-                if (!isActive) e.currentTarget.style.color = C.slate;
+                if (!isActive) e.currentTarget.style.color = THEME.colors.textSecondary;
               }}
             >
               {role}
@@ -168,7 +165,7 @@ function WorkloadDashboard() {
 
       {workload.length === 0 ? (
         <DataCard className="text-center mb-4">
-          <p className="text-sm" style={{ color: C.slate }}>
+          <p className="text-sm" style={{ color: THEME.colors.textSecondary }}>
             No active {activeRole}s found. Add team members with the {activeRole} role in the Team page.
           </p>
         </DataCard>
@@ -196,7 +193,7 @@ function WorkloadDashboard() {
       </div>
 
       {/* Role description */}
-      <p className="text-xs mb-4" style={{ color: C.slate }}>{WORKLOAD_ROLE_LABELS[activeRole] ?? activeRole}</p>
+      <p className="text-xs mb-4" style={{ color: THEME.colors.textSecondary }}>{WORKLOAD_ROLE_LABELS[activeRole] ?? activeRole}</p>
 
       {/* Member Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -215,8 +212,8 @@ function WorkloadDashboard() {
                 className="cursor-pointer flex items-center justify-between mb-3"
               >
                 <div>
-                  <p className="text-sm font-bold mb-0.5" style={{ color: C.cream }}>{w.member_name}</p>
-                  <p className="text-xs tabular-nums" style={{ color: C.slate }}>
+                  <p className="text-sm font-bold mb-0.5" style={{ color: THEME.colors.text }}>{w.member_name}</p>
+                  <p className="text-xs tabular-nums" style={{ color: THEME.colors.textSecondary }}>
                     {w.active_deals} advisor{w.active_deals !== 1 ? 's' : ''} · {w.total_complexity} pts
                   </p>
                 </div>
@@ -241,16 +238,16 @@ function WorkloadDashboard() {
 
               {/* Expanded: deal list */}
               {isExpanded && w.deals.length > 0 && (
-                <div className="mt-4 pt-4 border-t" style={{ borderColor: C.border }}>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: C.slate }}>
+                <div className="mt-4 pt-4 border-t" style={{ borderColor: THEME.colors.border }}>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: THEME.colors.textSecondary }}>
                     Assigned Advisors
                   </p>
                   {w.deals.map(d => (
-                    <div key={d.deal_id} className="flex items-center justify-between py-1.5 border-b" style={{ borderColor: C.border }}>
+                    <div key={d.deal_id} className="flex items-center justify-between py-1.5 border-b" style={{ borderColor: THEME.colors.border }}>
                       <Link
                         href={`/command-center/advisor/${d.deal_id}`}
                         className="text-xs no-underline font-medium hover:underline"
-                        style={{ color: C.teal }}
+                        style={{ color: THEME.colors.teal }}
                       >
                         {d.deal_name}
                       </Link>
@@ -269,7 +266,7 @@ function WorkloadDashboard() {
                 </div>
               )}
               {isExpanded && w.deals.length === 0 && (
-                <div className="mt-4 pt-4 border-t text-xs" style={{ borderColor: C.border, color: C.slate }}>
+                <div className="mt-4 pt-4 border-t text-xs" style={{ borderColor: THEME.colors.border, color: THEME.colors.textSecondary }}>
                   No advisors currently assigned.
                 </div>
               )}
@@ -290,8 +287,7 @@ function PhaseSection({ phase, tasks, onToggle, roleFilter }: {
   onToggle: (key: string, completed: boolean) => void;
   roleFilter: string;
 }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   const [open, setOpen] = useState(true);
   const meta = PHASE_META[phase];
@@ -304,24 +300,24 @@ function PhaseSection({ phase, tasks, onToggle, roleFilter }: {
   if (phaseTasks.length === 0) return null;
 
   return (
-    <div className="mb-3 border rounded-lg overflow-hidden" style={{ borderColor: C.border }}>
+    <div className="mb-3 border rounded-lg overflow-hidden" style={{ borderColor: THEME.colors.border }}>
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-between px-4 py-3 border-none cursor-pointer transition-smooth"
-        style={{ backgroundColor: C.cardBg }}
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = C.cardBgHover}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = C.cardBg}
+        style={{ backgroundColor: THEME.colors.surface }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = THEME.colors.surfaceHover}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = THEME.colors.surface}
       >
         <div className="flex items-center gap-3">
-          <span className="font-semibold text-sm" style={{ color: C.cream }}>{meta.label}</span>
-          <span className="text-[10px]" style={{ color: C.slate }}>{meta.timing}</span>
+          <span className="font-semibold text-sm" style={{ color: THEME.colors.text }}>{meta.label}</span>
+          <span className="text-[10px]" style={{ color: THEME.colors.textSecondary }}>{meta.timing}</span>
           {hardGatesRemaining > 0 && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ backgroundColor: C.teal + '25', color: C.teal }}>
+            <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ backgroundColor: THEME.colors.teal + '25', color: THEME.colors.teal }}>
               {hardGatesRemaining} gate{hardGatesRemaining > 1 ? 's' : ''}
             </span>
           )}
           {overdueCount > 0 && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ backgroundColor: C.redBg, color: C.red }}>
+            <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ backgroundColor: THEME.colors.errorBg, color: THEME.colors.error }}>
               {overdueCount} overdue
             </span>
           )}
@@ -329,34 +325,34 @@ function PhaseSection({ phase, tasks, onToggle, roleFilter }: {
         <div className="flex items-center gap-4 flex-1 ml-5">
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: C.border }}>
+              <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: THEME.colors.border }}>
                 <div
                   className="h-full rounded-full transition-smooth"
                   style={{
                     width: `${phaseTasks.length ? (completedCount / phaseTasks.length) * 100 : 0}%`,
-                    backgroundColor: C.teal
+                    backgroundColor: THEME.colors.teal
                   }}
                 />
               </div>
-              <span className="text-xs min-w-9 text-right" style={{ color: C.slate }}>{completedCount}/{phaseTasks.length}</span>
+              <span className="text-xs min-w-9 text-right" style={{ color: THEME.colors.textSecondary }}>{completedCount}/{phaseTasks.length}</span>
             </div>
           </div>
-          <span className="text-xs" style={{ color: C.slate }}>{open ? '▲' : '▼'}</span>
+          <span className="text-xs" style={{ color: THEME.colors.textSecondary }}>{open ? '▲' : '▼'}</span>
         </div>
       </button>
       {open && (
         <div>
           {phaseTasks.map((task) => {
             const overdue = !task.completed && isOverdue(task.due_date);
-            const taskBg = overdue ? C.redBg : task.completed ? C.greenBg : C.cardBgAlt;
+            const taskBg = overdue ? THEME.colors.errorBg : task.completed ? THEME.colors.successBg : THEME.colors.surfaceHover;
             return (
               <div
                 key={task.key}
                 className="flex items-start gap-3 px-4 py-2.5 border-t"
                 style={{
                   backgroundColor: taskBg,
-                  borderColor: C.border,
-                  borderLeft: overdue ? `2px solid ${C.red}` : 'none'
+                  borderColor: THEME.colors.border,
+                  borderLeft: overdue ? `2px solid ${THEME.colors.error}` : 'none'
                 }}
               >
                 <input
@@ -368,9 +364,9 @@ function PhaseSection({ phase, tasks, onToggle, roleFilter }: {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     {task.is_hard_gate && (
-                      <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: C.teal }} title="Hard gate" />
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: THEME.colors.teal }} title="Hard gate" />
                     )}
-                    <span className={`text-sm ${task.completed ? 'line-through' : ''}`} style={{ color: task.completed ? C.slate : C.cream }}>
+                    <span className={`text-sm ${task.completed ? 'line-through' : ''}`} style={{ color: task.completed ? THEME.colors.textSecondary : THEME.colors.text }}>
                       {task.label}
                     </span>
                     {roleFilter === 'all' && (
@@ -381,14 +377,14 @@ function PhaseSection({ phase, tasks, onToggle, roleFilter }: {
                     {task.due_date && !task.completed && (
                       <span
                         className={`text-[10px] whitespace-nowrap ${overdue ? 'font-bold' : ''}`}
-                        style={{ color: overdue ? C.red : C.slate }}
+                        style={{ color: overdue ? THEME.colors.error : THEME.colors.textSecondary }}
                       >
                         Due {formatDueDate(task.due_date)}
                       </span>
                     )}
                   </div>
                   {task.completed && task.completed_by && (
-                    <p className="text-xs mt-0.5" style={{ color: C.teal }}>
+                    <p className="text-xs mt-0.5" style={{ color: THEME.colors.teal }}>
                       {task.completed_by.split('@')[0]}
                       {task.completed_at && ` · ${new Date(task.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
                     </p>
@@ -414,8 +410,7 @@ interface DealWithDates {
 }
 
 function AdvisorChecklist({ deal, roleFilter }: { deal: DealWithDates; roleFilter: string }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   const day0 = deal.closedate || null;
   const launch = deal.actual_launch_date || deal.desired_start_date || null;
@@ -448,26 +443,26 @@ function AdvisorChecklist({ deal, roleFilter }: { deal: DealWithDates; roleFilte
 
   return (
     <DataCard className="mb-6">
-      <div className="flex items-center justify-between pb-4 border-b mb-4" style={{ borderColor: C.border }}>
+      <div className="flex items-center justify-between pb-4 border-b mb-4" style={{ borderColor: THEME.colors.border }}>
         <div>
           <Link href={`/command-center/advisor/${deal.id}`} className="no-underline">
             <h3
               className="text-base font-bold font-serif mb-1 cursor-pointer transition-smooth"
-              style={{ color: C.cream }}
-              onMouseEnter={(e) => e.currentTarget.style.color = C.teal}
-              onMouseLeave={(e) => e.currentTarget.style.color = C.cream}
+              style={{ color: THEME.colors.text }}
+              onMouseEnter={(e) => e.currentTarget.style.color = THEME.colors.teal}
+              onMouseLeave={(e) => e.currentTarget.style.color = THEME.colors.text}
             >
               {deal.dealname}
             </h3>
           </Link>
-          <span className="text-xs font-medium" style={{ color: C.teal }}>{STAGE_LABELS[deal.dealstage] ?? deal.dealstage}</span>
+          <span className="text-xs font-medium" style={{ color: THEME.colors.teal }}>{STAGE_LABELS[deal.dealstage] ?? deal.dealstage}</span>
           {day0 && (
-            <span className="text-[10px] ml-3" style={{ color: C.slate }}>
+            <span className="text-[10px] ml-3" style={{ color: THEME.colors.textSecondary }}>
               Signed {new Date(day0 + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
           )}
           {launch && (
-            <span className="text-[10px] ml-3" style={{ color: C.slate }}>
+            <span className="text-[10px] ml-3" style={{ color: THEME.colors.textSecondary }}>
               Launch {new Date(launch + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
           )}
@@ -476,12 +471,12 @@ function AdvisorChecklist({ deal, roleFilter }: { deal: DealWithDates; roleFilte
           {/* Summary stats */}
           <div className="flex items-center gap-3 text-[10px]">
             {overdueCount > 0 && (
-              <span className="px-2 py-0.5 rounded font-bold" style={{ backgroundColor: C.redBg, color: C.red }}>
+              <span className="px-2 py-0.5 rounded font-bold" style={{ backgroundColor: THEME.colors.errorBg, color: THEME.colors.error }}>
                 {overdueCount} overdue
               </span>
             )}
             {hardGatesRemaining > 0 && (
-              <span className="px-2 py-0.5 rounded font-bold" style={{ backgroundColor: C.teal + '25', color: C.teal }}>
+              <span className="px-2 py-0.5 rounded font-bold" style={{ backgroundColor: THEME.colors.teal + '25', color: THEME.colors.teal }}>
                 {hardGatesRemaining} gate{hardGatesRemaining > 1 ? 's' : ''}
               </span>
             )}
@@ -489,11 +484,11 @@ function AdvisorChecklist({ deal, roleFilter }: { deal: DealWithDates; roleFilte
           <div className="text-center">
             <div
               className="w-14 h-14 rounded-full border-[3px] flex items-center justify-center flex-col"
-              style={{ borderColor: pct === 100 ? C.teal : C.border }}
+              style={{ borderColor: pct === 100 ? THEME.colors.teal : THEME.colors.border }}
             >
-              <span className="text-sm font-bold" style={{ color: pct === 100 ? C.teal : C.cream }}>{pct}%</span>
+              <span className="text-sm font-bold" style={{ color: pct === 100 ? THEME.colors.teal : THEME.colors.text }}>{pct}%</span>
             </div>
-            <p className="text-[10px] mt-1" style={{ color: C.slate }}>{completedCount}/{filteredTasks.length}</p>
+            <p className="text-[10px] mt-1" style={{ color: THEME.colors.textSecondary }}>{completedCount}/{filteredTasks.length}</p>
           </div>
         </div>
       </div>
@@ -510,8 +505,7 @@ function AdvisorChecklist({ deal, roleFilter }: { deal: DealWithDates; roleFilte
  * Onboarding Tracker - Workload dashboard and 8-phase task checklists
  */
 export default function OnboardingTracker() {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   const { data, error, isLoading } = useSWR('/api/command-center/pipeline', fetcher, { refreshInterval: 43_200_000 });
   const [activeTab, setActiveTab] = useState<'workload' | 'checklists'>('workload');
@@ -540,7 +534,7 @@ export default function OnboardingTracker() {
   }
 
   if (error) {
-    return <div className="px-10 py-16" style={{ color: C.red }}>Failed to load data.</div>;
+    return <div className="px-10 py-16" style={{ color: THEME.colors.error }}>Failed to load data.</div>;
   }
 
   const onboardingDeals = (data?.deals ?? []).filter(
@@ -561,17 +555,17 @@ export default function OnboardingTracker() {
       <div className="relative mb-6">
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} className="absolute top-0 right-0 opacity-50" />
         <div className="text-center mb-4">
-          <h1 className="text-3xl font-bold font-serif mb-2" style={{ color: C.cream }}>
+          <h1 className="text-3xl font-bold font-serif mb-2" style={{ color: THEME.colors.text }}>
             Active Onboarding
           </h1>
-          <p className="text-sm" style={{ color: C.slate }}>
+          <p className="text-sm" style={{ color: THEME.colors.textSecondary }}>
             {onboardingDeals.length} advisor{onboardingDeals.length !== 1 ? 's' : ''} in onboarding · 8-phase checklist · Due-date tracking
           </p>
         </div>
 
         {/* Tab switcher */}
         <div className="flex justify-center">
-          <div className="flex gap-1 rounded-lg p-1" style={{ backgroundColor: C.cardBg, border: `1px solid ${C.border}` }}>
+          <div className="flex gap-1 rounded-lg p-1" style={{ backgroundColor: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
             {[
               { key: 'workload' as const, label: 'AXM Workload' },
               { key: 'checklists' as const, label: 'Checklists' },
@@ -581,14 +575,14 @@ export default function OnboardingTracker() {
                 onClick={() => setActiveTab(tab.key)}
                 className="px-3.5 py-1.5 rounded text-xs font-medium transition-smooth border-none cursor-pointer"
                 style={{
-                  backgroundColor: activeTab === tab.key ? C.teal : 'transparent',
-                  color: activeTab === tab.key ? C.white : C.slate
+                  backgroundColor: activeTab === tab.key ? THEME.colors.teal : 'transparent',
+                  color: activeTab === tab.key ? "#FFFFFF" : THEME.colors.textSecondary
                 }}
                 onMouseEnter={(e) => {
-                  if (activeTab !== tab.key) e.currentTarget.style.color = C.cream;
+                  if (activeTab !== tab.key) e.currentTarget.style.color = THEME.colors.text;
                 }}
                 onMouseLeave={(e) => {
-                  if (activeTab !== tab.key) e.currentTarget.style.color = C.slate;
+                  if (activeTab !== tab.key) e.currentTarget.style.color = THEME.colors.textSecondary;
                 }}
               >
                 {tab.label}
@@ -606,7 +600,7 @@ export default function OnboardingTracker() {
         <>
           {/* Role filter */}
           <div className="flex items-center gap-2 mb-5 flex-wrap">
-            <span className="text-xs font-semibold uppercase tracking-wider mr-2" style={{ color: C.slate }}>Filter by role:</span>
+            <span className="text-xs font-semibold uppercase tracking-wider mr-2" style={{ color: THEME.colors.textSecondary }}>Filter by role:</span>
             {PRIMARY_ROLES.map(role => {
               const isActive = checklistRoleFilter === role;
               return (
@@ -615,14 +609,14 @@ export default function OnboardingTracker() {
                   onClick={() => { setChecklistRoleFilter(role); setDropdownOpen(false); }}
                   className="px-3 py-1.5 rounded-md text-xs font-medium border-none cursor-pointer transition-smooth"
                   style={{
-                    backgroundColor: isActive ? C.teal : C.cardBg,
-                    color: isActive ? C.white : C.slate
+                    backgroundColor: isActive ? THEME.colors.teal : THEME.colors.surface,
+                    color: isActive ? "#FFFFFF" : THEME.colors.textSecondary
                   }}
                   onMouseEnter={(e) => {
-                    if (!isActive) e.currentTarget.style.color = C.cream;
+                    if (!isActive) e.currentTarget.style.color = THEME.colors.text;
                   }}
                   onMouseLeave={(e) => {
-                    if (!isActive) e.currentTarget.style.color = C.slate;
+                    if (!isActive) e.currentTarget.style.color = THEME.colors.textSecondary;
                   }}
                 >
                   {role === 'all' ? 'All Tasks' : role}
@@ -635,14 +629,14 @@ export default function OnboardingTracker() {
                 onClick={() => setDropdownOpen(o => !o)}
                 className="px-3 py-1.5 rounded-md text-xs font-medium border-none cursor-pointer transition-smooth"
                 style={{
-                  backgroundColor: isDropdownRole ? C.teal : C.cardBg,
-                  color: isDropdownRole ? C.white : C.slate
+                  backgroundColor: isDropdownRole ? THEME.colors.teal : THEME.colors.surface,
+                  color: isDropdownRole ? "#FFFFFF" : THEME.colors.textSecondary
                 }}
                 onMouseEnter={(e) => {
-                  if (!isDropdownRole) e.currentTarget.style.color = C.cream;
+                  if (!isDropdownRole) e.currentTarget.style.color = THEME.colors.text;
                 }}
                 onMouseLeave={(e) => {
-                  if (!isDropdownRole) e.currentTarget.style.color = C.slate;
+                  if (!isDropdownRole) e.currentTarget.style.color = THEME.colors.textSecondary;
                 }}
               >
                 {isDropdownRole ? checklistRoleFilter : 'More ▾'}
@@ -650,7 +644,7 @@ export default function OnboardingTracker() {
               {dropdownOpen && (
                 <div
                   className="absolute top-full left-0 mt-1 border rounded-lg shadow-xl z-50 min-w-[160px] py-1"
-                  style={{ backgroundColor: C.cardBg, borderColor: C.border }}
+                  style={{ backgroundColor: THEME.colors.surface, borderColor: THEME.colors.border }}
                 >
                   {DROPDOWN_ROLES.map(role => (
                     <button
@@ -658,18 +652,18 @@ export default function OnboardingTracker() {
                       onClick={() => { setChecklistRoleFilter(role); setDropdownOpen(false); }}
                       className="w-full text-left px-3 py-2 text-xs border-none cursor-pointer transition-smooth"
                       style={{
-                        backgroundColor: checklistRoleFilter === role ? C.teal + '25' : 'transparent',
-                        color: checklistRoleFilter === role ? C.teal : C.slate
+                        backgroundColor: checklistRoleFilter === role ? THEME.colors.teal + '25' : 'transparent',
+                        color: checklistRoleFilter === role ? THEME.colors.teal : THEME.colors.textSecondary
                       }}
                       onMouseEnter={(e) => {
                         if (checklistRoleFilter !== role) {
-                          e.currentTarget.style.color = C.cream;
+                          e.currentTarget.style.color = THEME.colors.text;
                           e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (checklistRoleFilter !== role) {
-                          e.currentTarget.style.color = C.slate;
+                          e.currentTarget.style.color = THEME.colors.textSecondary;
                           e.currentTarget.style.backgroundColor = 'transparent';
                         }
                       }}
@@ -684,7 +678,7 @@ export default function OnboardingTracker() {
 
           {onboardingDeals.length === 0 ? (
             <DataCard className="text-center py-16">
-              <p style={{ color: C.slate }}>
+              <p style={{ color: THEME.colors.textSecondary }}>
                 No advisors currently in onboarding (Offer Accepted or Launched stages).
               </p>
             </DataCard>

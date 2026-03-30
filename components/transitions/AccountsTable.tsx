@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { StatusPill, statusStyle } from './StatusPill';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/design-tokens';
 
 interface Account {
   id: number;
@@ -37,8 +36,7 @@ interface AccountsTableProps {
 type SortKey = keyof Account | '';
 
 export function AccountsTable({ accounts, total, page, perPage, onPageChange, showAdvisorColumn }: AccountsTableProps) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   const [sortCol, setSortCol] = useState<SortKey>('');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
@@ -72,17 +70,17 @@ export function AccountsTable({ accounts, total, page, perPage, onPageChange, sh
   ];
 
   return (
-    <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, overflow: 'hidden' }}>
+    <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8, overflow: 'hidden' }}>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
-            <tr style={{ borderBottom: `1px solid ${C.border}`, background: C.cardBg }}>
+            <tr style={{ borderBottom: `1px solid ${THEME.colors.border}`, background: THEME.colors.surface }}>
               {columns.map(col => (
                 <th
                   key={col.key}
                   onClick={() => handleSort(col.key)}
                   style={{
-                    padding: '10px 10px', textAlign: 'left', color: C.slate, fontSize: 11,
+                    padding: '10px 10px', textAlign: 'left', color: THEME.colors.textSecondary, fontSize: 11,
                     fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em',
                     whiteSpace: 'nowrap', cursor: 'pointer', userSelect: 'none',
                   }}
@@ -97,19 +95,19 @@ export function AccountsTable({ accounts, total, page, perPage, onPageChange, sh
               <tr
                 key={acc.id}
                 style={{
-                  borderBottom: `1px solid ${C.border}`,
-                  background: i % 2 === 0 ? C.cardBg : 'rgba(248,244,240,0.03)',
+                  borderBottom: `1px solid ${THEME.colors.border}`,
+                  background: i % 2 === 0 ? THEME.colors.surface : 'rgba(248,244,240,0.03)',
                   transition: 'background 120ms ease',
                 }}
                 onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(59,90,105,0.06)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? C.cardBg : 'rgba(248,244,240,0.03)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? THEME.colors.surface : 'rgba(248,244,240,0.03)'; }}
               >
-                {showAdvisorColumn && <td style={{ padding: '10px 10px', color: C.teal, fontWeight: 600 }}>{acc.advisor_name || '--'}</td>}
-                <td style={{ padding: '10px 10px', fontWeight: 500, color: C.dark }}>{acc.household_name || '--'}</td>
-                <td style={{ padding: '10px 10px', color: C.dark }}>{acc.account_type || '--'}</td>
-                <td style={{ padding: '10px 10px', color: C.dark }}>
+                {showAdvisorColumn && <td style={{ padding: '10px 10px', color: THEME.colors.teal, fontWeight: 600 }}>{acc.advisor_name || '--'}</td>}
+                <td style={{ padding: '10px 10px', fontWeight: 500, color: THEME.colors.text }}>{acc.household_name || '--'}</td>
+                <td style={{ padding: '10px 10px', color: THEME.colors.text }}>{acc.account_type || '--'}</td>
+                <td style={{ padding: '10px 10px', color: THEME.colors.text }}>
                   <div>{[acc.primary_first_name, acc.primary_last_name].filter(Boolean).join(' ') || '--'}</div>
-                  {acc.primary_email && <div style={{ fontSize: 11, color: C.slate }}>{acc.primary_email}</div>}
+                  {acc.primary_email && <div style={{ fontSize: 11, color: THEME.colors.textSecondary }}>{acc.primary_email}</div>}
                 </td>
                 <td style={{ padding: '10px 10px', ...statusStyle(acc.document_readiness) }}>{acc.document_readiness || '--'}</td>
                 <td style={{ padding: '10px 10px', ...statusStyle(acc.status_of_iaa) }}>{acc.status_of_iaa || '--'}</td>
@@ -117,11 +115,11 @@ export function AccountsTable({ accounts, total, page, perPage, onPageChange, sh
                 <td style={{ padding: '10px 10px' }}><StatusPill status={acc.docusign_iaa_status} /></td>
                 <td style={{ padding: '10px 10px' }}><StatusPill status={acc.docusign_paperwork_status} /></td>
                 <td style={{ padding: '10px 10px', ...statusStyle(acc.portal_status) }}>{acc.portal_status || '--'}</td>
-                <td style={{ padding: '10px 10px', color: C.dark, fontSize: 12 }}>{acc.fee_schedule || '--'}</td>
+                <td style={{ padding: '10px 10px', color: THEME.colors.text, fontSize: 12 }}>{acc.fee_schedule || '--'}</td>
               </tr>
             ))}
             {sorted.length === 0 && (
-              <tr><td colSpan={columns.length} style={{ padding: 40, textAlign: 'center', color: C.slate }}>No accounts match your filters</td></tr>
+              <tr><td colSpan={columns.length} style={{ padding: 40, textAlign: 'center', color: THEME.colors.textSecondary }}>No accounts match your filters</td></tr>
             )}
           </tbody>
         </table>
@@ -129,23 +127,23 @@ export function AccountsTable({ accounts, total, page, perPage, onPageChange, sh
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', borderTop: `1px solid ${C.border}` }}>
-          <span style={{ fontSize: 12, color: C.slate }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', borderTop: `1px solid ${THEME.colors.border}` }}>
+          <span style={{ fontSize: 12, color: THEME.colors.textSecondary }}>
             Showing {(page - 1) * perPage + 1}--{Math.min(page * perPage, total)} of {total}
           </span>
           <div style={{ display: 'flex', gap: 6 }}>
             <button
               disabled={page <= 1}
               onClick={() => onPageChange(page - 1)}
-              style={{ padding: '4px 12px', borderRadius: 6, border: `1px solid ${C.border}`, background: C.cardBg, color: page <= 1 ? C.slate : C.dark, fontSize: 12, cursor: page <= 1 ? 'default' : 'pointer', opacity: page <= 1 ? 0.4 : 1 }}
+              style={{ padding: '4px 12px', borderRadius: 6, border: `1px solid ${THEME.colors.border}`, background: THEME.colors.surface, color: page <= 1 ? THEME.colors.textSecondary : THEME.colors.text, fontSize: 12, cursor: page <= 1 ? 'default' : 'pointer', opacity: page <= 1 ? 0.4 : 1 }}
             >
               Prev
             </button>
-            <span style={{ padding: '4px 8px', fontSize: 12, color: C.dark }}>{page} / {totalPages}</span>
+            <span style={{ padding: '4px 8px', fontSize: 12, color: THEME.colors.text }}>{page} / {totalPages}</span>
             <button
               disabled={page >= totalPages}
               onClick={() => onPageChange(page + 1)}
-              style={{ padding: '4px 12px', borderRadius: 6, border: `1px solid ${C.border}`, background: C.cardBg, color: page >= totalPages ? C.slate : C.dark, fontSize: 12, cursor: page >= totalPages ? 'default' : 'pointer', opacity: page >= totalPages ? 0.4 : 1 }}
+              style={{ padding: '4px 12px', borderRadius: 6, border: `1px solid ${THEME.colors.border}`, background: THEME.colors.surface, color: page >= totalPages ? THEME.colors.textSecondary : THEME.colors.text, fontSize: 12, cursor: page >= totalPages ? 'default' : 'pointer', opacity: page >= totalPages ? 0.4 : 1 }}
             >
               Next
             </button>

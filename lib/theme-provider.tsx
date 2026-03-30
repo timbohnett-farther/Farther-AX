@@ -1,25 +1,26 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
-
-type Theme = "light" | "dark";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createTheme, type ThemeMode, type ThemeType, type StylesType } from "./theme";
 
 type ThemeContextType = {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
+  theme: ThemeMode;
+  THEME: ThemeType;
+  STYLES: StylesType;
+  CHART_COLORS: readonly string[];
+  setTheme: (theme: ThemeMode) => void;
   toggleTheme: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<ThemeMode>("dark");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Load theme from localStorage or use system preference
-    const stored = localStorage.getItem("farther-ax-theme") as Theme;
+    const stored = localStorage.getItem("farther-ax-theme") as ThemeMode;
     if (stored) {
       setThemeState(stored);
       document.documentElement.classList.toggle("dark", stored === "dark");
@@ -33,7 +34,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const setTheme = (newTheme: Theme) => {
+  const setTheme = (newTheme: ThemeMode) => {
     setThemeState(newTheme);
     localStorage.setItem("farther-ax-theme", newTheme);
     document.documentElement.classList.toggle("dark", newTheme === "dark");
@@ -44,13 +45,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setTheme(newTheme);
   };
 
-  // Prevent flash of wrong theme
+  const { THEME, STYLES, CHART_COLORS } = useMemo(() => createTheme(theme), [theme]);
+
   if (!mounted) {
     return null;
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, THEME, STYLES, CHART_COLORS, setTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

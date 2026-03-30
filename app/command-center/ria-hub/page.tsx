@@ -5,7 +5,7 @@ import useSWR from 'swr';
 import Image from 'next/image';
 import { Card, Text, Badge } from '@tremor/react';
 import { StatCard, DataCard, StatusBadge, TabGroup, FilterBar } from '@/components/ui';
-import { formatCompactCurrency } from '@/lib/design-tokens';
+import { formatCompactCurrency } from '@/lib/theme';
 import {
   UserGroupIcon,
   EnvelopeIcon,

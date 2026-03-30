@@ -21,8 +21,6 @@ const SWR_OPTS = {
 } as const;
 
 // Use centralized theme colors
-import { getThemeColors } from '@/lib/design-tokens';
-
 // ── Stage mappings for Advisor Recruiting ────────────────────────────────────
 const STAGE_LABELS: Record<string, string> = {
   '2496931':   'Step 1 – First Meeting',
@@ -127,41 +125,39 @@ interface AcquisitionsStage {
 
 // ── Shared UI components ─────────────────────────────────────────────────────
 function SummaryCard({ label, value, sub, accent, icon, iconColor, onClick }: { label: string; value: string; sub?: string; accent?: boolean; icon?: string; iconColor?: string; onClick?: () => void }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   return (
     <div
       onClick={onClick}
       style={{
-        background: accent ? C.teal : C.cardBg,
-        border: `1px solid ${accent ? C.teal : C.border}`,
+        background: accent ? THEME.colors.teal : THEME.colors.surface,
+        border: `1px solid ${accent ? THEME.colors.teal : THEME.colors.border}`,
         borderRadius: 8, padding: '20px 24px', position: 'relative',
         cursor: onClick ? 'pointer' : 'default',
         transition: 'border-color 150ms ease, box-shadow 150ms ease',
       }}
-      onMouseEnter={e => { if (onClick) { (e.currentTarget as HTMLDivElement).style.borderColor = iconColor || C.teal; (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 0 1px ${iconColor || C.teal}40`; } }}
-      onMouseLeave={e => { if (onClick) { (e.currentTarget as HTMLDivElement).style.borderColor = accent ? C.teal : C.border; (e.currentTarget as HTMLDivElement).style.boxShadow = 'none'; } }}
+      onMouseEnter={e => { if (onClick) { (e.currentTarget as HTMLDivElement).style.borderColor = iconColor || THEME.colors.teal; (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 0 1px ${iconColor || THEME.colors.teal}40`; } }}
+      onMouseLeave={e => { if (onClick) { (e.currentTarget as HTMLDivElement).style.borderColor = accent ? THEME.colors.teal : THEME.colors.border; (e.currentTarget as HTMLDivElement).style.boxShadow = 'none'; } }}
     >
       {icon && (
-        <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: iconColor || (accent ? C.white : C.slate) }}>{icon}</span>
+        <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: iconColor || (accent ? "#FFFFFF" : THEME.colors.textSecondary) }}>{icon}</span>
       )}
-      <p style={{ fontSize: 11, color: accent ? 'rgba(255,255,255,0.7)' : C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{label}</p>
-      <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums' }}>{value}</p>
-      {sub && <p style={{ fontSize: 12, color: accent ? 'rgba(255,255,255,0.6)' : C.slate, marginTop: 4 }}>{sub}</p>}
+      <p style={{ fontSize: 11, color: accent ? 'rgba(255,255,255,0.7)' : THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{label}</p>
+      <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums' }}>{value}</p>
+      {sub && <p style={{ fontSize: 12, color: accent ? 'rgba(255,255,255,0.6)' : THEME.colors.textSecondary, marginTop: 4 }}>{sub}</p>}
     </div>
   );
 }
 
 function StageBadge({ stageId, label, isTerminal }: { stageId: string; label: string; isTerminal?: boolean }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   const isLaunched = stageId === '100411705';
   const isOfferAccepted = stageId === '2496936';
   const isClosedWon = label?.toLowerCase().includes('closed won') || label?.toLowerCase().includes('closedwon');
   const description = STAGE_DESCRIPTIONS[stageId];
 
   let bg = 'rgba(91,106,113,0.18)';
-  let color = C.dark;
+  let color = THEME.colors.text;
   let borderColor = 'rgba(91,106,113,0.25)';
 
   if (isClosedWon) {
@@ -192,15 +188,14 @@ function StageBadge({ stageId, label, isTerminal }: { stageId: string; label: st
 // ── Launch timer component ───────────────────────────────────────────────────
 // Step 6: countdown to launch. Step 7: days since launch + graduation progress.
 function LaunchTimer({ deal }: { deal: Deal }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   const isOfferAccepted = deal.dealstage === '2496936';
   const isLaunched = deal.dealstage === '100411705';
 
-  if (!isOfferAccepted && !isLaunched) return <span style={{ color: C.slate }}>—</span>;
+  if (!isOfferAccepted && !isLaunched) return <span style={{ color: THEME.colors.textSecondary }}>—</span>;
 
   const launchDateStr = deal.actual_launch_date || deal.desired_start_date;
-  if (!launchDateStr) return <span style={{ color: C.slate, fontSize: 12 }}>No date set</span>;
+  if (!launchDateStr) return <span style={{ color: THEME.colors.textSecondary, fontSize: 12 }}>No date set</span>;
 
   const launchDate = new Date(launchDateStr);
   const now = new Date();
@@ -214,22 +209,22 @@ function LaunchTimer({ deal }: { deal: Deal }) {
       // Past target date but still in Step 6
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: C.red }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: THEME.colors.error }}>
             {Math.abs(daysUntilLaunch)}d overdue
           </span>
-          <span style={{ fontSize: 10, color: C.slate }}>
+          <span style={{ fontSize: 10, color: THEME.colors.textSecondary }}>
             Target: {launchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
           </span>
         </div>
       );
     }
-    const urgencyColor = daysUntilLaunch <= 7 ? C.red : daysUntilLaunch <= 30 ? C.amber : C.teal;
+    const urgencyColor = daysUntilLaunch <= 7 ? THEME.colors.error : daysUntilLaunch <= 30 ? THEME.colors.warning : THEME.colors.teal;
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <span style={{ fontSize: 13, fontWeight: 700, color: urgencyColor }}>
           T-{daysUntilLaunch}d
         </span>
-        <span style={{ fontSize: 10, color: C.slate }}>
+        <span style={{ fontSize: 10, color: THEME.colors.textSecondary }}>
           {launchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
         </span>
       </div>
@@ -241,27 +236,27 @@ function LaunchTimer({ deal }: { deal: Deal }) {
 
   // Graduation milestones
   let milestone = '';
-  let milestoneColor = C.slate;
+  let milestoneColor = THEME.colors.textSecondary;
   let progressPct = 0;
 
   if (daysSinceLaunch >= 45) {
     milestone = 'Graduated';
-    milestoneColor = C.green;
+    milestoneColor = THEME.colors.success;
     progressPct = 100;
   } else if (daysSinceLaunch >= 30) {
     milestone = '90% assets target';
-    milestoneColor = C.teal;
+    milestoneColor = THEME.colors.teal;
     progressPct = Math.round((daysSinceLaunch / 45) * 100);
   } else if (daysSinceLaunch >= 0) {
     milestone = '70% assets by Day 30';
-    milestoneColor = C.amber;
+    milestoneColor = THEME.colors.warning;
     progressPct = Math.round((daysSinceLaunch / 45) * 100);
   } else {
     // Future launch date
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: C.teal }}>T-{Math.abs(daysSinceLaunch)}d</span>
-        <span style={{ fontSize: 10, color: C.slate }}>Pre-launch</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: THEME.colors.teal }}>T-{Math.abs(daysSinceLaunch)}d</span>
+        <span style={{ fontSize: 10, color: THEME.colors.textSecondary }}>Pre-launch</span>
       </div>
     );
   }
@@ -272,7 +267,7 @@ function LaunchTimer({ deal }: { deal: Deal }) {
         <span style={{ fontSize: 13, fontWeight: 700, color: milestoneColor }}>
           Day {daysSinceLaunch}
         </span>
-        <span style={{ fontSize: 10, color: C.slate }}>/ 45</span>
+        <span style={{ fontSize: 10, color: THEME.colors.textSecondary }}>/ 45</span>
       </div>
       {/* Progress bar */}
       <div style={{ width: '100%', height: 4, background: 'rgba(91,106,113,0.1)', borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
@@ -290,12 +285,11 @@ function LaunchTimer({ deal }: { deal: Deal }) {
 }
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   return (
     <div style={{ marginBottom: 16 }}>
-      <h3 style={{ fontSize: 15, fontWeight: 600, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: subtitle ? 4 : 0 }}>{title}</h3>
-      {subtitle && <p style={{ fontSize: 12, color: C.slate }}>{subtitle}</p>}
+      <h3 style={{ fontSize: 15, fontWeight: 600, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: subtitle ? 4 : 0 }}>{title}</h3>
+      {subtitle && <p style={{ fontSize: 12, color: THEME.colors.textSecondary }}>{subtitle}</p>}
     </div>
   );
 }
@@ -323,8 +317,7 @@ function ComplexityBadge({ score, tier, tierColor }: { score: number; tier: stri
 
 // ── Horizontal bar component ─────────────────────────────────────────────────
 function HorizontalBar({ items, maxValue, perItemMax }: { items: { label: string; value: number; color: string; sub?: string; display?: string; onClick?: () => void }[]; maxValue: number; perItemMax?: number[] }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {items.map((item, i) => {
@@ -337,7 +330,7 @@ function HorizontalBar({ items, maxValue, perItemMax }: { items: { label: string
             onMouseEnter={e => { if (item.onClick) (e.currentTarget as HTMLDivElement).style.background = 'rgba(248,244,240,0.04)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
           >
-            <div style={{ width: 130, fontSize: 12, color: C.slate, textAlign: 'right', flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ width: 130, fontSize: 12, color: THEME.colors.textSecondary, textAlign: 'right', flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {item.label}
             </div>
             <div style={{ flex: 1, height: 22, background: 'rgba(91,106,113,0.06)', borderRadius: 4, overflow: 'hidden', position: 'relative' }}>
@@ -346,7 +339,7 @@ function HorizontalBar({ items, maxValue, perItemMax }: { items: { label: string
                 width: `${cap > 0 ? Math.max((item.value / cap) * 100, 2) : 0}%`,
                 background: item.color, transition: 'width 0.4s ease',
               }} />
-              <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 11, fontWeight: 600, color: C.dark }}>
+              <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 11, fontWeight: 600, color: THEME.colors.text }}>
                 {item.display ?? item.value}{item.sub ? ` · ${item.sub}` : ''}
               </span>
             </div>
@@ -359,8 +352,7 @@ function HorizontalBar({ items, maxValue, perItemMax }: { items: { label: string
 
 // ── Drill-Down Panel ─────────────────────────────────────────────────────────
 function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[]; onClose: () => void }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   const getAUM = (d: Deal) => parseFloat(d.transferable_aum ?? '0') || 0;
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 999, display: 'flex', justifyContent: 'flex-end' }} onClick={onClose}>
@@ -369,43 +361,43 @@ function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[
         onClick={e => e.stopPropagation()}
         style={{
           position: 'relative', width: '100%', maxWidth: 720, height: '100vh',
-          background: '#1a1a1a', borderLeft: `1px solid ${C.border}`,
+          background: '#1a1a1a', borderLeft: `1px solid ${THEME.colors.border}`,
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
           animation: 'slideInRight 200ms ease',
         }}
       >
         {/* Header */}
-        <div style={{ padding: '20px 24px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+        <div style={{ padding: '20px 24px', borderBottom: `1px solid ${THEME.colors.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
           <div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 2 }}>{title}</h3>
-            <p style={{ fontSize: 12, color: C.slate }}>{deals.length} deals · {formatAUM(deals.reduce((s, d) => s + getAUM(d), 0))} total AUM</p>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 2 }}>{title}</h3>
+            <p style={{ fontSize: 12, color: THEME.colors.textSecondary }}>{deals.length} deals · {formatAUM(deals.reduce((s, d) => s + getAUM(d), 0))} total AUM</p>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.slate, fontSize: 20, cursor: 'pointer', padding: '4px 8px', borderRadius: 4 }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: THEME.colors.textSecondary, fontSize: 20, cursor: 'pointer', padding: '4px 8px', borderRadius: 4 }}>✕</button>
         </div>
         {/* Table */}
         <div style={{ flex: 1, overflow: 'auto', padding: '0 24px 24px' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginTop: 12 }}>
             <thead>
-              <tr style={{ borderBottom: `1px solid ${C.border}`, position: 'sticky', top: 0, background: '#1a1a1a', zIndex: 1 }}>
+              <tr style={{ borderBottom: `1px solid ${THEME.colors.border}`, position: 'sticky', top: 0, background: '#1a1a1a', zIndex: 1 }}>
                 {['Advisor', 'Stage', 'Exp. AUM', 'Launch Date'].map(h => (
-                  <th key={h} style={{ padding: '8px 10px', textAlign: h === 'Advisor' ? 'left' : 'right', color: C.slate, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
+                  <th key={h} style={{ padding: '8px 10px', textAlign: h === 'Advisor' ? 'left' : 'right', color: THEME.colors.textSecondary, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {deals.map((deal, i) => (
-                <tr key={deal.id} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? 'transparent' : 'rgba(248,244,240,0.02)', transition: 'background 120ms ease' }}
+                <tr key={deal.id} style={{ borderBottom: `1px solid ${THEME.colors.border}`, background: i % 2 === 0 ? 'transparent' : 'rgba(248,244,240,0.02)', transition: 'background 120ms ease' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? 'transparent' : 'rgba(248,244,240,0.02)'; }}
                 >
                   <td style={{ padding: '8px 10px' }}>
-                    <Link href={`/command-center/advisor/${deal.id}`} style={{ color: C.teal, fontWeight: 600, textDecoration: 'none' }}>{deal.dealname}</Link>
+                    <Link href={`/command-center/advisor/${deal.id}`} style={{ color: THEME.colors.teal, fontWeight: 600, textDecoration: 'none' }}>{deal.dealname}</Link>
                   </td>
                   <td style={{ padding: '8px 10px', textAlign: 'right' }}>
                     <StageBadge stageId={deal.dealstage} label={STAGE_LABELS[deal.dealstage] ?? deal.dealstage} />
                   </td>
-                  <td style={{ padding: '8px 10px', textAlign: 'right', color: C.teal, fontWeight: 600 }}>{formatAUM(getAUM(deal))}</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'right', color: C.slate }}>{formatDate(deal.desired_start_date ?? deal.actual_launch_date)}</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'right', color: THEME.colors.teal, fontWeight: 600 }}>{formatAUM(getAUM(deal))}</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'right', color: THEME.colors.textSecondary }}>{formatDate(deal.desired_start_date ?? deal.actual_launch_date)}</td>
                 </tr>
               ))}
             </tbody>
@@ -421,9 +413,8 @@ function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[
 // COMMAND DASHBOARD (Analytics overlay for Recruiting tab)
 // ══════════════════════════════════════════════════════════════════════════════
 function CommandDashboard({ deals }: { deals: Deal[] }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
-  const STAGE_COLORS = useMemo(() => getStageColors(C.teal, C.gold), [C.teal, C.gold]);
+  const { THEME } = useTheme();
+  const STAGE_COLORS = useMemo(() => getStageColors(THEME.colors.teal, THEME.colors.bronze400), [THEME.colors.teal, THEME.colors.bronze400]);
   const { data: aumData } = useSWR('/api/command-center/aum-tracker', fetcher, SWR_OPTS);
   const { data: sentimentData } = useSWR('/api/command-center/sentiment/scores', fetcher, SWR_OPTS);
   const { data: complexityData } = useSWR('/api/command-center/complexity/scores', fetcher, SWR_OPTS);
@@ -631,18 +622,18 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
   function PaceIndicator({ label, aum, goal, pacePct, expectedPct, onTrack, deficit, count }: {
     label: string; aum: number; goal: number; pacePct: number; expectedPct: number; onTrack: boolean; deficit: number; count: number;
   }) {
-    const paceColor = onTrack ? C.green : C.red;
+    const paceColor = onTrack ? THEME.colors.success : THEME.colors.error;
     const cappedPct = Math.min(pacePct, 100);
     return (
-      <div style={{ flex: 1, padding: '16px 20px', borderRadius: 8, background: 'rgba(91,106,113,0.04)', border: `1px solid ${C.border}` }}>
+      <div style={{ flex: 1, padding: '16px 20px', borderRadius: 8, background: 'rgba(91,106,113,0.04)', border: `1px solid ${THEME.colors.border}` }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
-          <span style={{ fontSize: 11, color: C.slate }}>{count} launched</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
+          <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>{count} launched</span>
         </div>
-        <div style={{ fontSize: 24, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 2, fontVariantNumeric: 'tabular-nums' }}>
+        <div style={{ fontSize: 24, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 2, fontVariantNumeric: 'tabular-nums' }}>
           {formatAUM(aum)}
         </div>
-        <div style={{ fontSize: 11, color: C.slate, marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: THEME.colors.textSecondary, marginBottom: 10 }}>
           of {formatAUM(goal)} goal
         </div>
         {/* Progress bar with expected pace marker */}
@@ -654,7 +645,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           {/* Expected pace marker */}
           <div style={{
             position: 'absolute', top: -3, left: `${Math.min(expectedPct, 100)}%`,
-            width: 2, height: 14, background: C.dark, borderRadius: 1, opacity: 0.4,
+            width: 2, height: 14, background: THEME.colors.text, borderRadius: 1, opacity: 0.4,
           }} title={`Expected pace: ${expectedPct.toFixed(0)}%`} />
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -662,12 +653,12 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             {onTrack ? 'On Track' : 'Behind Pace'}
           </span>
           {!onTrack && deficit > 0 && (
-            <span style={{ fontSize: 11, fontWeight: 600, color: C.red }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: THEME.colors.error }}>
               {formatAUM(deficit)} deficit
             </span>
           )}
           {onTrack && (
-            <span style={{ fontSize: 11, color: C.green }}>
+            <span style={{ fontSize: 11, color: THEME.colors.success }}>
               +{formatAUM(aum - (goal * expectedPct / 100))} ahead
             </span>
           )}
@@ -680,24 +671,24 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
     <div style={{ marginBottom: 40 }}>
       {/* ── 2026 Launch Goal Tracker ── */}
       <div style={{
-        background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 10,
+        background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 10,
         padding: '28px 32px', marginBottom: 20,
       }}>
         {/* Header row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
           <div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 4 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 4 }}>
               2026 Launch Goal Tracker
             </h3>
-            <p style={{ fontSize: 12, color: C.slate }}>
+            <p style={{ fontSize: 12, color: THEME.colors.textSecondary }}>
               {formatAUM(a.ANNUAL_GOAL)} annual target · {a.ytdLaunched.length} advisors launched YTD
             </p>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 32, fontWeight: 700, color: a.ytdOnTrack ? C.teal : C.red, fontFamily: "'Inter', system-ui, sans-serif", lineHeight: 1 }}>
+            <div style={{ fontSize: 32, fontWeight: 700, color: a.ytdOnTrack ? THEME.colors.teal : THEME.colors.error, fontFamily: "'Inter', system-ui, sans-serif", lineHeight: 1 }}>
               {formatAUM(a.ytdAUM)}
             </div>
-            <div style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
+            <div style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 4 }}>
               {a.ytdPacePct.toFixed(1)}% of goal · {a.expectedYtdPct.toFixed(0)}% expected
             </div>
           </div>
@@ -708,19 +699,19 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           <div style={{
             height: '100%', borderRadius: 6,
             width: `${Math.min(a.ytdPacePct, 100)}%`,
-            background: a.ytdOnTrack ? C.teal : C.red,
+            background: a.ytdOnTrack ? THEME.colors.teal : THEME.colors.error,
             transition: 'width 0.4s ease',
           }} />
           {/* Expected pace marker */}
           <div style={{
             position: 'absolute', top: -4, left: `${Math.min(a.expectedYtdPct, 100)}%`,
-            width: 2, height: 20, background: C.dark, borderRadius: 1, opacity: 0.5,
+            width: 2, height: 20, background: THEME.colors.text, borderRadius: 1, opacity: 0.5,
           }} title={`Expected YTD pace: ${a.expectedYtdPct.toFixed(0)}%`} />
           {/* Goal markers */}
           {[25, 50, 75].map(pct => (
             <div key={pct} style={{
               position: 'absolute', top: 16, left: `${pct}%`, transform: 'translateX(-50%)',
-              fontSize: 9, color: C.slate, opacity: 0.6,
+              fontSize: 9, color: THEME.colors.textSecondary, opacity: 0.6,
             }}>
               {formatAUM(a.ANNUAL_GOAL * pct / 100)}
             </div>
@@ -800,19 +791,19 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             <div
               onClick={() => sentimentDeals.length > 0 && setDrillDown({ title: 'Sentiment Tracked Advisors', deals: sentimentDeals })}
               style={{
-                background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+                background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8,
                 padding: '20px 24px', position: 'relative', cursor: sentimentDeals.length > 0 ? 'pointer' : 'default',
                 transition: 'border-color 150ms ease',
               }}
               onMouseEnter={e => { if (sentimentDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = '#3B5A69'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = THEME.colors.border; }}
             >
               <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: '#3B5A69' }}>✦</span>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Sentiment Tracking</p>
-              <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>
+              <p style={{ fontSize: 11, color: THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Sentiment Tracking</p>
+              <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {scores.length > 0 ? `${scores.length}` : '—'}
               </p>
-              <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
+              <p style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 4 }}>
                 {scores.length > 0
                   ? `${positive} positive · ${atRisk > 0 ? `${atRisk} at risk` : 'none at risk'}`
                   : 'No scores yet'}
@@ -837,19 +828,19 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             <div
               onClick={() => launchedDeals.length > 0 && setDrillDown({ title: 'Current vs Expected AUM', deals: launchedDeals })}
               style={{
-                background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+                background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8,
                 padding: '20px 24px', position: 'relative', cursor: launchedDeals.length > 0 ? 'pointer' : 'default',
                 transition: 'border-color 150ms ease',
               }}
-              onMouseEnter={e => { if (launchedDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = C.teal; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
+              onMouseEnter={e => { if (launchedDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = THEME.colors.teal; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = THEME.colors.border; }}
             >
-              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: C.teal }}>◎</span>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Current vs Expected AUM</p>
-              <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>
+              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: THEME.colors.teal }}>◎</span>
+              <p style={{ fontSize: 11, color: THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Current vs Expected AUM</p>
+              <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {totalExpectedAum > 0 ? `${transferPct}%` : '—'}
               </p>
-              <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
+              <p style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 4 }}>
                 {totalTranAum > 0 && totalExpectedAum > 0
                   ? `${formatAUM(totalTranAum)} of ${formatAUM(totalExpectedAum)}`
                   : 'Launched advisors'}
@@ -871,19 +862,19 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             <div
               onClick={() => launchedDeals.length > 0 && setDrillDown({ title: 'On Book Revenue Advisors', deals: launchedDeals })}
               style={{
-                background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+                background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8,
                 padding: '20px 24px', position: 'relative', cursor: launchedDeals.length > 0 ? 'pointer' : 'default',
                 transition: 'border-color 150ms ease',
               }}
-              onMouseEnter={e => { if (launchedDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = C.green; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
+              onMouseEnter={e => { if (launchedDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = THEME.colors.success; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = THEME.colors.border; }}
             >
-              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: C.green }}>$</span>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>On Book Revenue</p>
-              <p style={{ fontSize: 28, fontWeight: 700, color: C.green, fontFamily: "'Inter', system-ui, sans-serif" }}>
+              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: THEME.colors.success }}>$</span>
+              <p style={{ fontSize: 11, color: THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>On Book Revenue</p>
+              <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.success, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {totalRevenue > 0 ? formatAUM(totalRevenue) : '—'}
               </p>
-              <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
+              <p style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 4 }}>
                 {launchedAdvisors.length > 0
                   ? `${launchedAdvisors.length} launched advisors`
                   : 'From launched advisors'}
@@ -909,19 +900,19 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             <div
               onClick={() => expectedRevenueDeals.length > 0 && setDrillDown({ title: 'Expected Revenue Advisors', deals: expectedRevenueDeals })}
               style={{
-                background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8,
+                background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8,
                 padding: '20px 24px', position: 'relative', cursor: expectedRevenueDeals.length > 0 ? 'pointer' : 'default',
                 transition: 'border-color 150ms ease',
               }}
-              onMouseEnter={e => { if (expectedRevenueDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = C.gold; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
+              onMouseEnter={e => { if (expectedRevenueDeals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = THEME.colors.bronze400; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = THEME.colors.border; }}
             >
-              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: C.gold }}>★</span>
-              <p style={{ fontSize: 11, color: C.slate, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Expected Revenue</p>
-              <p style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif" }}>
+              <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: THEME.colors.bronze400 }}>★</span>
+              <p style={{ fontSize: 11, color: THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Expected Revenue</p>
+              <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {totalExpectedRevenue > 0 ? formatAUM(Math.round(totalExpectedRevenue)) : '—'}
               </p>
-              <p style={{ fontSize: 12, color: C.slate, marginTop: 4 }}>
+              <p style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 4 }}>
                 {totalExpectedRevenue > 0 && aumData?.summary?.total_current_revenue
                   ? `${Math.round((aumData.summary.total_current_revenue / totalExpectedRevenue) * 100)}% realized`
                   : 'At full AUM transfer'}
@@ -934,21 +925,21 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
       {/* ── Rolling 6-Month Trend Charts ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
         {/* Monthly Launches Area Chart — 4 lines: AUM, Advisors, Goals */}
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24 }}>
+        <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8, padding: 24 }}>
           <SectionHeader title="Monthly Launches" subtitle="AUM launched & advisor count vs goals (last 6 months)" />
           <ResponsiveContainer width="100%" height={280}>
             <ComposedChart data={a.monthlyLaunches} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(248,244,240,0.06)" vertical={false} />
-              <XAxis dataKey="month" tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="month" tick={{ fill: THEME.colors.textSecondary, fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis
                 yAxisId="aum"
-                tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false}
+                tick={{ fill: THEME.colors.textSecondary, fontSize: 11 }} axisLine={false} tickLine={false}
                 tickFormatter={(v: number) => formatAUM(v)}
               />
               <YAxis
                 yAxisId="count"
                 orientation="right"
-                tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false}
+                tick={{ fill: THEME.colors.textSecondary, fontSize: 11 }} axisLine={false} tickLine={false}
                 allowDecimals={false}
               />
               <Tooltip
@@ -958,16 +949,16 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                   const entry = payload[0]?.payload as { count: number; aum: number; names: string[]; aumGoal: number; advisorGoal: number } | undefined;
                   if (!entry) return null;
                   return (
-                    <div style={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, padding: '10px 14px', fontSize: 12, maxWidth: 280 }}>
-                      <div style={{ color: C.slate, marginBottom: 6, fontWeight: 600 }}>{label}</div>
+                    <div style={{ background: '#2f2f2f', border: `1px solid ${THEME.colors.border}`, borderRadius: 6, padding: '10px 14px', fontSize: 12, maxWidth: 280 }}>
+                      <div style={{ color: THEME.colors.textSecondary, marginBottom: 6, fontWeight: 600 }}>{label}</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        <div><span style={{ color: C.teal, fontWeight: 600 }}>AUM Launched:</span> {formatAUM(entry.aum)} <span style={{ color: C.slate }}>(goal: {formatAUM(entry.aumGoal)})</span></div>
-                        <div><span style={{ color: C.gold, fontWeight: 600 }}>Advisors:</span> {entry.count} <span style={{ color: C.slate }}>(goal: {entry.advisorGoal})</span></div>
+                        <div><span style={{ color: THEME.colors.teal, fontWeight: 600 }}>AUM Launched:</span> {formatAUM(entry.aum)} <span style={{ color: THEME.colors.textSecondary }}>(goal: {formatAUM(entry.aumGoal)})</span></div>
+                        <div><span style={{ color: THEME.colors.bronze400, fontWeight: 600 }}>Advisors:</span> {entry.count} <span style={{ color: THEME.colors.textSecondary }}>(goal: {entry.advisorGoal})</span></div>
                       </div>
                       {entry.names.length > 0 && (
-                        <div style={{ marginTop: 6, borderTop: `1px solid ${C.border}`, paddingTop: 6 }}>
+                        <div style={{ marginTop: 6, borderTop: `1px solid ${THEME.colors.border}`, paddingTop: 6 }}>
                           {entry.names.map((name, i) => (
-                            <div key={i} style={{ color: C.teal, fontSize: 11, lineHeight: 1.5 }}>{name}</div>
+                            <div key={i} style={{ color: THEME.colors.teal, fontSize: 11, lineHeight: 1.5 }}>{name}</div>
                           ))}
                         </div>
                       )}
@@ -977,48 +968,48 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
               />
               <defs>
                 <linearGradient id="aumLaunchedGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={C.teal} stopOpacity={0.25} />
-                  <stop offset="95%" stopColor={C.teal} stopOpacity={0} />
+                  <stop offset="5%" stopColor={THEME.colors.teal} stopOpacity={0.25} />
+                  <stop offset="95%" stopColor={THEME.colors.teal} stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="advisorCountGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={C.gold} stopOpacity={0.2} />
-                  <stop offset="95%" stopColor={C.gold} stopOpacity={0} />
+                  <stop offset="5%" stopColor={THEME.colors.bronze400} stopOpacity={0.2} />
+                  <stop offset="95%" stopColor={THEME.colors.bronze400} stopOpacity={0} />
                 </linearGradient>
               </defs>
               {/* AUM Launched (area) */}
-              <Area yAxisId="aum" type="monotone" dataKey="aum" name="AUM Launched" fill="url(#aumLaunchedGrad)" stroke={C.teal} strokeWidth={2} dot={{ fill: C.teal, r: 4 }} />
+              <Area yAxisId="aum" type="monotone" dataKey="aum" name="AUM Launched" fill="url(#aumLaunchedGrad)" stroke={THEME.colors.teal} strokeWidth={2} dot={{ fill: THEME.colors.teal, r: 4 }} />
               {/* AUM Goal (dashed line) */}
-              <Line yAxisId="aum" type="monotone" dataKey="aumGoal" name="AUM Goal ($2B)" stroke={C.teal} strokeWidth={1.5} strokeDasharray="6 3" dot={false} />
+              <Line yAxisId="aum" type="monotone" dataKey="aumGoal" name="AUM Goal ($2B)" stroke={THEME.colors.teal} strokeWidth={1.5} strokeDasharray="6 3" dot={false} />
               {/* Advisors Started (area) */}
-              <Area yAxisId="count" type="monotone" dataKey="count" name="Advisors Started" fill="url(#advisorCountGrad)" stroke={C.gold} strokeWidth={2} dot={{ fill: C.gold, r: 4 }} />
+              <Area yAxisId="count" type="monotone" dataKey="count" name="Advisors Started" fill="url(#advisorCountGrad)" stroke={THEME.colors.bronze400} strokeWidth={2} dot={{ fill: THEME.colors.bronze400, r: 4 }} />
               {/* Advisor Goal (dashed line) */}
-              <Line yAxisId="count" type="monotone" dataKey="advisorGoal" name="Advisor Goal (12)" stroke={C.gold} strokeWidth={1.5} strokeDasharray="6 3" dot={false} />
+              <Line yAxisId="count" type="monotone" dataKey="advisorGoal" name="Advisor Goal (12)" stroke={THEME.colors.bronze400} strokeWidth={1.5} strokeDasharray="6 3" dot={false} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
 
         {/* Cumulative YTD Launched AUM */}
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24 }}>
+        <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8, padding: 24 }}>
           <SectionHeader title="Cumulative YTD Launched AUM" subtitle={`Running total vs $25B linear pace`} />
           <ResponsiveContainer width="100%" height={220}>
             <ComposedChart data={a.cumulativeYtd} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(248,244,240,0.06)" vertical={false} />
-              <XAxis dataKey="month" tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="month" tick={{ fill: THEME.colors.textSecondary, fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis
-                tick={{ fill: C.slate, fontSize: 11 }} axisLine={false} tickLine={false}
+                tick={{ fill: THEME.colors.textSecondary, fontSize: 11 }} axisLine={false} tickLine={false}
                 tickFormatter={(v: number) => formatAUM(v)}
               />
               <Tooltip
                 cursor={{ stroke: 'rgba(248,244,240,0.08)', strokeWidth: 1 }}
-                contentStyle={{ background: '#2f2f2f', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, color: C.dark }}
-                itemStyle={{ color: C.dark }}
+                contentStyle={{ background: '#2f2f2f', border: `1px solid ${THEME.colors.border}`, borderRadius: 6, fontSize: 12, color: THEME.colors.text }}
+                itemStyle={{ color: THEME.colors.text }}
                 formatter={(value: unknown, name: unknown) => {
                   const v = Number(value);
                   if (name === 'target') return [formatAUM(v), 'Pace Target'];
                   if (name === 'abovePace' || name === 'belowPace') return [formatAUM(v), 'Launched AUM'];
                   return [formatAUM(v), String(name)];
                 }}
-                labelStyle={{ color: C.slate, marginBottom: 4 }}
+                labelStyle={{ color: THEME.colors.textSecondary, marginBottom: 4 }}
               />
               <defs>
                 <linearGradient id="aboveGradient" x1="0" y1="0" x2="0" y2="1">
@@ -1043,7 +1034,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
 
         {/* Stage Funnel with AUM */}
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24 }}>
+        <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8, padding: 24 }}>
           <SectionHeader title="Pipeline Funnel" subtitle="Advisors & projected AUM by stage · Launched = YTD toward $25B goal" />
           <HorizontalBar
             maxValue={a.maxStageAUM}
@@ -1063,14 +1054,14 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
         </div>
 
         {/* Launch Countdown */}
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24 }}>
+        <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8, padding: 24 }}>
           <SectionHeader title="Launch Countdown" subtitle="Advisors with target launch dates" />
           {/* 30/60/90 tabs */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 16 }}>
             {[
-              { label: '90 Days', count: a.launches90.length, aum: a.launches90AUM, color: C.teal, deals: a.launches90 },
-              { label: '60 Days', count: a.launches60.length, aum: a.launches60AUM, color: C.amber, deals: a.launches60 },
-              { label: '30 Days', count: a.launches30.length, aum: a.launches30AUM, color: C.red, deals: a.launches30 },
+              { label: '90 Days', count: a.launches90.length, aum: a.launches90AUM, color: THEME.colors.teal, deals: a.launches90 },
+              { label: '60 Days', count: a.launches60.length, aum: a.launches60AUM, color: THEME.colors.warning, deals: a.launches60 },
+              { label: '30 Days', count: a.launches30.length, aum: a.launches30AUM, color: THEME.colors.error, deals: a.launches30 },
             ].map(item => (
               <div
                 key={item.label}
@@ -1087,7 +1078,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                 <div style={{ fontSize: 22, fontWeight: 700, color: item.color, fontFamily: "'Inter', system-ui, sans-serif" }}>
                   {item.count}
                 </div>
-                <div style={{ fontSize: 11, color: C.slate, marginTop: 2 }}>{item.label}</div>
+                <div style={{ fontSize: 11, color: THEME.colors.textSecondary, marginTop: 2 }}>{item.label}</div>
                 <div style={{ fontSize: 13, color: item.color, fontWeight: 700, marginTop: 2 }}>{formatAUM(item.aum)}</div>
               </div>
             ))}
@@ -1098,9 +1089,9 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             {a.launches90.length > 0 ? (
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 420 }}>
                 <thead>
-                  <tr style={{ borderBottom: `1px solid ${C.border}`, position: 'sticky', top: 0, background: C.cardBg, zIndex: 1 }}>
+                  <tr style={{ borderBottom: `1px solid ${THEME.colors.border}`, position: 'sticky', top: 0, background: THEME.colors.surface, zIndex: 1 }}>
                     {['Advisor', 'Stage', 'Exp. AUM', 'Days'].map(h => (
-                      <th key={h} style={{ padding: '6px 8px', textAlign: h === 'Advisor' ? 'left' : 'right', color: C.slate, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
+                      <th key={h} style={{ padding: '6px 8px', textAlign: h === 'Advisor' ? 'left' : 'right', color: THEME.colors.textSecondary, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
                         {h}
                       </th>
                     ))}
@@ -1118,18 +1109,18 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                     })
                     .map(deal => {
                       const days = daysUntil(deal.desired_start_date!);
-                      const urgencyColor = days <= 7 ? C.red : days <= 30 ? C.amber : C.teal;
+                      const urgencyColor = days <= 7 ? THEME.colors.error : days <= 30 ? THEME.colors.warning : THEME.colors.teal;
                       return (
-                        <tr key={deal.id} style={{ borderBottom: `1px solid ${C.border}` }}>
+                        <tr key={deal.id} style={{ borderBottom: `1px solid ${THEME.colors.border}` }}>
                           <td style={{ padding: '5px 8px' }}>
-                            <Link href={`/command-center/advisor/${deal.id}`} style={{ color: C.teal, fontWeight: 500, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                            <Link href={`/command-center/advisor/${deal.id}`} style={{ color: THEME.colors.teal, fontWeight: 500, textDecoration: 'none', whiteSpace: 'nowrap' }}>
                               {deal.dealname}
                             </Link>
                           </td>
                           <td style={{ padding: '5px 8px', textAlign: 'right' }}>
                             <StageBadge stageId={deal.dealstage} label={STAGE_LABELS[deal.dealstage] ?? deal.dealstage} />
                           </td>
-                          <td style={{ padding: '5px 8px', color: C.teal, fontWeight: 600, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                          <td style={{ padding: '5px 8px', color: THEME.colors.teal, fontWeight: 600, textAlign: 'right', whiteSpace: 'nowrap' }}>
                             {formatAUM(parseFloat(deal.transferable_aum ?? '0'))}
                           </td>
                           <td style={{ padding: '5px 8px', fontWeight: 600, textAlign: 'right', color: urgencyColor, whiteSpace: 'nowrap' }}>
@@ -1141,7 +1132,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                 </tbody>
               </table>
             ) : (
-              <p style={{ fontSize: 13, color: C.slate, textAlign: 'center', padding: 20 }}>No launches scheduled in the next 90 days</p>
+              <p style={{ fontSize: 13, color: THEME.colors.textSecondary, textAlign: 'center', padding: 20 }}>No launches scheduled in the next 90 days</p>
             )}
           </div>
         </div>
@@ -1157,8 +1148,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
 // ADVISOR RECRUITING TAB
 // ══════════════════════════════════════════════════════════════════════════════
 function RecruitingTab() {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   const { data, error, isLoading, mutate: mutatePipeline } = useSWR('/api/command-center/pipeline', fetcher, SWR_OPTS);
   const { data: teamData } = useSWR('/api/command-center/team?role=Recruiter', fetcher, SWR_OPTS);
   const { data: complexityData } = useSWR('/api/command-center/complexity/scores', fetcher, SWR_OPTS);
@@ -1307,7 +1297,7 @@ function RecruitingTab() {
       {[1,2,3,4,5,6].map(i => <div key={i} className="shimmer h-16 rounded-lg" />)}
     </div>
   );
-  if (error || data?.error) return <div style={{ padding: '60px 0', color: C.red }}>Failed to load pipeline data.</div>;
+  if (error || data?.error) return <div style={{ padding: '60px 0', color: THEME.colors.error }}>Failed to load pipeline data.</div>;
 
   // All deals sorted by funnel stage order
   const allActiveDeals = [...deals]
@@ -1378,9 +1368,9 @@ function RecruitingTab() {
           onClick={() => setShowAI(!showAI)}
           style={{
             padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500,
-            background: showAI ? C.teal : C.cardBg,
-            color: showAI ? C.white : C.slate,
-            border: `1px solid ${showAI ? C.teal : C.border}`,
+            background: showAI ? THEME.colors.teal : THEME.colors.surface,
+            color: showAI ? "#FFFFFF" : THEME.colors.textSecondary,
+            border: `1px solid ${showAI ? THEME.colors.teal : THEME.colors.border}`,
             cursor: 'pointer', transition: 'all 150ms ease',
           }}
         >
@@ -1390,9 +1380,9 @@ function RecruitingTab() {
           onClick={() => setShowDashboard(!showDashboard)}
           style={{
             padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500,
-            background: showDashboard ? C.teal : C.cardBg,
-            color: showDashboard ? C.white : C.slate,
-            border: `1px solid ${showDashboard ? C.teal : C.border}`,
+            background: showDashboard ? THEME.colors.teal : THEME.colors.surface,
+            color: showDashboard ? "#FFFFFF" : THEME.colors.textSecondary,
+            border: `1px solid ${showDashboard ? THEME.colors.teal : THEME.colors.border}`,
             cursor: 'pointer', transition: 'all 150ms ease',
           }}
         >
@@ -1405,11 +1395,11 @@ function RecruitingTab() {
 
       {/* Inline AI Chat */}
       {showAI && (
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, marginBottom: 20, overflow: 'hidden' }}>
-          <div style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 24, height: 24, borderRadius: '50%', background: C.teal, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: C.white }}>✦</div>
-            <span style={{ fontSize: 13, fontWeight: 600, color: C.dark }}>AX AI Assistant</span>
-            <span style={{ fontSize: 11, color: C.slate }}>· Powered by Grok · Live pipeline data</span>
+        <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8, marginBottom: 20, overflow: 'hidden' }}>
+          <div style={{ padding: '12px 16px', borderBottom: `1px solid ${THEME.colors.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 24, height: 24, borderRadius: '50%', background: THEME.colors.teal, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: "#FFFFFF" }}>✦</div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: THEME.colors.text }}>AX AI Assistant</span>
+            <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>· Powered by Grok · Live pipeline data</span>
           </div>
           <div style={{ maxHeight: 280, overflowY: 'auto', padding: '12px 16px' }}>
             {aiMessages.map((msg, i) => (
@@ -1417,10 +1407,10 @@ function RecruitingTab() {
                 <div style={{
                   maxWidth: '75%', padding: '8px 14px',
                   borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
-                  background: msg.role === 'user' ? C.teal : '#2f2f2f',
-                  color: msg.role === 'user' ? C.white : C.dark,
+                  background: msg.role === 'user' ? THEME.colors.teal : '#2f2f2f',
+                  color: msg.role === 'user' ? "#FFFFFF" : THEME.colors.text,
                   fontSize: 13, lineHeight: 1.5, whiteSpace: 'pre-wrap',
-                  border: msg.role === 'user' ? 'none' : `1px solid ${C.border}`,
+                  border: msg.role === 'user' ? 'none' : `1px solid ${THEME.colors.border}`,
                 }}>
                   {msg.content}
                 </div>
@@ -1428,7 +1418,7 @@ function RecruitingTab() {
             ))}
             {aiLoading && (
               <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-                <div style={{ padding: '8px 14px', borderRadius: '14px 14px 14px 4px', background: '#2f2f2f', border: `1px solid ${C.border}`, fontSize: 13, color: C.slate }}>
+                <div style={{ padding: '8px 14px', borderRadius: '14px 14px 14px 4px', background: '#2f2f2f', border: `1px solid ${THEME.colors.border}`, fontSize: 13, color: THEME.colors.textSecondary }}>
                   Thinking…
                 </div>
               </div>
@@ -1437,15 +1427,15 @@ function RecruitingTab() {
           </div>
           <form
             onSubmit={e => { e.preventDefault(); sendAiMessage(aiInput); }}
-            style={{ display: 'flex', gap: 8, padding: '10px 16px', borderTop: `1px solid ${C.border}`, background: C.cardBg }}
+            style={{ display: 'flex', gap: 8, padding: '10px 16px', borderTop: `1px solid ${THEME.colors.border}`, background: THEME.colors.surface }}
           >
             <input
               value={aiInput}
               onChange={e => setAiInput(e.target.value)}
               placeholder="Ask about deals, advisors, risks, upcoming launches…"
               style={{
-                flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
-                fontSize: 13, color: C.dark, background: C.white, outline: 'none',
+                flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
+                fontSize: 13, color: THEME.colors.text, background: "#FFFFFF", outline: 'none',
                 fontFamily: "'Inter', system-ui, sans-serif",
               }}
             />
@@ -1454,8 +1444,8 @@ function RecruitingTab() {
               disabled={!aiInput.trim() || aiLoading}
               style={{
                 padding: '8px 16px', borderRadius: 8, border: 'none',
-                background: aiInput.trim() && !aiLoading ? C.teal : C.border,
-                color: aiInput.trim() && !aiLoading ? C.white : C.slate,
+                background: aiInput.trim() && !aiLoading ? THEME.colors.teal : THEME.colors.border,
+                color: aiInput.trim() && !aiLoading ? "#FFFFFF" : THEME.colors.textSecondary,
                 fontSize: 13, fontWeight: 600, cursor: aiInput.trim() && !aiLoading ? 'pointer' : 'default',
                 fontFamily: "'Inter', system-ui, sans-serif",
               }}
@@ -1467,7 +1457,7 @@ function RecruitingTab() {
       )}
 
       {/* Sub-tabs: Early Deals / Launch to Graduation / Completed Transitions */}
-      <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${C.border}`, marginBottom: 20 }}>
+      <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${THEME.colors.border}`, marginBottom: 20 }}>
         {([
           { key: 'launch_to_grad' as const, label: 'Launch to Graduation', sub: 'Steps 5–7 (< 90 days)' },
           { key: 'early' as const, label: 'Early Deals', sub: 'Steps 1–4' },
@@ -1490,18 +1480,18 @@ function RecruitingTab() {
               onClick={() => { setAdvisorTab(tab.key); setStageFilter('all'); }}
               style={{
                 padding: '10px 20px', background: 'none', border: 'none',
-                borderBottom: `2px solid ${isActive ? C.teal : 'transparent'}`,
+                borderBottom: `2px solid ${isActive ? THEME.colors.teal : 'transparent'}`,
                 marginBottom: -2, cursor: 'pointer', transition: 'all 150ms ease',
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? C.teal : C.slate, fontFamily: "'Inter', system-ui, sans-serif" }}>
+              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? THEME.colors.teal : THEME.colors.textSecondary, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {tab.label}
               </span>
               <span style={{
                 marginLeft: 6, fontSize: 11, fontWeight: 600,
                 padding: '1px 6px', borderRadius: 10,
                 background: isActive ? 'rgba(29,118,130,0.12)' : 'rgba(91,106,113,0.08)',
-                color: isActive ? C.teal : C.slate,
+                color: isActive ? THEME.colors.teal : THEME.colors.textSecondary,
               }}>
                 {count}
               </span>
@@ -1520,11 +1510,11 @@ function RecruitingTab() {
             placeholder="Search advisors, firms, owners…"
             style={{
               width: '100%', padding: '8px 12px 8px 32px', borderRadius: 8,
-              border: `1px solid ${C.border}`, fontSize: 13, color: C.dark,
-              background: C.cardBg, outline: 'none', fontFamily: "'Inter', system-ui, sans-serif",
+              border: `1px solid ${THEME.colors.border}`, fontSize: 13, color: THEME.colors.text,
+              background: THEME.colors.surface, outline: 'none', fontFamily: "'Inter', system-ui, sans-serif",
             }}
           />
-          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: C.slate }}>⌕</span>
+          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: THEME.colors.textSecondary }}>⌕</span>
         </div>
 
         {/* Stage Filter */}
@@ -1532,8 +1522,8 @@ function RecruitingTab() {
           value={stageFilter}
           onChange={e => setStageFilter(e.target.value)}
           style={{
-            padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
-            fontSize: 12, color: C.dark, background: C.cardBg, outline: 'none',
+            padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
+            fontSize: 12, color: THEME.colors.text, background: THEME.colors.surface, outline: 'none',
             fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer',
           }}
         >
@@ -1548,8 +1538,8 @@ function RecruitingTab() {
           value={typeFilter}
           onChange={e => setTypeFilter(e.target.value)}
           style={{
-            padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
-            fontSize: 12, color: C.dark, background: C.cardBg, outline: 'none',
+            padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
+            fontSize: 12, color: THEME.colors.text, background: THEME.colors.surface, outline: 'none',
             fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer',
           }}
         >
@@ -1560,7 +1550,7 @@ function RecruitingTab() {
         </select>
 
         {/* Result count */}
-        <span style={{ fontSize: 12, color: C.slate }}>
+        <span style={{ fontSize: 12, color: THEME.colors.textSecondary }}>
           {filteredDeals.length} of {sortedDeals.length} deals
         </span>
       </div>
@@ -1576,8 +1566,8 @@ function RecruitingTab() {
           return (
             <button key={stageId} onClick={() => setStageFilter(isSelected ? 'all' : stageId)} style={{
               padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer',
-              background: isSelected ? C.teal : isLaunched ? 'rgba(29,118,130,0.22)' : isOfferAccepted ? 'rgba(245,158,11,0.2)' : 'rgba(91,106,113,0.15)',
-              color: isSelected ? '#ffffff' : isLaunched ? '#5ec4cf' : isOfferAccepted ? '#fbbf24' : C.dark,
+              background: isSelected ? THEME.colors.teal : isLaunched ? 'rgba(29,118,130,0.22)' : isOfferAccepted ? 'rgba(245,158,11,0.2)' : 'rgba(91,106,113,0.15)',
+              color: isSelected ? '#ffffff' : isLaunched ? '#5ec4cf' : isOfferAccepted ? '#fbbf24' : THEME.colors.text,
               fontFamily: "'Inter', system-ui, sans-serif",
             }}>
               {STAGE_LABELS[stageId]} · {count}
@@ -1653,7 +1643,7 @@ function RecruitingTab() {
         const recruiters = Object.entries(recruiterMap).sort((a, b) => b[1].aum - a[1].aum);
         if (recruiters.length === 0) return null;
         return (
-          <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 24, marginBottom: 20 }}>
+          <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8, padding: 24, marginBottom: 20 }}>
             <SectionHeader title="Recruiter Scorecard" subtitle="Pipeline contribution by deal owner — click to view deals" />
             <div style={{ maxHeight: 320, overflowY: 'auto', display: 'grid', gridTemplateColumns: `repeat(${Math.min(recruiters.length, 4)}, 1fr)`, gap: 12 }}>
               {recruiters.map(([name, stats]) => (
@@ -1663,57 +1653,57 @@ function RecruitingTab() {
                   style={{
                     padding: '14px 16px', borderRadius: 8, cursor: 'pointer',
                     background: selectedRecruiter === name ? 'rgba(29,118,130,0.08)' : 'rgba(91,106,113,0.04)',
-                    border: `1px solid ${selectedRecruiter === name ? C.teal : C.border}`,
+                    border: `1px solid ${selectedRecruiter === name ? THEME.colors.teal : THEME.colors.border}`,
                     transition: 'border-color 150ms ease, background 150ms ease',
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = C.teal; }}
-                  onMouseLeave={e => { if (selectedRecruiter !== name) (e.currentTarget as HTMLDivElement).style.borderColor = C.border; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = THEME.colors.teal; }}
+                  onMouseLeave={e => { if (selectedRecruiter !== name) (e.currentTarget as HTMLDivElement).style.borderColor = THEME.colors.border; }}
                 >
-                  <div style={{ fontSize: 13, fontWeight: 700, color: getNameColor(name, C.slate), marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: getNameColor(name, THEME.colors.textSecondary), marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {name}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 11, color: C.slate }}>Deals</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: C.dark }}>{stats.deals}</span>
+                      <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>Deals</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: THEME.colors.text }}>{stats.deals}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 11, color: C.slate }}>Pipeline AUM</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: C.teal }}>{formatAUM(stats.aum)}</span>
+                      <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>Pipeline AUM</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: THEME.colors.teal }}>{formatAUM(stats.aum)}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 11, color: C.slate }}>Launched</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: C.green }}>{stats.launched}</span>
+                      <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>Launched</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: THEME.colors.success }}>{stats.launched}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 11, color: C.slate }}>Launched AUM</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: C.green }}>{formatAUM(stats.launchedAum)}</span>
+                      <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>Launched AUM</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: THEME.colors.success }}>{formatAUM(stats.launchedAum)}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 11, color: C.slate }}>Avg AUM/Deal</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: C.teal }}>
+                      <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>Avg AUM/Deal</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: THEME.colors.teal }}>
                         {stats.deals > 0 ? formatAUM(Math.round(stats.aum / stats.deals)) : '—'}
                       </span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 11, color: C.slate }}>Avg Complexity</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: C.dark }}>
+                      <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>Avg Complexity</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: THEME.colors.text }}>
                         {stats.launchedComplexityScores.length > 0
                           ? Math.round(stats.launchedComplexityScores.reduce((a, b) => a + b, 0) / stats.launchedComplexityScores.length)
                           : '—'}
                       </span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: 11, color: C.slate }}>Sentiment</span>
+                      <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>Sentiment</span>
                       <span style={{ fontSize: 11, fontWeight: 600, display: 'flex', gap: 2 }}>
                         <span style={{ color: '#ef4444' }}>{stats.sentimentCounts.highRisk}</span>
-                        <span style={{ color: C.slate }}>/</span>
+                        <span style={{ color: THEME.colors.textSecondary }}>/</span>
                         <span style={{ color: '#f97316' }}>{stats.sentimentCounts.atRisk}</span>
-                        <span style={{ color: C.slate }}>/</span>
+                        <span style={{ color: THEME.colors.textSecondary }}>/</span>
                         <span style={{ color: '#6b7280' }}>{stats.sentimentCounts.neutral}</span>
-                        <span style={{ color: C.slate }}>/</span>
+                        <span style={{ color: THEME.colors.textSecondary }}>/</span>
                         <span style={{ color: '#10b981' }}>{stats.sentimentCounts.good}</span>
-                        <span style={{ color: C.slate }}>/</span>
+                        <span style={{ color: THEME.colors.textSecondary }}>/</span>
                         <span style={{ color: '#059669' }}>{stats.sentimentCounts.excellent}</span>
                       </span>
                     </div>
@@ -1738,11 +1728,11 @@ function RecruitingTab() {
       })()}
 
       {/* Deals Table */}
-      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8, overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
-              <tr style={{ borderBottom: `1px solid ${C.border}`, background: C.tableHeaderBg }}>
+              <tr style={{ borderBottom: `1px solid ${THEME.colors.border}`, background: THEME.colors.surfaceSubtle }}>
                 {[
                   { key: 'dealname', label: 'Advisor / Deal' },
                   { key: 'sentiment', label: 'Sentiment' },
@@ -1755,7 +1745,7 @@ function RecruitingTab() {
                   { key: 'complexity', label: 'Complexity' },
                   { key: 'launch_date', label: 'Launch Date' },
                   { key: 'launch_status', label: 'Launch Status' },
-                  { key: 'axm', label: 'AXM', color: C.teal },
+                  { key: 'axm', label: 'AXM', color: THEME.colors.teal },
                   { key: 'axa', label: 'AXA' },
                   { key: 'ctm', label: 'CTM', color: '#2f73a8' },
                   { key: 'cta', label: 'CTA' },
@@ -1772,7 +1762,7 @@ function RecruitingTab() {
                       }
                     }}
                     style={{
-                      padding: '10px 14px', textAlign: 'left', color: col.color || C.slate, fontSize: 11,
+                      padding: '10px 14px', textAlign: 'left', color: col.color || THEME.colors.textSecondary, fontSize: 11,
                       fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em',
                       whiteSpace: 'nowrap', cursor: 'pointer', userSelect: 'none',
                     }}
@@ -1840,12 +1830,12 @@ function RecruitingTab() {
                   const cx = complexityScores[deal.id];
                   const launchDate = deal.desired_start_date ?? deal.actual_launch_date;
                   const showSeparator = i === separatorAfterIndex;
-                  const rowBg = i % 2 === 0 ? C.cardBg : C.cardBgAlt;
+                  const rowBg = i % 2 === 0 ? THEME.colors.surface : THEME.colors.surfaceHover;
                   return (
                     <tr key={deal.id} style={{
                       borderBottom: showSeparator
-                        ? `3px solid ${C.teal}`
-                        : `1px solid ${C.border}`,
+                        ? `3px solid ${THEME.colors.teal}`
+                        : `1px solid ${THEME.colors.border}`,
                       background: rowBg,
                       transition: 'background 120ms ease',
                     }}
@@ -1853,14 +1843,14 @@ function RecruitingTab() {
                       onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = rowBg; }}
                     >
                       <td style={{ padding: '10px 14px' }}>
-                        <Link href={`/command-center/advisor/${deal.id}`} style={{ fontWeight: 600, color: C.teal, textDecoration: 'none' }}>
+                        <Link href={`/command-center/advisor/${deal.id}`} style={{ fontWeight: 600, color: THEME.colors.teal, textDecoration: 'none' }}>
                           {deal.dealname}
                         </Link>
                       </td>
                       <td style={{ padding: '10px 14px' }}>
                         {(() => {
                           const sentiment = sentimentScores[deal.id];
-                          if (!sentiment) return <span style={{ color: C.slate, fontSize: 11 }}>—</span>;
+                          if (!sentiment) return <span style={{ color: THEME.colors.textSecondary, fontSize: 11 }}>—</span>;
                           return (
                             <div
                               style={{
@@ -1885,8 +1875,8 @@ function RecruitingTab() {
                           );
                         })()}
                       </td>
-                      <td style={{ padding: '10px 14px', color: C.slate }}>{deal.current_firm__cloned_ ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: C.slate }}>{deal.firm_type ? deal.firm_type.replace(/_/g, ' ') : '—'}</td>
+                      <td style={{ padding: '10px 14px', color: THEME.colors.textSecondary }}>{deal.current_firm__cloned_ ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: THEME.colors.textSecondary }}>{deal.firm_type ? deal.firm_type.replace(/_/g, ' ') : '—'}</td>
                       <td style={{ padding: '10px 14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                           <select
@@ -1930,7 +1920,7 @@ function RecruitingTab() {
                                 const sid = deal.dealstage;
                                 if (sid === '100411705') return '#5ec4cf';
                                 if (sid === '2496936') return '#fbbf24';
-                                return C.dark;
+                                return THEME.colors.text;
                               })(),
                               border: `1px solid ${(() => {
                                 const sid = deal.dealstage;
@@ -1951,21 +1941,21 @@ function RecruitingTab() {
                             target="_blank"
                             rel="noopener noreferrer"
                             title="Open in HubSpot"
-                            style={{ color: C.slate, fontSize: 12, textDecoration: 'none', opacity: 0.6, flexShrink: 0 }}
-                            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; (e.currentTarget as HTMLAnchorElement).style.color = C.teal; }}
-                            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.6'; (e.currentTarget as HTMLAnchorElement).style.color = C.slate; }}
+                            style={{ color: THEME.colors.textSecondary, fontSize: 12, textDecoration: 'none', opacity: 0.6, flexShrink: 0 }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; (e.currentTarget as HTMLAnchorElement).style.color = THEME.colors.teal; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.6'; (e.currentTarget as HTMLAnchorElement).style.color = THEME.colors.textSecondary; }}
                           >
                             ↗
                           </a>
                         </div>
                       </td>
-                      <td style={{ padding: '10px 14px', color: C.teal, fontWeight: 600 }}>
+                      <td style={{ padding: '10px 14px', color: THEME.colors.teal, fontWeight: 600 }}>
                         {formatAUM(parseFloat(deal.transferable_aum ?? '0'))}
                       </td>
                       {(() => {
                         const tranAum = managedMap[deal.id]?.total_aum || parseFloat(deal.current_value ?? '0') || aumMap[deal.id]?.actual_aum || null;
                         return (
-                          <td style={{ padding: '10px 14px', color: tranAum ? C.dark : C.slate, fontWeight: tranAum ? 600 : 400 }}>
+                          <td style={{ padding: '10px 14px', color: tranAum ? THEME.colors.text : THEME.colors.textSecondary, fontWeight: tranAum ? 600 : 400 }}>
                             {tranAum ? formatAUM(tranAum) : '—'}
                           </td>
                         );
@@ -1974,13 +1964,13 @@ function RecruitingTab() {
                         const managedRevenue = managedMap[deal.id]?.revenue || null;
                         const revenue = managedRevenue || parseFloat(deal.t12_revenue ?? '0') || parseFloat(deal.fee_based_revenue ?? '0') || aumMap[deal.id]?.current_revenue || null;
                         return (
-                          <td style={{ padding: '10px 14px', color: revenue ? C.green : C.slate, fontWeight: revenue ? 600 : 400 }}>
+                          <td style={{ padding: '10px 14px', color: revenue ? THEME.colors.success : THEME.colors.textSecondary, fontWeight: revenue ? 600 : 400 }}>
                             {revenue ? formatAUM(revenue) : '—'}
                           </td>
                         );
                       })()}
                       <td style={{ padding: '10px 14px' }}>
-                        {cx ? <ComplexityBadge score={cx.score} tier={cx.tier} tierColor={cx.tierColor} /> : <span style={{ color: C.slate, fontSize: 11 }}>…</span>}
+                        {cx ? <ComplexityBadge score={cx.score} tier={cx.tier} tierColor={cx.tierColor} /> : <span style={{ color: THEME.colors.textSecondary, fontSize: 11 }}>…</span>}
                       </td>
                       <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
                         <input
@@ -2014,22 +2004,22 @@ function RecruitingTab() {
                           style={{
                             background: 'transparent', border: `1px solid transparent`,
                             borderRadius: 4, padding: '2px 4px', fontSize: 12,
-                            color: C.slate, cursor: 'pointer', outline: 'none',
+                            color: THEME.colors.textSecondary, cursor: 'pointer', outline: 'none',
                             fontFamily: "'Inter', system-ui, sans-serif",
                             width: 120,
                           }}
-                          onFocus={e => { (e.target as HTMLInputElement).style.borderColor = C.teal; }}
+                          onFocus={e => { (e.target as HTMLInputElement).style.borderColor = THEME.colors.teal; }}
                           onBlur={e => { (e.target as HTMLInputElement).style.borderColor = 'transparent'; }}
                         />
                       </td>
                       <td style={{ padding: '10px 14px' }}>
                         <LaunchTimer deal={deal} />
                       </td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXM ? getNameColor(teamAssignments[deal.id].AXM, C.slate) : C.slate, fontWeight: teamAssignments[deal.id]?.AXM ? 600 : 400 }}>{teamAssignments[deal.id]?.AXM ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXA ? getNameColor(teamAssignments[deal.id].AXA, C.slate) : C.slate, fontWeight: teamAssignments[deal.id]?.AXA ? 600 : 400 }}>{teamAssignments[deal.id]?.AXA ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTM ? getNameColor(teamAssignments[deal.id].CTM, C.slate) : C.slate, fontWeight: teamAssignments[deal.id]?.CTM ? 600 : 400 }}>{teamAssignments[deal.id]?.CTM ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTA ? getNameColor(teamAssignments[deal.id].CTA, C.slate) : C.slate, fontWeight: teamAssignments[deal.id]?.CTA ? 600 : 400 }}>{teamAssignments[deal.id]?.CTA ?? '—'}</td>
-                      <td style={{ padding: '10px 14px', color: deal.ownerName ? getNameColor(deal.ownerName, C.slate) : C.slate, fontWeight: deal.ownerName ? 600 : 400 }}>{deal.ownerName ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXM ? getNameColor(teamAssignments[deal.id].AXM, THEME.colors.textSecondary) : THEME.colors.textSecondary, fontWeight: teamAssignments[deal.id]?.AXM ? 600 : 400 }}>{teamAssignments[deal.id]?.AXM ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXA ? getNameColor(teamAssignments[deal.id].AXA, THEME.colors.textSecondary) : THEME.colors.textSecondary, fontWeight: teamAssignments[deal.id]?.AXA ? 600 : 400 }}>{teamAssignments[deal.id]?.AXA ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTM ? getNameColor(teamAssignments[deal.id].CTM, THEME.colors.textSecondary) : THEME.colors.textSecondary, fontWeight: teamAssignments[deal.id]?.CTM ? 600 : 400 }}>{teamAssignments[deal.id]?.CTM ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.CTA ? getNameColor(teamAssignments[deal.id].CTA, THEME.colors.textSecondary) : THEME.colors.textSecondary, fontWeight: teamAssignments[deal.id]?.CTA ? 600 : 400 }}>{teamAssignments[deal.id]?.CTA ?? '—'}</td>
+                      <td style={{ padding: '10px 14px', color: deal.ownerName ? getNameColor(deal.ownerName, THEME.colors.textSecondary) : THEME.colors.textSecondary, fontWeight: deal.ownerName ? 600 : 400 }}>{deal.ownerName ?? '—'}</td>
                     </tr>
                   );
                 });
@@ -2046,12 +2036,11 @@ function RecruitingTab() {
 // ACQUISITIONS TAB
 // ══════════════════════════════════════════════════════════════════════════════
 function AcquisitionsTab() {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   const { data, error, isLoading } = useSWR('/api/command-center/acquisitions', fetcher, SWR_OPTS);
 
-  if (isLoading) return <div style={{ padding: '60px 0', color: C.slate }}>Loading acquisitions…</div>;
-  if (error || data?.error) return <div style={{ padding: '60px 0', color: C.red }}>Failed to load acquisitions data.</div>;
+  if (isLoading) return <div style={{ padding: '60px 0', color: THEME.colors.textSecondary }}>Loading acquisitions…</div>;
+  if (error || data?.error) return <div style={{ padding: '60px 0', color: THEME.colors.error }}>Failed to load acquisitions data.</div>;
 
   const deals: AcquisitionsDeal[] = data?.deals ?? [];
   const stages: AcquisitionsStage[] = data?.stages ?? [];
@@ -2078,8 +2067,8 @@ function AcquisitionsTab() {
         {stages.filter(s => s.count > 0).map(stage => (
           <div key={stage.id} style={{
             padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500,
-            background: stage.isTerminal ? C.redBg : 'rgba(91,106,113,0.08)',
-            color: stage.isTerminal ? C.red : C.slate,
+            background: stage.isTerminal ? THEME.colors.errorBg : 'rgba(91,106,113,0.08)',
+            color: stage.isTerminal ? THEME.colors.error : THEME.colors.textSecondary,
           }}>
             {stage.label} · {stage.count}
           </div>
@@ -2087,13 +2076,13 @@ function AcquisitionsTab() {
       </div>
 
       {/* Deals Table */}
-      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8, overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
-              <tr style={{ borderBottom: `1px solid ${C.border}`, background: C.tableHeaderBg }}>
+              <tr style={{ borderBottom: `1px solid ${THEME.colors.border}`, background: THEME.colors.surfaceSubtle }}>
                 {['Deal Name', 'Prior Firm', 'Type', 'Stage', 'Exp. AUM', 'Households', 'Target Date', 'Owner'].map(h => (
-                  <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: C.slate, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
+                  <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: THEME.colors.textSecondary, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
                     {h}
                   </th>
                 ))}
@@ -2104,35 +2093,35 @@ function AcquisitionsTab() {
                 const rowOpacity = deal.isTerminal ? 0.6 : 1;
                 return (
                   <tr key={deal.id} style={{
-                    borderBottom: `1px solid ${C.border}`,
-                    background: deal.isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? C.cardBg : 'rgba(248,244,240,0.03)',
+                    borderBottom: `1px solid ${THEME.colors.border}`,
+                    background: deal.isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? THEME.colors.surface : 'rgba(248,244,240,0.03)',
                     opacity: rowOpacity,
                     transition: 'background 120ms ease',
                   }}
                     onMouseEnter={e => { if (!deal.isTerminal) (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(29,118,130,0.06)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = deal.isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? C.cardBg : 'rgba(248,244,240,0.03)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = deal.isTerminal ? 'rgba(192,57,43,0.03)' : i % 2 === 0 ? THEME.colors.surface : 'rgba(248,244,240,0.03)'; }}
                   >
                     <td style={{ padding: '10px 14px' }}>
                       <Link
                         href={`/command-center/advisor/${deal.id}`}
-                        style={{ fontWeight: 600, color: deal.isTerminal ? C.slate : C.teal, textDecoration: deal.isTerminal ? 'line-through' : 'none' }}
+                        style={{ fontWeight: 600, color: deal.isTerminal ? THEME.colors.textSecondary : THEME.colors.teal, textDecoration: deal.isTerminal ? 'line-through' : 'none' }}
                       >
                         {deal.dealname}
                       </Link>
                     </td>
-                    <td style={{ padding: '10px 14px', color: C.slate }}>{deal.current_firm__cloned_ ?? '—'}</td>
-                    <td style={{ padding: '10px 14px', color: C.slate }}>{deal.firm_type ? deal.firm_type.replace(/_/g, ' ') : '—'}</td>
+                    <td style={{ padding: '10px 14px', color: THEME.colors.textSecondary }}>{deal.current_firm__cloned_ ?? '—'}</td>
+                    <td style={{ padding: '10px 14px', color: THEME.colors.textSecondary }}>{deal.firm_type ? deal.firm_type.replace(/_/g, ' ') : '—'}</td>
                     <td style={{ padding: '10px 14px' }}>
                       <StageBadge stageId={deal.dealstage} label={deal.stageLabel} isTerminal={deal.isTerminal} />
                     </td>
-                    <td style={{ padding: '10px 14px', color: deal.isTerminal ? C.slate : C.teal, fontWeight: 600 }}>
+                    <td style={{ padding: '10px 14px', color: deal.isTerminal ? THEME.colors.textSecondary : THEME.colors.teal, fontWeight: 600 }}>
                       {formatAUM(parseFloat(deal.transferable_aum ?? '0'))}
                     </td>
-                    <td style={{ padding: '10px 14px', color: C.slate }}>{deal.client_households ?? '—'}</td>
-                    <td style={{ padding: '10px 14px', color: C.slate }}>
+                    <td style={{ padding: '10px 14px', color: THEME.colors.textSecondary }}>{deal.client_households ?? '—'}</td>
+                    <td style={{ padding: '10px 14px', color: THEME.colors.textSecondary }}>
                       {formatDate(deal.desired_start_date)}
                     </td>
-                    <td style={{ padding: '10px 14px', color: deal.ownerName ? getNameColor(deal.ownerName, C.slate) : C.slate, fontWeight: deal.ownerName ? 600 : 400 }}>{deal.ownerName ?? '—'}</td>
+                    <td style={{ padding: '10px 14px', color: deal.ownerName ? getNameColor(deal.ownerName, THEME.colors.textSecondary) : THEME.colors.textSecondary, fontWeight: deal.ownerName ? 600 : 400 }}>{deal.ownerName ?? '—'}</td>
                   </tr>
                 );
               })}
@@ -2150,8 +2139,7 @@ function AcquisitionsTab() {
 type TabKey = 'recruiting' | 'acquisitions';
 
 export default function PipelineDashboard() {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   const [activeTab, setActiveTab] = useState<TabKey>('recruiting');
 
   // Fire-and-forget: warm all caches in background on first load
@@ -2170,17 +2158,17 @@ export default function PipelineDashboard() {
       <div style={{ position: 'relative', marginBottom: 24 }}>
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />
         <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 6 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 6 }}>
             Pipeline Dashboard
           </h1>
-          <p style={{ color: C.slate, fontSize: 14 }}>
+          <p style={{ color: THEME.colors.textSecondary, fontSize: 14 }}>
             Live HubSpot data · refreshes every 30s
           </p>
         </div>
       </div>
 
       {/* Tab Bar */}
-      <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${C.border}`, marginBottom: 32 }}>
+      <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${THEME.colors.border}`, marginBottom: 32 }}>
         {tabs.map(tab => {
           const isActive = activeTab === tab.key;
           return (
@@ -2189,20 +2177,20 @@ export default function PipelineDashboard() {
               onClick={() => setActiveTab(tab.key)}
               style={{
                 padding: '12px 24px', background: 'none', border: 'none',
-                borderBottom: `2px solid ${isActive ? C.teal : 'transparent'}`,
+                borderBottom: `2px solid ${isActive ? THEME.colors.teal : 'transparent'}`,
                 marginBottom: -2, cursor: 'pointer', transition: 'all 150ms ease',
               }}
             >
               <span style={{
                 fontSize: 14, fontWeight: isActive ? 600 : 400,
-                color: isActive ? C.teal : C.slate,
+                color: isActive ? THEME.colors.teal : THEME.colors.textSecondary,
                 fontFamily: "'Inter', system-ui, sans-serif",
               }}>
                 {tab.label}
               </span>
               <span style={{
                 display: 'block', fontSize: 11,
-                color: isActive ? C.teal : C.slate,
+                color: isActive ? THEME.colors.teal : THEME.colors.textSecondary,
                 opacity: 0.6, marginTop: 2,
               }}>
                 {tab.sublabel}

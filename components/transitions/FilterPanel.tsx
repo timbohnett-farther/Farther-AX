@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import useSWR from 'swr';
 import { SearchSelect } from './SearchSelect';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -23,8 +22,7 @@ interface FilterPanelProps {
 }
 
 export function FilterPanel({ filters, onChange, onReset }: FilterPanelProps) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   const { data: advisorData } = useSWR('/api/command-center/transitions/filters/advisors', fetcher, {
     revalidateOnFocus: false,
@@ -47,8 +45,8 @@ export function FilterPanel({ filters, onChange, onReset }: FilterPanelProps) {
   const hasActiveFilters = filters.advisor || filters.iaa_status || filters.pw_status || filters.portal_status || filters.household;
 
   const selectStyle: React.CSSProperties = {
-    padding: '9px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
-    fontSize: 13, background: C.cardBg, color: C.dark, cursor: 'pointer',
+    padding: '9px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
+    fontSize: 13, background: THEME.colors.surface, color: THEME.colors.text, cursor: 'pointer',
     outline: 'none', fontFamily: "'Inter', system-ui, sans-serif",
     minWidth: 140,
   };
@@ -108,8 +106,8 @@ export function FilterPanel({ filters, onChange, onReset }: FilterPanelProps) {
         value={filters.household}
         onChange={e => onChange({ household: e.target.value })}
         style={{
-          padding: '9px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
-          fontSize: 13, background: C.cardBg, color: C.dark, outline: 'none',
+          padding: '9px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
+          fontSize: 13, background: THEME.colors.surface, color: THEME.colors.text, outline: 'none',
           fontFamily: "'Inter', system-ui, sans-serif", minWidth: 180,
         }}
       />
@@ -119,8 +117,8 @@ export function FilterPanel({ filters, onChange, onReset }: FilterPanelProps) {
         <button
           onClick={onReset}
           style={{
-            padding: '9px 14px', borderRadius: 8, border: `1px solid ${C.border}`,
-            background: 'transparent', color: C.slate, fontSize: 12, cursor: 'pointer',
+            padding: '9px 14px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
+            background: 'transparent', color: THEME.colors.textSecondary, fontSize: 12, cursor: 'pointer',
             fontFamily: "'Inter', system-ui, sans-serif",
           }}
         >

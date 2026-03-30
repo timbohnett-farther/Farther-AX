@@ -1,12 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useMemo } from 'react';
 import useSWR from 'swr';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/design-tokens';
 import { ProgressBar } from './StatusPill';
-import { colors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -28,14 +25,13 @@ interface ExecutiveSummaryProps {
 }
 
 export function ExecutiveSummary({ onAdvisorClick }: ExecutiveSummaryProps) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   const { data, isLoading } = useSWR('/api/command-center/transitions/executive-summary', fetcher, { revalidateOnFocus: false });
   const [sortCol, setSortCol] = useState<string>('advisor_name');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   if (isLoading) return (
-    <div className="p-10 text-center text-text-secondary">
+    <div style={{ padding: 40, textAlign: 'center', color: THEME.colors.textSecondary }}>
       Loading executive summary...
     </div>
   );
@@ -66,17 +62,21 @@ export function ExecutiveSummary({ onAdvisorClick }: ExecutiveSummaryProps) {
   ];
 
   return (
-    <div className="glass-card overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-[13px]">
+    <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 16, overflow: 'hidden', boxShadow: THEME.shadows.md }}>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
-            <tr className="border-b border-border">
+            <tr style={{ borderBottom: `1px solid ${THEME.colors.border}` }}>
               {cols.map(col => (
                 <th
                   key={col.key}
                   onClick={() => handleSort(col.key)}
-                  className="px-3.5 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.06em] cursor-pointer select-none whitespace-nowrap text-text-secondary"
-                  style={col.width ? { width: col.width } : undefined}
+                  style={{
+                    padding: '14px', textAlign: 'left', fontSize: 11, fontWeight: 600,
+                    textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer',
+                    userSelect: 'none', whiteSpace: 'nowrap', color: THEME.colors.textSecondary,
+                    width: col.width,
+                  }}
                 >
                   {col.label} {sortCol === col.key ? (sortDir === 'asc' ? '\u25B2' : '\u25BC') : ''}
                 </th>
@@ -87,27 +87,31 @@ export function ExecutiveSummary({ onAdvisorClick }: ExecutiveSummaryProps) {
             {sorted.map((adv) => (
               <tr
                 key={adv.advisor_name}
-                className={`border-b border-border transition-colors duration-[120ms] ${onAdvisorClick ? 'cursor-pointer' : ''}`}
+                style={{
+                  borderBottom: `1px solid ${THEME.colors.border}`,
+                  transition: 'background-color 120ms ease',
+                  cursor: onAdvisorClick ? 'pointer' : 'default',
+                }}
                 onClick={() => onAdvisorClick?.(adv.advisor_name)}
                 onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = 'rgba(59,90,105,0.06)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = ''; }}
               >
-                <td className="px-3.5 py-3 font-semibold text-teal">{adv.advisor_name}</td>
-                <td className="px-3.5 py-3">{adv.total_accounts}</td>
-                <td className="px-3.5 py-3">{adv.total_households}</td>
-                <td className="px-3.5 py-3 min-w-[120px]">
+                <td style={{ padding: '14px', fontWeight: 600, color: THEME.colors.teal }}>{adv.advisor_name}</td>
+                <td style={{ padding: '14px', color: THEME.colors.text }}>{adv.total_accounts}</td>
+                <td style={{ padding: '14px', color: THEME.colors.text }}>{adv.total_households}</td>
+                <td style={{ padding: '14px', minWidth: 120 }}>
                   <ProgressBar pct={adv.iaa_pct} />
                 </td>
-                <td className="px-3.5 py-3 min-w-[120px]">
+                <td style={{ padding: '14px', minWidth: 120 }}>
                   <ProgressBar pct={adv.paperwork_pct} />
                 </td>
-                <td className="px-3.5 py-3 min-w-[120px]">
+                <td style={{ padding: '14px', minWidth: 120 }}>
                   <ProgressBar pct={adv.portal_pct} />
                 </td>
-                <td className="px-3.5 py-3 min-w-[120px]">
+                <td style={{ padding: '14px', minWidth: 120 }}>
                   <ProgressBar
                     pct={adv.overall_pct}
-                    color={adv.overall_pct >= 80 ? colors.success : adv.overall_pct >= 40 ? colors.warning : colors.danger}
+                    color={adv.overall_pct >= 80 ? THEME.colors.success : adv.overall_pct >= 40 ? THEME.colors.warning : THEME.colors.error}
                   />
                 </td>
               </tr>

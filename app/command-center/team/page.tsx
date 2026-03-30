@@ -5,8 +5,6 @@ import useSWR, { mutate } from 'swr';
 import Image from 'next/image';
 import { DataCard, StatusBadge } from '@/components/ui';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/design-tokens';
-
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 const ROLES = ['AXM', 'AXA', 'CTM', 'CTA', 'Recruiter', 'CX Manager', 'Compliance', 'RIA Leadership', 'Director'] as const;
@@ -75,8 +73,7 @@ function MemberForm({
   onSave: (data: Partial<TeamMember>) => Promise<void>;
   onCancel: () => void;
 }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   const [name, setName] = useState(initial?.name ?? '');
   const [email, setEmail] = useState(initial?.email ?? '');
@@ -114,16 +111,16 @@ function MemberForm({
     <DataCard className="mb-6">
       <form onSubmit={handleSubmit}>
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-base font-semibold" style={{ color: C.cream }}>
+          <h3 className="text-base font-semibold" style={{ color: THEME.colors.text }}>
             {initial ? 'Edit Team Member' : 'Add Team Member'}
           </h3>
           <button
             type="button"
             onClick={onCancel}
             className="bg-transparent border-none text-lg cursor-pointer"
-            style={{ color: C.slate }}
-            onMouseEnter={(e) => e.currentTarget.style.color = C.cream}
-            onMouseLeave={(e) => e.currentTarget.style.color = C.slate}
+            style={{ color: THEME.colors.textSecondary }}
+            onMouseEnter={(e) => e.currentTarget.style.color = THEME.colors.text}
+            onMouseLeave={(e) => e.currentTarget.style.color = THEME.colors.textSecondary}
           >
             ×
           </button>
@@ -131,15 +128,15 @@ function MemberForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: C.slate }}>
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: THEME.colors.textSecondary }}>
               Full Name *
             </label>
             <input
               className="w-full px-3 py-2 rounded-md border text-sm focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               style={{
-                backgroundColor: C.cardBg,
-                color: C.cream,
-                borderColor: C.border
+                backgroundColor: THEME.colors.surface,
+                color: THEME.colors.text,
+                borderColor: THEME.colors.border
               }}
               value={name}
               onChange={e => setName(e.target.value)}
@@ -147,16 +144,16 @@ function MemberForm({
             />
           </div>
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: C.slate }}>
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: THEME.colors.textSecondary }}>
               Email *
             </label>
             <input
               type="email"
               className="w-full px-3 py-2 rounded-md border text-sm focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               style={{
-                backgroundColor: C.cardBg,
-                color: C.cream,
-                borderColor: C.border
+                backgroundColor: THEME.colors.surface,
+                color: THEME.colors.text,
+                borderColor: THEME.colors.border
               }}
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -164,15 +161,15 @@ function MemberForm({
             />
           </div>
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: C.slate }}>
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: THEME.colors.textSecondary }}>
               Role *
             </label>
             <select
               className="w-full px-3 py-2 rounded-md border text-sm focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               style={{
-                backgroundColor: C.cardBg,
-                color: C.cream,
-                borderColor: C.border
+                backgroundColor: THEME.colors.surface,
+                color: THEME.colors.text,
+                borderColor: THEME.colors.border
               }}
               value={role}
               onChange={e => setRole(e.target.value)}
@@ -183,15 +180,15 @@ function MemberForm({
             </select>
           </div>
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: C.slate }}>
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: THEME.colors.textSecondary }}>
               Phone
             </label>
             <input
               className="w-full px-3 py-2 rounded-md border text-sm focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               style={{
-                backgroundColor: C.cardBg,
-                color: C.cream,
-                borderColor: C.border
+                backgroundColor: THEME.colors.surface,
+                color: THEME.colors.text,
+                borderColor: THEME.colors.border
               }}
               value={phone}
               onChange={e => setPhone(e.target.value)}
@@ -199,15 +196,15 @@ function MemberForm({
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: C.slate }}>
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: THEME.colors.textSecondary }}>
               Calendar Link
             </label>
             <input
               className="w-full px-3 py-2 rounded-md border text-sm focus:border-teal focus:ring-1 focus:ring-teal outline-hidden"
               style={{
-                backgroundColor: C.cardBg,
-                color: C.cream,
-                borderColor: C.border
+                backgroundColor: THEME.colors.surface,
+                color: THEME.colors.text,
+                borderColor: THEME.colors.border
               }}
               value={calendarLink}
               onChange={e => setCalendarLink(e.target.value)}
@@ -216,7 +213,7 @@ function MemberForm({
           </div>
         </div>
 
-        {error && <p style={{ color: C.red }} className="text-xs mb-3">{error}</p>}
+        {error && <p style={{ color: THEME.colors.error }} className="text-xs mb-3">{error}</p>}
 
         <div className="flex gap-2.5">
           <button
@@ -224,8 +221,8 @@ function MemberForm({
             disabled={saving}
             className="px-5 py-2 rounded-md text-sm font-semibold border-none cursor-pointer hover:opacity-90 transition-smooth disabled:opacity-70 disabled:cursor-wait"
             style={{
-              backgroundColor: C.teal,
-              color: C.white
+              backgroundColor: THEME.colors.teal,
+              color: "#FFFFFF"
             }}
           >
             {saving ? 'Saving…' : initial ? 'Update' : 'Add Member'}
@@ -235,9 +232,9 @@ function MemberForm({
             onClick={onCancel}
             className="px-5 py-2 rounded-md text-sm font-medium border cursor-pointer hover:opacity-80 transition-smooth"
             style={{
-              backgroundColor: C.cardBg,
-              color: C.slate,
-              borderColor: C.border
+              backgroundColor: THEME.colors.surface,
+              color: THEME.colors.textSecondary,
+              borderColor: THEME.colors.border
             }}
           >
             Cancel
@@ -254,8 +251,7 @@ function MemberForm({
  * Migrated to Tremor components and Tailwind utilities
  */
 export default function TeamPage() {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   const { data, error, isLoading } = useSWR('/api/command-center/team', fetcher, { refreshInterval: 43_200_000 });
 
@@ -331,7 +327,7 @@ export default function TeamPage() {
       {[1,2,3,4,5].map(i => <div key={i} className="shimmer h-16 rounded-lg" />)}
     </div>
   );
-  if (error) return <div className="px-10 py-16" style={{ color: C.red }}>Failed to load team data.</div>;
+  if (error) return <div className="px-10 py-16" style={{ color: THEME.colors.error }}>Failed to load team data.</div>;
 
   return (
     <div className="px-10 py-10 min-h-screen bg-transparent font-sans">
@@ -339,10 +335,10 @@ export default function TeamPage() {
       <div className="relative mb-6">
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} className="absolute top-0 right-0 opacity-50" />
         <div className="text-center mb-4">
-          <h1 className="text-3xl font-bold font-serif mb-2" style={{ color: C.cream }}>
+          <h1 className="text-3xl font-bold font-serif mb-2" style={{ color: THEME.colors.text }}>
             Team Management
           </h1>
-          <p className="text-sm" style={{ color: C.slate }}>
+          <p className="text-sm" style={{ color: THEME.colors.textSecondary }}>
             Manage AX team members · Assign to advisors
           </p>
         </div>
@@ -352,8 +348,8 @@ export default function TeamPage() {
               onClick={() => { setShowForm(true); setEditMember(null); }}
               className="px-5 py-2.5 rounded-md text-sm font-semibold border-none cursor-pointer hover:opacity-90 transition-smooth"
               style={{
-                backgroundColor: C.teal,
-                color: C.white
+                backgroundColor: THEME.colors.teal,
+                color: "#FFFFFF"
               }}
             >
               + Add Team Member
@@ -383,20 +379,20 @@ export default function TeamPage() {
               onClick={() => setFilterRole(isActive ? 'all' : role)}
               className="px-3 py-3.5 rounded-lg border text-center cursor-pointer transition-smooth"
               style={{
-                backgroundColor: isActive ? style.bg.replace('bg-', '').replace('/10', '') + '10' : C.cardBg,
-                borderColor: isActive ? style.hex : C.border
+                backgroundColor: isActive ? style.bg.replace('bg-', '').replace('/10', '') + '10' : THEME.colors.surface,
+                borderColor: isActive ? style.hex : THEME.colors.border
               }}
               onMouseEnter={(e) => {
-                if (!isActive) e.currentTarget.style.backgroundColor = C.cardBgHover;
+                if (!isActive) e.currentTarget.style.backgroundColor = THEME.colors.surfaceHover;
               }}
               onMouseLeave={(e) => {
-                if (!isActive) e.currentTarget.style.backgroundColor = C.cardBg;
+                if (!isActive) e.currentTarget.style.backgroundColor = THEME.colors.surface;
               }}
             >
               <div className="text-2xl font-bold font-serif tabular-nums" style={{ color: style.hex }}>
                 {roleCounts[role]}
               </div>
-              <div className="text-[11px] font-semibold mt-0.5" style={{ color: isActive ? style.hex : C.slate }}>
+              <div className="text-[11px] font-semibold mt-0.5" style={{ color: isActive ? style.hex : THEME.colors.textSecondary }}>
                 {role}
               </div>
             </button>
@@ -406,11 +402,11 @@ export default function TeamPage() {
 
       {/* Filters */}
       <div className="flex justify-between items-center mb-4">
-        <div className="text-sm" style={{ color: C.slate }}>
+        <div className="text-sm" style={{ color: THEME.colors.textSecondary }}>
           {filteredMembers.length} member{filteredMembers.length !== 1 ? 's' : ''}
           {filterRole !== 'all' && ` · filtered by ${filterRole}`}
         </div>
-        <label className="text-xs cursor-pointer flex items-center gap-1.5" style={{ color: C.slate }}>
+        <label className="text-xs cursor-pointer flex items-center gap-1.5" style={{ color: THEME.colors.textSecondary }}>
           <input
             type="checkbox"
             checked={showInactive}
@@ -424,7 +420,7 @@ export default function TeamPage() {
       {/* Team Members */}
       {filteredMembers.length === 0 ? (
         <DataCard className="text-center py-10">
-          <p className="text-sm" style={{ color: C.slate }}>
+          <p className="text-sm" style={{ color: THEME.colors.textSecondary }}>
             {members.length === 0 ? 'No team members yet. Click "Add Team Member" to get started.' : 'No members match the current filter.'}
           </p>
         </DataCard>
@@ -456,21 +452,21 @@ export default function TeamPage() {
                     className="px-5 py-3.5 border-b flex items-center justify-between"
                     style={{
                       backgroundColor: roleStyle.hex + '15',
-                      borderColor: C.border
+                      borderColor: THEME.colors.border
                     }}
                   >
                     <div className="flex items-center gap-2.5">
                       <span className="text-base font-bold font-serif" style={{ color: roleStyle.hex }}>
                         {group.role}
                       </span>
-                      <span className="text-xs" style={{ color: C.slate }}>
+                      <span className="text-xs" style={{ color: THEME.colors.textSecondary }}>
                         {roleDesc}
                       </span>
                     </div>
                     <span
                       className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
                       style={{
-                        backgroundColor: C.tableHeaderBg,
+                        backgroundColor: THEME.colors.surfaceSubtle,
                         color: roleStyle.hex
                       }}
                     >
@@ -481,12 +477,12 @@ export default function TeamPage() {
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                        <tr style={{ borderBottom: `1px solid ${THEME.colors.border}` }}>
                           {['Name', 'Email', 'Phone', 'Calendar', 'Status', ''].map(h => (
                             <th
                               key={h}
                               className="px-3.5 py-2 text-left text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap"
-                              style={{ color: C.slate }}
+                              style={{ color: THEME.colors.textSecondary }}
                             >
                               {h}
                             </th>
@@ -495,13 +491,13 @@ export default function TeamPage() {
                       </thead>
                       <tbody>
                         {group.members.map((member, i) => {
-                          const rowBg = i % 2 === 0 ? C.cardBg : C.cardBgAlt;
+                          const rowBg = i % 2 === 0 ? THEME.colors.surface : THEME.colors.surfaceHover;
                           return (
                             <tr
                               key={member.id}
                               className={!member.active ? 'opacity-50' : ''}
                               style={{
-                                borderBottom: `1px solid ${C.border}`,
+                                borderBottom: `1px solid ${THEME.colors.border}`,
                                 background: rowBg
                               }}
                             >
@@ -509,21 +505,21 @@ export default function TeamPage() {
                                 {member.name}
                               </td>
                               <td className="px-3.5 py-2.5">
-                                <a href={`mailto:${member.email}`} className="no-underline hover:underline" style={{ color: C.teal }}>
+                                <a href={`mailto:${member.email}`} className="no-underline hover:underline" style={{ color: THEME.colors.teal }}>
                                   {member.email}
                                 </a>
                               </td>
-                              <td className="px-3.5 py-2.5" style={{ color: C.slate }}>
+                              <td className="px-3.5 py-2.5" style={{ color: THEME.colors.textSecondary }}>
                                 {member.phone || '—'}
                               </td>
                               <td className="px-3.5 py-2.5">
                                 {member.calendar_link ? (
                                   <a href={member.calendar_link} target="_blank" rel="noopener noreferrer"
-                                    className="no-underline text-xs hover:underline" style={{ color: C.teal }}>
+                                    className="no-underline text-xs hover:underline" style={{ color: THEME.colors.teal }}>
                                     View Calendar
                                   </a>
                                 ) : (
-                                  <span style={{ color: C.slate }}>—</span>
+                                  <span style={{ color: THEME.colors.textSecondary }}>—</span>
                                 )}
                               </td>
                               <td className="px-3.5 py-2.5">
@@ -536,7 +532,7 @@ export default function TeamPage() {
                                 <button
                                   onClick={() => { setEditMember(member); setShowForm(false); }}
                                   className="bg-transparent border-none text-xs font-medium cursor-pointer mr-3 hover:underline"
-                                  style={{ color: C.teal }}
+                                  style={{ color: THEME.colors.teal }}
                                 >
                                   Edit
                                 </button>
@@ -544,7 +540,7 @@ export default function TeamPage() {
                                   <button
                                     onClick={() => handleDeactivate(member)}
                                     className="bg-transparent border-none text-xs font-medium cursor-pointer hover:underline"
-                                    style={{ color: C.red }}
+                                    style={{ color: THEME.colors.error }}
                                   >
                                     Deactivate
                                   </button>
@@ -552,7 +548,7 @@ export default function TeamPage() {
                                   <button
                                     onClick={() => handleReactivate(member)}
                                     className="bg-transparent border-none text-xs font-medium cursor-pointer hover:underline"
-                                    style={{ color: C.green }}
+                                    style={{ color: THEME.colors.success }}
                                   >
                                     Reactivate
                                   </button>

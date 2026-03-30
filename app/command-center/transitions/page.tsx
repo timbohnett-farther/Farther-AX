@@ -16,8 +16,6 @@ import { ChangeLogPanel } from '@/components/transitions/ChangeLogPanel';
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // Using centralized theme colors
-import { getThemeColors } from '@/lib/design-tokens';
-
 type TabKey = 'accounts' | 'docusign' | 'summary' | 'changelog';
 
 const TABS: { key: TabKey; label: string; sub: string }[] = [
@@ -38,8 +36,7 @@ interface Filters {
 const EMPTY_FILTERS: Filters = { advisor: '', iaa_status: '', pw_status: '', portal_status: '', household: '' };
 
 function TransitionsPageInner() {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -327,16 +324,16 @@ function TransitionsPageInner() {
     <div style={{ padding: '32px 40px', maxWidth: '100vw', overflow: 'hidden' }}>
       {/* ── Header ────────────────────────────────────────────────────────────── */}
       <div style={{ marginBottom: 20 }}>
-        <Link href="/command-center" style={{ fontSize: 13, color: C.slate, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+        <Link href="/command-center" style={{ fontSize: 13, color: THEME.colors.textSecondary, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
           &larr; Back to Pipeline
         </Link>
         <div style={{ position: 'relative', margin: '8px 0 4px' }}>
           <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />
           <div style={{ textAlign: 'center' }}>
-            <h1 style={{ fontSize: 28, fontWeight: 700, color: C.dark, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 6 }}>
+            <h1 style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 6 }}>
               Client Transition Dashboard
             </h1>
-            <p style={{ fontSize: 14, color: C.slate, margin: 0 }}>
+            <p style={{ fontSize: 14, color: THEME.colors.textSecondary, margin: 0 }}>
               Last synced: {formatSyncAge(data?.lastSyncedAt)}
             </p>
           </div>
@@ -346,31 +343,31 @@ function TransitionsPageInner() {
       {/* ── Controls Row ──────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
         <button onClick={() => setShowSyncPanel(!showSyncPanel)} style={{
-          padding: '7px 14px', borderRadius: 6, border: 'none', background: C.teal,
+          padding: '7px 14px', borderRadius: 6, border: 'none', background: THEME.colors.teal,
           color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer',
         }}>
           &darr; Sync from Sheet
         </button>
         <button onClick={handleSyncTeamMappings} disabled={syncingTeamMappings} style={{
-          padding: '7px 14px', borderRadius: 6, border: `1px solid ${C.border}`,
-          background: syncingTeamMappings ? C.cardBg : 'transparent',
-          color: syncingTeamMappings ? C.slate : C.dark, fontSize: 12, fontWeight: 600,
+          padding: '7px 14px', borderRadius: 6, border: `1px solid ${THEME.colors.border}`,
+          background: syncingTeamMappings ? THEME.colors.surface : 'transparent',
+          color: syncingTeamMappings ? THEME.colors.textSecondary : THEME.colors.text, fontSize: 12, fontWeight: 600,
           cursor: syncingTeamMappings ? 'not-allowed' : 'pointer',
         }}>
           {syncingTeamMappings ? 'Syncing...' : '\u2728 Sync Team Mappings'}
         </button>
         <button onClick={handleSyncTranAum} disabled={syncingTranAum} style={{
-          padding: '7px 14px', borderRadius: 6, border: `1px solid ${C.border}`,
-          background: syncingTranAum ? C.cardBg : 'transparent',
-          color: syncingTranAum ? C.slate : C.dark, fontSize: 12, fontWeight: 600,
+          padding: '7px 14px', borderRadius: 6, border: `1px solid ${THEME.colors.border}`,
+          background: syncingTranAum ? THEME.colors.surface : 'transparent',
+          color: syncingTranAum ? THEME.colors.textSecondary : THEME.colors.text, fontSize: 12, fontWeight: 600,
           cursor: syncingTranAum ? 'not-allowed' : 'pointer',
         }}>
           {syncingTranAum ? 'Syncing...' : '💰 Sync TRAN AUM'}
         </button>
         <button onClick={handleDocuSignFetch} disabled={docusignLoading} style={{
-          padding: '7px 14px', borderRadius: 6, border: `1px solid ${C.border}`,
-          background: docusignLoading ? C.cardBg : 'transparent',
-          color: docusignLoading ? C.slate : C.dark, fontSize: 12, fontWeight: 600,
+          padding: '7px 14px', borderRadius: 6, border: `1px solid ${THEME.colors.border}`,
+          background: docusignLoading ? THEME.colors.surface : 'transparent',
+          color: docusignLoading ? THEME.colors.textSecondary : THEME.colors.text, fontSize: 12, fontWeight: 600,
           cursor: docusignLoading ? 'not-allowed' : 'pointer',
         }}>
           {docusignLoading ? 'Loading...' : docusignConnected ? '\u2713 DocuSign Connected' : '\u270E DocuSign Status'}
@@ -379,21 +376,21 @@ function TransitionsPageInner() {
 
       {/* ── Sync Panel ────────────────────────────────────────────────────────── */}
       {showSyncPanel && (
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 16, marginBottom: 16 }}>
+        <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8, padding: 16, marginBottom: 16 }}>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10 }}>
             <button onClick={() => { setSheetId(''); handleSync(); }} disabled={syncing} style={{
-              padding: '8px 16px', borderRadius: 6, border: 'none', background: syncing ? C.slate : C.teal,
+              padding: '8px 16px', borderRadius: 6, border: 'none', background: syncing ? THEME.colors.textSecondary : THEME.colors.teal,
               color: '#fff', fontSize: 12, fontWeight: 600, cursor: syncing ? 'not-allowed' : 'pointer',
             }}>
               {syncing ? 'Syncing...' : 'Sync All Folders'}
             </button>
             <input type="text" placeholder="Or enter Sheet ID..." value={sheetId} onChange={e => setSheetId(e.target.value)} style={{
-              flex: 1, padding: '8px 12px', borderRadius: 6, border: `1px solid ${C.border}`,
-              fontSize: 12, background: C.white, color: C.dark, outline: 'none',
+              flex: 1, padding: '8px 12px', borderRadius: 6, border: `1px solid ${THEME.colors.border}`,
+              fontSize: 12, background: "#FFFFFF", color: THEME.colors.text, outline: 'none',
             }} />
             <button onClick={handleSync} disabled={syncing || !sheetId.trim()} style={{
-              padding: '8px 16px', borderRadius: 6, border: `1px solid ${C.border}`,
-              background: 'transparent', color: C.dark, fontSize: 12, fontWeight: 600,
+              padding: '8px 16px', borderRadius: 6, border: `1px solid ${THEME.colors.border}`,
+              background: 'transparent', color: THEME.colors.text, fontSize: 12, fontWeight: 600,
               cursor: syncing || !sheetId.trim() ? 'not-allowed' : 'pointer',
               opacity: syncing || !sheetId.trim() ? 0.4 : 1,
             }}>
@@ -405,10 +402,10 @@ function TransitionsPageInner() {
           {syncProgress && (
             <div style={{ marginBottom: 10 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <span style={{ fontSize: 11, color: C.slate, fontWeight: 500 }}>
+                <span style={{ fontSize: 11, color: THEME.colors.textSecondary, fontWeight: 500 }}>
                   {syncProgress.currentWorkbook}
                 </span>
-                <span style={{ fontSize: 11, color: C.slate, fontWeight: 600 }}>
+                <span style={{ fontSize: 11, color: THEME.colors.textSecondary, fontWeight: 600 }}>
                   {syncProgress.totalWorkbooks > 0
                     ? `${syncProgress.completedWorkbooks}/${syncProgress.totalWorkbooks} (${Math.round((syncProgress.completedWorkbooks / syncProgress.totalWorkbooks) * 100)}%)`
                     : 'Preparing...'
@@ -418,7 +415,7 @@ function TransitionsPageInner() {
               <div style={{
                 width: '100%',
                 height: 8,
-                background: C.border,
+                background: THEME.colors.border,
                 borderRadius: 4,
                 overflow: 'hidden',
                 position: 'relative',
@@ -428,7 +425,7 @@ function TransitionsPageInner() {
                   width: syncProgress.totalWorkbooks > 0
                     ? `${(syncProgress.completedWorkbooks / syncProgress.totalWorkbooks) * 100}%`
                     : '30%',
-                  background: `linear-gradient(90deg, ${C.teal}, ${C.green})`,
+                  background: `linear-gradient(90deg, ${THEME.colors.teal}, ${THEME.colors.success})`,
                   borderRadius: 4,
                   transition: 'width 0.3s ease',
                   animation: syncProgress.totalWorkbooks === 0 ? 'pulse 1.5s ease-in-out infinite' : 'none',
@@ -440,8 +437,8 @@ function TransitionsPageInner() {
           {syncResult && (
             <div style={{
               fontSize: 12, padding: '6px 10px', borderRadius: 6,
-              background: syncResult.startsWith('Error') ? C.redBg : C.greenBg,
-              color: syncResult.startsWith('Error') ? C.red : C.green,
+              background: syncResult.startsWith('Error') ? THEME.colors.errorBg : THEME.colors.successBg,
+              color: syncResult.startsWith('Error') ? THEME.colors.error : THEME.colors.success,
             }}>{syncResult}</div>
           )}
         </div>
@@ -449,15 +446,15 @@ function TransitionsPageInner() {
 
       {/* ── Team Mappings Progress & Result ───────────────────────────────────── */}
       {(teamMappingsProgress || teamMappingsResult) && (
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 16, marginBottom: 16 }}>
+        <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8, padding: 16, marginBottom: 16 }}>
           {/* Progress Bar */}
           {teamMappingsProgress && (
             <div style={{ marginBottom: teamMappingsResult ? 10 : 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <span style={{ fontSize: 11, color: C.slate, fontWeight: 500 }}>
+                <span style={{ fontSize: 11, color: THEME.colors.textSecondary, fontWeight: 500 }}>
                   {teamMappingsProgress.currentDeal}
                 </span>
-                <span style={{ fontSize: 11, color: C.slate, fontWeight: 600 }}>
+                <span style={{ fontSize: 11, color: THEME.colors.textSecondary, fontWeight: 600 }}>
                   {teamMappingsProgress.totalDeals > 0
                     ? `${teamMappingsProgress.completedDeals}/${teamMappingsProgress.totalDeals} (${Math.round((teamMappingsProgress.completedDeals / teamMappingsProgress.totalDeals) * 100)}%)`
                     : 'Processing...'
@@ -467,7 +464,7 @@ function TransitionsPageInner() {
               <div style={{
                 width: '100%',
                 height: 8,
-                background: C.border,
+                background: THEME.colors.border,
                 borderRadius: 4,
                 overflow: 'hidden',
                 position: 'relative',
@@ -477,7 +474,7 @@ function TransitionsPageInner() {
                   width: teamMappingsProgress.totalDeals > 0
                     ? `${(teamMappingsProgress.completedDeals / teamMappingsProgress.totalDeals) * 100}%`
                     : '30%',
-                  background: `linear-gradient(90deg, ${C.purple}, ${C.teal})`,
+                  background: `linear-gradient(90deg, ${THEME.colors.sereneAqua400}, ${THEME.colors.teal})`,
                   borderRadius: 4,
                   transition: 'width 0.3s ease',
                 }} />
@@ -489,8 +486,8 @@ function TransitionsPageInner() {
           {teamMappingsResult && (
             <div style={{
               fontSize: 12, padding: '6px 10px', borderRadius: 6,
-              background: teamMappingsResult.startsWith('Error') ? C.redBg : C.greenBg,
-              color: teamMappingsResult.startsWith('Error') ? C.red : C.green,
+              background: teamMappingsResult.startsWith('Error') ? THEME.colors.errorBg : THEME.colors.successBg,
+              color: teamMappingsResult.startsWith('Error') ? THEME.colors.error : THEME.colors.success,
               display: 'flex', justifyContent: 'space-between', alignItems: 'center'
             }}>
               {teamMappingsResult}
@@ -502,11 +499,11 @@ function TransitionsPageInner() {
 
       {/* ── TRAN AUM Sync Result ──────────────────────────────────────────────── */}
       {tranAumResult && (
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 16, marginBottom: 16 }}>
+        <div style={{ background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8, padding: 16, marginBottom: 16 }}>
           <div style={{
             fontSize: 12, padding: '6px 10px', borderRadius: 6,
-            background: tranAumResult.success ? C.greenBg : C.redBg,
-            color: tranAumResult.success ? C.green : C.red,
+            background: tranAumResult.success ? THEME.colors.successBg : THEME.colors.errorBg,
+            color: tranAumResult.success ? THEME.colors.success : THEME.colors.error,
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             marginBottom: tranAumResult.sampleRecords ? 12 : 0,
           }}>
@@ -517,26 +514,26 @@ function TransitionsPageInner() {
           {/* Sample HubSpot Records */}
           {tranAumResult.sampleRecords && tranAumResult.sampleRecords.length > 0 && (
             <div style={{ marginBottom: 12 }}>
-              <p style={{ fontSize: 11, fontWeight: 600, color: C.slate, marginBottom: 6, textTransform: 'uppercase' }}>
+              <p style={{ fontSize: 11, fontWeight: 600, color: THEME.colors.textSecondary, marginBottom: 6, textTransform: 'uppercase' }}>
                 Sample HubSpot Records (first 3):
               </p>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', fontSize: 11, borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr style={{ background: 'rgba(248,244,240,0.03)', borderBottom: `1px solid ${C.border}` }}>
-                      <th style={{ padding: '6px 8px', textAlign: 'left', color: C.slate, fontWeight: 600 }}>Record ID</th>
-                      <th style={{ padding: '6px 8px', textAlign: 'left', color: C.slate, fontWeight: 600 }}>Advisor Name</th>
-                      <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>Current Value</th>
-                      <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>Monthly Fee</th>
+                    <tr style={{ background: 'rgba(248,244,240,0.03)', borderBottom: `1px solid ${THEME.colors.border}` }}>
+                      <th style={{ padding: '6px 8px', textAlign: 'left', color: THEME.colors.textSecondary, fontWeight: 600 }}>Record ID</th>
+                      <th style={{ padding: '6px 8px', textAlign: 'left', color: THEME.colors.textSecondary, fontWeight: 600 }}>Advisor Name</th>
+                      <th style={{ padding: '6px 8px', textAlign: 'right', color: THEME.colors.textSecondary, fontWeight: 600 }}>Current Value</th>
+                      <th style={{ padding: '6px 8px', textAlign: 'right', color: THEME.colors.textSecondary, fontWeight: 600 }}>Monthly Fee</th>
                     </tr>
                   </thead>
                   <tbody>
                     {tranAumResult.sampleRecords.map((rec, i) => (
-                      <tr key={rec.id} style={{ borderBottom: `1px solid ${C.borderSubtle}` }}>
-                        <td style={{ padding: '6px 8px', color: C.textSecondary }}>{rec.id}</td>
-                        <td style={{ padding: '6px 8px', color: C.cream }}>{rec.advisor_name || '—'}</td>
-                        <td style={{ padding: '6px 8px', textAlign: 'right', color: C.textSecondary }}>{rec.current_value || '0'}</td>
-                        <td style={{ padding: '6px 8px', textAlign: 'right', color: C.textSecondary }}>{rec.monthly_fee_amount || '0'}</td>
+                      <tr key={rec.id} style={{ borderBottom: `1px solid ${THEME.colors.borderSubtle}` }}>
+                        <td style={{ padding: '6px 8px', color: THEME.colors.textSecondary }}>{rec.id}</td>
+                        <td style={{ padding: '6px 8px', color: THEME.colors.text }}>{rec.advisor_name || '—'}</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: THEME.colors.textSecondary }}>{rec.current_value || '0'}</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: THEME.colors.textSecondary }}>{rec.monthly_fee_amount || '0'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -548,30 +545,30 @@ function TransitionsPageInner() {
           {/* Sample Aggregations */}
           {tranAumResult.sampleAggregations && tranAumResult.sampleAggregations.length > 0 && (
             <div>
-              <p style={{ fontSize: 11, fontWeight: 600, color: C.slate, marginBottom: 6, textTransform: 'uppercase' }}>
+              <p style={{ fontSize: 11, fontWeight: 600, color: THEME.colors.textSecondary, marginBottom: 6, textTransform: 'uppercase' }}>
                 Sample Aggregations (first 5 advisors):
               </p>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', fontSize: 11, borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr style={{ background: 'rgba(248,244,240,0.03)', borderBottom: `1px solid ${C.border}` }}>
-                      <th style={{ padding: '6px 8px', textAlign: 'left', color: C.slate, fontWeight: 600 }}>Advisor Name</th>
-                      <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>TRAN AUM</th>
-                      <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>Revenue</th>
-                      <th style={{ padding: '6px 8px', textAlign: 'right', color: C.slate, fontWeight: 600 }}>Record Count</th>
+                    <tr style={{ background: 'rgba(248,244,240,0.03)', borderBottom: `1px solid ${THEME.colors.border}` }}>
+                      <th style={{ padding: '6px 8px', textAlign: 'left', color: THEME.colors.textSecondary, fontWeight: 600 }}>Advisor Name</th>
+                      <th style={{ padding: '6px 8px', textAlign: 'right', color: THEME.colors.textSecondary, fontWeight: 600 }}>TRAN AUM</th>
+                      <th style={{ padding: '6px 8px', textAlign: 'right', color: THEME.colors.textSecondary, fontWeight: 600 }}>Revenue</th>
+                      <th style={{ padding: '6px 8px', textAlign: 'right', color: THEME.colors.textSecondary, fontWeight: 600 }}>Record Count</th>
                     </tr>
                   </thead>
                   <tbody>
                     {tranAumResult.sampleAggregations.map((agg, i) => (
-                      <tr key={i} style={{ borderBottom: `1px solid ${C.borderSubtle}` }}>
-                        <td style={{ padding: '6px 8px', color: C.cream }}>{agg.advisor_name}</td>
-                        <td style={{ padding: '6px 8px', textAlign: 'right', color: C.teal, fontWeight: 600 }}>
+                      <tr key={i} style={{ borderBottom: `1px solid ${THEME.colors.borderSubtle}` }}>
+                        <td style={{ padding: '6px 8px', color: THEME.colors.text }}>{agg.advisor_name}</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: THEME.colors.teal, fontWeight: 600 }}>
                           ${(agg.tran_aum / 1_000_000).toFixed(2)}M
                         </td>
-                        <td style={{ padding: '6px 8px', textAlign: 'right', color: C.textSecondary }}>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: THEME.colors.textSecondary }}>
                           ${agg.revenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
-                        <td style={{ padding: '6px 8px', textAlign: 'right', color: C.textSecondary }}>{agg.record_count}</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: THEME.colors.textSecondary }}>{agg.record_count}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -584,14 +581,14 @@ function TransitionsPageInner() {
 
       {/* ── DocuSign Error ────────────────────────────────────────────────────── */}
       {docusignError && (
-        <div style={{ background: C.redBg, border: `1px solid ${C.redBorder}`, borderRadius: 8, padding: '8px 14px', marginBottom: 12, fontSize: 13, color: C.red, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ background: THEME.colors.errorBg, border: `1px solid ${THEME.colors.errorBorder}`, borderRadius: 8, padding: '8px 14px', marginBottom: 12, fontSize: 13, color: THEME.colors.error, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           DocuSign Error: {docusignError}
           <button onClick={() => setDocusignError(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'inherit' }}>&times;</button>
         </div>
       )}
 
       {/* ── Tab Bar ───────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${C.border}`, marginBottom: 20 }}>
+      <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${THEME.colors.border}`, marginBottom: 20 }}>
         {TABS.map(tab => {
           const isActive = activeTab === tab.key;
           return (
@@ -600,14 +597,14 @@ function TransitionsPageInner() {
               onClick={() => handleTabChange(tab.key)}
               style={{
                 padding: '10px 20px', background: 'none', border: 'none',
-                borderBottom: `2px solid ${isActive ? C.teal : 'transparent'}`,
+                borderBottom: `2px solid ${isActive ? THEME.colors.teal : 'transparent'}`,
                 marginBottom: -2, cursor: 'pointer', transition: 'all 150ms ease',
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? C.teal : C.slate, fontFamily: "'Inter', system-ui, sans-serif" }}>
+              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? THEME.colors.teal : THEME.colors.textSecondary, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {tab.label}
               </span>
-              <span style={{ display: 'block', fontSize: 11, color: isActive ? C.teal : C.slate, opacity: 0.6, marginTop: 2 }}>
+              <span style={{ display: 'block', fontSize: 11, color: isActive ? THEME.colors.teal : THEME.colors.textSecondary, opacity: 0.6, marginTop: 2 }}>
                 {tab.sub}
               </span>
             </button>
@@ -633,7 +630,7 @@ function TransitionsPageInner() {
               {[1,2,3,4,5].map(i => <div key={i} className="shimmer h-12 rounded-lg" />)}
             </div>
           )}
-          {error && <div style={{ padding: 40, color: C.red, textAlign: 'center' }}>Failed to load data.</div>}
+          {error && <div style={{ padding: 40, color: THEME.colors.error, textAlign: 'center' }}>Failed to load data.</div>}
 
           {/* Accounts Table */}
           {!isLoading || data ? (

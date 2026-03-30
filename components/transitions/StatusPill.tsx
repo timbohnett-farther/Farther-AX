@@ -1,7 +1,9 @@
 'use client';
 
+import { useTheme } from '@/lib/theme-provider';
+
 // Status colors are static and theme-independent (status meaning is consistent across themes)
-const C = {
+const STATUS_COLORS = {
   dark: '#F8F4F0', slate: 'rgba(227,211,197,0.5)',
   green: '#4ade80', greenBg: 'rgba(74,222,128,0.2)', greenBorder: 'rgba(74,222,128,0.35)',
   amber: '#fbbf24', amberBg: 'rgba(251,191,36,0.2)', amberBorder: 'rgba(251,191,36,0.35)',
@@ -11,23 +13,23 @@ const C = {
 };
 
 export function statusStyle(status: string | null): React.CSSProperties {
-  if (!status) return { color: C.slate, fontStyle: 'italic' };
+  if (!status) return { color: STATUS_COLORS.slate, fontStyle: 'italic' };
   const s = status.toLowerCase();
-  if (s === 'completed' || s === 'signed' || s === 'done') return { color: C.green, fontWeight: 600 };
-  if (s === 'sent' || s === 'delivered' || s === 'in progress') return { color: C.amber, fontWeight: 500 };
-  if (s === 'not sent' || s === 'not ready' || s === 'declined' || s === 'voided') return { color: C.red, fontWeight: 500 };
-  if (s === 'ready to send documents' || s === 'ready') return { color: C.blue, fontWeight: 500 };
-  return { color: C.dark };
+  if (s === 'completed' || s === 'signed' || s === 'done') return { color: STATUS_COLORS.green, fontWeight: 600 };
+  if (s === 'sent' || s === 'delivered' || s === 'in progress') return { color: STATUS_COLORS.amber, fontWeight: 500 };
+  if (s === 'not sent' || s === 'not ready' || s === 'declined' || s === 'voided') return { color: STATUS_COLORS.red, fontWeight: 500 };
+  if (s === 'ready to send documents' || s === 'ready') return { color: STATUS_COLORS.blue, fontWeight: 500 };
+  return { color: STATUS_COLORS.dark };
 }
 
 export function StatusPill({ status }: { status: string | null }) {
-  if (!status) return <span style={{ color: C.slate, fontSize: 12 }}>--</span>;
+  if (!status) return <span style={{ color: STATUS_COLORS.slate, fontSize: 12 }}>--</span>;
   const s = status.toLowerCase();
-  let bg = C.amberBg, border = C.amberBorder, color = C.amber;
-  if (s === 'completed' || s === 'signed') { bg = C.greenBg; border = C.greenBorder; color = C.green; }
-  if (s === 'sent' || s === 'delivered') { bg = C.blueBg; border = C.blueBorder; color = C.blue; }
-  if (s === 'voided' || s === 'declined') { bg = C.redBg; border = C.redBorder; color = C.red; }
-  if (s === 'created') { bg = C.tealBg; border = C.tealBorder; color = C.teal; }
+  let bg = STATUS_COLORS.amberBg, border = STATUS_COLORS.amberBorder, color = STATUS_COLORS.amber;
+  if (s === 'completed' || s === 'signed') { bg = STATUS_COLORS.greenBg; border = STATUS_COLORS.greenBorder; color = STATUS_COLORS.green; }
+  if (s === 'sent' || s === 'delivered') { bg = STATUS_COLORS.blueBg; border = STATUS_COLORS.blueBorder; color = STATUS_COLORS.blue; }
+  if (s === 'voided' || s === 'declined') { bg = STATUS_COLORS.redBg; border = STATUS_COLORS.redBorder; color = STATUS_COLORS.red; }
+  if (s === 'created') { bg = STATUS_COLORS.tealBg; border = STATUS_COLORS.tealBorder; color = STATUS_COLORS.teal; }
   return (
     <span style={{
       display: 'inline-block', padding: '2px 8px', borderRadius: 12,
@@ -40,7 +42,7 @@ export function StatusPill({ status }: { status: string | null }) {
 }
 
 export function ProgressBar({ pct, color }: { pct: number; color?: string }) {
-  const barColor = color || (pct >= 80 ? C.green : pct >= 40 ? C.amber : C.red);
+  const barColor = color || (pct >= 80 ? STATUS_COLORS.green : pct >= 40 ? STATUS_COLORS.amber : STATUS_COLORS.red);
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <div style={{ flex: 1, height: 6, background: 'rgba(91,106,113,0.08)', borderRadius: 3, overflow: 'hidden' }}>

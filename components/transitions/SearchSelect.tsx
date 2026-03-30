@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/design-tokens';
 
 interface Option {
   name: string;
@@ -17,8 +16,7 @@ interface SearchSelectProps {
 }
 
 export function SearchSelect({ options, value, onChange, placeholder = 'All Advisors' }: SearchSelectProps) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -49,8 +47,8 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
         onClick={() => { setOpen(!open); setSearch(''); }}
         style={{
           width: '100%', padding: '9px 14px', borderRadius: 8,
-          border: `1px solid ${open ? C.teal : C.border}`,
-          background: C.cardBg, color: value ? C.dark : C.slate,
+          border: `1px solid ${open ? THEME.colors.teal : THEME.colors.border}`,
+          background: THEME.colors.surface, color: value ? THEME.colors.text : THEME.colors.textSecondary,
           fontSize: 13, textAlign: 'left', cursor: 'pointer',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           fontFamily: "'Inter', system-ui, sans-serif",
@@ -59,18 +57,18 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {selectedLabel || placeholder}
         </span>
-        <span style={{ fontSize: 10, color: C.slate, marginLeft: 8 }}>&#9662;</span>
+        <span style={{ fontSize: 10, color: THEME.colors.textSecondary, marginLeft: 8 }}>&#9662;</span>
       </button>
 
       {open && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
           marginTop: 4, borderRadius: 8, overflow: 'hidden',
-          background: C.cardBg, border: `1px solid ${C.border}`,
+          background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`,
           boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
           maxHeight: 320, display: 'flex', flexDirection: 'column',
         }}>
-          <div style={{ padding: 8, borderBottom: `1px solid ${C.border}` }}>
+          <div style={{ padding: 8, borderBottom: `1px solid ${THEME.colors.border}` }}>
             <input
               ref={inputRef}
               type="text"
@@ -79,8 +77,8 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
               placeholder="Type to search..."
               style={{
                 width: '100%', padding: '7px 10px', borderRadius: 6,
-                border: `1px solid ${C.border}`, background: C.cardBg,
-                color: C.dark, fontSize: 13, outline: 'none',
+                border: `1px solid ${THEME.colors.border}`, background: THEME.colors.surface,
+                color: THEME.colors.text, fontSize: 13, outline: 'none',
                 fontFamily: "'Inter', system-ui, sans-serif",
               }}
             />
@@ -92,7 +90,7 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
               style={{
                 width: '100%', padding: '8px 14px', border: 'none', textAlign: 'left',
                 background: !value ? 'rgba(59,90,105,0.08)' : 'transparent',
-                color: !value ? C.teal : C.dark, fontSize: 13, cursor: 'pointer',
+                color: !value ? THEME.colors.teal : THEME.colors.text, fontSize: 13, cursor: 'pointer',
                 fontWeight: !value ? 600 : 400,
                 fontFamily: "'Inter', system-ui, sans-serif",
               }}
@@ -108,7 +106,7 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
                 style={{
                   width: '100%', padding: '8px 14px', border: 'none', textAlign: 'left',
                   background: value === opt.name ? 'rgba(59,90,105,0.08)' : 'transparent',
-                  color: value === opt.name ? C.teal : C.dark, fontSize: 13, cursor: 'pointer',
+                  color: value === opt.name ? THEME.colors.teal : THEME.colors.text, fontSize: 13, cursor: 'pointer',
                   fontWeight: value === opt.name ? 600 : 400,
                   fontFamily: "'Inter', system-ui, sans-serif",
                 }}
@@ -119,7 +117,7 @@ export function SearchSelect({ options, value, onChange, placeholder = 'All Advi
               </button>
             ))}
             {filtered.length === 0 && (
-              <div style={{ padding: '12px 14px', fontSize: 13, color: C.slate }}>No matches</div>
+              <div style={{ padding: '12px 14px', fontSize: 13, color: THEME.colors.textSecondary }}>No matches</div>
             )}
           </div>
         </div>

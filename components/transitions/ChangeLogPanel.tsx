@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import useSWR from 'swr';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -20,15 +19,14 @@ interface ChangeEvent {
 }
 
 export function ChangeLogPanel() {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   const CHANGE_TYPE_STYLES: Record<string, { color: string; bg: string; icon: string }> = {
-    new_household: { color: C.green, bg: C.greenBg, icon: '+' },
-    removed_household: { color: C.red, bg: C.redBg, icon: '-' },
-    status_change: { color: C.amber, bg: C.amberBg, icon: '\u2192' },
-    new_envelope: { color: '#7CA4B4', bg: 'rgba(124,164,180,0.15)', icon: '\u2709' },
-    completed_envelope: { color: C.green, bg: C.greenBg, icon: '\u2713' },
+    new_household: { color: THEME.colors.success, bg: THEME.colors.successBg, icon: '+' },
+    removed_household: { color: THEME.colors.error, bg: THEME.colors.errorBg, icon: '-' },
+    status_change: { color: THEME.colors.warning, bg: THEME.colors.warningBg, icon: '\u2192' },
+    new_envelope: { color: THEME.colors.steelBlue400, bg: 'rgba(124,164,180,0.15)', icon: '\u2709' },
+    completed_envelope: { color: THEME.colors.success, bg: THEME.colors.successBg, icon: '\u2713' },
   };
 
   const [page, setPage] = useState(1);
@@ -61,8 +59,8 @@ export function ChangeLogPanel() {
           value={typeFilter}
           onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
           style={{
-            padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`,
-            fontSize: 13, background: C.cardBg, color: C.dark, cursor: 'pointer', outline: 'none',
+            padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
+            fontSize: 13, background: THEME.colors.surface, color: THEME.colors.text, cursor: 'pointer', outline: 'none',
           }}
         >
           <option value="">All Changes</option>
@@ -72,24 +70,24 @@ export function ChangeLogPanel() {
           <option value="new_envelope">New Envelopes</option>
           <option value="completed_envelope">Completed Envelopes</option>
         </select>
-        <span style={{ fontSize: 12, color: C.slate }}>{total} change{total !== 1 ? 's' : ''}</span>
+        <span style={{ fontSize: 12, color: THEME.colors.textSecondary }}>{total} change{total !== 1 ? 's' : ''}</span>
       </div>
 
-      {isLoading && <div style={{ padding: 40, color: C.slate, textAlign: 'center' }}>Loading changes...</div>}
+      {isLoading && <div style={{ padding: 40, color: THEME.colors.textSecondary, textAlign: 'center' }}>Loading changes...</div>}
 
       {/* Timeline */}
       {!isLoading && changes.length === 0 && (
-        <div style={{ padding: 40, color: C.slate, textAlign: 'center' }}>
+        <div style={{ padding: 40, color: THEME.colors.textSecondary, textAlign: 'center' }}>
           No changes detected yet. Changes appear after the first DocuSign sync comparison.
         </div>
       )}
 
       {changes.map(change => {
-        const style = CHANGE_TYPE_STYLES[change.change_type] ?? { color: C.slate, bg: 'transparent', icon: '?' };
+        const style = CHANGE_TYPE_STYLES[change.change_type] ?? { color: THEME.colors.textSecondary, bg: 'transparent', icon: '?' };
         return (
           <div key={change.id} style={{
             display: 'flex', gap: 12, padding: '10px 0',
-            borderBottom: `1px solid ${C.border}`,
+            borderBottom: `1px solid ${THEME.colors.border}`,
           }}>
             {/* Icon */}
             <div style={{
@@ -101,29 +99,29 @@ export function ChangeLogPanel() {
             </div>
             {/* Content */}
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, color: C.dark }}>
+              <div style={{ fontSize: 13, color: THEME.colors.text }}>
                 <span style={{ fontWeight: 600, color: style.color }}>
                   {change.change_type.replace(/_/g, ' ')}
                 </span>
                 {change.advisor_name && (
-                  <span style={{ color: C.teal, marginLeft: 6 }}>{change.advisor_name}</span>
+                  <span style={{ color: THEME.colors.teal, marginLeft: 6 }}>{change.advisor_name}</span>
                 )}
               </div>
               {change.entity_id && (
-                <div style={{ fontSize: 12, color: C.slate, marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 2 }}>
                   {change.entity_type}: {change.entity_id}
                 </div>
               )}
               {(change.old_value || change.new_value) && (
-                <div style={{ fontSize: 12, color: C.slate, marginTop: 2 }}>
-                  {change.old_value && <span style={{ color: C.red, textDecoration: 'line-through' }}>{change.old_value}</span>}
+                <div style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 2 }}>
+                  {change.old_value && <span style={{ color: THEME.colors.error, textDecoration: 'line-through' }}>{change.old_value}</span>}
                   {change.old_value && change.new_value && ' \u2192 '}
-                  {change.new_value && <span style={{ color: C.green }}>{change.new_value}</span>}
+                  {change.new_value && <span style={{ color: THEME.colors.success }}>{change.new_value}</span>}
                 </div>
               )}
             </div>
             {/* Timestamp */}
-            <div style={{ fontSize: 11, color: C.slate, whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <div style={{ fontSize: 11, color: THEME.colors.textSecondary, whiteSpace: 'nowrap', flexShrink: 0 }}>
               {fmtDate(change.detected_at)}
             </div>
           </div>
@@ -134,12 +132,12 @@ export function ChangeLogPanel() {
       {totalPages > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 16 }}>
           <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}
-            style={{ padding: '4px 12px', borderRadius: 6, border: `1px solid ${C.border}`, background: C.cardBg, color: page <= 1 ? C.slate : C.dark, fontSize: 12, cursor: page <= 1 ? 'default' : 'pointer', opacity: page <= 1 ? 0.4 : 1 }}>
+            style={{ padding: '4px 12px', borderRadius: 6, border: `1px solid ${THEME.colors.border}`, background: THEME.colors.surface, color: page <= 1 ? THEME.colors.textSecondary : THEME.colors.text, fontSize: 12, cursor: page <= 1 ? 'default' : 'pointer', opacity: page <= 1 ? 0.4 : 1 }}>
             Prev
           </button>
-          <span style={{ padding: '4px 8px', fontSize: 12, color: C.dark }}>{page} / {totalPages}</span>
+          <span style={{ padding: '4px 8px', fontSize: 12, color: THEME.colors.text }}>{page} / {totalPages}</span>
           <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}
-            style={{ padding: '4px 12px', borderRadius: 6, border: `1px solid ${C.border}`, background: C.cardBg, color: page >= totalPages ? C.slate : C.dark, fontSize: 12, cursor: page >= totalPages ? 'default' : 'pointer', opacity: page >= totalPages ? 0.4 : 1 }}>
+            style={{ padding: '4px 12px', borderRadius: 6, border: `1px solid ${THEME.colors.border}`, background: THEME.colors.surface, color: page >= totalPages ? THEME.colors.textSecondary : THEME.colors.text, fontSize: 12, cursor: page >= totalPages ? 'default' : 'pointer', opacity: page >= totalPages ? 0.4 : 1 }}>
             Next
           </button>
         </div>

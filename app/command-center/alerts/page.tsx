@@ -1,12 +1,11 @@
 'use client';
 
 import useSWR from 'swr';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { DataCard, StatCard } from '@/components/ui';
 import { useTheme } from '@/lib/theme-provider';
-import { getThemeColors } from '@/lib/design-tokens';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -104,32 +103,31 @@ function formatCurrency(n: number) {
 // ── Task Alert Row ──────────────────────────────────────────────────────────
 
 function TaskAlertRow({ alert }: { alert: TaskAlert }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   return (
     <div
       className="flex items-center gap-3 px-3 py-2.5 border-b last:border-b-0"
       style={{
-        backgroundColor: alert.is_hard_gate ? C.redBg : 'transparent',
-        borderColor: C.border,
-        borderLeft: alert.is_hard_gate ? `2px solid ${C.red}` : 'none'
+        backgroundColor: alert.is_hard_gate ? THEME.colors.errorBg : 'transparent',
+        borderColor: THEME.colors.border,
+        borderLeft: alert.is_hard_gate ? `2px solid ${THEME.colors.error}` : 'none'
       }}
     >
       {alert.is_hard_gate && (
-        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: C.teal }} title="Hard gate" />
+        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: THEME.colors.teal }} title="Hard gate" />
       )}
       <div className="flex-1 min-w-0">
-        <span className="text-sm" style={{ color: C.cream }}>{alert.task_label}</span>
-        <span className="text-[10px] ml-2" style={{ color: C.slate }}>{alert.phase_label}</span>
+        <span className="text-sm" style={{ color: THEME.colors.text }}>{alert.task_label}</span>
+        <span className="text-[10px] ml-2" style={{ color: THEME.colors.textSecondary }}>{alert.phase_label}</span>
       </div>
       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap ${ROLE_BADGE_COLORS[alert.owner] ?? 'bg-slate/15 text-slate'}`}>
         {alert.owner}
       </span>
-      <span className="text-[10px] font-bold whitespace-nowrap" style={{ color: C.red }}>
+      <span className="text-[10px] font-bold whitespace-nowrap" style={{ color: THEME.colors.error }}>
         {alert.days_overdue}d overdue
       </span>
-      <span className="text-[10px] whitespace-nowrap" style={{ color: C.slate }}>
+      <span className="text-[10px] whitespace-nowrap" style={{ color: THEME.colors.textSecondary }}>
         Due {formatDate(alert.due_date)}
       </span>
     </div>
@@ -139,40 +137,39 @@ function TaskAlertRow({ alert }: { alert: TaskAlert }) {
 // ── Sentiment Alert Row ─────────────────────────────────────────────────────
 
 function SentimentAlertRow({ alert }: { alert: SentimentAlert }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   return (
     <div
       className="flex items-center gap-3 px-3 py-2.5 border-b last:border-b-0"
       style={{
-        backgroundColor: C.amberBg,
-        borderColor: C.border,
-        borderLeft: `2px solid ${C.amber}`
+        backgroundColor: THEME.colors.warningBg,
+        borderColor: THEME.colors.border,
+        borderLeft: `2px solid ${THEME.colors.warning}`
       }}
     >
       <div className="flex-1 min-w-0">
-        <span className="text-sm" style={{ color: C.cream }}>Sentiment dropped</span>
+        <span className="text-sm" style={{ color: THEME.colors.text }}>Sentiment dropped</span>
         <div className="flex items-center gap-2 mt-1">
           <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${TIER_COLORS[alert.previous_tier] ?? 'bg-slate/15 text-slate'}`}>
             {alert.previous_tier}
           </span>
-          <span className="text-[10px]" style={{ color: C.slate }}>&rarr;</span>
+          <span className="text-[10px]" style={{ color: THEME.colors.textSecondary }}>&rarr;</span>
           <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${TIER_COLORS[alert.current_tier] ?? 'bg-slate/15 text-slate'}`}>
             {alert.current_tier}
           </span>
         </div>
       </div>
       <div className="text-right">
-        <span className="text-[10px] font-bold block" style={{ color: C.red }}>
+        <span className="text-[10px] font-bold block" style={{ color: THEME.colors.error }}>
           {alert.score_change > 0 ? '+' : ''}{alert.score_change.toFixed(1)} pts
         </span>
-        <span className="text-[10px]" style={{ color: C.slate }}>
+        <span className="text-[10px]" style={{ color: THEME.colors.textSecondary }}>
           {alert.current_score.toFixed(0)}/100
         </span>
       </div>
       {alert.changed_at && (
-        <span className="text-[10px] whitespace-nowrap" style={{ color: C.slate }}>
+        <span className="text-[10px] whitespace-nowrap" style={{ color: THEME.colors.textSecondary }}>
           {formatDate(alert.changed_at)}
         </span>
       )}
@@ -183,42 +180,41 @@ function SentimentAlertRow({ alert }: { alert: SentimentAlert }) {
 // ── AUM Alert Row ───────────────────────────────────────────────────────────
 
 function AumAlertRow({ alert }: { alert: AumAlert }) {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
   const isCritical = alert.pace_status === 'behind';
 
   return (
     <div
       className="flex items-center gap-3 px-3 py-2.5 border-b last:border-b-0"
       style={{
-        backgroundColor: isCritical ? C.redBg : C.amberBg,
-        borderColor: C.border,
-        borderLeft: `2px solid ${isCritical ? C.red : C.amber}`
+        backgroundColor: isCritical ? THEME.colors.errorBg : THEME.colors.warningBg,
+        borderColor: THEME.colors.border,
+        borderLeft: `2px solid ${isCritical ? THEME.colors.error : THEME.colors.warning}`
       }}
     >
       <div className="flex-1 min-w-0">
-        <span className="text-sm" style={{ color: C.cream }}>
+        <span className="text-sm" style={{ color: THEME.colors.text }}>
           AUM transfer {isCritical ? 'behind target' : 'slower than expected'}
         </span>
         <div className="flex items-center gap-3 mt-1">
-          <span className="text-[10px]" style={{ color: C.slate }}>
+          <span className="text-[10px]" style={{ color: THEME.colors.textSecondary }}>
             {alert.transfer_pct}% transferred · expected {alert.expected_pct}% by day {alert.days_since_launch}
           </span>
         </div>
       </div>
       <div className="text-right shrink-0">
-        <span className="text-[10px] font-bold block" style={{ color: isCritical ? C.red : C.amber }}>
+        <span className="text-[10px] font-bold block" style={{ color: isCritical ? THEME.colors.error : THEME.colors.warning }}>
           {alert.deficit}% behind
         </span>
-        <span className="text-[10px] tabular-nums" style={{ color: C.slate }}>
+        <span className="text-[10px] tabular-nums" style={{ color: THEME.colors.textSecondary }}>
           {formatCurrency(alert.actual_aum)} / {formatCurrency(alert.expected_aum)}
         </span>
       </div>
       <span
         className="text-[9px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap"
         style={{
-          backgroundColor: isCritical ? C.redBg : C.amberBg,
-          color: isCritical ? C.red : C.amber
+          backgroundColor: isCritical ? THEME.colors.errorBg : THEME.colors.warningBg,
+          color: isCritical ? THEME.colors.error : THEME.colors.warning
         }}
       >
         {alert.transition_type}
@@ -230,8 +226,7 @@ function AumAlertRow({ alert }: { alert: AumAlert }) {
 // ── Main Page ───────────────────────────────────────────────────────────────
 
 export default function AlertsPage() {
-  const { theme } = useTheme();
-  const C = useMemo(() => getThemeColors(theme === 'dark'), [theme]);
+  const { THEME } = useTheme();
 
   const { data, isLoading, error } = useSWR('/api/command-center/alerts', fetcher, { refreshInterval: 300_000 });
   const [activeTab, setActiveTab] = useState<AlertTab>('all');
@@ -245,7 +240,7 @@ export default function AlertsPage() {
       {[1,2,3,4,5].map(i => <div key={i} className="shimmer h-14 rounded-lg" />)}
     </div>
   );
-  if (error) return <div className="px-10 py-16" style={{ color: C.red }}>Failed to load alerts.</div>;
+  if (error) return <div className="px-10 py-16" style={{ color: THEME.colors.error }}>Failed to load alerts.</div>;
 
   const allAlerts: Alert[] = data?.alerts ?? [];
   const counts = data?.counts ?? { task_overdue: 0, hard_gates: 0, sentiment_drop: 0, aum_behind: 0, aum_critical: 0 };
@@ -275,10 +270,10 @@ export default function AlertsPage() {
       <div className="relative mb-6">
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} className="absolute top-0 right-0 opacity-50" />
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold font-serif mb-2" style={{ color: C.cream }}>
+          <h1 className="text-3xl font-bold font-serif mb-2" style={{ color: THEME.colors.text }}>
             Onboarding Alerts
           </h1>
-          <p className="text-sm" style={{ color: C.slate }}>
+          <p className="text-sm" style={{ color: THEME.colors.textSecondary }}>
             Overdue tasks, sentiment shifts, and AUM transfer pace
           </p>
         </div>
@@ -314,21 +309,21 @@ export default function AlertsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 rounded-lg p-1 mb-6 w-fit" style={{ backgroundColor: C.cardBg, border: `1px solid ${C.border}` }}>
+      <div className="flex gap-1 rounded-lg p-1 mb-6 w-fit" style={{ backgroundColor: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
         {tabs.map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className="px-3.5 py-1.5 rounded text-xs font-medium transition-smooth border-none cursor-pointer flex items-center gap-1.5"
             style={{
-              backgroundColor: activeTab === tab.key ? C.teal : 'transparent',
-              color: activeTab === tab.key ? C.white : C.slate
+              backgroundColor: activeTab === tab.key ? THEME.colors.teal : 'transparent',
+              color: activeTab === tab.key ? '#FFFFFF' : THEME.colors.textSecondary
             }}
             onMouseEnter={(e) => {
-              if (activeTab !== tab.key) e.currentTarget.style.color = C.cream;
+              if (activeTab !== tab.key) e.currentTarget.style.color = THEME.colors.text;
             }}
             onMouseLeave={(e) => {
-              if (activeTab !== tab.key) e.currentTarget.style.color = C.slate;
+              if (activeTab !== tab.key) e.currentTarget.style.color = THEME.colors.textSecondary;
             }}
           >
             {tab.label}
@@ -336,8 +331,8 @@ export default function AlertsPage() {
               <span
                 className="text-[9px] px-1 py-0.5 rounded-sm font-bold"
                 style={{
-                  backgroundColor: activeTab === tab.key ? 'rgba(255,255,255,0.2)' : C.redBg,
-                  color: activeTab === tab.key ? 'inherit' : C.red
+                  backgroundColor: activeTab === tab.key ? 'rgba(255,255,255,0.2)' : THEME.colors.errorBg,
+                  color: activeTab === tab.key ? 'inherit' : THEME.colors.error
                 }}
               >
                 {tab.count}
@@ -350,7 +345,7 @@ export default function AlertsPage() {
       {/* Alert list */}
       {filtered.length === 0 ? (
         <DataCard className="text-center py-16">
-          <p className="text-sm" style={{ color: C.slate }}>
+          <p className="text-sm" style={{ color: THEME.colors.textSecondary }}>
             {allAlerts.length === 0
               ? 'No alerts. All advisors are on track!'
               : 'No alerts in this category.'}
@@ -359,13 +354,13 @@ export default function AlertsPage() {
       ) : (
         Array.from(grouped.values()).map(group => (
           <DataCard key={group.deal_id} className="mb-4">
-            <div className="flex items-center justify-between pb-3 border-b mb-0" style={{ borderColor: C.border }}>
+            <div className="flex items-center justify-between pb-3 border-b mb-0" style={{ borderColor: THEME.colors.border }}>
               <Link href={`/command-center/advisor/${group.deal_id}`} className="no-underline">
                 <h3
                   className="text-sm font-bold font-serif cursor-pointer transition-smooth"
-                  style={{ color: C.cream }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = C.teal}
-                  onMouseLeave={(e) => e.currentTarget.style.color = C.cream}
+                  style={{ color: THEME.colors.text }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = THEME.colors.teal}
+                  onMouseLeave={(e) => e.currentTarget.style.color = THEME.colors.text}
                 >
                   {group.deal_name}
                 </h3>
@@ -374,7 +369,7 @@ export default function AlertsPage() {
                 {group.alerts.some(a => a.type === 'task_overdue') && (
                   <span
                     className="text-[10px] px-2 py-0.5 rounded font-bold"
-                    style={{ backgroundColor: C.redBg, color: C.red }}
+                    style={{ backgroundColor: THEME.colors.errorBg, color: THEME.colors.error }}
                   >
                     {group.alerts.filter(a => a.type === 'task_overdue').length} overdue
                   </span>
@@ -382,7 +377,7 @@ export default function AlertsPage() {
                 {group.alerts.some(a => a.type === 'sentiment_drop') && (
                   <span
                     className="text-[10px] px-2 py-0.5 rounded font-bold"
-                    style={{ backgroundColor: C.amberBg, color: C.amber }}
+                    style={{ backgroundColor: THEME.colors.warningBg, color: THEME.colors.warning }}
                   >
                     Sentiment
                   </span>
@@ -390,7 +385,7 @@ export default function AlertsPage() {
                 {group.alerts.some(a => a.type === 'aum_behind') && (
                   <span
                     className="text-[10px] px-2 py-0.5 rounded font-bold"
-                    style={{ backgroundColor: C.amberBg, color: C.amber }}
+                    style={{ backgroundColor: THEME.colors.warningBg, color: THEME.colors.warning }}
                   >
                     AUM Pace
                   </span>

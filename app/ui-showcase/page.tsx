@@ -19,7 +19,7 @@ import {
   ChartBarIcon,
   ArrowTrendingUpIcon,
 } from '@heroicons/react/24/outline';
-import { formatCompactCurrency } from '@/lib/design-tokens';
+import { formatCompactCurrency } from '@/lib/theme';
 
 /**
  * UI Showcase - Component Library Reference
