@@ -123,11 +123,11 @@ export function createTheme(mode: ThemeMode) {
     cardTextMuted: isDark ? '#7C8D94' : '#7C8D94',
     cardTextFaint: isDark ? 'rgba(248, 244, 240, 0.45)' : 'rgba(51, 51, 51, 0.35)',
 
-    // Sidebar-specific text
-    sidebarText: isDark ? '#F8F4F0' : '#F8F4F0',
-    sidebarTextSecondary: isDark ? '#CCD2D5' : '#CCD2D5',
-    sidebarTextMuted: isDark ? '#7C8D94' : '#94B5C3',
-    sidebarTextFaint: isDark ? 'rgba(248, 244, 240, 0.45)' : 'rgba(248, 244, 240, 0.45)',
+    // Sidebar-specific text (mode-aware)
+    sidebarText: isDark ? '#F8F4F0' : '#333333',                      // Light mode: charcoal
+    sidebarTextSecondary: isDark ? '#CCD2D5' : '#5B6A71',             // Light mode: slate blue
+    sidebarTextMuted: isDark ? '#7C8D94' : '#7C8D94',                 // Consistent across modes
+    sidebarTextFaint: isDark ? 'rgba(248, 244, 240, 0.45)' : 'rgba(51, 51, 51, 0.35)',  // Light mode: charcoal opacity
 
     // === Accent colors ===
     accent1: PALETTE.clay400,
