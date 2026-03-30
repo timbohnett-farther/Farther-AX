@@ -42,11 +42,13 @@
 
 /* ============================================================================
    Farther Brand Color CSS Variables (Light Mode Default)
+   Dark mode: steel-blue surfaces, limestone text, clay brand
+   Light mode: limestone surfaces, charcoal text, steel-blue accents
    ============================================================================ */
 
 :root {
-  /* Backgrounds */
-  --color-bg: #F8F4F0;
+  /* Backgrounds (Light mode: cream/limestone) */
+  --color-bg: #F8F4F0;           /* limestone-50 */
   --color-bg-soft: #FFFFFF;
   --color-bg-elevated: #FFFFFF;
 
@@ -55,14 +57,16 @@
   --color-surface-hover: #F5F8FA;
   --color-surface-subtle: rgba(59, 90, 105, 0.06);
 
-  /* Text */
-  --color-text: #333333;
-  --color-text-secondary: #5B6A71;
-  --color-text-muted: #7C8D94;
+  /* Text (Light mode: dark charcoal) */
+  --color-text: #333333;         /* charcoal-900 - PRIMARY TEXT */
+  --color-text-secondary: #5B6A71;  /* slate-blue-500 */
+  --color-text-muted: #7C8D94;   /* slate-blue-400 */
+  --color-text-faint: rgba(51, 51, 51, 0.35);
 
   /* Borders */
   --color-border: rgba(59, 90, 105, 0.15);
   --color-border-strong: rgba(59, 90, 105, 0.25);
+  --color-border-subtle: rgba(59, 90, 105, 0.08);
 }
 
 /* ============================================================================
@@ -70,24 +74,26 @@
    ============================================================================ */
 
 .dark {
-  /* Backgrounds */
-  --color-bg: #2F424B;
-  --color-bg-soft: #334D59;
-  --color-bg-elevated: #3F535F;
+  /* Backgrounds (Dark mode: steel-blue) */
+  --color-bg: #2F424B;           /* steel-blue-900 */
+  --color-bg-soft: #334D59;      /* steel-blue-800 */
+  --color-bg-elevated: #3F535F;  /* smalt-blue-700 */
 
   /* Surfaces */
-  --color-surface: #3B5A69;
-  --color-surface-hover: #476F82;
+  --color-surface: #3B5A69;      /* steel-blue-700 */
+  --color-surface-hover: #476F82; /* steel-blue-600 */
   --color-surface-subtle: rgba(59, 90, 105, 0.30);
 
-  /* Text */
-  --color-text: #F8F4F0;
-  --color-text-secondary: #CCD2D5;
-  --color-text-muted: #7C8D94;
+  /* Text (Dark mode: light cream/limestone) */
+  --color-text: #F8F4F0;         /* limestone-50 - PRIMARY TEXT */
+  --color-text-secondary: #CCD2D5;  /* slate-blue-200 */
+  --color-text-muted: #7C8D94;   /* slate-blue-400 */
+  --color-text-faint: rgba(248, 244, 240, 0.45);
 
   /* Borders */
   --color-border: rgba(148, 181, 195, 0.18);
   --color-border-strong: #5B8A9C;
+  --color-border-subtle: rgba(148, 181, 195, 0.10);
 }
 
 /* ============================================================================

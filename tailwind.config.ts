@@ -84,6 +84,7 @@ const config: Config = {
         },
 
         // === Semantic Color Aliases ===
+        // These adapt to light/dark mode via CSS variables
 
         // Primary brand colors
         teal: {
@@ -93,17 +94,18 @@ const config: Config = {
           glow: 'rgba(59, 90, 105, 0.18)',
         },
 
-        // Background colors
+        // Contextual colors (mode-aware via CSS variables)
         cream: {
-          DEFAULT: '#F8F4F0',  // limestone-50
-          border: 'rgba(59, 90, 105, 0.15)',
+          DEFAULT: 'var(--color-text)',      // Text color: charcoal in light, cream in dark
+          bg: 'var(--color-bg)',             // Background: cream in light, dark in dark
+          border: 'var(--color-border)',     // Border: mode-aware
         },
 
-        // Text colors
+        // Text colors (mode-aware)
         slate: {
-          DEFAULT: '#7C8D94',  // slate-blue-400
+          DEFAULT: 'var(--color-text-secondary)',  // Secondary text color
           200: '#CCD2D5',      // slate-blue-200
-          400: '#7C8D94',
+          400: '#7C8D94',      // slate-blue-400
           500: '#5B6A71',      // slate-blue-500
         },
 
@@ -118,6 +120,10 @@ const config: Config = {
         graphite: '#2F424B',   // steel-blue-900
         bronze: '#B68A4C',
         pomegranate: '#CE3657',
+
+        // Additional contextual colors
+        'cream-bg': 'var(--color-bg)',
+        'cream-border': 'var(--color-border)',
 
         // Status colors
         success: '#6DBF7B',
