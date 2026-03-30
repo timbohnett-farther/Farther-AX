@@ -6,6 +6,104 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Database Migration - Transitions Tables — 2026-03-30
+
+**What**: Fixed "Sync All Folders" error by adding missing transitions tables to main migration
+
+**Problem**: Error "relation 'advisor_team_mappings' does not exist" when syncing transitions
+
+**Root Cause**: Transitions tables were defined in `migrate-transitions.ts` but not included in `migrate.ts` that Railway runs on deployment
+
+**Solution**: Merged all transitions tables into main migration script:
+- `advisor_team_mappings` - Individual to team name mapping
+- `transition_clients` - Google Sheets sync data
+- `transition_workbooks` - Workbook-to-advisor assignment
+- `docusign_tokens` - OAuth tokens for DocuSign API
+- `advisor_tran_aum` - TRAN AUM & revenue aggregation
+
+**Files Modified**: `scripts/migrate.ts` - Added 90 lines of table definitions
+
+**Impact**:
+- ✅ Transitions tables created automatically on deployment
+- ✅ "Sync All Folders" now works correctly
+- ✅ All transitions features fully functional
+
+**Commit**: `2396dfa`
+
+**Status**: ✅ Complete - deployed to Railway
+
+---
+
+## [Completed] Fix 11 Training Pages Formatting — 2026-03-30
+
+**What**: Systematically fixed formatting issues across all AX Training & Playbook pages
+
+**Problem**: 11 out of 13 training pages had broken formatting:
+- Missing 'use client' directives
+- No useTheme() hook usage
+- Hardcoded colors that don't adapt to light/dark mode
+- Undefined Tailwind classes (text-cream, bg-charcoal-700, etc.)
+
+**Solution**: Fixed in 4 parallel batches:
+
+**Batch 1 - Critical (3 pages)**:
+- no-to-low-aum, master-merge, lpoa
+- Added 'use client' + useTheme()
+- Replaced all Tailwind color classes with THEME variables
+- Commit: `6880afc`
+
+**Batch 2 - Critical (2 pages)**:
+- repaper-acat, breakaway-process
+- Same transformation as batch 1
+- Commit: `9d1a7c7`
+
+**Batch 3 - High Priority (2 pages)**:
+- calendar-generator, knowledge-check
+- Already had 'use client', added useTheme()
+- Replaced hardcoded hex colors
+- Commit: `9d1a7c7`
+
+**Batch 4 - Medium Priority (3 pages)**:
+- onboarding-vs-transitions, key-documents, ma
+- Added 'use client' + useTheme()
+- Replaced undefined Tailwind classes
+- Commit: `4bbfb10`
+
+**Impact**:
+- ✅ All 11 pages now support light/dark mode
+- ✅ Consistent cream/slate backgrounds
+- ✅ Proper text contrast in both modes
+- ✅ No undefined Tailwind classes
+
+**Status**: ✅ Complete - all pages fixed
+
+---
+
+## [Completed] Fix Pipeline Page Horizontal Scrolling — 2026-03-30
+
+**What**: Removed horizontal scrolling from pipeline page
+
+**Problem**: Main pipeline page had horizontal scroll bar
+
+**Root Cause**: Container used `maxWidth: '100vw'` which doesn't account for padding (40px left + 40px right). Content exceeded viewport width.
+
+**Solution**:
+- Changed `maxWidth: '100vw'` → `width: '100%'` + `maxWidth: '100%'`
+- Added `boxSizing: 'border-box'` to include padding in width calculation
+
+**Files Modified**: `app/command-center/page.tsx` - Line 2156
+
+**Impact**:
+- ✅ No page-level horizontal scroll
+- ✅ Everything fits screen width
+- ✅ Tables scroll internally (as intended)
+
+**Commit**: `a3594ff`
+
+**Status**: ✅ Complete
+
+---
+
 ## [Completed] Fix Body/Main Element Backgrounds — 2026-03-30
 
 **What**: Applied cream/slate background to body and main elements (was still white)
