@@ -1,5 +1,8 @@
+'use client';
+
 import PageLayout from "@/components/PageLayout";
 import QuizSection from "@/components/QuizSection";
+import { useTheme } from '@/lib/theme-provider';
 
 const phases = [
   { num: "1", name: "Initial Assessment", lead: "M&A Strategist", question: "Is this a strategic fit? Go/No-Go for full diligence?" },
@@ -83,7 +86,7 @@ function SectionHeader({ part, title }: { part: string; title: string }) {
       <span className="inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-full bg-teal text-white text-xs font-bold shadow-[0_0_12px_rgba(29,118,130,0.4)]">
         {part}
       </span>
-      <h2 className="font-serif text-xl text-cream font-bold tracking-tight">{title}</h2>
+      <h2 className="font-serif text-xl text-foreground font-bold tracking-tight">{title}</h2>
     </div>
   );
 }
@@ -105,14 +108,14 @@ function FlagList({ title, badge, badgeClass, dotClass, items }: { title: string
   return (
     <div className="glass-card rounded-xl p-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)]">
       <div className="flex items-center gap-3 mb-4">
-        <h4 className="font-serif text-base text-cream font-semibold">{title}</h4>
+        <h4 className="font-serif text-base text-foreground font-semibold">{title}</h4>
         <span className={`text-[10px] font-semibold tracking-wider uppercase text-white px-3 py-1 rounded-full ${badgeClass}`}>
           {badge}
         </span>
       </div>
       <ul className="space-y-2.5">
         {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-3 text-sm text-cream-muted leading-relaxed">
+          <li key={i} className="flex items-start gap-3 text-sm text-foreground-muted leading-relaxed">
             <span className={`shrink-0 w-1.5 h-1.5 rounded-full mt-2 ${dotClass}`} />
             {item}
           </li>
@@ -123,6 +126,8 @@ function FlagList({ title, badge, badgeClass, dotClass, items }: { title: string
 }
 
 export default function MAPage() {
+  const { THEME } = useTheme();
+
   return (
     <PageLayout
       step={6}
@@ -134,10 +139,10 @@ export default function MAPage() {
       <div className="max-w-4xl mx-auto">
         {/* Hero / Why This Matters */}
         <div className="glass-card rounded-2xl px-8 py-8 mb-8">
-          <h2 className="font-serif text-2xl text-cream mb-4">
-            Why This Matters at <span className="text-gold">Farther</span>
+          <h2 className="font-serif text-2xl text-foreground mb-4">
+            Why This Matters at <span className="text-teal">Farther</span>
           </h2>
-          <p className="text-sm text-cream-muted leading-7">
+          <p className="text-sm text-foreground-muted leading-7">
             Farther&rsquo;s growth strategy is built on combining top-tier advisor talent with proprietary
             technology &mdash; and RIA acquisitions are a meaningful accelerant to that mission. When Farther
             brings on an acquired book of business, the Advisor Experience and Onboarding team sits at the
@@ -150,7 +155,7 @@ export default function MAPage() {
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 1: How Farther Evaluates an RIA */}
         <SectionHeader part="1" title="How Farther Evaluates an RIA Before We Buy" />
-        <p className="text-sm text-cream-muted leading-7 mb-6">
+        <p className="text-sm text-foreground-muted leading-7 mb-6">
           Before our team touches a deal, it has already gone through a rigorous six-phase evaluation process.
           Knowing where a deal stands in this pipeline helps the Onboarding team anticipate what&rsquo;s coming
           and prepare accordingly.
@@ -167,17 +172,17 @@ export default function MAPage() {
                 <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-teal text-white text-xs font-bold shadow-[0_0_10px_rgba(29,118,130,0.3)]">
                   {p.num}
                 </span>
-                <h4 className="font-serif text-sm text-cream font-semibold leading-snug">{p.name}</h4>
+                <h4 className="font-serif text-sm text-foreground font-semibold leading-snug">{p.name}</h4>
               </div>
-              <p className="text-[11px] text-gold-dark uppercase tracking-wider font-medium mb-1.5">{p.lead}</p>
-              <p className="text-xs text-cream-muted leading-relaxed">{p.question}</p>
+              <p className="text-[11px] text-bronze uppercase tracking-wider font-medium mb-1.5">{p.lead}</p>
+              <p className="text-xs text-foreground-muted leading-relaxed">{p.question}</p>
             </div>
           ))}
         </div>
 
         <Callout>
           By the time the Advisor Experience team is activated, Phases 1&ndash;5 are largely complete.{" "}
-          <strong className="text-cream">Your work begins in earnest at Phase 6</strong> &mdash; and everything
+          <strong className="text-foreground">Your work begins in earnest at Phase 6</strong> &mdash; and everything
           you do either validates or undermines the thesis built in Phases 1&ndash;5.
         </Callout>
 
@@ -186,22 +191,22 @@ export default function MAPage() {
         <SectionHeader part="2" title="Understanding the Deal Structure" />
 
         <div className="glass-card rounded-xl p-6 mb-6">
-          <h3 className="font-serif text-base text-cream font-semibold mb-3">How RIA Acquisitions Are Valued</h3>
-          <p className="text-sm text-cream-muted leading-7">
+          <h3 className="font-serif text-base text-foreground font-semibold mb-3">How RIA Acquisitions Are Valued</h3>
+          <p className="text-sm text-foreground-muted leading-7">
             RIA books of business are typically valued as a multiple of recurring revenue or seller&rsquo;s
             discretionary earnings. A proper valuation accounts for revenue quality, client demographics, tenure,
             attrition risk, and numerous other factors. No two books are identical &mdash; context matters enormously.
           </p>
         </div>
 
-        <h3 className="font-serif text-base text-cream font-semibold mb-4">
+        <h3 className="font-serif text-base text-foreground font-semibold mb-4">
           Earnouts: The Deal Structure You&rsquo;ll Encounter Most
         </h3>
-        <p className="text-sm text-cream-muted leading-7 mb-5">
-          Nearly every RIA acquisition at scale includes an <strong className="text-cream">earnout</strong>, where
+        <p className="text-sm text-foreground-muted leading-7 mb-5">
+          Nearly every RIA acquisition at scale includes an <strong className="text-foreground">earnout</strong>, where
           a portion of the purchase price is deferred and paid based on post-close performance. This is critically
           important for the Onboarding team to understand because{" "}
-          <strong className="text-cream">how we handle the transition directly affects whether earnout targets are met.</strong>
+          <strong className="text-foreground">how we handle the transition directly affects whether earnout targets are met.</strong>
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -213,7 +218,7 @@ export default function MAPage() {
           ].map((s) => (
             <div key={s.label} className="glass-card rounded-lg p-4 transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]">
               <p className="font-serif text-lg text-teal font-bold mb-1">{s.label}</p>
-              <p className="text-xs text-cream-muted leading-relaxed">{s.sub}</p>
+              <p className="text-xs text-foreground-muted leading-relaxed">{s.sub}</p>
             </div>
           ))}
         </div>
@@ -227,7 +232,7 @@ export default function MAPage() {
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 3: Compliance */}
         <SectionHeader part="3" title="Compliance — What the Onboarding Team Must Know" />
-        <p className="text-sm text-cream-muted leading-7 mb-6">
+        <p className="text-sm text-foreground-muted leading-7 mb-6">
           Compliance is the highest-stakes area for any RIA acquisition. Errors here have regulatory, financial,
           and reputational consequences.
         </p>
@@ -235,7 +240,7 @@ export default function MAPage() {
         {/* Form ADV */}
         <div className="glass-card rounded-xl p-6 mb-6 transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]">
           <div className="flex items-center gap-3 mb-4">
-            <h3 className="font-serif text-base text-cream font-semibold">Form ADV &mdash; The Foundation</h3>
+            <h3 className="font-serif text-base text-foreground font-semibold">Form ADV &mdash; The Foundation</h3>
             <span className="text-[10px] font-semibold tracking-wider uppercase text-white bg-teal px-3 py-1 rounded-full shadow-[0_0_10px_rgba(29,118,130,0.3)]">
               Core Document
             </span>
@@ -251,33 +256,33 @@ export default function MAPage() {
                 <span className="text-[10px] font-bold tracking-wider uppercase text-teal bg-teal/15 px-2.5 py-1 rounded-full shrink-0 shadow-[0_0_6px_rgba(29,118,130,0.2)]">
                   {a.part}
                 </span>
-                <p className="text-xs text-cream-muted leading-relaxed">{a.desc}</p>
+                <p className="text-xs text-foreground-muted leading-relaxed">{a.desc}</p>
               </div>
             ))}
           </div>
-          <p className="text-xs text-cream-muted leading-relaxed">
-            <strong className="text-cream">Why it matters for onboarding:</strong> When Farther acquires an RIA,
+          <p className="text-xs text-foreground-muted leading-relaxed">
+            <strong className="text-foreground">Why it matters for onboarding:</strong> When Farther acquires an RIA,
             the acquired firm&rsquo;s ADV must be updated or superseded. Clients must receive updated disclosure
             documents. Any material changes trigger re-disclosure obligations.
           </p>
         </div>
 
         {/* Regulatory Red Flags */}
-        <h3 className="font-serif text-base text-cream font-semibold mb-4">Regulatory Red Flags to Know Before Day 1</h3>
+        <h3 className="font-serif text-base text-foreground font-semibold mb-4">Regulatory Red Flags to Know Before Day 1</h3>
         <div className="space-y-2.5 mb-6">
           {regFlags.map((f, i) => (
             <div key={i} className="flex items-start gap-3 glass-card rounded-lg px-5 py-3">
               <span className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500/15 text-red-400 text-[10px] font-bold shadow-[0_0_6px_rgba(239,68,68,0.2)]">
                 !
               </span>
-              <p className="text-sm text-cream-muted leading-relaxed">{f}</p>
+              <p className="text-sm text-foreground-muted leading-relaxed">{f}</p>
             </div>
           ))}
         </div>
 
         {/* 30-Day Timeline */}
-        <h3 className="font-serif text-base text-cream font-semibold mb-4">The 30-Day Advisor Onboarding Compliance Standard</h3>
-        <p className="text-sm text-cream-muted leading-7 mb-5">
+        <h3 className="font-serif text-base text-foreground font-semibold mb-4">The 30-Day Advisor Onboarding Compliance Standard</h3>
+        <p className="text-sm text-foreground-muted leading-7 mb-5">
           Documentation must be complete, accessible, and defensible before the advisor is deployed. SEC and state
           examiners do not accept partial onboarding as a defense.
         </p>
@@ -301,9 +306,9 @@ export default function MAPage() {
                   <span className="text-[10px] font-bold tracking-wider uppercase text-teal bg-teal/15 px-2.5 py-0.5 rounded-full shadow-[0_0_6px_rgba(29,118,130,0.2)]">
                     {step.days}
                   </span>
-                  <span className="text-sm font-semibold text-cream">{step.title}</span>
+                  <span className="text-sm font-semibold text-foreground">{step.title}</span>
                 </div>
-                <p className="text-xs text-cream-muted leading-relaxed">{step.items}</p>
+                <p className="text-xs text-foreground-muted leading-relaxed">{step.items}</p>
               </div>
             </div>
           ))}
@@ -315,12 +320,12 @@ export default function MAPage() {
         </Callout>
 
         {/* Farther-Specific Compliance */}
-        <h3 className="font-serif text-base text-cream font-semibold mb-4">Special Compliance Concerns at Farther</h3>
+        <h3 className="font-serif text-base text-foreground font-semibold mb-4">Special Compliance Concerns at Farther</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           {fartherCompliance.map((c) => (
             <div key={c.issue} className="glass-card rounded-xl p-5 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5">
-              <h4 className="text-sm text-cream font-semibold mb-2">{c.issue}</h4>
-              <p className="text-xs text-cream-muted leading-relaxed">{c.detail}</p>
+              <h4 className="text-sm text-foreground font-semibold mb-2">{c.issue}</h4>
+              <p className="text-xs text-foreground-muted leading-relaxed">{c.detail}</p>
             </div>
           ))}
         </div>
@@ -328,7 +333,7 @@ export default function MAPage() {
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 4: Client Retention */}
         <SectionHeader part="4" title="Client Retention — The Metric That Drives Everything" />
-        <p className="text-sm text-cream-muted leading-7 mb-6">
+        <p className="text-sm text-foreground-muted leading-7 mb-6">
           Client retention is the single most important post-acquisition metric. Earnout payments depend on it.
           Farther&rsquo;s reputation as an acquirer depends on it.
         </p>
@@ -343,13 +348,13 @@ export default function MAPage() {
           ].map((s) => (
             <div key={s.label} className="glass-card rounded-lg p-4 text-center transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]">
               <p className="font-serif text-xl text-teal font-bold mb-1">{s.value}</p>
-              <p className="text-[10px] text-cream-muted leading-snug uppercase tracking-wider">{s.label}</p>
+              <p className="text-[10px] text-foreground-muted leading-snug uppercase tracking-wider">{s.label}</p>
             </div>
           ))}
         </div>
 
         {/* What drives retention */}
-        <h3 className="font-serif text-base text-cream font-semibold mb-4">What Actually Drives Retention</h3>
+        <h3 className="font-serif text-base text-foreground font-semibold mb-4">What Actually Drives Retention</h3>
         <div className="space-y-2.5 mb-6">
           {[
             "Communicate with clients before anyone else does — don’t let news travel through the grapevine",
@@ -361,7 +366,7 @@ export default function MAPage() {
               <span className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-bold shadow-[0_0_6px_rgba(16,185,129,0.2)]">
                 {i + 1}
               </span>
-              <p className="text-sm text-cream-muted leading-relaxed">{item}</p>
+              <p className="text-sm text-foreground-muted leading-relaxed">{item}</p>
             </div>
           ))}
         </div>
@@ -369,7 +374,7 @@ export default function MAPage() {
         {/* Warm Handoff */}
         <div className="glass-card rounded-xl p-6 mb-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)]">
           <div className="flex items-center gap-3 mb-3">
-            <h3 className="font-serif text-base text-cream font-semibold">The Warm Handoff Standard</h3>
+            <h3 className="font-serif text-base text-foreground font-semibold">The Warm Handoff Standard</h3>
             <span className="text-[10px] font-semibold tracking-wider uppercase text-white bg-emerald-600 px-3 py-1 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]">
               Gold Standard
             </span>
@@ -380,7 +385,7 @@ export default function MAPage() {
               "Negotiate seller participation in the transition as part of deal terms — this directly protects retention and earnout performance",
               "Use Farther’s technology — CRM tracking, automated follow-up workflows, and the AI-powered proposal tool — to ensure no client is overlooked",
             ].map((item, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm text-cream-muted leading-relaxed">
+              <li key={i} className="flex items-start gap-3 text-sm text-foreground-muted leading-relaxed">
                 <span className="text-emerald-400 mt-0.5 shrink-0">&#9670;</span>
                 {item}
               </li>
@@ -389,7 +394,7 @@ export default function MAPage() {
         </div>
 
         <Callout>
-          <strong className="text-cream">The client doesn&rsquo;t follow the firm &mdash; they follow the mechanic.</strong>{" "}
+          <strong className="text-foreground">The client doesn&rsquo;t follow the firm &mdash; they follow the mechanic.</strong>{" "}
           The job is to make sure they understand Farther&rsquo;s team <em>is</em> their mechanic going forward.
         </Callout>
 
@@ -397,27 +402,27 @@ export default function MAPage() {
         {/* Part 5: Technology */}
         <SectionHeader part="5" title="Technology Integration — Farther’s Competitive Advantage" />
 
-        <h3 className="font-serif text-base text-cream font-semibold mb-4">What Makes Farther&rsquo;s Tech Stack Different</h3>
+        <h3 className="font-serif text-base text-foreground font-semibold mb-4">What Makes Farther&rsquo;s Tech Stack Different</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           {techAdvantages.map((t) => (
             <div key={t.label} className="glass-card rounded-xl p-5 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5">
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-2 h-2 rounded-full bg-teal shadow-[0_0_6px_rgba(29,118,130,0.4)]" />
-                <h4 className="text-sm text-cream font-semibold">{t.label}</h4>
+                <h4 className="text-sm text-foreground font-semibold">{t.label}</h4>
               </div>
-              <p className="text-xs text-cream-muted leading-relaxed">{t.desc}</p>
+              <p className="text-xs text-foreground-muted leading-relaxed">{t.desc}</p>
             </div>
           ))}
         </div>
 
-        <h3 className="font-serif text-base text-cream font-semibold mb-4">Technology Migration Risks to Manage</h3>
+        <h3 className="font-serif text-base text-foreground font-semibold mb-4">Technology Migration Risks to Manage</h3>
         <div className="space-y-2.5 mb-8">
           {techRisks.map((r, i) => (
             <div key={i} className="flex items-start gap-3 glass-card rounded-lg px-5 py-3">
               <span className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold shadow-[0_0_6px_rgba(245,158,11,0.2)]">
                 !
               </span>
-              <p className="text-sm text-cream-muted leading-relaxed">{r}</p>
+              <p className="text-sm text-foreground-muted leading-relaxed">{r}</p>
             </div>
           ))}
         </div>
@@ -425,10 +430,10 @@ export default function MAPage() {
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 6: Red Flags */}
         <SectionHeader part="6" title="Red Flags Onboarding Should Escalate Immediately" />
-        <p className="text-sm text-cream-muted leading-7 mb-6">
+        <p className="text-sm text-foreground-muted leading-7 mb-6">
           The onboarding team is often the first to interact with acquired advisors and clients at a human level.
           This gives the team unique visibility into issues that due diligence may not have surfaced.{" "}
-          <strong className="text-cream">Escalate immediately if you observe:</strong>
+          <strong className="text-foreground">Escalate immediately if you observe:</strong>
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
@@ -439,15 +444,15 @@ export default function MAPage() {
 
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Quick Reference: Key Terms */}
-        <div className="border-t border-cream-border pt-8 mt-8 mb-8">
-          <h2 className="font-serif text-xl text-cream font-bold mb-6">Quick Reference: Key Terms</h2>
+        <div className="border-t border-border pt-8 mt-8 mb-8">
+          <h2 className="font-serif text-xl text-foreground font-bold mb-6">Quick Reference: Key Terms</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {glossary.map((g) => (
               <div key={g.term} className="flex items-start gap-3 bg-white/[0.03] rounded-lg px-4 py-3">
                 <span className="text-[10px] font-bold tracking-wider uppercase text-teal bg-teal/15 px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap shadow-[0_0_6px_rgba(29,118,130,0.2)]">
                   {g.term}
                 </span>
-                <p className="text-xs text-cream-muted leading-relaxed">{g.def}</p>
+                <p className="text-xs text-foreground-muted leading-relaxed">{g.def}</p>
               </div>
             ))}
           </div>
@@ -456,20 +461,20 @@ export default function MAPage() {
         {/* ──────────────────────────────────────────────────────────── */}
         {/* North Star */}
         <div className="glass-card-dark rounded-2xl px-8 py-8 text-center">
-          <p className="text-[10px] text-gold-dark uppercase tracking-[0.2em] font-semibold mb-3">
+          <p className="text-[10px] text-bronze uppercase tracking-[0.2em] font-semibold mb-3">
             The Onboarding Team&rsquo;s North Star
           </p>
-          <p className="font-serif text-lg text-cream leading-relaxed max-w-3xl mx-auto mb-4">
+          <p className="font-serif text-lg text-foreground leading-relaxed max-w-3xl mx-auto mb-4">
             Making the transition so seamless for clients and advisors that they never question
-            their decision to be part of <span className="text-gold">Farther</span>.
+            their decision to be part of <span className="text-teal">Farther</span>.
           </p>
-          <p className="text-sm text-cream-muted leading-7 max-w-3xl mx-auto">
+          <p className="text-sm text-foreground-muted leading-7 max-w-3xl mx-auto">
             That means compliance documentation that holds up under exam scrutiny, technology that works from
             Day 1, communication that is personal and proactive, and a culture introduction that makes advisors
             feel they&rsquo;ve upgraded &mdash; not just changed firms.
           </p>
-          <div className="mt-5 h-px w-24 mx-auto bg-gold opacity-40" />
-          <p className="mt-4 text-xs text-gold font-medium tracking-wide">
+          <div className="mt-5 h-px w-24 mx-auto bg-teal opacity-40" />
+          <p className="mt-4 text-xs text-teal font-medium tracking-wide">
             The deals are won in due diligence. The value is created &mdash; or destroyed &mdash; in onboarding.
           </p>
         </div>

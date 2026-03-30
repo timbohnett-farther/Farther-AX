@@ -234,13 +234,13 @@ export default function KeyDocumentsPage() {
 
         {/* Page header */}
         <div className="mb-10">
-          <p className="text-sm font-semibold text-gold-dark uppercase tracking-widest mb-2">
+          <p className="text-sm font-semibold text-bronze uppercase tracking-widest mb-2">
             Step 03 of 13
           </p>
           <h1 className="font-serif text-4xl sm:text-5xl text-foreground mb-3">
             Key Documents
           </h1>
-          <p className="text-gold font-serif text-lg sm:text-xl">
+          <p className="text-teal font-serif text-lg sm:text-xl">
             Document Applicability Matrix &amp; Definitions
           </p>
         </div>
@@ -346,12 +346,12 @@ export default function KeyDocumentsPage() {
               >
                 {/* Card header */}
                 <div className="flex items-start gap-4 mb-3">
-                  <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-card-700 text-gold-dark text-xs font-bold font-sans">
+                  <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-card-700 text-bronze text-xs font-bold font-sans">
                     {String(idx + 1).padStart(2, "0")}
                   </span>
                   <div>
                     <h3 className="font-serif text-xl text-foreground mb-0.5">
-                      <span className="text-gold-dark">{def.code}</span>
+                      <span className="text-bronze">{def.code}</span>
                       {def.code !== def.title && (
                         <span className="text-foreground"> — {def.title}</span>
                       )}
