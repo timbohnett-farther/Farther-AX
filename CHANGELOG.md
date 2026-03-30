@@ -6,6 +6,26 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Sidebar Text Colors for Light Mode — 2026-03-30
+
+**What**: Fixed sidebar text colors to be readable in light mode (charcoal instead of cream)
+
+**Problem**: Sidebar text was using cream color (#F8F4F0) in both light and dark modes, making it difficult to read in light mode.
+
+**Solution**: Made sidebar text colors mode-aware in `lib/theme.ts`:
+- Light mode: `sidebarText` = #333333 (charcoal - dark and readable)
+- Dark mode: `sidebarText` = #F8F4F0 (cream - light and readable)
+- Also fixed `sidebarTextSecondary` and `sidebarTextFaint` for proper contrast
+
+**Files Modified**:
+- `lib/theme.ts` - Lines 126-130: Updated sidebar color definitions
+
+**Commit**: `14cd8b1`
+
+**Status**: ✅ Complete
+
+---
+
 ## [Completed] Fix Brand Colors with Mode-Aware CSS Variables — 2026-03-30
 
 **What**: Fixed broken color theme by implementing mode-aware CSS variables (second fix after first attempt caused text visibility issues)
