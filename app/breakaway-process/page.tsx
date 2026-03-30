@@ -1,7 +1,12 @@
+'use client';
+
 import PageLayout from "@/components/PageLayout";
 import QuizSection from "@/components/QuizSection";
+import { useTheme } from '@/lib/theme-provider';
 
 export default function BreakawayProcessPage() {
+  const { THEME } = useTheme();
+
   const phases = [
     {
       phase: "Phase 1",
@@ -15,7 +20,7 @@ export default function BreakawayProcessPage() {
     {
       phase: "Phase 2",
       title: "Pre-Resignation Preparation",
-      duration: "Weeks 1-3",
+      duration: "Weeks 1–3",
       items: [
         { meeting: "Tech Onboarding Session", attendees: "AXA, Advisor", agenda: "Portal access setup, platform walkthrough, model portfolio orientation", followUp: "Advisor completes training modules", owner: "AXA" },
         { meeting: "IAA & Exhibit B Signing", attendees: "AXM, Legal, Advisor", agenda: "Review and execute IAA and Exhibit B", followUp: "Documents stored in client file", owner: "AXM" },
@@ -36,7 +41,7 @@ export default function BreakawayProcessPage() {
     {
       phase: "Phase 4",
       title: "Transitions Running",
-      duration: "Weeks 2-8+",
+      duration: "Weeks 2–8+",
       items: [
         { meeting: "Weekly Transitions Check-In", attendees: "AXM, AXA, CTM, CTA", agenda: "Review Transition Spreadsheet, address open items, escalate blockers", followUp: "Transition Tracker updated within 24 hours", owner: "CTM" },
         { meeting: "Client Progress Review", attendees: "AXM, Advisor", agenda: "Discuss client transfer progress, address advisor concerns, manage client expectations", followUp: "Advisor sends update communications as needed", owner: "AXM" },
@@ -45,7 +50,7 @@ export default function BreakawayProcessPage() {
     {
       phase: "Phase 5",
       title: "Graduation",
-      duration: "Week 8-12",
+      duration: "Week 8–12",
       items: [
         { meeting: "Graduation Review", attendees: "AXM, AXA, Advisor, Head of AX", agenda: "Confirm all graduation criteria met: all accounts transferred, training complete, advisor self-sufficient on platform", followUp: "Advisor officially graduated. AX support transitions to standard model.", owner: "AXM" },
         { meeting: "Closeout & Handoff", attendees: "AXM, AXA, CTM", agenda: "Close out Transition Tracker, archive documents, confirm no open items", followUp: "Files archived. Case closed.", owner: "AXA" },
@@ -62,7 +67,10 @@ export default function BreakawayProcessPage() {
       nextHref="/calendar-generator"
     >
       <div className="max-w-4xl">
-        <p className="text-base leading-relaxed mb-8 text-cream">
+        <p
+          className="text-base leading-relaxed mb-8"
+          style={{ color: THEME.colors.text }}
+        >
           The following workflow maps every phase of a Breakaway advisor onboarding — from the
           moment the deal is signed through graduation. Each phase shows the key meetings,
           required attendees, agenda items, and follow-up actions with assigned owners.
@@ -73,41 +81,119 @@ export default function BreakawayProcessPage() {
             <div key={phaseIdx}>
               {/* Phase header */}
               <div className="flex items-center gap-4 mb-3">
-                <div className="px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-teal text-white shadow-[0_0_10px_rgba(78,112,130,0.3)]">
+                <div
+                  className="px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase text-white"
+                  style={{
+                    backgroundColor: THEME.colors.teal,
+                    boxShadow: `0 0 10px ${THEME.colors.teal}50`
+                  }}
+                >
                   {phase.phase}
                 </div>
-                <h3 className="text-xl font-bold font-sans text-cream">
+                <h3
+                  className="text-xl font-bold font-sans"
+                  style={{ color: THEME.colors.text }}
+                >
                   {phase.title}
                 </h3>
-                <span className="text-sm px-2 py-0.5 border border-cream-border rounded-full text-cream-muted shadow-[0_0_6px_rgba(78,112,130,0.15)]">
+                <span
+                  className="text-sm px-2 py-0.5 border rounded-full"
+                  style={{
+                    color: THEME.colors.textSecondary,
+                    borderColor: THEME.colors.border,
+                    boxShadow: `0 0 6px ${THEME.colors.teal}25`
+                  }}
+                >
                   {phase.duration}
                 </span>
               </div>
 
               {/* Meetings table */}
-              <div className="rounded-lg border border-cream-border overflow-hidden transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]">
+              <div
+                className="rounded-lg border overflow-hidden transition-all duration-200"
+                style={{
+                  borderColor: THEME.colors.border,
+                  boxShadow: `0 0 16px ${THEME.colors.teal}25`
+                }}
+              >
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-charcoal-600">
-                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider text-cream-muted w-[22%]">Meeting</th>
-                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider text-cream-muted w-[20%]">Attendees</th>
-                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider text-cream-muted w-[28%]">Agenda</th>
-                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider text-cream-muted w-[22%]">Follow-Up</th>
-                      <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider text-cream-muted w-[8%]">Owner</th>
+                    <tr style={{ backgroundColor: THEME.colors.surface }}>
+                      <th
+                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[22%]"
+                        style={{ color: THEME.colors.textSecondary }}
+                      >
+                        Meeting
+                      </th>
+                      <th
+                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[20%]"
+                        style={{ color: THEME.colors.textSecondary }}
+                      >
+                        Attendees
+                      </th>
+                      <th
+                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[28%]"
+                        style={{ color: THEME.colors.textSecondary }}
+                      >
+                        Agenda
+                      </th>
+                      <th
+                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[22%]"
+                        style={{ color: THEME.colors.textSecondary }}
+                      >
+                        Follow-Up
+                      </th>
+                      <th
+                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[8%]"
+                        style={{ color: THEME.colors.textSecondary }}
+                      >
+                        Owner
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {phase.items.map((item, itemIdx) => (
                       <tr
                         key={itemIdx}
-                        className={`transition-colors duration-200 hover:bg-white/5 border-t border-cream-border ${itemIdx % 2 === 0 ? "bg-charcoal-500/50" : "bg-charcoal-600"}`}
+                        className="transition-colors duration-200 hover:bg-white/5 border-t"
+                        style={{
+                          backgroundColor: itemIdx % 2 === 0 ? THEME.colors.surface : THEME.colors.background,
+                          borderColor: THEME.colors.border
+                        }}
                       >
-                        <td className="px-4 py-3 font-medium text-cream">{item.meeting}</td>
-                        <td className="px-4 py-3 text-cream">{item.attendees}</td>
-                        <td className="px-4 py-3 text-cream">{item.agenda}</td>
-                        <td className="px-4 py-3 text-cream">{item.followUp}</td>
+                        <td
+                          className="px-4 py-3 font-medium"
+                          style={{ color: THEME.colors.text }}
+                        >
+                          {item.meeting}
+                        </td>
+                        <td
+                          className="px-4 py-3"
+                          style={{ color: THEME.colors.text }}
+                        >
+                          {item.attendees}
+                        </td>
+                        <td
+                          className="px-4 py-3"
+                          style={{ color: THEME.colors.text }}
+                        >
+                          {item.agenda}
+                        </td>
+                        <td
+                          className="px-4 py-3"
+                          style={{ color: THEME.colors.text }}
+                        >
+                          {item.followUp}
+                        </td>
                         <td className="px-4 py-3">
-                          <span className="px-2 py-0.5 text-xs font-semibold bg-charcoal-600 text-teal-dark rounded-full shadow-[0_0_6px_rgba(78,112,130,0.2)]">
+                          <span
+                            className="px-2 py-0.5 text-xs font-semibold rounded-full"
+                            style={{
+                              backgroundColor: THEME.colors.surface,
+                              color: THEME.colors.teal,
+                              boxShadow: `0 0 6px ${THEME.colors.teal}33`
+                            }}
+                          >
                             {item.owner}
                           </span>
                         </td>
