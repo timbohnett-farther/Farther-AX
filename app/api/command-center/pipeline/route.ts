@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { withPgCache } from '@/lib/pg-cache';
+import { paginatedSearch, hubspotFetch } from '@/lib/hubspot';
 
-// Support both env var names so Railway config doesn't need to change
-const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
 
 // ── Stage definitions ─────────────────────────────────────────────────────────
@@ -52,52 +51,26 @@ const DEAL_PROPERTIES = [
   'people',
 ];
 
-// ── HubSpot pagination helper ─────────────────────────────────────────────────
+// ── Type definitions ──────────────────────────────────────────────────────────
 type DealResult = { id: string; properties: Record<string, string | null> };
-
-async function paginatedSearch(filterGroups: unknown[]): Promise<DealResult[]> {
-  const deals: DealResult[] = [];
-  let after: string | undefined;
-
-  do {
-    const body: Record<string, unknown> = {
-      filterGroups,
-      properties: DEAL_PROPERTIES,
-      sorts: [{ propertyName: 'hs_lastmodifieddate', direction: 'DESCENDING' }],
-      limit: 100,
-    };
-    if (after) body.after = after;
-
-    const res = await fetch('https://api.hubapi.com/crm/v3/objects/deals/search', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.text();
-      throw new Error(`HubSpot ${res.status}: ${errBody}`);
-    }
-    const data = await res.json();
-    deals.push(...data.results);
-    after = data.paging?.next?.after;
-  } while (after);
-
-  return deals;
-}
 
 // ── Fetch active deals (in-progress stages) ───────────────────────────────────
 async function fetchActiveDeals(): Promise<DealResult[]> {
   // HubSpot allows max 5 filterGroups. We use one group per active stage
   // with AND logic: pipeline = X AND dealstage IN active stages.
-  return paginatedSearch([
-    {
-      filters: [
-        { propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID },
-        { propertyName: 'dealstage', operator: 'IN', values: ACTIVE_STAGE_IDS },
-      ],
-    },
-  ]);
+  return paginatedSearch<DealResult>(
+    'deals',
+    [
+      {
+        filters: [
+          { propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID },
+          { propertyName: 'dealstage', operator: 'IN', values: ACTIVE_STAGE_IDS },
+        ],
+      },
+    ],
+    DEAL_PROPERTIES,
+    [{ propertyName: 'hs_lastmodifieddate', direction: 'DESCENDING' }]
+  );
 }
 
 // ── Compute days since launch for graduated status ──────────────────────────
@@ -118,13 +91,15 @@ async function fetchOwners(): Promise<Record<string, string>> {
   let after: string | undefined;
 
   do {
-    const url = `https://api.hubapi.com/crm/v3/owners?limit=100${after ? `&after=${after}` : ''}`;
-    const res = await fetch(url, {
-      headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` },
-    });
-    if (!res.ok) break;
-    const data = await res.json();
-    for (const o of data.results) map[o.id] = `${o.firstName} ${o.lastName}`.trim();
+    const url = `/crm/v3/owners?limit=100${after ? `&after=${after}` : ''}`;
+    const data = await hubspotFetch<{
+      results: Array<{ id: string; firstName: string; lastName: string }>;
+      paging?: { next?: { after: string } };
+    }>(url);
+
+    for (const o of data.results) {
+      map[o.id] = `${o.firstName} ${o.lastName}`.trim();
+    }
     after = data.paging?.next?.after;
   } while (after);
 
