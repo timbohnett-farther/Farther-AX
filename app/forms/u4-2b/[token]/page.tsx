@@ -2,26 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import { useTheme } from '@/lib/theme-provider';
 
-// ── Design tokens (matching Farther brand) ──────────────────────────────────
-const C = {
-  bg: '#2C3B4E',
-  cardBg: '#F8F4F0',
-  cardBgAlt: '#E3D3C5',
-  border: 'rgba(248,244,240,0.08)',
-  borderFocus: '#3B5A69',
-  teal: '#3B5A69',
-  tealLight: '#7CA4B4',
-  dark: '#F8F4F0',
-  slate: 'rgba(248,244,240,0.5)',
-  green: '#10b981',
-  greenBg: 'rgba(16,185,129,0.15)',
-  amber: '#f59e0b',
-  amberBg: 'rgba(245,158,11,0.15)',
-  red: '#ef4444',
-  redBg: 'rgba(239,68,68,0.15)',
-  white: '#595959',
-};
+// ── Design tokens (from useTheme, populated in component) ────────────────────
+// Note: C is now populated dynamically from THEME inside the component
+let C: any;
 
 const STEPS = [
   { num: 1, label: 'General Information' },
@@ -206,8 +191,29 @@ function CheckboxGroup({ options, selected, onChange }: {
 
 // ── Main Page Component ──────────────────────────────────────────────────────
 export default function U4FormPage() {
+  const { THEME } = useTheme();
   const params = useParams();
   const token = params.token as string;
+
+  // Populate design tokens from THEME
+  C = {
+    bg: THEME.colors.bg,
+    cardBg: THEME.colors.surface,
+    cardBgAlt: THEME.colors.surfaceSubtle,
+    border: THEME.colors.border,
+    borderFocus: THEME.colors.teal,
+    teal: THEME.colors.teal,
+    tealLight: THEME.colors.tealLight,
+    dark: THEME.colors.text,
+    slate: THEME.colors.textSecondary,
+    green: '#10b981',
+    greenBg: 'rgba(16,185,129,0.15)',
+    amber: '#f59e0b',
+    amberBg: 'rgba(245,158,11,0.15)',
+    red: '#ef4444',
+    redBg: 'rgba(239,68,68,0.15)',
+    white: '#595959',
+  };
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

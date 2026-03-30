@@ -20,6 +20,7 @@ import {
   ArrowTrendingUpIcon,
 } from '@heroicons/react/24/outline';
 import { formatCompactCurrency } from '@/lib/theme';
+import { useTheme } from '@/lib/theme-provider';
 
 /**
  * UI Showcase - Component Library Reference
@@ -28,6 +29,7 @@ import { formatCompactCurrency } from '@/lib/theme';
  * Use this as a visual reference during development
  */
 export default function UIShowcasePage() {
+  const { THEME } = useTheme();
   const [searchValue, setSearchValue] = useState('');
   const [filterValue, setFilterValue] = useState('');
 
@@ -360,21 +362,42 @@ export default function UIShowcasePage() {
             Premium CSS Effects
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="glass-card p-6">
+            <div
+              className="p-6 rounded-xl transition-all duration-300 hover:shadow-xl"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`,
+                backdropFilter: 'blur(10px)',
+              }}
+            >
               <h3 className="text-lg font-serif font-semibold mb-2">Glass Card</h3>
               <p className="text-sm text-slate">
                 Hover to see elevation effect
               </p>
             </div>
 
-            <div className="stat-card">
+            <div
+              className="p-6 rounded-xl transition-all duration-300 hover:border-teal"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`,
+                borderTop: `3px solid ${THEME.colors.teal}`,
+              }}
+            >
               <h3 className="text-lg font-serif font-semibold mb-2">Stat Card</h3>
               <p className="text-sm text-slate">
                 Hover to see top border accent
               </p>
             </div>
 
-            <div className="chart-card">
+            <div
+              className="p-6 rounded-xl"
+              style={{
+                backgroundColor: THEME.colors.surfaceSubtle,
+                border: `1px solid ${THEME.colors.border}`,
+                backdropFilter: 'blur(20px)',
+              }}
+            >
               <h3 className="text-lg font-serif font-semibold mb-2">Chart Card</h3>
               <p className="text-sm text-slate">
                 Frosted glass with blur

@@ -38,8 +38,8 @@ function SignInContent() {
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
           <Image
-            src="/images/farther-iw-cream.png"
-            alt="Farther"
+            src="/ax.png"
+            alt="Farther AX"
             width={180}
             height={45}
             priority
