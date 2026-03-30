@@ -50,7 +50,7 @@ export default function RepaperAcatPage() {
         <div
           className="rounded-xl p-8 mb-8 text-center"
           style={{
-            backgroundColor: THEME.colors.background,
+            backgroundColor: THEME.colors.bg,
             border: `1px solid ${THEME.colors.border}`
           }}
         >

@@ -157,7 +157,7 @@ export default function BreakawayProcessPage() {
                         key={itemIdx}
                         className="transition-colors duration-200 hover:bg-white/5 border-t"
                         style={{
-                          backgroundColor: itemIdx % 2 === 0 ? THEME.colors.surface : THEME.colors.background,
+                          backgroundColor: itemIdx % 2 === 0 ? THEME.colors.surface : THEME.colors.bg,
                           borderColor: THEME.colors.border
                         }}
                       >
