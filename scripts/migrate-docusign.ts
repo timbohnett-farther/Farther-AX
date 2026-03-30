@@ -85,6 +85,30 @@ async function migrate() {
       -- Add computed status columns to transition_clients
       ALTER TABLE transition_clients ADD COLUMN IF NOT EXISTS household_status VARCHAR(64);
       ALTER TABLE transition_clients ADD COLUMN IF NOT EXISTS completion_pct SMALLINT DEFAULT 0;
+
+      -- Webhook event logging (for audit trail and debugging)
+      CREATE TABLE IF NOT EXISTS docusign_webhook_events (
+        id SERIAL PRIMARY KEY,
+        event_type VARCHAR(64) NOT NULL,
+        envelope_id VARCHAR(64) NOT NULL,
+        status VARCHAR(32),
+        email_subject TEXT,
+        payload JSONB NOT NULL,
+        received_at TIMESTAMPTZ DEFAULT NOW(),
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE (envelope_id, event_type, received_at)
+      );
+      CREATE INDEX IF NOT EXISTS idx_webhook_events_envelope ON docusign_webhook_events(envelope_id);
+      CREATE INDEX IF NOT EXISTS idx_webhook_events_received ON docusign_webhook_events(received_at DESC);
+
+      -- Sync state tracking (for incremental sync)
+      CREATE TABLE IF NOT EXISTS docusign_sync_state (
+        id SERIAL PRIMARY KEY,
+        last_synced_at TIMESTAMPTZ NOT NULL,
+        envelopes_synced INTEGER DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS idx_sync_state_last_synced ON docusign_sync_state(last_synced_at DESC);
     `);
     console.log('DocuSign migration complete.');
   } finally {
