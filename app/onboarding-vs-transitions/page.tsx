@@ -1,7 +1,12 @@
+'use client';
+
 import Link from "next/link";
 import QuizSection from "@/components/QuizSection";
+import { useTheme } from '@/lib/theme-provider';
 
 export default function OnboardingVsTransitions() {
+  const { THEME } = useTheme();
+
   return (
     <div className="min-h-screen bg-transparent font-sans">
       {/* Top Bar */}
@@ -10,7 +15,7 @@ export default function OnboardingVsTransitions() {
           <span className="font-serif text-gold-dark text-sm tracking-widest uppercase">
             Farther AX Hub
           </span>
-          <span className="text-cream-muted text-xs tracking-widest uppercase font-medium">
+          <span className="text-foreground-muted text-xs tracking-widest uppercase font-medium">
             Step 02 / 13
           </span>
         </div>
@@ -22,10 +27,10 @@ export default function OnboardingVsTransitions() {
           <p className="text-gold text-xs tracking-widest uppercase font-medium mb-3">
             ◆ Playbook — Step 02
           </p>
-          <h1 className="font-serif text-4xl md:text-5xl text-cream leading-tight mb-4">
+          <h1 className="font-serif text-4xl md:text-5xl text-foreground leading-tight mb-4">
             Onboarding vs. Transitions
           </h1>
-          <p className="text-cream-muted text-lg font-sans leading-relaxed">
+          <p className="text-foreground-muted text-lg font-sans leading-relaxed">
             Understanding Team Ownership &amp; Role Responsibilities
           </p>
           <div className="mt-6 w-16 h-px bg-gold opacity-60" />
@@ -33,10 +38,10 @@ export default function OnboardingVsTransitions() {
 
         {/* Section 1: Two Distinct Workstreams */}
         <section className="mb-14">
-          <h2 className="font-serif text-2xl text-cream mb-5">
+          <h2 className="font-serif text-2xl text-foreground mb-5">
             Two Distinct Workstreams
           </h2>
-          <p className="text-cream-muted leading-relaxed mb-8 max-w-3xl">
+          <p className="text-foreground-muted leading-relaxed mb-8 max-w-3xl">
             The AX team operates two parallel workstreams when a new advisor joins Farther.
             Onboarding and Transitions are distinct processes with different owners, timelines,
             and success metrics. Understanding the boundary between these two workstreams is
@@ -45,15 +50,15 @@ export default function OnboardingVsTransitions() {
 
           <div className="grid md:grid-cols-2 gap-5">
             {/* Onboarding Card */}
-            <div className="glass-card-dark rounded-xl p-7 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5">
+            <div className="glass-card rounded-xl p-7 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-9 h-9 rounded-lg bg-gold flex items-center justify-center text-cream text-sm font-bold shrink-0 shadow-[0_0_10px_rgba(29,118,130,0.3)]">
+                <div className="w-9 h-9 rounded-lg bg-gold flex items-center justify-center text-foreground text-sm font-bold shrink-0 shadow-[0_0_10px_rgba(29,118,130,0.3)]">
                   ◈
                 </div>
-                <h3 className="font-serif text-xl text-cream">Onboarding</h3>
+                <h3 className="font-serif text-xl text-foreground">Onboarding</h3>
               </div>
-              <p className="text-cream-muted leading-relaxed text-sm">
-                Owned by the <span className="text-cream font-medium">AX Manager (AXM)</span>.
+              <p className="text-foreground-muted leading-relaxed text-sm">
+                Owned by the <span className="text-foreground font-medium">AX Manager (AXM)</span>.
                 Covers everything related to setting up the advisor as a Farther professional —
                 their technology access, compliance filings, training, introductions to internal
                 teams, and graduation milestones.
@@ -61,15 +66,15 @@ export default function OnboardingVsTransitions() {
             </div>
 
             {/* Transitions Card */}
-            <div className="glass-card-dark rounded-xl p-7 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5">
+            <div className="glass-card rounded-xl p-7 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-9 h-9 rounded-lg bg-charcoal flex items-center justify-center text-cream text-sm font-bold shrink-0 shadow-[0_0_10px_rgba(29,118,130,0.15)]">
+                <div className="w-9 h-9 rounded-lg bg-charcoal flex items-center justify-center text-foreground text-sm font-bold shrink-0 shadow-[0_0_10px_rgba(29,118,130,0.15)]">
                   ⇌
                 </div>
-                <h3 className="font-serif text-xl text-cream">Transitions</h3>
+                <h3 className="font-serif text-xl text-foreground">Transitions</h3>
               </div>
-              <p className="text-cream-muted leading-relaxed text-sm">
-                Owned by the <span className="text-cream font-medium">Transitions team (CTM/CTA)</span>.
+              <p className="text-foreground-muted leading-relaxed text-sm">
+                Owned by the <span className="text-foreground font-medium">Transitions team (CTM/CTA)</span>.
                 Covers the movement of client assets from the advisor&apos;s previous custodian to
                 Farther&apos;s custodians. This process runs in parallel with onboarding but has its
                 own timeline and dependencies.
@@ -80,21 +85,21 @@ export default function OnboardingVsTransitions() {
 
         {/* Section 2: AXM Role Card */}
         <section className="mb-10">
-          <h2 className="font-serif text-2xl text-cream mb-6">
+          <h2 className="font-serif text-2xl text-foreground mb-6">
             AXM — Advisor Experience Manager
           </h2>
-          <div className="glass-card-dark rounded-xl overflow-hidden">
+          <div className="glass-card rounded-xl overflow-hidden">
             {/* Card Header */}
             <div className="border-b border-cream-border px-8 py-6 flex flex-wrap gap-6 items-start">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-gold flex items-center justify-center shrink-0">
-                  <span className="text-cream text-xl font-serif font-bold">A</span>
+                  <span className="text-foreground text-xl font-serif font-bold">A</span>
                 </div>
                 <div>
                   <p className="text-xs text-gold-dark uppercase tracking-widest font-medium mb-0.5">
                     Primary Ownership
                   </p>
-                  <p className="text-cream font-medium">Onboarding workstream</p>
+                  <p className="text-foreground font-medium">Onboarding workstream</p>
                 </div>
               </div>
               <div className="h-px w-full md:h-auto md:w-px bg-cream-border md:self-stretch" />
@@ -102,7 +107,7 @@ export default function OnboardingVsTransitions() {
                 <p className="text-xs text-gold-dark uppercase tracking-widest font-medium mb-0.5">
                   Reports to
                 </p>
-                <p className="text-cream font-medium">Head of Advisor Experience</p>
+                <p className="text-foreground font-medium">Head of Advisor Experience</p>
               </div>
             </div>
 
@@ -123,7 +128,7 @@ export default function OnboardingVsTransitions() {
                     "Escalate issues to legal, compliance, or executive sponsors as needed",
                     "Maintain accurate records in the Transition Tracker",
                   ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-cream-muted leading-relaxed">
+                    <li key={i} className="flex items-start gap-3 text-sm text-foreground-muted leading-relaxed">
                       <span className="text-gold mt-0.5 shrink-0">▸</span>
                       <span>{item}</span>
                     </li>
@@ -142,7 +147,7 @@ export default function OnboardingVsTransitions() {
                       (rel) => (
                         <span
                           key={rel}
-                          className="border border-teal/30 bg-teal/10 text-cream text-xs px-3 py-1.5 rounded-full font-medium shadow-[0_0_6px_rgba(29,118,130,0.15)]"
+                          className="border border-teal/30 bg-teal/10 text-foreground text-xs px-3 py-1.5 rounded-full font-medium shadow-[0_0_6px_rgba(29,118,130,0.15)]"
                         >
                           {rel}
                         </span>
@@ -161,7 +166,7 @@ export default function OnboardingVsTransitions() {
                       "Advisor NPS / satisfaction score post-graduation",
                       "No compliance violations during the onboarding window",
                     ].map((metric, i) => (
-                      <li key={i} className="flex items-start gap-3 text-sm text-cream-muted leading-relaxed">
+                      <li key={i} className="flex items-start gap-3 text-sm text-foreground-muted leading-relaxed">
                         <span className="text-gold-dark mt-0.5 shrink-0">◆</span>
                         <span>{metric}</span>
                       </li>
@@ -175,21 +180,21 @@ export default function OnboardingVsTransitions() {
 
         {/* Section 3: AXA Role Card */}
         <section className="mb-14">
-          <h2 className="font-serif text-2xl text-cream mb-6">
+          <h2 className="font-serif text-2xl text-foreground mb-6">
             AXA — Advisor Experience Associate
           </h2>
-          <div className="glass-card-dark rounded-xl overflow-hidden">
+          <div className="glass-card rounded-xl overflow-hidden">
             {/* Card Header */}
             <div className="border-b border-cream-border px-8 py-6 flex flex-wrap gap-6 items-start">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-charcoal flex items-center justify-center shrink-0">
-                  <span className="text-cream text-xl font-serif font-bold">A</span>
+                  <span className="text-foreground text-xl font-serif font-bold">A</span>
                 </div>
                 <div>
                   <p className="text-xs text-gold-dark uppercase tracking-widest font-medium mb-0.5">
                     Primary Ownership
                   </p>
-                  <p className="text-cream font-medium">Day-to-day execution and logistics support</p>
+                  <p className="text-foreground font-medium">Day-to-day execution and logistics support</p>
                 </div>
               </div>
               <div className="h-px w-full md:h-auto md:w-px bg-cream-border md:self-stretch" />
@@ -197,7 +202,7 @@ export default function OnboardingVsTransitions() {
                 <p className="text-xs text-gold-dark uppercase tracking-widest font-medium mb-0.5">
                   Reports to
                 </p>
-                <p className="text-cream font-medium">AXM</p>
+                <p className="text-foreground font-medium">AXM</p>
               </div>
             </div>
 
@@ -218,7 +223,7 @@ export default function OnboardingVsTransitions() {
                     "Prepare meeting agendas and send follow-up summaries after each session",
                     "Manage the Holiday List distribution and scheduling considerations",
                   ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-cream-muted leading-relaxed">
+                    <li key={i} className="flex items-start gap-3 text-sm text-foreground-muted leading-relaxed">
                       <span className="text-gold mt-0.5 shrink-0">▸</span>
                       <span>{item}</span>
                     </li>
@@ -237,7 +242,7 @@ export default function OnboardingVsTransitions() {
                       (rel) => (
                         <span
                           key={rel}
-                          className="border border-teal/30 bg-teal/10 text-cream text-xs px-3 py-1.5 rounded-full font-medium shadow-[0_0_6px_rgba(29,118,130,0.15)]"
+                          className="border border-teal/30 bg-teal/10 text-foreground text-xs px-3 py-1.5 rounded-full font-medium shadow-[0_0_6px_rgba(29,118,130,0.15)]"
                         >
                           {rel}
                         </span>
@@ -255,7 +260,7 @@ export default function OnboardingVsTransitions() {
                       "No missed meetings or scheduling gaps",
                       "Transition Tracker kept current (updated within 24 hours of each touchpoint)",
                     ].map((metric, i) => (
-                      <li key={i} className="flex items-start gap-3 text-sm text-cream-muted leading-relaxed">
+                      <li key={i} className="flex items-start gap-3 text-sm text-foreground-muted leading-relaxed">
                         <span className="text-gold-dark mt-0.5 shrink-0">◆</span>
                         <span>{metric}</span>
                       </li>
@@ -269,7 +274,7 @@ export default function OnboardingVsTransitions() {
 
         {/* Section 4: The Handoff Moment */}
         <section className="mb-16">
-          <h2 className="font-serif text-2xl text-cream mb-6">
+          <h2 className="font-serif text-2xl text-foreground mb-6">
             The Handoff Moment
           </h2>
           <div className="relative bg-charcoal rounded-xl px-8 py-8 overflow-hidden">
@@ -307,12 +312,12 @@ export default function OnboardingVsTransitions() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-cream-border shrink-0" />
-                  <span className="text-cream-muted text-xs">Transitions track — runs Transition Initiated → account transfers close</span>
+                  <span className="text-foreground-muted text-xs">Transitions track — runs Transition Initiated → account transfers close</span>
                 </div>
               </div>
             </div>
 
-            <p className="text-cream text-sm leading-relaxed relative z-10 max-w-3xl">
+            <p className="text-foreground text-sm leading-relaxed relative z-10 max-w-3xl">
               <span className="text-gold font-medium">Onboarding begins at deal-signed.</span>{" "}
               Transitions begin when the advisor&apos;s chosen transition method is confirmed and
               custodian paperwork is initiated. Both workstreams proceed in parallel until Go Live,
@@ -326,7 +331,7 @@ export default function OnboardingVsTransitions() {
         <div className="flex items-center justify-between pt-8 border-t border-cream-border">
           <Link
             href="/introduction"
-            className="group inline-flex items-center gap-2 text-cream-muted text-sm font-medium hover:text-cream transition-colors duration-200"
+            className="group inline-flex items-center gap-2 text-foreground-muted text-sm font-medium hover:text-foreground transition-colors duration-200"
           >
             <span className="text-gold group-hover:-translate-x-0.5 transition-transform duration-200">←</span>
             Back
@@ -334,7 +339,7 @@ export default function OnboardingVsTransitions() {
 
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-gold" />
-            <span className="text-cream-muted text-xs tracking-widest font-medium">02 / 13</span>
+            <span className="text-foreground-muted text-xs tracking-widest font-medium">02 / 13</span>
             <span className="w-2 h-2 rounded-full bg-cream-border" />
           </div>
 
