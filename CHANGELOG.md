@@ -6,6 +6,30 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Add Missing Gold Color to Theme — 2026-03-30
+
+**What**: Added gold color alias to theme system
+
+**Problem**: Build failed with "Property 'gold' does not exist on type" error
+
+**Root Cause**: Training pages used `THEME.colors.gold` but theme only had `bronze400` - no gold alias
+
+**Solution**:
+- Added `gold: PALETTE.bronze400` to theme colors object
+- Gold color (#B68A4C) now accessible as `THEME.colors.gold`
+
+**Files Modified**:
+- `lib/theme.ts` (line 102)
+
+**Impact**:
+- ✅ TypeScript build now passes
+- ✅ Training pages can use THEME.colors.gold
+- ✅ Consistent brand color usage across site
+
+**Status**: ✅ Complete - deployed
+
+---
+
 ## [Completed] Complete Layout Rebuild - Introduction & Onboarding Pages — 2026-03-30
 
 **What**: Completely rebuilt two training pages with proper theme system implementation

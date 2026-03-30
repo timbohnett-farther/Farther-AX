@@ -98,6 +98,9 @@ export function createTheme(mode: ThemeMode) {
     ice: PALETTE.steelBlue200,
     iceLight: PALETTE.steelBlue300,
 
+    // Brand accent
+    gold: PALETTE.bronze400,  // Gold accent for training pages (#B68A4C)
+
     // === Backgrounds (mode-aware) ===
     // Light mode: cream (#F8F4F0) | Dark mode: slate/steel-blue (#2F424B)
     bg: isDark ? '#2F424B' : '#F8F4F0',              // Main page background
