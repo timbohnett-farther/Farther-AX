@@ -22,10 +22,10 @@ const complianceTimeline = [
 ];
 
 const fartherCompliance = [
-  { issue: "Marketing Rule Compliance", detail: "Acquired advisors may have used testimonials, hypothetical performance, or social media in ways that don’t comply with SEC Marketing Rule requirements" },
-  { issue: "Cybersecurity & Data Transfer", detail: "Farther’s platform is a closed-loop encrypted ecosystem. Client data from acquired firms must be migrated into this ecosystem — not held in third-party systems" },
-  { issue: "Custody Rule", detail: "Confirm the acquired RIA’s custody arrangements are properly disclosed and structured before migration begins" },
-  { issue: "Fiduciary Standard Alignment", detail: "Any acquired firm with commission-based compensation structures requires careful review to ensure alignment with Farther’s fiduciary model" },
+  { issue: "Marketing Rule Compliance", detail: "Acquired advisors may have used testimonials, hypothetical performance, or social media in ways that don't comply with SEC Marketing Rule requirements" },
+  { issue: "Cybersecurity & Data Transfer", detail: "Farther's platform is a closed-loop encrypted ecosystem. Client data from acquired firms must be migrated into this ecosystem — not held in third-party systems" },
+  { issue: "Custody Rule", detail: "Confirm the acquired RIA's custody arrangements are properly disclosed and structured before migration begins" },
+  { issue: "Fiduciary Standard Alignment", detail: "Any acquired firm with commission-based compensation structures requires careful review to ensure alignment with Farther's fiduciary model" },
 ];
 
 const regFlags = [
@@ -38,31 +38,31 @@ const regFlags = [
 const techAdvantages = [
   { label: "Home-built platform", desc: "No stitched-together vendor stack — fewer breaking points during migration" },
   { label: "AI Proposal tool", desc: "Acquired advisors can generate personalized client proposals in under 10 minutes" },
-  { label: "Closed-loop data", desc: "All client data stays within Farther’s encrypted infrastructure; no third-party re-entry required" },
+  { label: "Closed-loop data", desc: "All client data stays within Farther's encrypted infrastructure; no third-party re-entry required" },
   { label: "3x efficiency", desc: "Advisors can manage books 3x larger than industry average due to workflow gains" },
 ];
 
 const techRisks = [
   "Vendor lock-in at the acquired firm — legacy CRM or portfolio management contracts may have expensive breakage clauses",
   "Data integrity during migration — account history, client notes, and preferences must transfer cleanly",
-  "Cybersecurity posture — past breaches or vulnerabilities discovered post-close become Farther’s liability",
+  "Cybersecurity posture — past breaches or vulnerabilities discovered post-close become Farther's liability",
   "Custodian transitions are among the highest-risk moments for client attrition",
 ];
 
 const financialFlags = [
   "Advisors claiming higher AUM, revenue, or client count than disclosed in due diligence",
-  "Unusual billing arrangements or fee structures that don’t align with the disclosed fee schedule",
+  "Unusual billing arrangements or fee structures that don't align with the disclosed fee schedule",
   "Clients expressing surprise at fees or services they say they were never told about",
 ];
 
 const complianceFlags = [
   "Advisors referencing undisclosed activities (outside business activities, side arrangements)",
-  "Marketing materials, testimonials, or social media posts that weren’t reviewed pre-deal",
+  "Marketing materials, testimonials, or social media posts that weren't reviewed pre-deal",
   "Any mention of client complaints, disputes, or informal settlements not disclosed pre-close",
 ];
 
 const culturalFlags = [
-  "Advisor dissatisfaction with Farther’s fiduciary model or technology requirements",
+  "Advisor dissatisfaction with Farther's fiduciary model or technology requirements",
   "Key person dependencies — if one advisor holds 80%+ of client relationships, disengagement is catastrophic",
   "Client relationships that appear transactional rather than advisory — higher attrition risk",
 ];
@@ -72,50 +72,92 @@ const glossary = [
   { term: "Form ADV", def: "RIA registration document; contains disclosure of services, fees, conflicts, and exam history" },
   { term: "Form CRS", def: "Client Relationship Summary — required for SEC-registered RIAs serving retail investors" },
   { term: "Earnout", def: "Deferred purchase price contingent on post-close performance metrics like AUM and client retention" },
-  { term: "OBA", def: "Outside Business Activity — any activity outside the advisor’s primary registration that must be disclosed" },
+  { term: "OBA", def: "Outside Business Activity — any activity outside the advisor's primary registration that must be disclosed" },
   { term: "U4", def: "FINRA registration form for individual advisors — must be filed and clean before activation" },
   { term: "Warm Handoff", def: "Transition model where selling advisor introduces successor advisor directly to clients over time" },
-  { term: "CRD", def: "Central Registration Depository — FINRA’s database of advisor registration and disciplinary history" },
-  { term: "Fiduciary Standard", def: "Legal obligation to act in the client’s best interest — Farther’s non-negotiable baseline" },
+  { term: "CRD", def: "Central Registration Depository — FINRA's database of advisor registration and disciplinary history" },
+  { term: "Fiduciary Standard", def: "Legal obligation to act in the client's best interest — Farther's non-negotiable baseline" },
   { term: "IARD", def: "Investment Adviser Registration Depository — the SEC/state filing system for RIA registration" },
 ];
 
-function SectionHeader({ part, title }: { part: string; title: string }) {
+function SectionHeader({ part, title, THEME }: { part: string; title: string; THEME: any }) {
   return (
     <div className="flex items-center gap-3 mb-6 mt-12 first:mt-0">
-      <span className="inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-full bg-teal text-white text-xs font-bold shadow-[0_0_12px_rgba(29,118,130,0.4)]">
+      <span
+        className="inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-full text-xs font-bold shadow-[0_0_12px_rgba(29,118,130,0.4)]"
+        style={{
+          backgroundColor: THEME.colors.teal,
+          color: '#FFFFFF'
+        }}
+      >
         {part}
       </span>
-      <h2 className="font-serif text-xl text-foreground font-bold tracking-tight">{title}</h2>
+      <h2 className="font-serif text-xl font-bold tracking-tight" style={{ color: THEME.colors.text }}>
+        {title}
+      </h2>
     </div>
   );
 }
 
-function Callout({ children, color = "teal" }: { children: React.ReactNode; color?: "teal" | "amber" | "red" }) {
+function Callout({ children, color = "teal", THEME }: { children: React.ReactNode; color?: "teal" | "amber" | "red"; THEME: any }) {
   const styles = {
-    teal: "bg-teal/[0.08] border-l-teal/40 shadow-[0_0_12px_rgba(78,112,130,0.15)] text-teal",
-    amber: "bg-amber-500/[0.08] border-l-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.15)] text-amber-400",
-    red: "bg-red-500/[0.08] border-l-red-500/30 shadow-[0_0_12px_rgba(239,68,68,0.12)] text-red-400",
+    teal: {
+      bg: 'rgba(78, 112, 130, 0.08)',
+      border: 'rgba(78, 112, 130, 0.4)',
+      text: THEME.colors.teal,
+      shadow: '0 0 12px rgba(78,112,130,0.15)'
+    },
+    amber: {
+      bg: 'rgba(245, 158, 11, 0.08)',
+      border: 'rgba(245, 158, 11, 0.4)',
+      text: '#fbbf24',
+      shadow: '0 0 12px rgba(245,158,11,0.15)'
+    },
+    red: {
+      bg: 'rgba(239, 68, 68, 0.08)',
+      border: 'rgba(239, 68, 68, 0.3)',
+      text: '#f87171',
+      shadow: '0 0 12px rgba(239,68,68,0.12)'
+    },
   };
+
+  const currentStyle = styles[color];
+
   return (
-    <div className={`rounded-lg px-5 py-4 mb-6 border-l-4 ${styles[color]}`}>
+    <div
+      className="rounded-lg px-5 py-4 mb-6 border-l-4"
+      style={{
+        backgroundColor: currentStyle.bg,
+        borderLeftColor: currentStyle.border,
+        boxShadow: currentStyle.shadow,
+        color: currentStyle.text
+      }}
+    >
       <p className="text-sm leading-relaxed">{children}</p>
     </div>
   );
 }
 
-function FlagList({ title, badge, badgeClass, dotClass, items }: { title: string; badge: string; badgeClass: string; dotClass: string; items: string[] }) {
+function FlagList({ title, badge, badgeClass, dotClass, items, THEME }: { title: string; badge: string; badgeClass: string; dotClass: string; items: string[]; THEME: any }) {
   return (
-    <div className="glass-card rounded-xl p-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)]">
+    <div
+      className="rounded-xl p-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)]"
+      style={{
+        backgroundColor: THEME.colors.surface,
+        border: `1px solid ${THEME.colors.border}`
+      }}
+    >
       <div className="flex items-center gap-3 mb-4">
-        <h4 className="font-serif text-base text-foreground font-semibold">{title}</h4>
+        <h4 className="font-serif text-base font-semibold" style={{ color: THEME.colors.text }}>
+          {title}
+        </h4>
         <span className={`text-[10px] font-semibold tracking-wider uppercase text-white px-3 py-1 rounded-full ${badgeClass}`}>
           {badge}
         </span>
       </div>
       <ul className="space-y-2.5">
         {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-3 text-sm text-foreground-muted leading-relaxed">
+          <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
             <span className={`shrink-0 w-1.5 h-1.5 rounded-full mt-2 ${dotClass}`} />
             {item}
           </li>
@@ -138,11 +180,17 @@ export default function MAPage() {
     >
       <div className="max-w-4xl mx-auto">
         {/* Hero / Why This Matters */}
-        <div className="glass-card rounded-2xl px-8 py-8 mb-8">
-          <h2 className="font-serif text-2xl text-foreground mb-4">
-            Why This Matters at <span className="text-teal">Farther</span>
+        <div
+          className="rounded-2xl px-8 py-8 mb-8"
+          style={{
+            backgroundColor: THEME.colors.surface,
+            border: `1px solid ${THEME.colors.border}`
+          }}
+        >
+          <h2 className="font-serif text-2xl mb-4" style={{ color: THEME.colors.text }}>
+            Why This Matters at <span style={{ color: THEME.colors.teal }}>Farther</span>
           </h2>
-          <p className="text-sm text-foreground-muted leading-7">
+          <p className="text-sm leading-7" style={{ color: THEME.colors.textSecondary }}>
             Farther&rsquo;s growth strategy is built on combining top-tier advisor talent with proprietary
             technology &mdash; and RIA acquisitions are a meaningful accelerant to that mission. When Farther
             brings on an acquired book of business, the Advisor Experience and Onboarding team sits at the
@@ -154,8 +202,8 @@ export default function MAPage() {
 
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 1: How Farther Evaluates an RIA */}
-        <SectionHeader part="1" title="How Farther Evaluates an RIA Before We Buy" />
-        <p className="text-sm text-foreground-muted leading-7 mb-6">
+        <SectionHeader part="1" title="How Farther Evaluates an RIA Before We Buy" THEME={THEME} />
+        <p className="text-sm leading-7 mb-6" style={{ color: THEME.colors.textSecondary }}>
           Before our team touches a deal, it has already gone through a rigorous six-phase evaluation process.
           Knowing where a deal stands in this pipeline helps the Onboarding team anticipate what&rsquo;s coming
           and prepare accordingly.
@@ -166,47 +214,71 @@ export default function MAPage() {
           {phases.map((p) => (
             <div
               key={p.num}
-              className="glass-card rounded-xl p-5 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+              className="rounded-xl p-5 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`
+              }}
             >
               <div className="flex items-center gap-3 mb-3">
-                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-teal text-white text-xs font-bold shadow-[0_0_10px_rgba(29,118,130,0.3)]">
+                <span
+                  className="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold shadow-[0_0_10px_rgba(29,118,130,0.3)]"
+                  style={{
+                    backgroundColor: THEME.colors.teal,
+                    color: '#FFFFFF'
+                  }}
+                >
                   {p.num}
                 </span>
-                <h4 className="font-serif text-sm text-foreground font-semibold leading-snug">{p.name}</h4>
+                <h4 className="font-serif text-sm font-semibold leading-snug" style={{ color: THEME.colors.text }}>
+                  {p.name}
+                </h4>
               </div>
-              <p className="text-[11px] text-bronze uppercase tracking-wider font-medium mb-1.5">{p.lead}</p>
-              <p className="text-xs text-foreground-muted leading-relaxed">{p.question}</p>
+              <p className="text-[11px] uppercase tracking-wider font-medium mb-1.5" style={{ color: THEME.colors.gold }}>
+                {p.lead}
+              </p>
+              <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                {p.question}
+              </p>
             </div>
           ))}
         </div>
 
-        <Callout>
+        <Callout THEME={THEME}>
           By the time the Advisor Experience team is activated, Phases 1&ndash;5 are largely complete.{" "}
-          <strong className="text-foreground">Your work begins in earnest at Phase 6</strong> &mdash; and everything
+          <strong style={{ color: THEME.colors.text }}>Your work begins in earnest at Phase 6</strong> &mdash; and everything
           you do either validates or undermines the thesis built in Phases 1&ndash;5.
         </Callout>
 
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 2: Deal Structure */}
-        <SectionHeader part="2" title="Understanding the Deal Structure" />
+        <SectionHeader part="2" title="Understanding the Deal Structure" THEME={THEME} />
 
-        <div className="glass-card rounded-xl p-6 mb-6">
-          <h3 className="font-serif text-base text-foreground font-semibold mb-3">How RIA Acquisitions Are Valued</h3>
-          <p className="text-sm text-foreground-muted leading-7">
+        <div
+          className="rounded-xl p-6 mb-6"
+          style={{
+            backgroundColor: THEME.colors.surface,
+            border: `1px solid ${THEME.colors.border}`
+          }}
+        >
+          <h3 className="font-serif text-base font-semibold mb-3" style={{ color: THEME.colors.text }}>
+            How RIA Acquisitions Are Valued
+          </h3>
+          <p className="text-sm leading-7" style={{ color: THEME.colors.textSecondary }}>
             RIA books of business are typically valued as a multiple of recurring revenue or seller&rsquo;s
             discretionary earnings. A proper valuation accounts for revenue quality, client demographics, tenure,
             attrition risk, and numerous other factors. No two books are identical &mdash; context matters enormously.
           </p>
         </div>
 
-        <h3 className="font-serif text-base text-foreground font-semibold mb-4">
+        <h3 className="font-serif text-base font-semibold mb-4" style={{ color: THEME.colors.text }}>
           Earnouts: The Deal Structure You&rsquo;ll Encounter Most
         </h3>
-        <p className="text-sm text-foreground-muted leading-7 mb-5">
-          Nearly every RIA acquisition at scale includes an <strong className="text-foreground">earnout</strong>, where
+        <p className="text-sm leading-7 mb-5" style={{ color: THEME.colors.textSecondary }}>
+          Nearly every RIA acquisition at scale includes an <strong style={{ color: THEME.colors.text }}>earnout</strong>, where
           a portion of the purchase price is deferred and paid based on post-close performance. This is critically
           important for the Onboarding team to understand because{" "}
-          <strong className="text-foreground">how we handle the transition directly affects whether earnout targets are met.</strong>
+          <strong style={{ color: THEME.colors.text }}>how we handle the transition directly affects whether earnout targets are met.</strong>
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -216,32 +288,54 @@ export default function MAPage() {
             { label: "AUM + Revenue", sub: "common performance triggers alongside client retention" },
             { label: "Buyer obligation", sub: "failure to deliver promised support can legally impair earnout" },
           ].map((s) => (
-            <div key={s.label} className="glass-card rounded-lg p-4 transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]">
-              <p className="font-serif text-lg text-teal font-bold mb-1">{s.label}</p>
-              <p className="text-xs text-foreground-muted leading-relaxed">{s.sub}</p>
+            <div
+              key={s.label}
+              className="rounded-lg p-4 transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`
+              }}
+            >
+              <p className="font-serif text-lg font-bold mb-1" style={{ color: THEME.colors.teal }}>
+                {s.label}
+              </p>
+              <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                {s.sub}
+              </p>
             </div>
           ))}
         </div>
 
-        <Callout color="amber">
-          <strong className="text-amber-300">Onboarding team takeaway:</strong> A delayed technology migration,
+        <Callout color="amber" THEME={THEME}>
+          <strong style={{ color: '#fcd34d' }}>Onboarding team takeaway:</strong> A delayed technology migration,
           a poor client communication rollout, or a rocky first 90 days can directly reduce earnout payments &mdash;
           and damage Farther&rsquo;s reputation as an acquirer.
         </Callout>
 
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 3: Compliance */}
-        <SectionHeader part="3" title="Compliance — What the Onboarding Team Must Know" />
-        <p className="text-sm text-foreground-muted leading-7 mb-6">
+        <SectionHeader part="3" title="Compliance — What the Onboarding Team Must Know" THEME={THEME} />
+        <p className="text-sm leading-7 mb-6" style={{ color: THEME.colors.textSecondary }}>
           Compliance is the highest-stakes area for any RIA acquisition. Errors here have regulatory, financial,
           and reputational consequences.
         </p>
 
         {/* Form ADV */}
-        <div className="glass-card rounded-xl p-6 mb-6 transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]">
+        <div
+          className="rounded-xl p-6 mb-6 transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
+          style={{
+            backgroundColor: THEME.colors.surface,
+            border: `1px solid ${THEME.colors.border}`
+          }}
+        >
           <div className="flex items-center gap-3 mb-4">
-            <h3 className="font-serif text-base text-foreground font-semibold">Form ADV &mdash; The Foundation</h3>
-            <span className="text-[10px] font-semibold tracking-wider uppercase text-white bg-teal px-3 py-1 rounded-full shadow-[0_0_10px_rgba(29,118,130,0.3)]">
+            <h3 className="font-serif text-base font-semibold" style={{ color: THEME.colors.text }}>
+              Form ADV &mdash; The Foundation
+            </h3>
+            <span
+              className="text-[10px] font-semibold tracking-wider uppercase text-white px-3 py-1 rounded-full shadow-[0_0_10px_rgba(29,118,130,0.3)]"
+              style={{ backgroundColor: THEME.colors.teal }}
+            >
               Core Document
             </span>
           </div>
@@ -252,37 +346,68 @@ export default function MAPage() {
               { part: "Part 2B", desc: "Brochure Supplement — background on key advisory personnel" },
               { part: "Part 3 / CRS", desc: "Client Relationship Summary for SEC-registered firms serving retail investors" },
             ].map((a) => (
-              <div key={a.part} className="flex items-start gap-3 bg-white/[0.03] rounded-lg px-4 py-3">
-                <span className="text-[10px] font-bold tracking-wider uppercase text-teal bg-teal/15 px-2.5 py-1 rounded-full shrink-0 shadow-[0_0_6px_rgba(29,118,130,0.2)]">
+              <div
+                key={a.part}
+                className="flex items-start gap-3 rounded-lg px-4 py-3"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
+              >
+                <span
+                  className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full shrink-0 shadow-[0_0_6px_rgba(29,118,130,0.2)]"
+                  style={{
+                    color: THEME.colors.teal,
+                    backgroundColor: 'rgba(78, 112, 130, 0.15)'
+                  }}
+                >
                   {a.part}
                 </span>
-                <p className="text-xs text-foreground-muted leading-relaxed">{a.desc}</p>
+                <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                  {a.desc}
+                </p>
               </div>
             ))}
           </div>
-          <p className="text-xs text-foreground-muted leading-relaxed">
-            <strong className="text-foreground">Why it matters for onboarding:</strong> When Farther acquires an RIA,
+          <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+            <strong style={{ color: THEME.colors.text }}>Why it matters for onboarding:</strong> When Farther acquires an RIA,
             the acquired firm&rsquo;s ADV must be updated or superseded. Clients must receive updated disclosure
             documents. Any material changes trigger re-disclosure obligations.
           </p>
         </div>
 
         {/* Regulatory Red Flags */}
-        <h3 className="font-serif text-base text-foreground font-semibold mb-4">Regulatory Red Flags to Know Before Day 1</h3>
+        <h3 className="font-serif text-base font-semibold mb-4" style={{ color: THEME.colors.text }}>
+          Regulatory Red Flags to Know Before Day 1
+        </h3>
         <div className="space-y-2.5 mb-6">
           {regFlags.map((f, i) => (
-            <div key={i} className="flex items-start gap-3 glass-card rounded-lg px-5 py-3">
-              <span className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500/15 text-red-400 text-[10px] font-bold shadow-[0_0_6px_rgba(239,68,68,0.2)]">
+            <div
+              key={i}
+              className="flex items-start gap-3 rounded-lg px-5 py-3"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`
+              }}
+            >
+              <span
+                className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold shadow-[0_0_6px_rgba(239,68,68,0.2)]"
+                style={{
+                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  color: '#f87171'
+                }}
+              >
                 !
               </span>
-              <p className="text-sm text-foreground-muted leading-relaxed">{f}</p>
+              <p className="text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                {f}
+              </p>
             </div>
           ))}
         </div>
 
         {/* 30-Day Timeline */}
-        <h3 className="font-serif text-base text-foreground font-semibold mb-4">The 30-Day Advisor Onboarding Compliance Standard</h3>
-        <p className="text-sm text-foreground-muted leading-7 mb-5">
+        <h3 className="font-serif text-base font-semibold mb-4" style={{ color: THEME.colors.text }}>
+          The 30-Day Advisor Onboarding Compliance Standard
+        </h3>
+        <p className="text-sm leading-7 mb-5" style={{ color: THEME.colors.textSecondary }}>
           Documentation must be complete, accessible, and defensible before the advisor is deployed. SEC and state
           examiners do not accept partial onboarding as a defense.
         </p>
@@ -292,48 +417,75 @@ export default function MAPage() {
               {/* Left: dot + line */}
               <div className="flex flex-col items-center shrink-0">
                 <div
-                  className="w-8 h-8 rounded-full bg-teal text-white flex items-center justify-center text-[10px] font-bold z-10 shadow-[0_0_12px_rgba(29,118,130,0.4)]"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold z-10 shadow-[0_0_12px_rgba(29,118,130,0.4)]"
+                  style={{
+                    backgroundColor: THEME.colors.teal,
+                    color: '#FFFFFF'
+                  }}
                 >
                   {i + 1}
                 </div>
                 {i < complianceTimeline.length - 1 && (
-                  <div className="w-px flex-1 min-h-[1rem] bg-teal/20" />
+                  <div className="w-px flex-1 min-h-[1rem]" style={{ backgroundColor: 'rgba(78, 112, 130, 0.2)' }} />
                 )}
               </div>
               {/* Right: content */}
               <div className="pb-5 pt-0.5">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-bold tracking-wider uppercase text-teal bg-teal/15 px-2.5 py-0.5 rounded-full shadow-[0_0_6px_rgba(29,118,130,0.2)]">
+                  <span
+                    className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full shadow-[0_0_6px_rgba(29,118,130,0.2)]"
+                    style={{
+                      color: THEME.colors.teal,
+                      backgroundColor: 'rgba(78, 112, 130, 0.15)'
+                    }}
+                  >
                     {step.days}
                   </span>
-                  <span className="text-sm font-semibold text-foreground">{step.title}</span>
+                  <span className="text-sm font-semibold" style={{ color: THEME.colors.text }}>
+                    {step.title}
+                  </span>
                 </div>
-                <p className="text-xs text-foreground-muted leading-relaxed">{step.items}</p>
+                <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                  {step.items}
+                </p>
               </div>
             </div>
           ))}
         </div>
 
-        <Callout color="red">
-          <strong className="text-red-300">Slow onboarding is not an operational nuisance</strong> &mdash;
+        <Callout color="red" THEME={THEME}>
+          <strong style={{ color: '#fca5a5' }}>Slow onboarding is not an operational nuisance</strong> &mdash;
           it is a compliance failure vector.
         </Callout>
 
         {/* Farther-Specific Compliance */}
-        <h3 className="font-serif text-base text-foreground font-semibold mb-4">Special Compliance Concerns at Farther</h3>
+        <h3 className="font-serif text-base font-semibold mb-4" style={{ color: THEME.colors.text }}>
+          Special Compliance Concerns at Farther
+        </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           {fartherCompliance.map((c) => (
-            <div key={c.issue} className="glass-card rounded-xl p-5 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5">
-              <h4 className="text-sm text-foreground font-semibold mb-2">{c.issue}</h4>
-              <p className="text-xs text-foreground-muted leading-relaxed">{c.detail}</p>
+            <div
+              key={c.issue}
+              className="rounded-xl p-5 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`
+              }}
+            >
+              <h4 className="text-sm font-semibold mb-2" style={{ color: THEME.colors.text }}>
+                {c.issue}
+              </h4>
+              <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                {c.detail}
+              </p>
             </div>
           ))}
         </div>
 
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 4: Client Retention */}
-        <SectionHeader part="4" title="Client Retention — The Metric That Drives Everything" />
-        <p className="text-sm text-foreground-muted leading-7 mb-6">
+        <SectionHeader part="4" title="Client Retention — The Metric That Drives Everything" THEME={THEME} />
+        <p className="text-sm leading-7 mb-6" style={{ color: THEME.colors.textSecondary }}>
           Client retention is the single most important post-acquisition metric. Earnout payments depend on it.
           Farther&rsquo;s reputation as an acquirer depends on it.
         </p>
@@ -346,35 +498,71 @@ export default function MAPage() {
             { value: "19%", label: "Avg attrition from poor custodian transitions" },
             { value: "6–9 mo", label: "Pivotal retention window post-acquisition" },
           ].map((s) => (
-            <div key={s.label} className="glass-card rounded-lg p-4 text-center transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]">
-              <p className="font-serif text-xl text-teal font-bold mb-1">{s.value}</p>
-              <p className="text-[10px] text-foreground-muted leading-snug uppercase tracking-wider">{s.label}</p>
+            <div
+              key={s.label}
+              className="rounded-lg p-4 text-center transition-all duration-200 hover:shadow-[0_0_16px_rgba(29,118,130,0.15)]"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`
+              }}
+            >
+              <p className="font-serif text-xl font-bold mb-1" style={{ color: THEME.colors.teal }}>
+                {s.value}
+              </p>
+              <p className="text-[10px] leading-snug uppercase tracking-wider" style={{ color: THEME.colors.textSecondary }}>
+                {s.label}
+              </p>
             </div>
           ))}
         </div>
 
         {/* What drives retention */}
-        <h3 className="font-serif text-base text-foreground font-semibold mb-4">What Actually Drives Retention</h3>
+        <h3 className="font-serif text-base font-semibold mb-4" style={{ color: THEME.colors.text }}>
+          What Actually Drives Retention
+        </h3>
         <div className="space-y-2.5 mb-6">
           {[
-            "Communicate with clients before anyone else does — don’t let news travel through the grapevine",
+            "Communicate with clients before anyone else does — don't let news travel through the grapevine",
             "Keep messaging consistent across all clients — every touchpoint reinforces the same narrative",
             "Frame the transition around client benefit — better technology, more personalized planning, stronger support",
-            "Get clients into Farther’s service rhythm (reviews, communications, events) as fast as possible",
+            "Get clients into Farther's service rhythm (reviews, communications, events) as fast as possible",
           ].map((item, i) => (
-            <div key={i} className="flex items-start gap-3 glass-card rounded-lg px-5 py-3">
-              <span className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-bold shadow-[0_0_6px_rgba(16,185,129,0.2)]">
+            <div
+              key={i}
+              className="flex items-start gap-3 rounded-lg px-5 py-3"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`
+              }}
+            >
+              <span
+                className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold shadow-[0_0_6px_rgba(16,185,129,0.2)]"
+                style={{
+                  backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                  color: '#34d399'
+                }}
+              >
                 {i + 1}
               </span>
-              <p className="text-sm text-foreground-muted leading-relaxed">{item}</p>
+              <p className="text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                {item}
+              </p>
             </div>
           ))}
         </div>
 
         {/* Warm Handoff */}
-        <div className="glass-card rounded-xl p-6 mb-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)]">
+        <div
+          className="rounded-xl p-6 mb-6 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)]"
+          style={{
+            backgroundColor: THEME.colors.surface,
+            border: `1px solid ${THEME.colors.border}`
+          }}
+        >
           <div className="flex items-center gap-3 mb-3">
-            <h3 className="font-serif text-base text-foreground font-semibold">The Warm Handoff Standard</h3>
+            <h3 className="font-serif text-base font-semibold" style={{ color: THEME.colors.text }}>
+              The Warm Handoff Standard
+            </h3>
             <span className="text-[10px] font-semibold tracking-wider uppercase text-white bg-emerald-600 px-3 py-1 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]">
               Gold Standard
             </span>
@@ -383,76 +571,123 @@ export default function MAPage() {
             {[
               "Joint meetings with the seller during the transition period build trust before the seller steps back",
               "Negotiate seller participation in the transition as part of deal terms — this directly protects retention and earnout performance",
-              "Use Farther’s technology — CRM tracking, automated follow-up workflows, and the AI-powered proposal tool — to ensure no client is overlooked",
+              "Use Farther's technology — CRM tracking, automated follow-up workflows, and the AI-powered proposal tool — to ensure no client is overlooked",
             ].map((item, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm text-foreground-muted leading-relaxed">
-                <span className="text-emerald-400 mt-0.5 shrink-0">&#9670;</span>
+              <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                <span className="mt-0.5 shrink-0" style={{ color: '#34d399' }}>&#9670;</span>
                 {item}
               </li>
             ))}
           </ul>
         </div>
 
-        <Callout>
-          <strong className="text-foreground">The client doesn&rsquo;t follow the firm &mdash; they follow the mechanic.</strong>{" "}
+        <Callout THEME={THEME}>
+          <strong style={{ color: THEME.colors.text }}>The client doesn&rsquo;t follow the firm &mdash; they follow the mechanic.</strong>{" "}
           The job is to make sure they understand Farther&rsquo;s team <em>is</em> their mechanic going forward.
         </Callout>
 
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 5: Technology */}
-        <SectionHeader part="5" title="Technology Integration — Farther’s Competitive Advantage" />
+        <SectionHeader part="5" title="Technology Integration — Farther's Competitive Advantage" THEME={THEME} />
 
-        <h3 className="font-serif text-base text-foreground font-semibold mb-4">What Makes Farther&rsquo;s Tech Stack Different</h3>
+        <h3 className="font-serif text-base font-semibold mb-4" style={{ color: THEME.colors.text }}>
+          What Makes Farther&rsquo;s Tech Stack Different
+        </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           {techAdvantages.map((t) => (
-            <div key={t.label} className="glass-card rounded-xl p-5 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5">
+            <div
+              key={t.label}
+              className="rounded-xl p-5 transition-all duration-200 hover:shadow-[0_0_20px_rgba(29,118,130,0.2)] hover:-translate-y-0.5"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`
+              }}
+            >
               <div className="flex items-center gap-2 mb-2">
-                <span className="w-2 h-2 rounded-full bg-teal shadow-[0_0_6px_rgba(29,118,130,0.4)]" />
-                <h4 className="text-sm text-foreground font-semibold">{t.label}</h4>
+                <span
+                  className="w-2 h-2 rounded-full shadow-[0_0_6px_rgba(29,118,130,0.4)]"
+                  style={{ backgroundColor: THEME.colors.teal }}
+                />
+                <h4 className="text-sm font-semibold" style={{ color: THEME.colors.text }}>
+                  {t.label}
+                </h4>
               </div>
-              <p className="text-xs text-foreground-muted leading-relaxed">{t.desc}</p>
+              <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                {t.desc}
+              </p>
             </div>
           ))}
         </div>
 
-        <h3 className="font-serif text-base text-foreground font-semibold mb-4">Technology Migration Risks to Manage</h3>
+        <h3 className="font-serif text-base font-semibold mb-4" style={{ color: THEME.colors.text }}>
+          Technology Migration Risks to Manage
+        </h3>
         <div className="space-y-2.5 mb-8">
           {techRisks.map((r, i) => (
-            <div key={i} className="flex items-start gap-3 glass-card rounded-lg px-5 py-3">
-              <span className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold shadow-[0_0_6px_rgba(245,158,11,0.2)]">
+            <div
+              key={i}
+              className="flex items-start gap-3 rounded-lg px-5 py-3"
+              style={{
+                backgroundColor: THEME.colors.surface,
+                border: `1px solid ${THEME.colors.border}`
+              }}
+            >
+              <span
+                className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold shadow-[0_0_6px_rgba(245,158,11,0.2)]"
+                style={{
+                  backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                  color: '#fbbf24'
+                }}
+              >
                 !
               </span>
-              <p className="text-sm text-foreground-muted leading-relaxed">{r}</p>
+              <p className="text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                {r}
+              </p>
             </div>
           ))}
         </div>
 
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Part 6: Red Flags */}
-        <SectionHeader part="6" title="Red Flags Onboarding Should Escalate Immediately" />
-        <p className="text-sm text-foreground-muted leading-7 mb-6">
+        <SectionHeader part="6" title="Red Flags Onboarding Should Escalate Immediately" THEME={THEME} />
+        <p className="text-sm leading-7 mb-6" style={{ color: THEME.colors.textSecondary }}>
           The onboarding team is often the first to interact with acquired advisors and clients at a human level.
           This gives the team unique visibility into issues that due diligence may not have surfaced.{" "}
-          <strong className="text-foreground">Escalate immediately if you observe:</strong>
+          <strong style={{ color: THEME.colors.text }}>Escalate immediately if you observe:</strong>
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-          <FlagList title="Financial" badge="Escalate" badgeClass="bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.3)]" dotClass="bg-red-600" items={financialFlags} />
-          <FlagList title="Compliance" badge="Escalate" badgeClass="bg-amber-600 shadow-[0_0_10px_rgba(217,119,6,0.3)]" dotClass="bg-amber-600" items={complianceFlags} />
-          <FlagList title="Cultural" badge="Monitor" badgeClass="bg-violet-600 shadow-[0_0_10px_rgba(124,58,237,0.3)]" dotClass="bg-violet-600" items={culturalFlags} />
+          <FlagList title="Financial" badge="Escalate" badgeClass="bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.3)]" dotClass="bg-red-600" items={financialFlags} THEME={THEME} />
+          <FlagList title="Compliance" badge="Escalate" badgeClass="bg-amber-600 shadow-[0_0_10px_rgba(217,119,6,0.3)]" dotClass="bg-amber-600" items={complianceFlags} THEME={THEME} />
+          <FlagList title="Cultural" badge="Monitor" badgeClass="bg-violet-600 shadow-[0_0_10px_rgba(124,58,237,0.3)]" dotClass="bg-violet-600" items={culturalFlags} THEME={THEME} />
         </div>
 
         {/* ──────────────────────────────────────────────────────────── */}
         {/* Quick Reference: Key Terms */}
-        <div className="border-t border-border pt-8 mt-8 mb-8">
-          <h2 className="font-serif text-xl text-foreground font-bold mb-6">Quick Reference: Key Terms</h2>
+        <div className="pt-8 mt-8 mb-8" style={{ borderTop: `1px solid ${THEME.colors.border}` }}>
+          <h2 className="font-serif text-xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+            Quick Reference: Key Terms
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {glossary.map((g) => (
-              <div key={g.term} className="flex items-start gap-3 bg-white/[0.03] rounded-lg px-4 py-3">
-                <span className="text-[10px] font-bold tracking-wider uppercase text-teal bg-teal/15 px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap shadow-[0_0_6px_rgba(29,118,130,0.2)]">
+              <div
+                key={g.term}
+                className="flex items-start gap-3 rounded-lg px-4 py-3"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
+              >
+                <span
+                  className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap shadow-[0_0_6px_rgba(29,118,130,0.2)]"
+                  style={{
+                    color: THEME.colors.teal,
+                    backgroundColor: 'rgba(78, 112, 130, 0.15)'
+                  }}
+                >
                   {g.term}
                 </span>
-                <p className="text-xs text-foreground-muted leading-relaxed">{g.def}</p>
+                <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                  {g.def}
+                </p>
               </div>
             ))}
           </div>
@@ -460,21 +695,27 @@ export default function MAPage() {
 
         {/* ──────────────────────────────────────────────────────────── */}
         {/* North Star */}
-        <div className="glass-card-dark rounded-2xl px-8 py-8 text-center">
-          <p className="text-[10px] text-bronze uppercase tracking-[0.2em] font-semibold mb-3">
+        <div
+          className="rounded-2xl px-8 py-8 text-center"
+          style={{
+            backgroundColor: THEME.colors.surfaceSubtle,
+            border: `1px solid ${THEME.colors.border}`
+          }}
+        >
+          <p className="text-[10px] uppercase tracking-[0.2em] font-semibold mb-3" style={{ color: THEME.colors.gold }}>
             The Onboarding Team&rsquo;s North Star
           </p>
-          <p className="font-serif text-lg text-foreground leading-relaxed max-w-3xl mx-auto mb-4">
+          <p className="font-serif text-lg leading-relaxed max-w-3xl mx-auto mb-4" style={{ color: THEME.colors.text }}>
             Making the transition so seamless for clients and advisors that they never question
-            their decision to be part of <span className="text-teal">Farther</span>.
+            their decision to be part of <span style={{ color: THEME.colors.teal }}>Farther</span>.
           </p>
-          <p className="text-sm text-foreground-muted leading-7 max-w-3xl mx-auto">
+          <p className="text-sm leading-7 max-w-3xl mx-auto" style={{ color: THEME.colors.textSecondary }}>
             That means compliance documentation that holds up under exam scrutiny, technology that works from
             Day 1, communication that is personal and proactive, and a culture introduction that makes advisors
             feel they&rsquo;ve upgraded &mdash; not just changed firms.
           </p>
-          <div className="mt-5 h-px w-24 mx-auto bg-teal opacity-40" />
-          <p className="mt-4 text-xs text-teal font-medium tracking-wide">
+          <div className="mt-5 h-px w-24 mx-auto" style={{ backgroundColor: THEME.colors.teal, opacity: 0.4 }} />
+          <p className="mt-4 text-xs font-medium tracking-wide" style={{ color: THEME.colors.teal }}>
             The deals are won in due diligence. The value is created &mdash; or destroyed &mdash; in onboarding.
           </p>
         </div>
