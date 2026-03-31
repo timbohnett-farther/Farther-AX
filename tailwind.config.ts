@@ -165,10 +165,10 @@ const config: Config = {
         md: '12px',
         lg: '16px',
         xl: '24px',
-        '2xl': '32px',
-        '3xl': '40px',
-        '4xl': '48px',
-        '5xl': '64px',
+        // NOTE: Do NOT use 2xl/3xl/4xl/5xl/6xl/7xl keys here — they collide
+        // with Tailwind v4's max-width scale (max-w-3xl, max-w-4xl, etc.)
+        // causing containers to shrink to pixel values instead of rem values.
+        // Use THEME.spacing in inline styles for these larger values instead.
       },
 
       borderRadius: {
