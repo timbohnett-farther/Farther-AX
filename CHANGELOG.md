@@ -6,6 +6,23 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Email Alias Support — Lauren Moone Multi-Email Identity — 2026-03-31
+
+**What**: Added email alias mapping in NextAuth so team members with multiple @farther.com emails are recognized as the same person regardless of which Google account they sign in with.
+
+**Scope**:
+- Added `EMAIL_ALIASES` map in auth config — maps alternate emails to canonical identity (email + display name)
+- Normalized email/name in JWT callback so all downstream session consumers get canonical values
+- Exported `resolveEmail()` utility for any future server-side email lookups
+- Lauren Moone: `laren@farther.com` → `lauren.moone@farther.com` (canonical)
+
+**Status**: ✅ Fixed and deployed
+
+**Files**:
+- `lib/auth.ts` — EMAIL_ALIASES map, JWT normalization, resolveEmail utility
+
+---
+
 ## [Completed] Rebuild All Training Pages — 2026-03-30
 
 **What**: Complete rebuild of all 10 AX Training & Playbook pages from scratch with clean THEME formatting
