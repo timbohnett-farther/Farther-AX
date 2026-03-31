@@ -6,6 +6,28 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Expandable Task Checklist in Advisor Hub — 2026-03-31
+
+**What**: Added interactive 8-phase task checklist directly in the Advisor Hub — expanding an advisor row shows all tasks with checkboxes, progress bars, and resource links
+
+**Scope:**
+- Added resource links to ~15 tasks in `lib/onboarding-tasks-v2.ts` (HubSpot templates, Drive folders, DocuSign, BlackDiamond)
+- Added missing Phase 5 task: "Schedule Weekly Transition Check-In calls" (CTM, hard gate)
+- Built `ExpandableChecklist` component with collapsible phase sections, checkbox toggle with optimistic PATCH, owner badges, resource link icons, status badges, phase progress bars
+- Advisor rows now expand/collapse (accordion — one at a time) to show full checklist inline
+- Data fetched lazily via SWR only when a row is expanded
+- Checkbox toggles also refresh task summary counts in parent via `globalMutate`
+
+**Status**: Deployed
+
+**Files:**
+- `lib/onboarding-tasks-v2.ts` (resource links, new Phase 5 CTM task)
+- `app/command-center/advisor-hub/page.tsx` (ExpandableChecklist component, expand/collapse rows)
+
+**Commit**: `fb13630`
+
+---
+
 ## [Completed] Fix Active Onboarding Cards in Light Mode — 2026-03-31
 
 **What**: Tremor Card/Badge/ProgressBar components were rendering with default white backgrounds instead of brand surface colors in light mode
