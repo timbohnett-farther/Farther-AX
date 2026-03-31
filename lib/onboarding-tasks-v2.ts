@@ -139,6 +139,7 @@ export const TASKS: Task[] = [
     owner: 'Recruiter',
     timing: 'Day 0',
     is_hard_gate: true,
+    resources: 'https://app.hubspot.com/contacts/deals',
   },
   {
     id: 'p0_recruiter_axm_sync',
@@ -163,6 +164,7 @@ export const TASKS: Task[] = [
     owner: 'AXA',
     timing: 'Within 4 hrs',
     is_hard_gate: false,
+    resources: 'https://drive.google.com/drive/folders/new-advisor-onboarding',
   },
   {
     id: 'p0_assign_axm',
@@ -185,6 +187,7 @@ export const TASKS: Task[] = [
     owner: 'AXA',
     timing: 'Within 24 hrs',
     is_hard_gate: true,
+    resources: 'https://drive.google.com/drive/folders/new-advisor-onboarding',
   },
   {
     id: 'p1_transition_sheet',
@@ -193,6 +196,7 @@ export const TASKS: Task[] = [
     owner: 'AXA',
     timing: 'Within 24 hrs',
     is_hard_gate: true,
+    resources: 'https://drive.google.com/drive/folders/transition-templates',
   },
   {
     id: 'p1_slack_channel',
@@ -211,6 +215,7 @@ export const TASKS: Task[] = [
     owner: 'AXM',
     timing: 'Within 24 hrs',
     is_hard_gate: true,
+    resources: 'https://app.hubspot.com/email/templates/pre-meeting-email',
   },
   {
     id: 'p1_advisor_decks',
@@ -219,6 +224,7 @@ export const TASKS: Task[] = [
     owner: 'AXM',
     timing: 'With kickoff',
     is_hard_gate: true,
+    resources: 'https://drive.google.com/drive/folders/advisor-decks',
   },
   {
     id: 'p1_schedule_kickoff',
@@ -245,6 +251,7 @@ export const TASKS: Task[] = [
     owner: 'Advisor',
     timing: 'Within 3 days',
     is_hard_gate: true,
+    resources: 'https://docs.google.com/forms/u4-2b-intake',
   },
   {
     id: 'p1_u4_2b_review',
@@ -269,6 +276,7 @@ export const TASKS: Task[] = [
     owner: 'AXA',
     timing: 'Within 3 days',
     is_hard_gate: true,
+    resources: 'https://docs.google.com/spreadsheets/blueprint-data-checklist',
   },
   {
     id: 'p1_tech_procurement',
@@ -404,6 +412,7 @@ export const TASKS: Task[] = [
     owner: 'AXA',
     timing: 'Within 4 hrs',
     is_hard_gate: true,
+    resources: 'https://docs.google.com/spreadsheets/blueprint-data-checklist',
   },
   {
     id: 'p2_followup_email',
@@ -412,6 +421,7 @@ export const TASKS: Task[] = [
     owner: 'AXA',
     timing: 'EOD same day',
     is_hard_gate: true,
+    resources: 'https://app.hubspot.com/email/templates/kickoff-followup',
   },
   {
     id: 'p2_advisor_signoff',
@@ -444,6 +454,7 @@ export const TASKS: Task[] = [
     owner: 'AXM',
     timing: 'Post-meeting',
     is_hard_gate: false,
+    resources: 'https://app.docusign.com/templates',
   },
 
   // ──────────────────────────────────────────────────────────────────────────
@@ -578,6 +589,7 @@ export const TASKS: Task[] = [
     owner: 'CTM',
     timing: 'By T-7',
     is_hard_gate: true,
+    resources: 'https://drive.google.com/drive/folders/transition-docs',
   },
   {
     id: 'p3_assign_cx_pod',
@@ -602,6 +614,7 @@ export const TASKS: Task[] = [
     owner: 'Marketing',
     timing: 'By T-14',
     is_hard_gate: true,
+    resources: 'https://drive.google.com/drive/folders/marketing-brand-assets',
   },
   {
     id: 'p3_tech_order',
@@ -618,6 +631,7 @@ export const TASKS: Task[] = [
     owner: 'Finance',
     timing: 'By T-14',
     is_hard_gate: true,
+    resources: 'https://blackdiamond.advent.com',
   },
   {
     id: 'p3_employment_paperwork',
@@ -663,6 +677,7 @@ export const TASKS: Task[] = [
     owner: 'AXM',
     timing: 'By T-6',
     is_hard_gate: true,
+    resources: 'https://drive.google.com/drive/folders/day-1-guide',
   },
   {
     id: 'p4_verify_meetings',
@@ -706,7 +721,7 @@ export const TASKS: Task[] = [
   },
 
   // ──────────────────────────────────────────────────────────────────────────
-  // PHASE 5: LAUNCH DAY (12 tasks)
+  // PHASE 5: LAUNCH DAY (13 tasks)
   // ──────────────────────────────────────────────────────────────────────────
 
   // Morning Setup
@@ -801,12 +816,21 @@ export const TASKS: Task[] = [
     owner: 'AXA',
     timing: 'Day 1',
     is_hard_gate: true,
+    resources: 'https://app.hubspot.com/email/templates/client-announcement',
   },
   {
     id: 'p5_verify_access',
     label: 'Confirm all systems access working',
     phase: 'phase_5',
     owner: 'AXA',
+    timing: 'Day 1',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p5_weekly_transition_checkins',
+    label: 'Schedule Weekly Transition Check-In calls',
+    phase: 'phase_5',
+    owner: 'CTM',
     timing: 'Day 1',
     is_hard_gate: true,
   },
@@ -899,6 +923,7 @@ export const TASKS: Task[] = [
     owner: 'CTM',
     timing: 'T+2',
     is_hard_gate: false,
+    resources: 'https://app.docusign.com/templates',
   },
   {
     id: 'p6_crm_import',
@@ -907,6 +932,7 @@ export const TASKS: Task[] = [
     owner: 'IT',
     timing: 'Week 1-2',
     is_hard_gate: true,
+    resources: 'https://app.hubspot.com/contacts/import',
   },
   {
     id: 'p6_client_portals',
@@ -933,6 +959,7 @@ export const TASKS: Task[] = [
     owner: 'Finance',
     timing: 'Week 2-3',
     is_hard_gate: true,
+    resources: 'https://blackdiamond.advent.com',
   },
   {
     id: 'p6_first_billing',

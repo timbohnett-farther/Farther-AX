@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate as globalMutate } from 'swr';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '@/lib/theme-provider';
 import { getStageColors } from '@/lib/theme';
+import { PHASES, PHASE_ORDER, type Phase } from '@/lib/onboarding-tasks-v2';
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 const SWR_OPTS = {
@@ -512,6 +513,258 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
   );
 }
 
+// ── Phase colors for expandable checklist ────────────────────────────────────
+const PHASE_CONFIG: Record<Phase, { color: string; bg: string; border: string }> = {
+  phase_0: { color: '#7c3aed', bg: 'rgba(124,58,237,0.08)', border: 'rgba(124,58,237,0.2)' },
+  phase_1: { color: '#3b82f6', bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.2)' },
+  phase_2: { color: '#0ea5e9', bg: 'rgba(14,165,233,0.08)', border: 'rgba(14,165,233,0.2)' },
+  phase_3: { color: '#06b6d4', bg: 'rgba(6,182,212,0.08)', border: 'rgba(6,182,212,0.2)' },
+  phase_4: { color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)' },
+  phase_5: { color: '#ef4444', bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.2)' },
+  phase_6: { color: '#10b981', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)' },
+  phase_7: { color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)', border: 'rgba(139,92,246,0.2)' },
+};
+
+interface ChecklistTask {
+  id: string; label: string; phase: Phase; owner: string; timing: string; is_hard_gate: boolean;
+  resources: string | null; completed: boolean; completed_by: string | null; completed_at: string | null;
+  notes: string | null; due_date: string | null;
+  responsible_person: { name: string; email: string; role: string } | null;
+  countdown_display: string; days_remaining: number | null;
+  status: 'upcoming' | 'due_soon' | 'overdue' | 'critical' | 'completed' | 'no_due_date';
+}
+
+const STATUS_COLORS: Record<string, { color: string; bg: string; border: string }> = {
+  upcoming: { color: '#5b6a71', bg: 'rgba(91,106,113,0.08)', border: 'rgba(91,106,113,0.15)' },
+  due_soon: { color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.3)' },
+  overdue: { color: '#ef4444', bg: 'rgba(239,68,68,0.15)', border: 'rgba(239,68,68,0.3)' },
+  critical: { color: '#dc2626', bg: 'rgba(220,38,38,0.2)', border: 'rgba(220,38,38,0.4)' },
+  completed: { color: '#10b981', bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.3)' },
+  no_due_date: { color: '#5b6a71', bg: 'rgba(91,106,113,0.08)', border: 'rgba(91,106,113,0.15)' },
+};
+
+// ── Expandable Checklist Panel ──────────────────────────────────────────────
+function ExpandableChecklist({ dealId }: { dealId: string }) {
+  const { THEME } = useTheme();
+  const { data, error, isLoading, mutate } = useSWR<{ dealId: string; tasks: ChecklistTask[] }>(
+    `/api/command-center/checklist/${dealId}`, fetcher
+  );
+  const [collapsedPhases, setCollapsedPhases] = useState<Record<string, boolean>>({});
+  const [toggling, setToggling] = useState<string | null>(null);
+
+  const togglePhase = (phase: string) => setCollapsedPhases(prev => ({ ...prev, [phase]: !prev[phase] }));
+
+  const handleToggle = useCallback(async (taskId: string, currentCompleted: boolean) => {
+    if (!data) return;
+    setToggling(taskId);
+    const newCompleted = !currentCompleted;
+    // Optimistic update
+    mutate(
+      { ...data, tasks: data.tasks.map(t => t.id === taskId ? { ...t, completed: newCompleted, completed_by: newCompleted ? 'you' : null, completed_at: newCompleted ? new Date().toISOString() : null, status: newCompleted ? 'completed' as const : 'upcoming' as const } : t) },
+      false
+    );
+    try {
+      await fetch(`/api/command-center/checklist/${dealId}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId, completed: newCompleted }),
+      });
+      mutate();
+      // Also refresh the task summary counts in the parent
+      globalMutate('/api/command-center/tasks/summary');
+    } catch { mutate(); }
+    setToggling(null);
+  }, [data, dealId, mutate]);
+
+  if (isLoading) {
+    return (
+      <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {[1, 2, 3].map(i => <div key={i} style={{ height: 40, borderRadius: 8, background: 'rgba(91,106,113,0.06)', animation: 'shimmer 1.5s infinite' }} />)}
+      </div>
+    );
+  }
+  if (error || !data) {
+    return (
+      <div style={{ padding: '24px', textAlign: 'center', color: THEME.colors.textSecondary, fontSize: 13 }}>
+        Failed to load tasks
+      </div>
+    );
+  }
+
+  const tasks = data.tasks;
+  const totalCompleted = tasks.filter(t => t.completed).length;
+  const totalTasks = tasks.length;
+  const pctComplete = totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0;
+  const overdueCount = tasks.filter(t => !t.completed && (t.status === 'overdue' || t.status === 'critical')).length;
+
+  const phases: { key: Phase; tasks: ChecklistTask[] }[] = PHASE_ORDER.map(phaseKey => ({
+    key: phaseKey,
+    tasks: tasks.filter(t => t.phase === phaseKey),
+  }));
+
+  return (
+    <div style={{
+      padding: '16px 20px 20px',
+      borderTop: `1px solid ${THEME.colors.border}`,
+      background: 'rgba(91,106,113,0.02)',
+    }}>
+      {/* Summary bar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16, padding: '12px 16px', borderRadius: 8, background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}` }}>
+        {/* Mini progress ring */}
+        <div style={{ position: 'relative', width: 40, height: 40, flexShrink: 0 }}>
+          <svg width="40" height="40" viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="16" fill="none" stroke={THEME.colors.border} strokeWidth="3" />
+            <circle cx="20" cy="20" r="16" fill="none" stroke="#f59e0b" strokeWidth="3"
+              strokeDasharray={`${(pctComplete / 100) * 100.5} 100.5`}
+              strokeLinecap="round" transform="rotate(-90 20 20)" style={{ transition: 'stroke-dasharray 0.4s ease' }} />
+          </svg>
+          <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#f59e0b' }}>{pctComplete}%</span>
+        </div>
+        <div>
+          <p style={{ fontSize: 14, fontWeight: 600, color: THEME.colors.text }}>{totalCompleted}/{totalTasks} tasks</p>
+          <p style={{ fontSize: 11, color: THEME.colors.textSecondary }}>
+            {overdueCount > 0 ? <span style={{ color: '#ef4444', fontWeight: 600 }}>{overdueCount} overdue</span> : 'On track'}
+          </p>
+        </div>
+        {/* Phase mini indicators */}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+          {phases.filter(p => p.tasks.length > 0).map(p => {
+            const cfg = PHASE_CONFIG[p.key];
+            const done = p.tasks.filter(t => t.completed).length;
+            const allDone = done === p.tasks.length;
+            return (
+              <span key={p.key} style={{
+                fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 4,
+                background: allDone ? 'rgba(16,185,129,0.1)' : cfg.bg, color: allDone ? '#10b981' : cfg.color,
+              }}>
+                P{p.key.replace('phase_', '')} {done}/{p.tasks.length}
+              </span>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Phase sections */}
+      {phases.filter(p => p.tasks.length > 0).map(p => {
+        const cfg = PHASE_CONFIG[p.key];
+        const done = p.tasks.filter(t => t.completed).length;
+        const phasePct = p.tasks.length > 0 ? Math.round((done / p.tasks.length) * 100) : 0;
+        const isCollapsed = collapsedPhases[p.key] ?? true; // Collapsed by default
+
+        return (
+          <div key={p.key} style={{ marginBottom: 8, borderRadius: 8, border: `1px solid ${cfg.border}`, overflow: 'hidden', background: THEME.colors.surface }}>
+            {/* Phase header */}
+            <button onClick={() => togglePhase(p.key)} style={{
+              width: '100%', padding: '10px 16px', background: cfg.bg, border: 'none',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10,
+            }}>
+              <span style={{ fontSize: 12, color: cfg.color, transition: 'transform 0.2s', transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)' }}>▼</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: cfg.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                {PHASES[p.key].label}
+              </span>
+              <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>{done}/{p.tasks.length}</span>
+              <div style={{ flex: 1, height: 4, background: 'rgba(91,106,113,0.08)', borderRadius: 2, overflow: 'hidden', marginLeft: 4 }}>
+                <div style={{ height: '100%', width: `${phasePct}%`, background: cfg.color, borderRadius: 2, transition: 'width 0.3s ease' }} />
+              </div>
+              <span style={{ fontSize: 11, fontWeight: 600, color: cfg.color, minWidth: 32, textAlign: 'right' }}>{phasePct}%</span>
+            </button>
+
+            {/* Task rows */}
+            {!isCollapsed && (
+              <div style={{ padding: '4px 0' }}>
+                {p.tasks.map((task, ti) => {
+                  const statusStyle = STATUS_COLORS[task.status] || STATUS_COLORS.no_due_date;
+                  return (
+                    <div key={task.id} style={{
+                      display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px',
+                      borderBottom: ti < p.tasks.length - 1 ? `1px solid ${THEME.colors.border}` : 'none',
+                      opacity: toggling === task.id ? 0.6 : 1, transition: 'opacity 0.15s',
+                    }}>
+                      {/* Checkbox */}
+                      <button onClick={() => handleToggle(task.id, task.completed)} style={{
+                        width: 20, height: 20, borderRadius: 4, flexShrink: 0, cursor: 'pointer',
+                        border: `2px solid ${task.completed ? cfg.color : 'rgba(91,106,113,0.3)'}`,
+                        background: task.completed ? cfg.color : 'transparent',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'all 0.15s ease',
+                      }}>
+                        {task.completed && <span style={{ fontSize: 12, color: '#fff', lineHeight: 1 }}>✓</span>}
+                      </button>
+
+                      {/* Label */}
+                      <span style={{
+                        flex: 1, fontSize: 12, color: task.completed ? THEME.colors.textSecondary : THEME.colors.text,
+                        textDecoration: task.completed ? 'line-through' : 'none',
+                        textDecorationColor: 'rgba(91,106,113,0.4)',
+                      }}>
+                        {task.label}
+                      </span>
+
+                      {/* Owner badge */}
+                      <span style={{
+                        fontSize: 9, fontWeight: 600, padding: '2px 6px', borderRadius: 3,
+                        background: 'rgba(91,106,113,0.08)', color: THEME.colors.textSecondary,
+                        textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap',
+                      }}>
+                        {task.owner}
+                      </span>
+
+                      {/* Resource link icon */}
+                      {task.resources && (
+                        <a
+                          href={task.resources}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            width: 22, height: 22, borderRadius: 4, flexShrink: 0,
+                            background: 'rgba(59,130,246,0.1)', color: '#3b82f6',
+                            fontSize: 12, textDecoration: 'none',
+                            transition: 'background 0.15s ease',
+                          }}
+                          title="Open resource"
+                        >
+                          ↗
+                        </a>
+                      )}
+
+                      {/* Status badge */}
+                      {!task.completed && task.status !== 'no_due_date' && (
+                        <span style={{
+                          fontSize: 9, fontWeight: 600, padding: '2px 6px', borderRadius: 3,
+                          background: statusStyle.bg, color: statusStyle.color,
+                          border: `1px solid ${statusStyle.border}`,
+                          textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap',
+                        }}>
+                          {task.countdown_display}
+                        </span>
+                      )}
+
+                      {/* Hard gate indicator */}
+                      {!task.is_hard_gate && (
+                        <span style={{ fontSize: 9, fontWeight: 600, padding: '2px 6px', borderRadius: 3, background: 'rgba(91,106,113,0.06)', color: THEME.colors.textSecondary, whiteSpace: 'nowrap' }}>
+                          Optional
+                        </span>
+                      )}
+
+                      {/* Completed date */}
+                      {task.completed && task.completed_at && (
+                        <span style={{ fontSize: 10, color: THEME.colors.textSecondary, whiteSpace: 'nowrap' }}>
+                          {new Date(task.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Main Component ───────────────────────────────────────────────────────────
 export default function AdvisorHubPage() {
   const { THEME } = useTheme();
@@ -532,6 +785,7 @@ export default function AdvisorHubPage() {
   const [sentimentFilter, setSentimentFilter] = useState('all');
   const [taskPhaseFilter, setTaskPhaseFilter] = useState('all');
   const [alertFilter, setAlertFilter] = useState('all');
+  const [expandedDealId, setExpandedDealId] = useState<string | null>(null);
 
   // Build maps for task summary + alerts per deal
   const taskMap = useMemo(() => {
@@ -1056,139 +1310,158 @@ export default function AdvisorHubPage() {
               : deal.desired_start_date;
             const sentiment = sentimentMap[deal.id];
             const isScoring = scoring[deal.id];
+            const isExpanded = expandedDealId === deal.id;
 
             return (
               <div key={deal.id} style={{
-                display: 'grid',
-                gridTemplateColumns: gridCols,
-                gap: 16, padding: '16px 20px', alignItems: 'center',
-                background: THEME.colors.surface, border: `1px solid ${THEME.colors.border}`, borderRadius: 8,
+                borderRadius: 8, overflow: 'hidden',
+                border: `1px solid ${isExpanded ? THEME.colors.teal : THEME.colors.border}`,
+                background: THEME.colors.surface,
                 transition: 'border-color 150ms ease, box-shadow 150ms ease',
-              }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = THEME.colors.teal;
-                  e.currentTarget.style.background = 'rgba(78,112,130,0.04)';
+              }}>
+                {/* Row */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: gridCols,
+                  gap: 16, padding: '16px 20px', alignItems: 'center',
+                  cursor: 'pointer',
                 }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = THEME.colors.border;
-                  e.currentTarget.style.background = THEME.colors.surface;
-                }}
-              >
-                {/* Name — clickable link */}
-                <Link href={`/command-center/advisor/${deal.id}`} style={{ textDecoration: 'none' }}>
+                  onMouseEnter={e => {
+                    if (!isExpanded) e.currentTarget.style.background = 'rgba(78,112,130,0.04)';
+                  }}
+                  onMouseLeave={e => {
+                    if (!isExpanded) e.currentTarget.style.background = '';
+                  }}
+                  onClick={() => setExpandedDealId(isExpanded ? null : deal.id)}
+                >
+                  {/* Name — clickable link + expand chevron */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{
+                      fontSize: 12, color: THEME.colors.textSecondary, flexShrink: 0,
+                      transition: 'transform 0.2s ease',
+                      transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                    }}>
+                      ▶
+                    </span>
+                    <Link href={`/command-center/advisor/${deal.id}`} style={{ textDecoration: 'none' }} onClick={e => e.stopPropagation()}>
+                      <div>
+                        <p style={{ fontSize: 15, fontWeight: 600, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer' }}>
+                          {deal.dealname || '—'}
+                        </p>
+                        {deal.firm_type && (
+                          <p style={{ fontSize: 11, color: THEME.colors.textSecondary, marginTop: 2 }}>{deal.firm_type}</p>
+                        )}
+                      </div>
+                    </Link>
+                  </div>
+
+                  {/* Current Firm */}
+                  <p style={{ fontSize: 13, color: THEME.colors.text }}>
+                    {deal.current_firm__cloned_ || '—'}
+                  </p>
+
+                  {/* AUM */}
+                  <p style={{ fontSize: 14, fontWeight: 600, color: THEME.colors.text, textAlign: 'right', fontFamily: "'Inter', system-ui, sans-serif" }}>
+                    {formatAUM(aum)}
+                  </p>
+
+                  {/* Stage Badge */}
                   <div>
-                    <p style={{ fontSize: 15, fontWeight: 600, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer' }}>
-                      {deal.dealname || '—'}
-                    </p>
-                    {deal.firm_type && (
-                      <p style={{ fontSize: 11, color: THEME.colors.textSecondary, marginTop: 2 }}>{deal.firm_type}</p>
+                    <span style={{
+                      display: 'inline-block', padding: '4px 10px', borderRadius: 4,
+                      fontSize: 11, fontWeight: 600,
+                      background: `${stageColor}18`, color: stageColor,
+                    }}>
+                      {shortStage}
+                    </span>
+                    {activeTab === 'launch' && deal.daysSinceLaunch !== null && (
+                      <p style={{ fontSize: 10, color: THEME.colors.textSecondary, marginTop: 3 }}>
+                        Day {deal.daysSinceLaunch}
+                      </p>
+                    )}
+                    {activeTab === 'completed' && deal.daysSinceLaunch !== null && (
+                      <p style={{ fontSize: 10, color: THEME.colors.success, marginTop: 3 }}>
+                        {deal.daysSinceLaunch} days
+                      </p>
                     )}
                   </div>
-                </Link>
 
-                {/* Current Firm */}
-                <p style={{ fontSize: 13, color: THEME.colors.text }}>
-                  {deal.current_firm__cloned_ || '—'}
-                </p>
-
-                {/* AUM */}
-                <p style={{ fontSize: 14, fontWeight: 600, color: THEME.colors.text, textAlign: 'right', fontFamily: "'Inter', system-ui, sans-serif" }}>
-                  {formatAUM(aum)}
-                </p>
-
-                {/* Stage Badge */}
-                <div>
-                  <span style={{
-                    display: 'inline-block', padding: '4px 10px', borderRadius: 4,
-                    fontSize: 11, fontWeight: 600,
-                    background: `${stageColor}18`, color: stageColor,
-                  }}>
-                    {shortStage}
-                  </span>
-                  {activeTab === 'launch' && deal.daysSinceLaunch !== null && (
-                    <p style={{ fontSize: 10, color: THEME.colors.textSecondary, marginTop: 3 }}>
-                      Day {deal.daysSinceLaunch}
-                    </p>
+                  {/* Sentiment — only for launch & completed tabs */}
+                  {showSentiment && (
+                    <div onClick={e => e.stopPropagation()}>
+                      {isScoring ? (
+                        <span style={{ fontSize: 11, color: THEME.colors.teal, fontStyle: 'italic' }}>
+                          Analyzing...
+                        </span>
+                      ) : sentiment ? (
+                        <SentimentBadge
+                          score={Number(sentiment.composite_score)}
+                          tier={sentiment.tier}
+                        />
+                      ) : (
+                        <button
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); scoreAdvisor(deal.id); }}
+                          style={{
+                            padding: '4px 10px', fontSize: 10, fontWeight: 600,
+                            borderRadius: 4, border: `1px solid ${THEME.colors.border}`,
+                            background: 'none', color: THEME.colors.textSecondary, cursor: 'pointer',
+                            fontFamily: "'Inter', system-ui, sans-serif",
+                            transition: 'color 150ms ease, border-color 150ms ease',
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.color = THEME.colors.teal; e.currentTarget.style.borderColor = THEME.colors.teal; }}
+                          onMouseLeave={e => { e.currentTarget.style.color = THEME.colors.textSecondary; e.currentTarget.style.borderColor = THEME.colors.border; }}
+                        >
+                          ✦ Score
+                        </button>
+                      )}
+                    </div>
                   )}
-                  {activeTab === 'completed' && deal.daysSinceLaunch !== null && (
-                    <p style={{ fontSize: 10, color: THEME.colors.success, marginTop: 3 }}>
-                      {deal.daysSinceLaunch} days
-                    </p>
-                  )}
+
+                  {/* Tasks */}
+                  {(() => {
+                    const t = taskMap[deal.id];
+                    if (!t) return <span style={{ fontSize: 11, color: THEME.colors.textSecondary, fontStyle: 'italic' }}>—</span>;
+                    const phaseLabel = t.current_phase ? t.current_phase.replace('phase_', 'P') : '—';
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: t.open_tasks > 0 ? THEME.colors.warning : THEME.colors.success }}>
+                          {t.open_tasks} open
+                        </span>
+                        <span style={{ fontSize: 10, color: THEME.colors.textSecondary }}>
+                          {phaseLabel} · {t.completed_tasks}/{t.total_tasks}
+                        </span>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Alerts */}
+                  {(() => {
+                    const count = alertMap[deal.id] ?? 0;
+                    if (count === 0) return <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>—</span>;
+                    return (
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                        padding: '3px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600,
+                        background: THEME.colors.errorBg, color: THEME.colors.error,
+                      }}>
+                        {count}
+                      </span>
+                    );
+                  })()}
+
+                  {/* Date */}
+                  <p style={{ fontSize: 13, color: THEME.colors.textSecondary }}>
+                    {formatDate(dateVal)}
+                  </p>
+
+                  {/* Recruiter */}
+                  <p style={{ fontSize: 13, color: THEME.colors.textSecondary }}>
+                    {deal.ownerName || '—'}
+                  </p>
                 </div>
 
-                {/* Sentiment — only for launch & completed tabs */}
-                {showSentiment && (
-                  <div>
-                    {isScoring ? (
-                      <span style={{ fontSize: 11, color: THEME.colors.teal, fontStyle: 'italic' }}>
-                        Analyzing...
-                      </span>
-                    ) : sentiment ? (
-                      <SentimentBadge
-                        score={Number(sentiment.composite_score)}
-                        tier={sentiment.tier}
-                      />
-                    ) : (
-                      <button
-                        onClick={(e) => { e.preventDefault(); scoreAdvisor(deal.id); }}
-                        style={{
-                          padding: '4px 10px', fontSize: 10, fontWeight: 600,
-                          borderRadius: 4, border: `1px solid ${THEME.colors.border}`,
-                          background: 'none', color: THEME.colors.textSecondary, cursor: 'pointer',
-                          fontFamily: "'Inter', system-ui, sans-serif",
-                          transition: 'color 150ms ease, border-color 150ms ease',
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.color = THEME.colors.teal; e.currentTarget.style.borderColor = THEME.colors.teal; }}
-                        onMouseLeave={e => { e.currentTarget.style.color = THEME.colors.textSecondary; e.currentTarget.style.borderColor = THEME.colors.border; }}
-                      >
-                        ✦ Score
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {/* Tasks */}
-                {(() => {
-                  const t = taskMap[deal.id];
-                  if (!t) return <span style={{ fontSize: 11, color: THEME.colors.textSecondary, fontStyle: 'italic' }}>—</span>;
-                  const phaseLabel = t.current_phase ? t.current_phase.replace('phase_', 'P') : '—';
-                  return (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: t.open_tasks > 0 ? THEME.colors.warning : THEME.colors.success }}>
-                        {t.open_tasks} open
-                      </span>
-                      <span style={{ fontSize: 10, color: THEME.colors.textSecondary }}>
-                        {phaseLabel} · {t.completed_tasks}/{t.total_tasks}
-                      </span>
-                    </div>
-                  );
-                })()}
-
-                {/* Alerts */}
-                {(() => {
-                  const count = alertMap[deal.id] ?? 0;
-                  if (count === 0) return <span style={{ fontSize: 11, color: THEME.colors.textSecondary }}>—</span>;
-                  return (
-                    <span style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 4,
-                      padding: '3px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600,
-                      background: THEME.colors.errorBg, color: THEME.colors.error,
-                    }}>
-                      {count}
-                    </span>
-                  );
-                })()}
-
-                {/* Date */}
-                <p style={{ fontSize: 13, color: THEME.colors.textSecondary }}>
-                  {formatDate(dateVal)}
-                </p>
-
-                {/* Recruiter */}
-                <p style={{ fontSize: 13, color: THEME.colors.textSecondary }}>
-                  {deal.ownerName || '—'}
-                </p>
+                {/* Expanded checklist panel */}
+                {isExpanded && <ExpandableChecklist dealId={deal.id} />}
               </div>
             );
           })}
