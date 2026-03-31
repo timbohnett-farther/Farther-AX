@@ -35,7 +35,7 @@ export default function RootLayout({
             <SWRProvider>
               <div className="flex min-h-screen">
                 <Sidebar />
-                <main className="flex-1 ml-64 min-h-screen bg-[var(--color-bg)]">
+                <main className="flex-1 ml-64 min-h-screen">
                   {children}
                 </main>
               </div>

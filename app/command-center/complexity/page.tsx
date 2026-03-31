@@ -124,7 +124,7 @@ export default function ComplexityEducationPage() {
   ];
 
   return (
-    <main className="min-h-screen py-12 px-4" style={{ backgroundColor: THEME.colors.bg }}>
+    <div className="min-h-screen py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-10">
@@ -333,6 +333,6 @@ export default function ComplexityEducationPage() {
           </p>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

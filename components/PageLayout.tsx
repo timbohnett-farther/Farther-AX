@@ -36,7 +36,7 @@ export default function PageLayout({
   const totalStr = String(totalSteps).padStart(2, "0");
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: THEME.colors.bg }}>
+    <div className="min-h-screen flex flex-col">
       {/* Top bar */}
       <header
         className="sticky top-0 z-30 flex items-center justify-between px-10 py-4 border-b backdrop-blur-md"
