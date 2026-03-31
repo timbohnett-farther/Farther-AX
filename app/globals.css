@@ -12,9 +12,9 @@
 
 @theme {
   /* Typography */
-  --font-sans: 'Fakt', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-serif: 'ABC Arizona Text', 'Inter', Georgia, serif;
-  --font-mono: 'Fakt Mono', 'DM Mono', 'Courier New', Courier, monospace;
+  --font-sans: 'Fakt', 'Inter', Arial, sans-serif;
+  --font-serif: 'ABC Arizona Text', Georgia, serif;
+  --font-mono: 'Fakt Mono', 'DM Mono', 'Courier New', monospace;
 
   /* Animations */
   --animate-shimmer: shimmer 2s infinite linear;
@@ -52,9 +52,9 @@
   --color-bg-soft: #F2EAE2;      /* limestone-100 - soft cream */
   --color-bg-elevated: #FAFAFA;  /* nearly white for elevation */
 
-  /* Surfaces (Light mode: cream tones) */
-  --color-surface: #F8F4F0;      /* limestone-50 - cards/panels match bg */
-  --color-surface-hover: #E6E3DB; /* clay-100 - hover state */
+  /* Surfaces (Light mode: warm light brown for card contrast) */
+  --color-surface: #F2EAE2;      /* limestone-100 - warm light brown cards */
+  --color-surface-hover: #F5F2EE; /* warm off-white - hover state */
   --color-surface-subtle: rgba(59, 90, 105, 0.06);
 
   /* Text (Light mode: dark charcoal) */

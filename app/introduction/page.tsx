@@ -1,35 +1,20 @@
 'use client';
 
-import Link from 'next/link';
+import PageLayout from '@/components/PageLayout';
 import { useTheme } from '@/lib/theme-provider';
 
 export default function IntroductionPage() {
   const { THEME } = useTheme();
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg }}>
-      {/* Header */}
-      <div className="max-w-5xl mx-auto px-8 py-16">
-        <div className="text-center mb-16">
-          <div className="mb-4">
-            <span
-              className="text-xs uppercase tracking-widest font-semibold"
-              style={{ color: THEME.colors.gold }}
-            >
-              Step 01 / 13
-            </span>
-          </div>
-          <h1
-            className="text-5xl font-bold mb-4"
-            style={{ color: THEME.colors.text }}
-          >
-            Welcome to the <span style={{ color: THEME.colors.gold }}>AX Playbook</span>
-          </h1>
-          <p className="text-lg" style={{ color: THEME.colors.textSecondary }}>
-            Advisor Experience Onboarding & Transition Reference
-          </p>
-        </div>
-
+    <PageLayout
+      step={1}
+      title="Welcome to the AX Playbook"
+      subtitle="Advisor Experience Onboarding & Transition Reference"
+      nextHref="/onboarding-vs-transitions"
+      nextLabel="Next: Onboarding vs. Transitions"
+    >
+      <div className="max-w-5xl mx-auto">
         {/* Overview */}
         <div
           className="rounded-xl p-8 mb-16"
@@ -355,20 +340,7 @@ export default function IntroductionPage() {
           </p>
         </div>
 
-        {/* Navigation */}
-        <div className="flex justify-end">
-          <Link
-            href="/onboarding-vs-transitions"
-            className="px-8 py-4 rounded-lg text-sm font-semibold"
-            style={{
-              backgroundColor: THEME.colors.gold,
-              color: '#FFFFFF',
-            }}
-          >
-            Next: Onboarding vs. Transitions →
-          </Link>
-        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

@@ -1,34 +1,21 @@
 'use client';
 
-import Link from 'next/link';
+import PageLayout from '@/components/PageLayout';
 import { useTheme } from '@/lib/theme-provider';
 
 export default function RepaperAcatPage() {
   const { THEME } = useTheme();
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg }}>
-      <div className="max-w-5xl mx-auto px-8 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="mb-4">
-            <span
-              className="text-xs uppercase tracking-widest font-semibold"
-              style={{ color: THEME.colors.gold }}
-            >
-              Step 10 / 13
-            </span>
-          </div>
-          <h1
-            className="text-5xl font-bold mb-4"
-            style={{ color: THEME.colors.text }}
-          >
-            Repaper / ACAT
-          </h1>
-          <p className="text-lg" style={{ color: THEME.colors.textSecondary }}>
-            Transition Method — Full Re-Documentation (8–12 Weeks)
-          </p>
-        </div>
+    <PageLayout
+      step={10}
+      title="Repaper / ACAT"
+      subtitle="Transition Method — Full Re-Documentation (8–12 Weeks)"
+      backHref="/lpoa"
+      nextHref="/breakaway-process"
+      nextLabel="Next: Breakaway Process"
+    >
+      <div className="max-w-5xl mx-auto">
 
         {/* At a Glance Stats */}
         <div className="grid md:grid-cols-3 gap-4 mb-12">
@@ -108,30 +95,7 @@ export default function RepaperAcatPage() {
           </ul>
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between mt-12">
-          <Link
-            href="/lpoa"
-            className="px-6 py-3 rounded-lg text-sm font-semibold"
-            style={{
-              border: `1px solid ${THEME.colors.border}`,
-              color: THEME.colors.text,
-            }}
-          >
-            ← Back
-          </Link>
-          <Link
-            href="/"
-            className="px-8 py-4 rounded-lg text-sm font-semibold"
-            style={{
-              backgroundColor: THEME.colors.gold,
-              color: '#FFFFFF',
-            }}
-          >
-            Back to Home →
-          </Link>
-        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

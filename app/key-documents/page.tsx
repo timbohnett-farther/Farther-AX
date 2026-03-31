@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import PageLayout from '@/components/PageLayout';
 import { useTheme } from '@/lib/theme-provider';
 
 export default function KeyDocumentsPage() {
@@ -85,29 +85,15 @@ export default function KeyDocumentsPage() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg }}>
-      <div className="max-w-6xl mx-auto px-8 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="mb-4">
-            <span
-              className="text-xs uppercase tracking-widest font-semibold"
-              style={{ color: THEME.colors.gold }}
-            >
-              Step 03 / 13
-            </span>
-          </div>
-          <h1
-            className="text-5xl font-bold mb-4"
-            style={{ color: THEME.colors.text }}
-          >
-            Key <span style={{ color: THEME.colors.gold }}>Documents</span>
-          </h1>
-          <p className="text-lg" style={{ color: THEME.colors.textSecondary }}>
-            Document Applicability Matrix & Definitions
-          </p>
-        </div>
-
+    <PageLayout
+      step={3}
+      title="Key Documents"
+      subtitle="Document Applicability Matrix & Definitions"
+      backHref="/onboarding-vs-transitions"
+      nextHref="/breakaway"
+      nextLabel="Next: Breakaway"
+    >
+      <div className="max-w-6xl mx-auto">
         {/* Introduction */}
         <p className="text-base leading-relaxed mb-12" style={{ color: THEME.colors.text }}>
           Every advisor onboarding involves a set of core documents. Which documents apply depends on the
@@ -296,30 +282,7 @@ export default function KeyDocumentsPage() {
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <Link
-            href="/onboarding-vs-transitions"
-            className="px-6 py-3 rounded-lg text-sm font-semibold"
-            style={{
-              border: `1px solid ${THEME.colors.border}`,
-              color: THEME.colors.text,
-            }}
-          >
-            ← Back
-          </Link>
-          <Link
-            href="/breakaway"
-            className="px-8 py-4 rounded-lg text-sm font-semibold"
-            style={{
-              backgroundColor: THEME.colors.gold,
-              color: '#FFFFFF',
-            }}
-          >
-            Next: Breakaway →
-          </Link>
-        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

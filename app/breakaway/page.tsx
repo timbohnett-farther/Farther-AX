@@ -1,35 +1,21 @@
 'use client';
 
-import Link from 'next/link';
+import PageLayout from '@/components/PageLayout';
 import { useTheme } from '@/lib/theme-provider';
 
 export default function BreakawayPage() {
   const { THEME } = useTheme();
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg }}>
-      <div className="max-w-5xl mx-auto px-8 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="mb-4">
-            <span
-              className="text-xs uppercase tracking-widest font-semibold"
-              style={{ color: THEME.colors.gold }}
-            >
-              Step 04 / 13
-            </span>
-          </div>
-          <h1
-            className="text-5xl font-bold mb-4"
-            style={{ color: THEME.colors.text }}
-          >
-            Breakaway
-          </h1>
-          <p className="text-lg" style={{ color: THEME.colors.textSecondary }}>
-            Advisor Pathway — Wirehouse & Captive Firm Departures
-          </p>
-        </div>
-
+    <PageLayout
+      step={4}
+      title="Breakaway"
+      subtitle="Advisor Pathway — Wirehouse & Captive Firm Departures"
+      backHref="/key-documents"
+      nextHref="/independent-ria"
+      nextLabel="Next: Independent RIA"
+    >
+      <div className="max-w-5xl mx-auto">
         {/* Intro */}
         <p
           className="text-base leading-relaxed mb-12"
@@ -145,30 +131,7 @@ export default function BreakawayPage() {
           </ul>
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <Link
-            href="/key-documents"
-            className="px-6 py-3 rounded-lg text-sm font-semibold"
-            style={{
-              border: `1px solid ${THEME.colors.border}`,
-              color: THEME.colors.text,
-            }}
-          >
-            ← Back
-          </Link>
-          <Link
-            href="/independent-ria"
-            className="px-8 py-4 rounded-lg text-sm font-semibold"
-            style={{
-              backgroundColor: THEME.colors.gold,
-              color: '#FFFFFF',
-            }}
-          >
-            Next: Independent RIA →
-          </Link>
-        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

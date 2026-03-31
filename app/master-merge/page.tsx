@@ -1,34 +1,21 @@
 'use client';
 
-import Link from 'next/link';
+import PageLayout from '@/components/PageLayout';
 import { useTheme } from '@/lib/theme-provider';
 
 export default function MasterMergePage() {
   const { THEME } = useTheme();
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg }}>
-      <div className="max-w-5xl mx-auto px-8 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="mb-4">
-            <span
-              className="text-xs uppercase tracking-widest font-semibold"
-              style={{ color: THEME.colors.gold }}
-            >
-              Step 08 / 13
-            </span>
-          </div>
-          <h1
-            className="text-5xl font-bold mb-4"
-            style={{ color: THEME.colors.text }}
-          >
-            Master Merge
-          </h1>
-          <p className="text-lg" style={{ color: THEME.colors.textSecondary }}>
-            Transition Method — Fastest Option (4–6 Weeks)
-          </p>
-        </div>
+    <PageLayout
+      step={8}
+      title="Master Merge"
+      subtitle="Transition Method — Fastest Option (4–6 Weeks)"
+      backHref="/no-to-low-aum"
+      nextHref="/lpoa"
+      nextLabel="Next: LPOA"
+    >
+      <div className="max-w-5xl mx-auto">
 
         {/* At a Glance Stats */}
         <div className="grid md:grid-cols-3 gap-4 mb-12">
@@ -107,30 +94,7 @@ export default function MasterMergePage() {
           </ul>
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between mt-12">
-          <Link
-            href="/no-to-low-aum"
-            className="px-6 py-3 rounded-lg text-sm font-semibold"
-            style={{
-              border: `1px solid ${THEME.colors.border}`,
-              color: THEME.colors.text,
-            }}
-          >
-            ← Back
-          </Link>
-          <Link
-            href="/lpoa"
-            className="px-8 py-4 rounded-lg text-sm font-semibold"
-            style={{
-              backgroundColor: THEME.colors.gold,
-              color: '#FFFFFF',
-            }}
-          >
-            Next: LPOA →
-          </Link>
-        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

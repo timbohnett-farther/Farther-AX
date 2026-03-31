@@ -1,52 +1,48 @@
 "use client";
 
-import Image from 'next/image';
-import { DataCard } from '@/components/ui';
+import { useTheme } from '@/lib/theme-provider';
 
-/**
- * Complexity Education Page - Transition complexity scoring guide
- *
- * Migrated to Tailwind utilities and DataCard components
- */
 export default function ComplexityEducationPage() {
+  const { THEME } = useTheme();
+
   const tiers = [
     {
       tier: "Low",
       range: "0 – 25",
-      color: "emerald",
-      borderColor: "border-emerald-500/30",
-      bgColor: "bg-emerald-500/20",
-      textColor: "text-emerald-300",
+      dotColor: THEME.colors.success,
+      borderColor: THEME.colors.successBorder,
+      bgColor: THEME.colors.successBg,
+      textColor: THEME.colors.success,
       days: 45,
       desc: "Standard transition with minimal complexity. Any available AXM can manage. Standard process and timeline apply.",
     },
     {
       tier: "Moderate",
       range: "26 – 50",
-      color: "amber",
-      borderColor: "border-amber-500/30",
-      bgColor: "bg-amber-500/20",
-      textColor: "text-amber-300",
+      dotColor: THEME.colors.warning,
+      borderColor: THEME.colors.warningBorder,
+      bgColor: THEME.colors.warningBg,
+      textColor: THEME.colors.warning,
       days: 45,
       desc: "Some complexities detected — plan accordingly. Standard AXM assignment with CTM support. Monitor for escalation triggers.",
     },
     {
       tier: "High",
       range: "51 – 75",
-      color: "red",
-      borderColor: "border-red-500/30",
-      bgColor: "bg-red-500/20",
-      textColor: "text-red-300",
+      dotColor: THEME.colors.error,
+      borderColor: THEME.colors.errorBorder,
+      bgColor: THEME.colors.errorBg,
+      textColor: THEME.colors.error,
       days: 60,
       desc: "Significant complexity. Senior AXM recommended with dedicated CTM and bi-weekly progress reviews. Flag for leadership visibility.",
     },
     {
       tier: "Critical",
       range: "76 – 105",
-      color: "purple",
-      borderColor: "border-purple-500/30",
-      bgColor: "bg-purple-500/20",
-      textColor: "text-purple-300",
+      dotColor: THEME.colors.info,
+      borderColor: '#7C5BC3',
+      bgColor: 'rgba(124, 91, 195, 0.12)',
+      textColor: '#A78BFA',
       days: 75,
       desc: "Maximum complexity. Dedicated senior AXM + AXA pair, CTM lead, extended weekly check-ins. Consider dual-CTM for asset transfer.",
     },
@@ -128,20 +124,23 @@ export default function ComplexityEducationPage() {
   ];
 
   return (
-    <main className="min-h-screen py-12 px-4 bg-transparent font-sans">
+    <main className="min-h-screen py-12 px-4" style={{ backgroundColor: THEME.colors.bg }}>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-10">
-          <p className="text-xs tracking-widest uppercase mb-2 text-teal">
+          <p
+            className="text-xs tracking-widest uppercase mb-2"
+            style={{ color: THEME.colors.teal }}
+          >
             Command Center — Education
           </p>
-          <div className="relative mb-3">
-            <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} className="absolute top-0 right-0 opacity-50" />
-            <h1 className="text-3xl font-light text-cream font-serif text-center">
-              Transition Complexity Scoring
-            </h1>
-          </div>
-          <p className="text-sm leading-relaxed text-slate">
+          <h1
+            className="text-3xl font-light text-center mb-3"
+            style={{ color: THEME.colors.text, fontFamily: THEME.typography.fontFamily.serif }}
+          >
+            Transition Complexity Scoring
+          </h1>
+          <p className="text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
             The complexity score is an objective, data-driven rating that helps us staff transitions
             appropriately, set realistic timelines, and ensure every advisor gets the right resources
             from day one. Scores range from 0 to 105 and are computed automatically from HubSpot
@@ -151,128 +150,184 @@ export default function ComplexityEducationPage() {
 
         {/* Tiers */}
         <section className="mb-10">
-          <h2 className="text-lg font-medium mb-4 text-cream font-serif">
+          <h2
+            className="text-lg font-medium mb-4"
+            style={{ color: THEME.colors.text, fontFamily: THEME.typography.fontFamily.serif }}
+          >
             Score Tiers
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {tiers.map((t) => (
-              <DataCard
+              <div
                 key={t.tier}
-                className={`border-2 ${t.borderColor}`}
+                className="rounded-xl p-6"
+                style={{
+                  backgroundColor: THEME.colors.surface,
+                  border: `2px solid ${t.borderColor}`,
+                }}
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <span className={`inline-block w-3 h-3 rounded-full ${t.bgColor}`} />
-                  <span className={`text-sm font-semibold ${t.textColor}`}>
+                  <span
+                    className="inline-block w-3 h-3 rounded-full"
+                    style={{ backgroundColor: t.dotColor }}
+                  />
+                  <span className="text-sm font-semibold" style={{ color: t.textColor }}>
                     {t.tier}
                   </span>
-                  <span className="text-xs ml-auto text-slate">
+                  <span className="text-xs ml-auto" style={{ color: THEME.colors.textSecondary }}>
                     {t.range} pts
                   </span>
                 </div>
-                <p className="text-xs leading-relaxed mb-2 text-cream-muted">
+                <p className="text-xs leading-relaxed mb-2" style={{ color: THEME.colors.textSecondary }}>
                   {t.desc}
                 </p>
-                <p className="text-xs text-slate">
+                <p className="text-xs" style={{ color: THEME.colors.textMuted }}>
                   Estimated graduation: {t.days} days
                 </p>
-              </DataCard>
+              </div>
             ))}
           </div>
         </section>
 
         {/* Scoring Factors */}
         <section className="mb-10">
-          <h2 className="text-lg font-medium mb-4 text-cream font-serif">
+          <h2
+            className="text-lg font-medium mb-4"
+            style={{ color: THEME.colors.text, fontFamily: THEME.typography.fontFamily.serif }}
+          >
             Scoring Factors
           </h2>
-          <p className="text-sm mb-6 text-slate">
+          <p className="text-sm mb-6" style={{ color: THEME.colors.textSecondary }}>
             The score is additive — each factor contributes independently. The final score is the
             sum of all nine factors.
           </p>
           <div className="space-y-4">
             {factors.map((factor) => (
-              <DataCard key={factor.name}>
+              <div
+                key={factor.name}
+                className="rounded-xl p-6"
+                style={{
+                  backgroundColor: THEME.colors.surface,
+                  border: `1px solid ${THEME.colors.border}`,
+                }}
+              >
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="text-sm font-semibold text-cream">
+                  <span className="text-sm font-semibold" style={{ color: THEME.colors.text }}>
                     {factor.name}
                   </span>
-                  <span className="text-xs px-2 py-0.5 rounded-sm bg-charcoal-700 text-slate">
+                  <span
+                    className="text-xs px-2 py-0.5 rounded-sm"
+                    style={{
+                      backgroundColor: THEME.colors.surfaceSubtle,
+                      color: THEME.colors.textSecondary,
+                    }}
+                  >
                     {factor.category}
                   </span>
-                  <span className="text-xs ml-auto font-mono text-teal">
+                  <span
+                    className="text-xs ml-auto"
+                    style={{ color: THEME.colors.teal, fontFamily: THEME.typography.fontFamily.mono }}
+                  >
                     0 – {factor.max} pts
                   </span>
                 </div>
-                <p className="text-xs leading-relaxed text-cream-muted">
+                <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
                   {factor.description}
                 </p>
-              </DataCard>
+              </div>
             ))}
           </div>
         </section>
 
         {/* How It's Used */}
         <section className="mb-10">
-          <h2 className="text-lg font-medium mb-4 text-cream font-serif">
+          <h2
+            className="text-lg font-medium mb-4"
+            style={{ color: THEME.colors.text, fontFamily: THEME.typography.fontFamily.serif }}
+          >
             How Complexity Scores Are Used
           </h2>
-          <DataCard>
-            <div className="space-y-4 text-sm text-cream-muted">
+          <div
+            className="rounded-xl p-6"
+            style={{
+              backgroundColor: THEME.colors.surface,
+              border: `1px solid ${THEME.colors.border}`,
+            }}
+          >
+            <div className="space-y-4 text-sm" style={{ color: THEME.colors.textSecondary }}>
               <p>
-                <span className="font-semibold text-cream">Staffing Decisions</span>{" "}
+                <span className="font-semibold" style={{ color: THEME.colors.text }}>Staffing Decisions</span>{" "}
                 — The tier directly informs which AXM, CTM, and support staff should be assigned.
                 Critical transitions get senior staff and dedicated pairs; Low complexity can be
                 handled by any available team member.
               </p>
               <p>
-                <span className="font-semibold text-cream">Timeline Planning</span>{" "}
+                <span className="font-semibold" style={{ color: THEME.colors.text }}>Timeline Planning</span>{" "}
                 — Each tier has a recommended graduation timeline. Low/Moderate transitions target
                 45 days. High complexity extends to 60 days. Critical transitions plan for 75 days.
                 The launch timer on the pipeline dashboard reflects these extended targets.
               </p>
               <p>
-                <span className="font-semibold text-cream">Pipeline Visibility</span>{" "}
+                <span className="font-semibold" style={{ color: THEME.colors.text }}>Pipeline Visibility</span>{" "}
                 — The complexity badge appears in the pipeline table so leadership can spot
                 high-complexity deals at a glance. The advisor detail page shows a full factor
                 breakdown so AXMs understand exactly what&apos;s driving the score.
               </p>
               <p>
-                <span className="font-semibold text-cream">Recalculation</span>{" "}
+                <span className="font-semibold" style={{ color: THEME.colors.text }}>Recalculation</span>{" "}
                 — Scores are recalculated whenever the pipeline data refreshes. As new information is
                 added to a deal in HubSpot — new notes, updated properties, team data — the score
                 automatically adjusts. There is no manual scoring; the system reads directly from
                 HubSpot.
               </p>
             </div>
-          </DataCard>
+          </div>
         </section>
 
         {/* Keywords Reference */}
         <section className="mb-10">
-          <h2 className="text-lg font-medium mb-4 text-cream font-serif">
+          <h2
+            className="text-lg font-medium mb-4"
+            style={{ color: THEME.colors.text, fontFamily: THEME.typography.fontFamily.serif }}
+          >
             Note Keywords Reference
           </h2>
-          <p className="text-sm mb-4 text-slate">
+          <p className="text-sm mb-4" style={{ color: THEME.colors.textSecondary }}>
             The following keywords in deal notes, transition notes, and descriptions trigger
             qualitative complexity signals:
           </p>
-          <DataCard>
+          <div
+            className="rounded-xl p-6"
+            style={{
+              backgroundColor: THEME.colors.surface,
+              border: `1px solid ${THEME.colors.border}`,
+            }}
+          >
             <div className="flex flex-wrap gap-2">
               {keywords.map((kw) => (
                 <span
                   key={kw}
-                  className="text-xs px-2 py-1 rounded-sm font-mono bg-charcoal-700 text-slate border border-cream-border"
+                  className="text-xs px-2 py-1 rounded-sm"
+                  style={{
+                    backgroundColor: THEME.colors.surfaceSubtle,
+                    color: THEME.colors.textSecondary,
+                    border: `1px solid ${THEME.colors.border}`,
+                    fontFamily: THEME.typography.fontFamily.mono,
+                  }}
                 >
                   {kw}
                 </span>
               ))}
             </div>
-          </DataCard>
+          </div>
         </section>
 
         {/* Footer */}
-        <div className="text-center pt-6 border-t border-cream-border">
-          <p className="text-xs text-slate">
+        <div
+          className="text-center pt-6"
+          style={{ borderTop: `1px solid ${THEME.colors.border}` }}
+        >
+          <p className="text-xs" style={{ color: THEME.colors.textMuted }}>
             Complexity scoring is an evolving system. As we refine the algorithm based on real
             transition outcomes, weights and thresholds may be adjusted.
           </p>

@@ -1,35 +1,21 @@
 'use client';
 
-import Link from 'next/link';
+import PageLayout from '@/components/PageLayout';
 import { useTheme } from '@/lib/theme-provider';
 
 export default function OnboardingVsTransitionsPage() {
   const { THEME } = useTheme();
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg }}>
-      <div className="max-w-5xl mx-auto px-8 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="mb-4">
-            <span
-              className="text-xs uppercase tracking-widest font-semibold"
-              style={{ color: THEME.colors.gold }}
-            >
-              Step 02 / 13
-            </span>
-          </div>
-          <h1
-            className="text-5xl font-bold mb-4"
-            style={{ color: THEME.colors.text }}
-          >
-            Onboarding vs. <span style={{ color: THEME.colors.gold }}>Transitions</span>
-          </h1>
-          <p className="text-lg" style={{ color: THEME.colors.textSecondary }}>
-            Understanding Team Ownership & Role Responsibilities
-          </p>
-        </div>
-
+    <PageLayout
+      step={2}
+      title="Onboarding vs. Transitions"
+      subtitle="Understanding Team Ownership & Role Responsibilities"
+      backHref="/introduction"
+      nextHref="/key-documents"
+      nextLabel="Next: Key Documents"
+    >
+      <div className="max-w-5xl mx-auto">
         {/* Two Distinct Workstreams */}
         <div className="mb-16">
           <h2
@@ -316,30 +302,7 @@ export default function OnboardingVsTransitionsPage() {
           </p>
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <Link
-            href="/introduction"
-            className="px-6 py-3 rounded-lg text-sm font-semibold"
-            style={{
-              border: `1px solid ${THEME.colors.border}`,
-              color: THEME.colors.text,
-            }}
-          >
-            ← Back
-          </Link>
-          <Link
-            href="/key-documents"
-            className="px-8 py-4 rounded-lg text-sm font-semibold"
-            style={{
-              backgroundColor: THEME.colors.gold,
-              color: '#FFFFFF',
-            }}
-          >
-            Next: Key Documents →
-          </Link>
-        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

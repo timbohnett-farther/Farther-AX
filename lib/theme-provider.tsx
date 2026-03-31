@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { createTheme, type ThemeMode, type ThemeType, type StylesType } from "./theme";
 
 type ThemeContextType = {
@@ -16,10 +16,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>("dark");
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const stored = localStorage.getItem("farther-ax-theme") as ThemeMode;
     if (stored) {
       setThemeState(stored);
@@ -34,25 +32,30 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const setTheme = (newTheme: ThemeMode) => {
+  const setTheme = useCallback((newTheme: ThemeMode) => {
     setThemeState(newTheme);
     localStorage.setItem("farther-ax-theme", newTheme);
     document.documentElement.classList.toggle("dark", newTheme === "dark");
-  };
+  }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-  };
+  const toggleTheme = useCallback(() => {
+    setThemeState((prev) => {
+      const newTheme = prev === "dark" ? "light" : "dark";
+      localStorage.setItem("farther-ax-theme", newTheme);
+      document.documentElement.classList.toggle("dark", newTheme === "dark");
+      return newTheme;
+    });
+  }, []);
 
   const { THEME, STYLES, CHART_COLORS } = useMemo(() => createTheme(theme), [theme]);
 
-  if (!mounted) {
-    return null;
-  }
+  const value = useMemo(
+    () => ({ theme, THEME, STYLES, CHART_COLORS, setTheme, toggleTheme }),
+    [theme, THEME, STYLES, CHART_COLORS, setTheme, toggleTheme]
+  );
 
   return (
-    <ThemeContext.Provider value={{ theme, THEME, STYLES, CHART_COLORS, setTheme, toggleTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

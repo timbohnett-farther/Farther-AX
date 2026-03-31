@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import PageLayout from '@/components/PageLayout';
 import { useTheme } from '@/lib/theme-provider';
 
 export default function MAPage() {
@@ -44,28 +44,15 @@ export default function MAPage() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg }}>
-      <div className="max-w-5xl mx-auto px-8 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="mb-4">
-            <span
-              className="text-xs uppercase tracking-widest font-semibold"
-              style={{ color: THEME.colors.gold }}
-            >
-              Step 06 / 13
-            </span>
-          </div>
-          <h1
-            className="text-5xl font-bold mb-4"
-            style={{ color: THEME.colors.text }}
-          >
-            M&A
-          </h1>
-          <p className="text-lg" style={{ color: THEME.colors.textSecondary }}>
-            Advisor Pathway — Mergers & Acquisitions
-          </p>
-        </div>
+    <PageLayout
+      step={6}
+      title="M&A"
+      subtitle="Advisor Pathway — Mergers & Acquisitions"
+      backHref="/independent-ria"
+      nextHref="/no-to-low-aum"
+      nextLabel="Next: No to Low AUM"
+    >
+      <div className="max-w-5xl mx-auto">
 
         {/* Why This Matters */}
         <div
@@ -526,30 +513,7 @@ export default function MAPage() {
           </p>
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <Link
-            href="/independent-ria"
-            className="px-6 py-3 rounded-lg text-sm font-semibold"
-            style={{
-              border: `1px solid ${THEME.colors.border}`,
-              color: THEME.colors.text,
-            }}
-          >
-            ← Back
-          </Link>
-          <Link
-            href="/no-to-low-aum"
-            className="px-8 py-4 rounded-lg text-sm font-semibold"
-            style={{
-              backgroundColor: THEME.colors.gold,
-              color: '#FFFFFF',
-            }}
-          >
-            Next: No to Low AUM →
-          </Link>
-        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

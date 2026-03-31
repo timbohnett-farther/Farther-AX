@@ -1,34 +1,21 @@
 'use client';
 
-import Link from 'next/link';
+import PageLayout from '@/components/PageLayout';
 import { useTheme } from '@/lib/theme-provider';
 
 export default function NoToLowAUMPage() {
   const { THEME } = useTheme();
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg }}>
-      <div className="max-w-5xl mx-auto px-8 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="mb-4">
-            <span
-              className="text-xs uppercase tracking-widest font-semibold"
-              style={{ color: THEME.colors.gold }}
-            >
-              Step 07 / 13
-            </span>
-          </div>
-          <h1
-            className="text-5xl font-bold mb-4"
-            style={{ color: THEME.colors.text }}
-          >
-            No to Low AUM
-          </h1>
-          <p className="text-lg" style={{ color: THEME.colors.textSecondary }}>
-            Advisor Pathway — Below $15–20M AUM
-          </p>
-        </div>
+    <PageLayout
+      step={7}
+      title="No to Low AUM"
+      subtitle="Advisor Pathway — Below $15–20M AUM"
+      backHref="/ma"
+      nextHref="/master-merge"
+      nextLabel="Next: Master Merge"
+    >
+      <div className="max-w-5xl mx-auto">
 
         {/* Intro */}
         <p
@@ -215,30 +202,7 @@ export default function NoToLowAUMPage() {
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <Link
-            href="/ma"
-            className="px-6 py-3 rounded-lg text-sm font-semibold"
-            style={{
-              border: `1px solid ${THEME.colors.border}`,
-              color: THEME.colors.text,
-            }}
-          >
-            ← Back
-          </Link>
-          <Link
-            href="/master-merge"
-            className="px-8 py-4 rounded-lg text-sm font-semibold"
-            style={{
-              backgroundColor: THEME.colors.gold,
-              color: '#FFFFFF',
-            }}
-          >
-            Next: Master Merge →
-          </Link>
-        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

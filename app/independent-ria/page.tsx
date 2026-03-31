@@ -1,35 +1,21 @@
 'use client';
 
-import Link from 'next/link';
+import PageLayout from '@/components/PageLayout';
 import { useTheme } from '@/lib/theme-provider';
 
 export default function IndependentRIAPage() {
   const { THEME } = useTheme();
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg }}>
-      <div className="max-w-5xl mx-auto px-8 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="mb-4">
-            <span
-              className="text-xs uppercase tracking-widest font-semibold"
-              style={{ color: THEME.colors.gold }}
-            >
-              Step 05 / 13
-            </span>
-          </div>
-          <h1
-            className="text-5xl font-bold mb-4"
-            style={{ color: THEME.colors.text }}
-          >
-            Independent RIA
-          </h1>
-          <p className="text-lg" style={{ color: THEME.colors.textSecondary }}>
-            Advisor Pathway — Independent Registered Investment Advisers
-          </p>
-        </div>
-
+    <PageLayout
+      step={5}
+      title="Independent RIA"
+      subtitle="Advisor Pathway — Independent Registered Investment Advisers"
+      backHref="/breakaway"
+      nextHref="/ma"
+      nextLabel="Next: M&A"
+    >
+      <div className="max-w-5xl mx-auto">
         {/* Intro */}
         <p
           className="text-base leading-relaxed mb-12"
@@ -151,30 +137,7 @@ export default function IndependentRIAPage() {
           </ul>
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <Link
-            href="/breakaway"
-            className="px-6 py-3 rounded-lg text-sm font-semibold"
-            style={{
-              border: `1px solid ${THEME.colors.border}`,
-              color: THEME.colors.text,
-            }}
-          >
-            ← Back
-          </Link>
-          <Link
-            href="/ma"
-            className="px-8 py-4 rounded-lg text-sm font-semibold"
-            style={{
-              backgroundColor: THEME.colors.gold,
-              color: '#FFFFFF',
-            }}
-          >
-            Next: M&A →
-          </Link>
-        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

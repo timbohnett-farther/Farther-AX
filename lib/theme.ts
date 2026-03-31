@@ -110,8 +110,8 @@ export function createTheme(mode: ThemeMode) {
 
     // === Surfaces (mode-aware) ===
     // Light mode: cream tones | Dark mode: slate/steel-blue
-    surface: isDark ? '#3B5A69' : '#F8F4F0',         // Card/panel background (cream in light, slate in dark)
-    surfaceHover: isDark ? '#476F82' : '#E6E3DB',    // Hover state (clay-100 in light)
+    surface: isDark ? '#3B5A69' : '#F2EAE2',           // Card/panel background (limestone-100 warm brown in light, slate in dark)
+    surfaceHover: isDark ? '#476F82' : '#F5F2EE',    // Hover state (warm off-white in light)
     surfaceSubtle: isDark ? 'rgba(59, 90, 105, 0.30)' : 'rgba(59, 90, 105, 0.06)',
 
     // === Text hierarchy (mode-aware) ===

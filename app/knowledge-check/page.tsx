@@ -70,43 +70,72 @@ export default function KnowledgeCheckPage() {
         <div
           className="rounded-xl p-8 mb-8"
           style={{
-            backgroundColor: THEME.colors.surfaceSubtle,
-            border: `1px solid ${THEME.colors.border}`
+            backgroundColor: THEME.colors.surface,
+            border: `1px solid ${THEME.colors.border}`,
           }}
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-white font-sans">
+              <h2
+                className="text-2xl font-bold"
+                style={{ color: THEME.colors.text, fontFamily: THEME.typography.fontFamily.sans }}
+              >
                 Training Progress
               </h2>
-              <p className="text-sm text-white/50 mt-1 font-sans">
+              <p
+                className="text-sm mt-1"
+                style={{ color: THEME.colors.textMuted, fontFamily: THEME.typography.fontFamily.sans }}
+              >
                 {session?.user?.name || "User"} &middot; {session?.user?.email}
               </p>
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-3xl font-bold text-white font-mono tabular-nums">
+                <p
+                  className="text-3xl font-bold tabular-nums"
+                  style={{ color: THEME.colors.text, fontFamily: THEME.typography.fontFamily.mono }}
+                >
                   {passedCount}/{totalTopics}
                 </p>
-                <p className="text-xs text-white/40 font-sans">quizzes passed</p>
+                <p
+                  className="text-xs"
+                  style={{ color: THEME.colors.textFaint, fontFamily: THEME.typography.fontFamily.sans }}
+                >
+                  quizzes passed
+                </p>
               </div>
             </div>
           </div>
 
           {/* Progress bar */}
-          <div className="w-full h-3 rounded-full bg-white/10 overflow-hidden mb-2">
+          <div
+            className="w-full h-3 rounded-full overflow-hidden mb-2"
+            style={{ backgroundColor: THEME.colors.surfaceSubtle }}
+          >
             <div
-              className="h-full rounded-full bg-teal transition-all duration-500"
-              style={{ width: `${completionPct}%` }}
+              className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${completionPct}%`, backgroundColor: THEME.colors.teal }}
             />
           </div>
-          <p className="text-xs text-white/40 font-sans text-right">
+          <p
+            className="text-xs text-right"
+            style={{ color: THEME.colors.textFaint, fontFamily: THEME.typography.fontFamily.sans }}
+          >
             {completionPct}% complete
           </p>
 
           {passedCount === totalTopics && (
-            <div className="mt-6 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4 text-center">
-              <p className="text-sm text-emerald-400 font-sans font-medium">
+            <div
+              className="mt-6 rounded-lg p-4 text-center"
+              style={{
+                border: `1px solid ${THEME.colors.successBorder}`,
+                backgroundColor: THEME.colors.successBg,
+              }}
+            >
+              <p
+                className="text-sm font-medium"
+                style={{ color: THEME.colors.success, fontFamily: THEME.typography.fontFamily.sans }}
+              >
                 All training quizzes completed. You are fully certified on the AX Playbook.
               </p>
             </div>
@@ -131,26 +160,47 @@ export default function KnowledgeCheckPage() {
               return (
                 <div
                   key={topic.slug}
-                  className={`rounded-xl border p-5 transition-colors ${
-                    passed
-                      ? "border-emerald-500/20 bg-emerald-500/5"
+                  className="rounded-xl p-5 transition-colors"
+                  style={{
+                    border: `1px solid ${
+                      passed
+                        ? THEME.colors.successBorder
+                        : attemptsUsed > 0
+                        ? THEME.colors.warningBorder
+                        : THEME.colors.border
+                    }`,
+                    backgroundColor: passed
+                      ? THEME.colors.successBg
                       : attemptsUsed > 0
-                      ? "border-amber-500/20 bg-amber-500/5"
-                      : "border-white/10 bg-white/[0.02]"
-                  }`}
+                      ? THEME.colors.warningBg
+                      : THEME.colors.surfaceSubtle,
+                  }}
                 >
                   <div className="flex items-center gap-4">
                     {/* Step number */}
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10 text-sm font-mono font-bold text-teal">
+                    <span
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold"
+                      style={{
+                        backgroundColor: THEME.colors.surfaceSubtle,
+                        color: THEME.colors.teal,
+                        fontFamily: THEME.typography.fontFamily.mono,
+                      }}
+                    >
                       {String(topic.step).padStart(2, "0")}
                     </span>
 
                     {/* Topic info */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white font-sans truncate">
+                      <p
+                        className="text-sm font-medium truncate"
+                        style={{ color: THEME.colors.text, fontFamily: THEME.typography.fontFamily.sans }}
+                      >
                         {topic.label}
                       </p>
-                      <p className="text-xs text-white/40 font-sans mt-0.5">
+                      <p
+                        className="text-xs mt-0.5"
+                        style={{ color: THEME.colors.textFaint, fontFamily: THEME.typography.fontFamily.sans }}
+                      >
                         {attemptsUsed === 0
                           ? "Not started"
                           : `${attemptsUsed}/2 attempt${attemptsUsed !== 1 ? "s" : ""} used`}
@@ -161,14 +211,28 @@ export default function KnowledgeCheckPage() {
                     {/* Status badge */}
                     <div className="shrink-0">
                       {passed ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 text-xs font-medium text-emerald-400">
+                        <span
+                          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
+                          style={{
+                            backgroundColor: THEME.colors.successBg,
+                            border: `1px solid ${THEME.colors.successBorder}`,
+                            color: THEME.colors.success,
+                          }}
+                        >
                           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                           </svg>
                           Passed
                         </span>
                       ) : attemptsUsed >= 2 ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/15 border border-red-500/30 px-3 py-1 text-xs font-medium text-red-400">
+                        <span
+                          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
+                          style={{
+                            backgroundColor: THEME.colors.errorBg,
+                            border: `1px solid ${THEME.colors.errorBorder}`,
+                            color: THEME.colors.error,
+                          }}
+                        >
                           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                           </svg>
@@ -177,7 +241,12 @@ export default function KnowledgeCheckPage() {
                       ) : (
                         <Link
                           href={topic.href}
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-teal/15 border border-teal/30 px-3 py-1 text-xs font-medium text-teal hover:bg-teal/25 transition-colors"
+                          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-medium transition-colors"
+                          style={{
+                            backgroundColor: THEME.colors.teal + '26',
+                            border: `1px solid ${THEME.colors.teal}4D`,
+                            color: THEME.colors.teal,
+                          }}
                         >
                           {attemptsUsed > 0 ? "Retake" : "Take Quiz"} →
                         </Link>
@@ -189,8 +258,12 @@ export default function KnowledgeCheckPage() {
                   {topicResults.length > 0 && (
                     <div className="mt-3 ml-14 space-y-1">
                       {topicResults.map((r) => (
-                        <div key={`${r.topic_slug}-${r.attempt_number}`} className="flex items-center gap-2 text-xs text-white/40 font-sans">
-                          <span className="font-mono tabular-nums">
+                        <div
+                          key={`${r.topic_slug}-${r.attempt_number}`}
+                          className="flex items-center gap-2 text-xs"
+                          style={{ color: THEME.colors.textFaint, fontFamily: THEME.typography.fontFamily.sans }}
+                        >
+                          <span className="tabular-nums" style={{ fontFamily: THEME.typography.fontFamily.mono }}>
                             Attempt {r.attempt_number}: {r.score}/{r.total_questions}
                           </span>
                           <span>·</span>
