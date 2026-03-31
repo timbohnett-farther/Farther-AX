@@ -1821,6 +1821,7 @@ function RecruitingTab() {
                   { key: 'complexity', label: 'Complexity' },
                   { key: 'launch_date', label: 'Launch Date' },
                   { key: 'launch_status', label: 'Launch Status' },
+                  { key: 'graduate', label: '' },
                   { key: 'axm', label: 'AXM', color: THEME.colors.teal },
                   { key: 'axa', label: 'AXA' },
                   { key: 'ctm', label: 'CTM', color: '#2f73a8' },
@@ -1919,54 +1920,9 @@ function RecruitingTab() {
                       onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = rowBg; }}
                     >
                       <td style={{ padding: '10px 14px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <Link href={`/command-center/advisor/${deal.id}`} style={{ fontWeight: 600, color: THEME.colors.teal, textDecoration: 'none' }}>
-                            {deal.dealname}
-                          </Link>
-                          {/* Graduate button — only in Launch to Graduation tab for Launched advisors */}
-                          {advisorTab === 'launch_to_grad' && deal.dealstage === '100411705' && (
-                            <button
-                              onClick={() => graduateDeal(deal.id)}
-                              disabled={graduatingId === deal.id}
-                              title="Graduate this advisor early"
-                              style={{
-                                padding: '1px 6px', borderRadius: 4, fontSize: 10, fontWeight: 600,
-                                background: 'rgba(16,185,129,0.12)', color: '#10b981',
-                                border: '1px solid rgba(16,185,129,0.3)', cursor: 'pointer',
-                                opacity: graduatingId === deal.id ? 0.5 : 1,
-                                whiteSpace: 'nowrap', flexShrink: 0,
-                              }}
-                            >
-                              {graduatingId === deal.id ? '...' : 'Graduate'}
-                            </button>
-                          )}
-                          {/* Graduated Early badge — in Completed tab for manually graduated advisors */}
-                          {advisorTab === 'completed' && graduatedSet.has(deal.id) && (deal.daysSinceLaunch ?? 0) < 90 && (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                              <span style={{
-                                padding: '1px 6px', borderRadius: 4, fontSize: 10, fontWeight: 600,
-                                background: 'rgba(245,158,11,0.12)', color: '#f59e0b',
-                                border: '1px solid rgba(245,158,11,0.3)', whiteSpace: 'nowrap',
-                              }}>
-                                Graduated Early
-                              </span>
-                              <button
-                                onClick={() => ungraduateDeal(deal.id)}
-                                disabled={graduatingId === deal.id}
-                                title="Undo early graduation"
-                                style={{
-                                  padding: '0px 4px', borderRadius: 3, fontSize: 10, fontWeight: 600,
-                                  background: 'rgba(239,68,68,0.08)', color: '#ef4444',
-                                  border: '1px solid rgba(239,68,68,0.2)', cursor: 'pointer',
-                                  opacity: graduatingId === deal.id ? 0.5 : 1,
-                                  lineHeight: '16px',
-                                }}
-                              >
-                                {graduatingId === deal.id ? '...' : '×'}
-                              </button>
-                            </span>
-                          )}
-                        </div>
+                        <Link href={`/command-center/advisor/${deal.id}`} style={{ fontWeight: 600, color: THEME.colors.teal, textDecoration: 'none' }}>
+                          {deal.dealname}
+                        </Link>
                       </td>
                       <td style={{ padding: '10px 14px' }}>
                         {(() => {
@@ -2135,6 +2091,51 @@ function RecruitingTab() {
                       </td>
                       <td style={{ padding: '10px 14px' }}>
                         <LaunchTimer deal={deal} />
+                      </td>
+                      <td style={{ padding: '10px 6px', textAlign: 'center' }}>
+                        {/* Graduate button — Launch to Graduation tab, Launched advisors only */}
+                        {advisorTab === 'launch_to_grad' && deal.dealstage === '100411705' && (
+                          <button
+                            onClick={() => graduateDeal(deal.id)}
+                            disabled={graduatingId === deal.id}
+                            title="Graduate this advisor early"
+                            style={{
+                              padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 600,
+                              background: 'rgba(16,185,129,0.12)', color: '#10b981',
+                              border: '1px solid rgba(16,185,129,0.3)', cursor: 'pointer',
+                              opacity: graduatingId === deal.id ? 0.5 : 1,
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {graduatingId === deal.id ? '...' : 'Graduate'}
+                          </button>
+                        )}
+                        {/* Graduated Early badge + undo — Completed tab */}
+                        {advisorTab === 'completed' && graduatedSet.has(deal.id) && (deal.daysSinceLaunch ?? 0) < 90 && (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                            <span style={{
+                              padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 600,
+                              background: 'rgba(245,158,11,0.12)', color: '#f59e0b',
+                              border: '1px solid rgba(245,158,11,0.3)', whiteSpace: 'nowrap',
+                            }}>
+                              Early
+                            </span>
+                            <button
+                              onClick={() => ungraduateDeal(deal.id)}
+                              disabled={graduatingId === deal.id}
+                              title="Undo early graduation"
+                              style={{
+                                padding: '0px 4px', borderRadius: 3, fontSize: 10, fontWeight: 600,
+                                background: 'rgba(239,68,68,0.08)', color: '#ef4444',
+                                border: '1px solid rgba(239,68,68,0.2)', cursor: 'pointer',
+                                opacity: graduatingId === deal.id ? 0.5 : 1,
+                                lineHeight: '16px',
+                              }}
+                            >
+                              {graduatingId === deal.id ? '...' : '×'}
+                            </button>
+                          </span>
+                        )}
                       </td>
                       <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXM ? getNameColor(teamAssignments[deal.id].AXM, THEME.colors.textSecondary) : THEME.colors.textSecondary, fontWeight: teamAssignments[deal.id]?.AXM ? 600 : 400 }}>{teamAssignments[deal.id]?.AXM ?? '—'}</td>
                       <td style={{ padding: '10px 14px', color: teamAssignments[deal.id]?.AXA ? getNameColor(teamAssignments[deal.id].AXA, THEME.colors.textSecondary) : THEME.colors.textSecondary, fontWeight: teamAssignments[deal.id]?.AXA ? 600 : 400 }}>{teamAssignments[deal.id]?.AXA ?? '—'}</td>
