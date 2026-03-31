@@ -6,6 +6,21 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Active Onboarding Cards in Light Mode — 2026-03-31
+
+**What**: Tremor Card/Badge/ProgressBar components were rendering with default white backgrounds instead of brand surface colors in light mode
+
+**Scope:**
+- Added Tremor CSS variable overrides in `globals.css` mapping `--tremor-background`, `--tremor-border-default`, `--tremor-content-*` (and dark variants) to our `--color-surface`, `--color-border`, `--color-text` CSS variables
+- Fixed `text-cream-muted` (dead class — not in Tailwind config) → `text-slate` (maps to `var(--color-text-secondary)`) in StatCard and ProgressIndicator
+
+**Files:**
+- `app/globals.css` (Tremor theme variable overrides)
+- `components/ui/StatCard.tsx` (text class fix)
+- `components/ui/ProgressIndicator.tsx` (text class fix)
+
+---
+
 ## [Completed] Manual "Graduate Early" Override — 2026-03-31
 
 **What**: Added ability to manually graduate an advisor early from "Launch to Graduation" to "Completed Transitions" regardless of 90-day rule

@@ -30,7 +30,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
   return (
     <div className={`space-y-2 ${className}`}>
       <Flex justifyContent="between" alignItems="center">
-        <Text className="text-sm font-medium text-cream-muted">{label}</Text>
+        <Text className="text-sm font-medium text-slate">{label}</Text>
         {showPercentage && (
           <Text className="text-sm font-semibold text-cream">
             {percentage.toFixed(0)}%

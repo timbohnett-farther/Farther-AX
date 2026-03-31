@@ -97,6 +97,36 @@
 }
 
 /* ============================================================================
+   Tremor Component Overrides
+   Maps Tremor's internal color tokens to our brand CSS variables so Cards,
+   ProgressBars, and other Tremor components match light/dark mode.
+   ============================================================================ */
+
+:root {
+  --tremor-background: var(--color-surface);        /* Card bg */
+  --tremor-background-subtle: var(--color-bg-soft);
+  --tremor-background-default: var(--color-bg);
+  --tremor-background-emphasis: var(--color-surface-hover);
+  --tremor-border-default: var(--color-border);
+  --tremor-ring: var(--color-border);
+  --tremor-content-DEFAULT: var(--color-text);
+  --tremor-content-subtle: var(--color-text-secondary);
+  --tremor-content-emphasis: var(--color-text);
+}
+
+.dark {
+  --dark-tremor-background: var(--color-surface);
+  --dark-tremor-background-subtle: var(--color-bg-soft);
+  --dark-tremor-background-default: var(--color-bg);
+  --dark-tremor-background-emphasis: var(--color-surface-hover);
+  --dark-tremor-border-default: var(--color-border);
+  --dark-tremor-ring: var(--color-border);
+  --dark-tremor-content-DEFAULT: var(--color-text);
+  --dark-tremor-content-subtle: var(--color-text-secondary);
+  --dark-tremor-content-emphasis: var(--color-text);
+}
+
+/* ============================================================================
    Light Mode Background Pattern (on main content area, right of sidebar)
    ============================================================================ */
 
