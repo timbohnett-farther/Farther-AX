@@ -5,6 +5,7 @@ import pool from '@/lib/db';
 import { TASKS } from '@/lib/onboarding-tasks-v2';
 import { calculateDueDate, getDay0Date, getLaunchDate } from '@/lib/due-date-calculator';
 import { calculateTaskStatus, getTaskResponsiblePerson, type ResponsiblePerson } from '@/lib/task-status';
+import { initializeTasksForDeal } from '@/lib/task-initializer';
 
 export async function GET(
   req: NextRequest,
@@ -91,6 +92,18 @@ export async function GET(
       }
     } catch (hubspotError) {
       console.error('[checklist] Error fetching HubSpot deal:', hubspotError);
+    }
+
+    // Auto-initialize all tasks if deal is Stage 6+ and has a Day 0 date
+    const dealStage = dealData?.properties?.dealstage;
+    const isStage6Plus = dealStage === '2496936' || dealStage === '100411705';
+    if (isStage6Plus && day0_date) {
+      try {
+        const initResult = await initializeTasksForDeal(dealId, day0_date, launch_date);
+        console.log('[checklist] Task initialization result:', initResult === -1 ? 'already initialized' : `${initResult} rows upserted`);
+      } catch (initError) {
+        console.error('[checklist] Task initialization failed (non-fatal):', initError);
+      }
     }
 
     console.log('[checklist] Querying database for dealId:', dealId);

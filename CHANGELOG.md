@@ -6,6 +6,26 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Auto-Initialize Onboarding Tasks with Due Dates — 2026-03-31
+
+**What**: When a deal reaches Stage 6 (Offer Accepted), all ~107 onboarding tasks are now auto-created in the DB with calculated due dates. Previously tasks only entered the DB on manual checkbox toggle, causing wrong summary counts and missing overdue alerts.
+
+**Scope:**
+- Extended `lib/due-date-calculator.ts` with 7 new timing handlers (Morning, During mtg, With kickoff, EOD same day, Post-meeting, Start of Phase 3)
+- Created `lib/task-initializer.ts` — bulk INSERT of all tasks with `ON CONFLICT` to fill in null due dates without overwriting existing completion state
+- Checklist GET endpoint now calls `initializeTasksForDeal()` for Stage 6+ deals (non-fatal — existing behavior preserved on failure)
+- Task summary query now filters `WHERE (is_legacy IS NULL OR is_legacy = FALSE)` to prevent double-counting legacy v1 tasks
+
+**Status**: Deployed
+
+**Files:**
+- `lib/due-date-calculator.ts` (7 new timing handlers)
+- `lib/task-initializer.ts` (NEW — bulk insert function)
+- `app/api/command-center/checklist/[dealId]/route.ts` (auto-trigger initializer)
+- `app/api/command-center/tasks/summary/route.ts` (is_legacy filter)
+
+---
+
 ## [Completed] Expandable Task Checklist in Advisor Hub — 2026-03-31
 
 **What**: Added interactive 8-phase task checklist directly in the Advisor Hub — expanding an advisor row shows all tasks with checkboxes, progress bars, and resource links

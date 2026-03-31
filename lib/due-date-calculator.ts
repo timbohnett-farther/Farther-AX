@@ -137,6 +137,45 @@ export function calculateDueDate(input: DueDateInput): DueDateResult {
     };
   }
 
+  // "Morning" — Launch Day morning tasks (Phase 5)
+  if (timingLower === 'morning') {
+    return {
+      due_date: launch_date || null,
+      anchor: 'launch',
+      offset_days: 0,
+    };
+  }
+
+  // Kickoff-meeting tasks: "During mtg", "With kickoff", "With kick-off", "EOD same day", "Post-meeting"
+  if (
+    timingLower === 'during mtg' ||
+    timingLower === 'with kickoff' ||
+    timingLower === 'with kick-off' ||
+    timingLower === 'eod same day' ||
+    timingLower === 'post-meeting'
+  ) {
+    if (day0_date) {
+      return {
+        due_date: addDays(day0_date, 7),
+        anchor: 'day0',
+        offset_days: 7,
+      };
+    }
+    return { due_date: null, anchor: 'day0', offset_days: 7 };
+  }
+
+  // "Start of Phase 3" — Phase 3 begins after kickoff (~Day 10)
+  if (timingLower === 'start of phase 3') {
+    if (day0_date) {
+      return {
+        due_date: addDays(day0_date, 10),
+        anchor: 'day0',
+        offset_days: 10,
+      };
+    }
+    return { due_date: null, anchor: 'day0', offset_days: 10 };
+  }
+
   // Phase 3 timing (no specific date)
   if (timingLower === 'phase 3') {
     // Default to 21 days before launch (mid-Phase 3)

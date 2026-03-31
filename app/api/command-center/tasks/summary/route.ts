@@ -11,6 +11,7 @@ export async function GET() {
         COUNT(*) as total_tasks,
         MIN(phase) FILTER (WHERE NOT completed) as current_phase
       FROM onboarding_tasks
+      WHERE (is_legacy IS NULL OR is_legacy = FALSE)
       GROUP BY deal_id
     `);
 
