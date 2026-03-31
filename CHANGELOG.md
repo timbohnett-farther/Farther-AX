@@ -6,6 +6,44 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Shared Components + Training Content Export — 2026-03-30
+
+**What**: Fixed root cause of training page formatting issues and created comprehensive markdown export
+
+**Impact**: All training pages now render correctly with proper theme colors + documentation archive created
+
+**Root Cause Fix - Shared Components:**
+
+Fixed hardcoded rgba() values in wrapper components that affect ALL training pages:
+
+1. **PageLayout.tsx** (5 rgba() instances)
+   - Back button hover shadow (line 100) → `${THEME.colors.steel}4D`
+   - Step dots active shadow (line 130) → `${THEME.colors.steel}99`
+   - Next button shadows (lines 146, 151, 156) → `${THEME.colors.steel}4D` and `80`
+   - These fixes apply to ALL 10 training pages that use PageLayout wrapper
+
+2. **QuizSection.tsx** (3 rgba() instances + hook addition)
+   - Quiz modal backgrounds (lines 205, 304, 420) → `${THEME.colors.border}26` and `${THEME.colors.surface}CC`
+   - Added `useTheme` hook support
+   - Fixes apply to ALL quiz sections across training pages
+
+**Documentation:**
+
+Created `TRAINING_CONTENT_EXPORT.md` - comprehensive 36KB markdown export containing all text content from 10 training pages (Introduction, Onboarding vs Transitions, Key Documents, Breakaway, Independent RIA, M&A, No to Low AUM, Master Merge, LPOA, Repaper/ACAT)
+
+**Files Modified:**
+- `components/PageLayout.tsx`
+- `components/QuizSection.tsx`
+- `TRAINING_CONTENT_EXPORT.md` (created)
+
+**Commits:**
+- `3a66a22` - fix: eliminate hardcoded rgba() from PageLayout and QuizSection
+- `6d3e956` - docs: add comprehensive training content markdown export
+
+**Status:** ✅ Deployed to Railway
+
+---
+
 ## [Completed] Complete Training Pages Theme Compliance — 2026-03-30
 
 **What**: Systematically eliminated ALL hardcoded rgba() colors from entire AX Training & Playbook section
