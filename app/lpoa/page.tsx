@@ -1,180 +1,157 @@
 'use client';
 
-import PageLayout from "@/components/PageLayout";
-import QuizSection from "@/components/QuizSection";
+import Link from 'next/link';
 import { useTheme } from '@/lib/theme-provider';
-
-const statCards = [
-  { label: "Timeline", value: "6-8 Weeks" },
-  { label: "Who Signs", value: "Advisor (not clients)" },
-  { label: "Available At", value: "Schwab, Fidelity IWS, Pershing PAS" },
-];
-
-const processSteps = [
-  "Advisor and AXM confirm LPOA eligibility at the advisor's current custodian(s)",
-  "Transitions team (CTM) prepares the LPOA document package",
-  "Advisor signs the LPOA document",
-  "CTM submits LPOA authorization to custodian",
-  "Custodian reviews and approves the LPOA (typically 5-10 business days)",
-  "Asset transfers begin systematically, batch by batch",
-  "Accounts are monitored daily; discrepancies flagged and resolved",
-  "All accounts confirmed transferred — transitions closes out",
-];
-
-const custodians = [
-  {
-    name: "Schwab",
-    icon: "S",
-    body: "Full LPOA support. Most common for Breakaway advisors with Schwab accounts.",
-  },
-  {
-    name: "Fidelity IWS",
-    icon: "F",
-    body: "Fidelity Institutional Wealth Services supports LPOA. Requires specific form submission through Fidelity's advisor portal.",
-  },
-  {
-    name: "Pershing PAS",
-    icon: "P",
-    body: "Pershing Portfolio Advisory Service supports LPOA through NetX360.",
-  },
-];
-
-const considerations = [
-  "LPOA does NOT require client notification of the transfer (although best practice is to notify)",
-  "Some account types cannot transfer via LPOA (e.g., 401k, certain annuities) — these may require Repaper",
-  "ACATs may still be needed for non-LPOA-eligible accounts within an otherwise LPOA transition",
-  "The LPOA document must be stored in the client file and Transition Tracker",
-];
 
 export default function LPOAPage() {
   const { THEME } = useTheme();
 
   return (
-    <PageLayout
-      step={9}
-      title="LPOA"
-      subtitle="Transition Method — Limited Power of Attorney (6-8 Weeks)"
-      backHref="/master-merge"
-      nextHref="/repaper-acat"
-      backLabel="Master Merge"
-      nextLabel="Repaper / ACAT"
-    >
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg }}>
+      <div className="max-w-5xl mx-auto px-8 py-16">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <div className="mb-4">
+            <span
+              className="text-xs uppercase tracking-widest font-semibold"
+              style={{ color: THEME.colors.gold }}
+            >
+              Step 09 / 13
+            </span>
+          </div>
+          <h1
+            className="text-5xl font-bold mb-4"
+            style={{ color: THEME.colors.text }}
+          >
+            LPOA
+          </h1>
+          <p className="text-lg" style={{ color: THEME.colors.textSecondary }}>
+            Transition Method — Limited Power of Attorney (6-8 Weeks)
+          </p>
+        </div>
 
         {/* Intro */}
-        <p className="leading-relaxed text-base mb-12 max-w-3xl" style={{ color: THEME.colors.textSecondary }}>
+        <p
+          className="text-base leading-relaxed mb-12"
+          style={{
+            color: THEME.colors.text,
+            borderLeft: `3px solid ${THEME.colors.teal}`,
+            paddingLeft: '1.5rem',
+          }}
+        >
           The LPOA (Limited Power of Attorney) transition method allows Farther to transfer client
           assets without requiring individual client signatures on new paperwork. Instead, the advisor
           signs a single LPOA document granting Farther authority to act on behalf of clients. This is
           a mid-range timeline method — faster than Repaper/ACAT but slower than Master Merge.
         </p>
 
-        {/* Section: At a Glance */}
-        <section className="mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full" style={{ background: THEME.colors.teal }} />
-            <h2 className="font-sans text-2xl font-bold" style={{ color: THEME.colors.text }}>
-              At a Glance
-            </h2>
-          </div>
-
+        {/* At a Glance */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+            At a Glance
+          </h2>
           <div className="grid md:grid-cols-3 gap-4">
-            {statCards.map((card, idx) => (
+            {[
+              { label: 'Timeline', value: '6-8 Weeks' },
+              { label: 'Who Signs', value: 'Advisor (not clients)' },
+              { label: 'Available At', value: 'Schwab, Fidelity IWS, Pershing PAS' },
+            ].map((card) => (
               <div
-                key={idx}
-                className="rounded-xl text-center px-6 py-7 transition-all duration-200"
+                key={card.label}
+                className="rounded-xl p-6 text-center"
                 style={{
                   backgroundColor: THEME.colors.surface,
                   border: `1px solid ${THEME.colors.border}`,
-                  boxShadow: '0 0 0 transparent'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 16px ${THEME.colors.teal}33`}
-                onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 transparent'}
               >
-                <p className="text-xs uppercase tracking-widest font-medium mb-3" style={{ color: THEME.colors.textSecondary }}>
+                <p
+                  className="text-xs uppercase tracking-wider mb-3"
+                  style={{ color: THEME.colors.textSecondary }}
+                >
                   {card.label}
                 </p>
-                <p className="font-sans text-xl leading-snug" style={{ color: THEME.colors.teal }}>
+                <p className="text-xl leading-snug" style={{ color: THEME.colors.teal }}>
                   {card.value}
                 </p>
               </div>
             ))}
           </div>
-        </section>
+        </div>
 
-        {/* Section: How LPOA Works */}
-        <section className="mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full" style={{ background: THEME.colors.teal }} />
-            <h2 className="font-sans text-2xl font-bold" style={{ color: THEME.colors.text }}>
-              How LPOA Works
-            </h2>
-          </div>
-
-          <div className="rounded-xl border overflow-hidden" style={{ borderColor: THEME.colors.border }}>
-            {processSteps.map((step, idx) => {
-              const isLast = idx === processSteps.length - 1;
-              return (
-                <div
-                  key={idx}
-                  className="flex items-start gap-5 px-6 py-5 border-b last:border-b-0 relative"
-                  style={{
-                    background: idx % 2 !== 0 ? THEME.colors.surfaceSubtle : 'transparent',
-                    borderColor: THEME.colors.border
-                  }}
-                >
-                  {/* Step number */}
-                  <div className="flex flex-col items-center shrink-0">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold font-sans shrink-0"
-                      style={{
-                        backgroundColor: isLast ? THEME.colors.teal : THEME.colors.text,
-                        color: '#FFFFFF',
-                        boxShadow: `0 0 12px ${isLast ? THEME.colors.teal : THEME.colors.text}66`
-                      }}
-                    >
-                      {idx + 1}
-                    </div>
-                    {!isLast && (
-                      <div className="w-px mt-1 h-5" style={{ background: THEME.colors.border }} />
-                    )}
+        {/* How LPOA Works */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+            How LPOA Works
+          </h2>
+          <div className="space-y-0">
+            {[
+              'Advisor and AXM confirm LPOA eligibility at the advisor\'s current custodian(s)',
+              'Transitions team (CTM) prepares the LPOA document package',
+              'Advisor signs the LPOA document',
+              'CTM submits LPOA authorization to custodian',
+              'Custodian reviews and approves the LPOA (typically 5-10 business days)',
+              'Asset transfers begin systematically, batch by batch',
+              'Accounts are monitored daily; discrepancies flagged and resolved',
+              'All accounts confirmed transferred — transitions closes out',
+            ].map((step, i, arr) => (
+              <div key={i} className="flex gap-4">
+                <div className="flex flex-col items-center shrink-0">
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={{
+                      backgroundColor: i === arr.length - 1 ? THEME.colors.teal : THEME.colors.text,
+                      color: '#FFFFFF',
+                    }}
+                  >
+                    {i + 1}
                   </div>
-                  <p className="text-sm leading-relaxed pt-1.5" style={{ color: THEME.colors.text }}>
+                  {i < arr.length - 1 && (
+                    <div
+                      className="w-px flex-1 min-h-8"
+                      style={{ backgroundColor: THEME.colors.border }}
+                    />
+                  )}
+                </div>
+                <div className="pb-8">
+                  <p className="text-sm leading-relaxed pt-1" style={{ color: THEME.colors.text }}>
                     {step}
                   </p>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
-        </section>
+        </div>
 
-        {/* Section: Custodian Availability */}
-        <section className="mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full" style={{ background: THEME.colors.teal }} />
-            <h2 className="font-sans text-2xl font-bold" style={{ color: THEME.colors.text }}>
-              Custodian Availability
-            </h2>
-          </div>
-
+        {/* Custodian Availability */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+            Custodian Availability
+          </h2>
           <div className="grid md:grid-cols-3 gap-4">
-            {custodians.map((c, idx) => (
+            {[
+              { name: 'Schwab', icon: 'S', body: 'Full LPOA support. Most common for Breakaway advisors with Schwab accounts.' },
+              { name: 'Fidelity IWS', icon: 'F', body: 'Fidelity Institutional Wealth Services supports LPOA. Requires specific form submission through Fidelity\'s advisor portal.' },
+              { name: 'Pershing PAS', icon: 'P', body: 'Pershing Portfolio Advisory Service supports LPOA through NetX360.' },
+            ].map((c) => (
               <div
-                key={idx}
-                className="rounded-xl p-6 transition-all duration-200"
+                key={c.name}
+                className="rounded-xl p-6"
                 style={{
                   backgroundColor: THEME.colors.surface,
                   border: `1px solid ${THEME.colors.border}`,
-                  boxShadow: '0 0 0 transparent'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 0 20px ${THEME.colors.teal}33`}
-                onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 transparent'}
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center font-serif font-bold text-lg shrink-0" style={{ background: THEME.colors.text, color: THEME.colors.charcoal900 }}>
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold"
+                    style={{
+                      backgroundColor: THEME.colors.teal,
+                      color: '#FFFFFF',
+                    }}
+                  >
                     {c.icon}
                   </div>
-                  <h3 className="font-sans text-lg" style={{ color: THEME.colors.text }}>
+                  <h3 className="text-lg font-bold" style={{ color: THEME.colors.text }}>
                     {c.name}
                   </h3>
                 </div>
@@ -184,45 +161,71 @@ export default function LPOAPage() {
               </div>
             ))}
           </div>
-        </section>
+        </div>
 
-        {/* Section: Key Considerations */}
-        <section className="mb-4">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full" style={{ background: THEME.colors.teal }} />
-            <h2 className="font-sans text-2xl font-bold" style={{ color: THEME.colors.text }}>
-              Key Considerations
-            </h2>
-          </div>
-
-          <div className="rounded-xl border overflow-hidden" style={{ borderColor: THEME.colors.border }}>
-            {/* Header bar */}
-            <div className="px-6 py-3 border-b" style={{ background: THEME.colors.text, borderColor: THEME.colors.border }}>
-              <span className="text-xs uppercase tracking-widest font-medium" style={{ color: THEME.colors.charcoal900 }}>
+        {/* Key Considerations */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+            Key Considerations
+          </h2>
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{
+              backgroundColor: THEME.colors.surface,
+              border: `1px solid ${THEME.colors.border}`,
+            }}
+          >
+            <div
+              className="px-8 py-4"
+              style={{ borderBottom: `1px solid ${THEME.colors.border}` }}
+            >
+              <span
+                className="text-xs uppercase tracking-wider font-semibold"
+                style={{ color: THEME.colors.teal }}
+              >
                 Important Notes
               </span>
             </div>
-
-            <ul className="divide-y" style={{ borderColor: THEME.colors.border }}>
-              {considerations.map((item, idx) => (
-                <li
-                  key={idx}
-                  className="flex items-start gap-4 px-6 py-4"
-                >
-                  <span className="shrink-0 mt-0.5 text-base" style={{ color: THEME.colors.charcoal900 }}>
-                    &#9656;
-                  </span>
-                  <span className="text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
-                    {item}
-                  </span>
+            <ul className="px-8 py-6 space-y-3">
+              {[
+                'LPOA does NOT require client notification of the transfer (although best practice is to notify)',
+                'Some account types cannot transfer via LPOA (e.g., 401k, certain annuities) — these may require Repaper',
+                'ACATs may still be needed for non-LPOA-eligible accounts within an otherwise LPOA transition',
+                'The LPOA document must be stored in the client file and Transition Tracker',
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
+                  <span style={{ color: THEME.colors.teal }}>•</span>
+                  <span>{item}</span>
                 </li>
               ))}
             </ul>
           </div>
-        </section>
+        </div>
 
-        <QuizSection topicSlug="lpoa" topicTitle="LPOA Transition" />
+        {/* Navigation */}
+        <div className="flex items-center justify-between">
+          <Link
+            href="/master-merge"
+            className="px-6 py-3 rounded-lg text-sm font-semibold"
+            style={{
+              border: `1px solid ${THEME.colors.border}`,
+              color: THEME.colors.text,
+            }}
+          >
+            ← Back
+          </Link>
+          <Link
+            href="/repaper-acat"
+            className="px-8 py-4 rounded-lg text-sm font-semibold"
+            style={{
+              backgroundColor: THEME.colors.gold,
+              color: '#FFFFFF',
+            }}
+          >
+            Next: Repaper / ACAT →
+          </Link>
+        </div>
       </div>
-    </PageLayout>
+    </div>
   );
 }

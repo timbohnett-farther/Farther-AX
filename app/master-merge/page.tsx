@@ -1,39 +1,57 @@
 'use client';
 
-import PageLayout from "@/components/PageLayout";
+import Link from 'next/link';
 import { useTheme } from '@/lib/theme-provider';
 
 export default function MasterMergePage() {
   const { THEME } = useTheme();
 
   return (
-    <PageLayout
-      step={8}
-      title="Master Merge"
-      subtitle="Transition Method — Fastest Option (4–6 Weeks)"
-      backHref="/no-to-low-aum"
-      nextHref="/lpoa"
-    >
-      <div className="max-w-3xl">
-        {/* At a glance */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+    <div className="min-h-screen" style={{ backgroundColor: THEME.colors.bg }}>
+      <div className="max-w-5xl mx-auto px-8 py-16">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <div className="mb-4">
+            <span
+              className="text-xs uppercase tracking-widest font-semibold"
+              style={{ color: THEME.colors.gold }}
+            >
+              Step 08 / 13
+            </span>
+          </div>
+          <h1
+            className="text-5xl font-bold mb-4"
+            style={{ color: THEME.colors.text }}
+          >
+            Master Merge
+          </h1>
+          <p className="text-lg" style={{ color: THEME.colors.textSecondary }}>
+            Transition Method — Fastest Option (4–6 Weeks)
+          </p>
+        </div>
+
+        {/* At a Glance Stats */}
+        <div className="grid md:grid-cols-3 gap-4 mb-12">
           {[
-            { label: "Timeline", value: "4-6 Weeks" },
-            { label: "Method", value: "Custodian-Level Merge" },
-            { label: "Complexity", value: "High" },
+            { label: 'Timeline', value: '4-6 Weeks' },
+            { label: 'Method', value: 'Custodian-Level Merge' },
+            { label: 'Complexity', value: 'High' },
           ].map((stat) => (
             <div
               key={stat.label}
-              className="rounded-lg p-5 text-center"
+              className="rounded-xl p-6 text-center"
               style={{
                 backgroundColor: THEME.colors.surface,
-                border: `1px solid ${THEME.colors.border}`
+                border: `1px solid ${THEME.colors.border}`,
               }}
             >
-              <p className="text-xs tracking-widest uppercase mb-1" style={{ color: THEME.colors.textMuted }}>
+              <p
+                className="text-xs uppercase tracking-wider mb-2"
+                style={{ color: THEME.colors.textSecondary }}
+              >
                 {stat.label}
               </p>
-              <p className="text-xl font-bold font-sans" style={{ color: THEME.colors.text }}>
+              <p className="text-2xl font-bold" style={{ color: THEME.colors.text }}>
                 {stat.value}
               </p>
             </div>
@@ -42,17 +60,19 @@ export default function MasterMergePage() {
 
         {/* Coming Soon Banner */}
         <div
-          className="rounded-xl p-8 mb-8 text-center"
+          className="rounded-xl p-12 mb-12 text-center"
           style={{
-            backgroundColor: THEME.colors.surfaceSubtle,
-            border: `1px solid ${THEME.colors.border}`
+            backgroundColor: THEME.colors.surface,
+            border: `1px solid ${THEME.colors.border}`,
           }}
         >
-          <div className="text-5xl mb-4" style={{ color: THEME.colors.teal }}>&#9670;</div>
-          <h2 className="text-2xl font-bold font-sans mb-3" style={{ color: THEME.colors.text }}>
+          <div className="text-6xl mb-6" style={{ color: THEME.colors.teal }}>
+            ◆
+          </div>
+          <h2 className="text-3xl font-bold mb-4" style={{ color: THEME.colors.text }}>
             Detailed Content Coming Soon
           </h2>
-          <p className="text-base leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+          <p className="text-base leading-relaxed max-w-2xl mx-auto" style={{ color: THEME.colors.textSecondary }}>
             The Master Merge section will provide a complete step-by-step guide to
             executing the fastest available transition method, including custodian
             requirements, eligibility criteria, and the full workflow.
@@ -61,32 +81,56 @@ export default function MasterMergePage() {
 
         {/* Preview */}
         <div
-          className="rounded-lg p-6"
+          className="rounded-xl p-8"
           style={{
             backgroundColor: THEME.colors.surface,
-            border: `1px solid ${THEME.colors.border}`
+            border: `1px solid ${THEME.colors.border}`,
           }}
         >
-          <h3 className="text-lg font-semibold font-sans mb-4" style={{ color: THEME.colors.text }}>
+          <h3 className="text-xl font-bold mb-6" style={{ color: THEME.colors.text }}>
             What This Section Will Cover
           </h3>
           <ul className="space-y-3">
             {[
-              "Eligibility criteria for Master Merge (custodian and account type requirements)",
-              "Step-by-step custodian coordination process",
-              "Account type considerations and exclusions",
-              "Timeline milestones and dependency mapping",
-              "Common failure points and how to resolve them",
-              "Post-merge verification and reconciliation",
+              'Eligibility criteria for Master Merge (custodian and account type requirements)',
+              'Step-by-step custodian coordination process',
+              'Account type considerations and exclusions',
+              'Timeline milestones and dependency mapping',
+              'Common failure points and how to resolve them',
+              'Post-merge verification and reconciliation',
             ].map((item, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <span className="mt-0.5" style={{ color: THEME.colors.teal }}>&#9656;</span>
-                <span className="text-sm" style={{ color: THEME.colors.text }}>{item}</span>
+              <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
+                <span style={{ color: THEME.colors.teal }}>•</span>
+                <span>{item}</span>
               </li>
             ))}
           </ul>
         </div>
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between mt-12">
+          <Link
+            href="/no-to-low-aum"
+            className="px-6 py-3 rounded-lg text-sm font-semibold"
+            style={{
+              border: `1px solid ${THEME.colors.border}`,
+              color: THEME.colors.text,
+            }}
+          >
+            ← Back
+          </Link>
+          <Link
+            href="/lpoa"
+            className="px-8 py-4 rounded-lg text-sm font-semibold"
+            style={{
+              backgroundColor: THEME.colors.gold,
+              color: '#FFFFFF',
+            }}
+          >
+            Next: LPOA →
+          </Link>
+        </div>
       </div>
-    </PageLayout>
+    </div>
   );
 }
