@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import useSWR from 'swr';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -143,7 +143,7 @@ function SummaryCard({ label, value, sub, accent, icon, iconColor, onClick }: { 
         <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: iconColor || (accent ? "#FFFFFF" : THEME.colors.textSecondary) }}>{icon}</span>
       )}
       <p style={{ fontSize: 11, color: accent ? 'rgba(255,255,255,0.7)' : THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{label}</p>
-      <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums' }}>{value}</p>
+      <p style={{ fontSize: 28, fontWeight: 700, color: accent ? THEME.colors.ivory : THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums' }}>{value}</p>
       {sub && <p style={{ fontSize: 12, color: accent ? 'rgba(255,255,255,0.6)' : THEME.colors.textSecondary, marginTop: 4 }}>{sub}</p>}
     </div>
   );
@@ -820,7 +820,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             return launchedDeals.some(d => d.dealname === a.advisor_name);
           });
 
-          const totalTranAum = launchedAdvisors.reduce((sum: number, a: { tran_aum: number }) => sum + (a.tran_aum || 0), 0);
+          const totalTranAum = launchedAdvisors.reduce((sum: number, a: { tran_aum: number | string }) => sum + (parseFloat(String(a.tran_aum)) || 0), 0);
           const totalExpectedAum = launchedDeals.reduce((sum, d) => sum + (parseFloat(d.transferable_aum || '0') || 0), 0);
           const transferPct = totalExpectedAum > 0 ? Math.round((totalTranAum / totalExpectedAum) * 100) : 0;
 
@@ -855,7 +855,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
           const launchedAdvisors = (tranAumData?.advisors ?? []).filter((a: { advisor_name: string }) => {
             return deals.some(d => d.dealstage === '100411705' && d.dealname === a.advisor_name);
           });
-          const totalRevenue = launchedAdvisors.reduce((sum: number, a: { revenue: number }) => sum + (a.revenue || 0), 0);
+          const totalRevenue = launchedAdvisors.reduce((sum: number, a: { revenue: number | string }) => sum + (parseFloat(String(a.revenue)) || 0), 0);
           const launchedDeals = deals.filter(d => d.dealstage === '100411705');
 
           return (
@@ -1172,7 +1172,69 @@ function RecruitingTab() {
   const [teamAssignments, setTeamAssignments] = useState<Record<string, Record<string, string>>>({});
   const { data: aumData } = useSWR('/api/command-center/aum-tracker?all=true', fetcher, SWR_OPTS);
   const { data: managedData } = useSWR('/api/command-center/managed-accounts', fetcher, SWR_OPTS);
+  const { data: graduationsData, mutate: mutateGraduations } = useSWR('/api/command-center/graduations', fetcher, SWR_OPTS);
   const [selectedRecruiter, setSelectedRecruiter] = useState<string | null>(null);
+  const [graduatingId, setGraduatingId] = useState<string | null>(null);
+
+  // Set of deal IDs that have been graduated early
+  const graduatedSet = useMemo(() => {
+    const set = new Set<string>();
+    if (graduationsData?.dealIds) {
+      for (const id of graduationsData.dealIds) set.add(id);
+    }
+    return set;
+  }, [graduationsData]);
+
+  interface GraduationEntry { deal_id: string; graduated_at: string; graduated_by: string | null }
+  interface GraduationsResponse { dealIds: string[]; graduations: GraduationEntry[] }
+
+  // Graduate a deal early
+  const graduateDeal = useCallback(async (dealId: string) => {
+    setGraduatingId(dealId);
+    try {
+      // Optimistic update
+      mutateGraduations(
+        (current: GraduationsResponse | undefined) => ({
+          dealIds: [...(current?.dealIds ?? []), dealId],
+          graduations: [...(current?.graduations ?? []), { deal_id: dealId, graduated_at: new Date().toISOString(), graduated_by: null }],
+        }),
+        { revalidate: false }
+      );
+      await fetch(`/api/command-center/deal/${dealId}/graduate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      mutateGraduations();
+    } catch (err) {
+      console.error('Graduate failed:', err);
+      mutateGraduations(); // revert
+    } finally {
+      setGraduatingId(null);
+    }
+  }, [mutateGraduations]);
+
+  // Un-graduate a deal
+  const ungraduateDeal = useCallback(async (dealId: string) => {
+    setGraduatingId(dealId);
+    try {
+      // Optimistic update
+      mutateGraduations(
+        (current: GraduationsResponse | undefined) => ({
+          dealIds: (current?.dealIds ?? []).filter(id => id !== dealId),
+          graduations: (current?.graduations ?? []).filter(g => g.deal_id !== dealId),
+        }),
+        { revalidate: false }
+      );
+      await fetch(`/api/command-center/deal/${dealId}/graduate`, { method: 'DELETE' });
+      mutateGraduations();
+    } catch (err) {
+      console.error('Ungraduate failed:', err);
+      mutateGraduations(); // revert
+    } finally {
+      setGraduatingId(null);
+    }
+  }, [mutateGraduations]);
 
   // Fire-and-forget: trigger managed accounts sync (endpoint checks 20hr cooldown)
   useEffect(() => {
@@ -1304,13 +1366,20 @@ function RecruitingTab() {
     .filter(d => ACTIVE_STAGE_IDS.includes(d.dealstage))
     .sort((a, b) => FUNNEL_STAGE_ORDER.indexOf(a.dealstage) - FUNNEL_STAGE_ORDER.indexOf(b.dealstage));
 
-  // Filter deals by sub-tab
+  // Filter deals by sub-tab (graduations override the 90-day rule)
   const sortedDeals = allActiveDeals.filter(d => {
     if (advisorTab === 'early') return EARLY_STAGE_IDS.includes(d.dealstage);
-    if (advisorTab === 'completed') return d.dealstage === '100411705' && (d.daysSinceLaunch ?? 0) >= 90;
-    // launch_to_grad: Stages 5-7, but launched advisors only if < 90 days
+    if (advisorTab === 'completed') {
+      if (d.dealstage !== '100411705') return false;
+      // Graduated early OR 90+ days
+      return graduatedSet.has(d.id) || (d.daysSinceLaunch ?? 0) >= 90;
+    }
+    // launch_to_grad: Stages 5-7, but launched advisors only if < 90 days AND not graduated
     if (LAUNCH_STAGE_IDS.includes(d.dealstage)) {
-      if (d.dealstage === '100411705') return (d.daysSinceLaunch ?? 0) < 90;
+      if (d.dealstage === '100411705') {
+        if (graduatedSet.has(d.id)) return false; // graduated → goes to completed
+        return (d.daysSinceLaunch ?? 0) < 90;
+      }
       return true;
     }
     return false;
@@ -1464,12 +1533,18 @@ function RecruitingTab() {
           { key: 'completed' as const, label: 'Completed Transitions', sub: '90+ days post-launch' },
         ]).map(tab => {
           const isActive = advisorTab === tab.key;
-          // Count deals for badge
+          // Count deals for badge (respects graduations)
           const count = allActiveDeals.filter(d => {
             if (tab.key === 'early') return EARLY_STAGE_IDS.includes(d.dealstage);
-            if (tab.key === 'completed') return d.dealstage === '100411705' && (d.daysSinceLaunch ?? 0) >= 90;
+            if (tab.key === 'completed') {
+              if (d.dealstage !== '100411705') return false;
+              return graduatedSet.has(d.id) || (d.daysSinceLaunch ?? 0) >= 90;
+            }
             if (LAUNCH_STAGE_IDS.includes(d.dealstage)) {
-              if (d.dealstage === '100411705') return (d.daysSinceLaunch ?? 0) < 90;
+              if (d.dealstage === '100411705') {
+                if (graduatedSet.has(d.id)) return false;
+                return (d.daysSinceLaunch ?? 0) < 90;
+              }
               return true;
             }
             return false;
@@ -1628,15 +1703,16 @@ function RecruitingTab() {
             else if (score === 10) recruiterMap[name].sentimentCounts.excellent++;
           }
 
-          // Only track complexity for Launched deals (stage '100411705')
+          // Track complexity for ALL deals (not just launched)
+          const cx = complexityScores[deal.id];
+          if (cx?.score) {
+            recruiterMap[name].launchedComplexityScores.push(cx.score);
+          }
+
+          // Only track launched stats for Launched deals (stage '100411705')
           if (deal.dealstage === '100411705') {
             recruiterMap[name].launched += 1;
             recruiterMap[name].launchedAum += parseFloat(deal.transferable_aum ?? '0') || 0;
-
-            const complexityAdvisor = (complexityData?.advisors ?? []).find((a: { deal_id: string }) => a.deal_id === deal.id);
-            if (complexityAdvisor?.total_score) {
-              recruiterMap[name].launchedComplexityScores.push(complexityAdvisor.total_score);
-            }
           }
         }
 
@@ -1843,9 +1919,54 @@ function RecruitingTab() {
                       onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = rowBg; }}
                     >
                       <td style={{ padding: '10px 14px' }}>
-                        <Link href={`/command-center/advisor/${deal.id}`} style={{ fontWeight: 600, color: THEME.colors.teal, textDecoration: 'none' }}>
-                          {deal.dealname}
-                        </Link>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <Link href={`/command-center/advisor/${deal.id}`} style={{ fontWeight: 600, color: THEME.colors.teal, textDecoration: 'none' }}>
+                            {deal.dealname}
+                          </Link>
+                          {/* Graduate button — only in Launch to Graduation tab for Launched advisors */}
+                          {advisorTab === 'launch_to_grad' && deal.dealstage === '100411705' && (
+                            <button
+                              onClick={() => graduateDeal(deal.id)}
+                              disabled={graduatingId === deal.id}
+                              title="Graduate this advisor early"
+                              style={{
+                                padding: '1px 6px', borderRadius: 4, fontSize: 10, fontWeight: 600,
+                                background: 'rgba(16,185,129,0.12)', color: '#10b981',
+                                border: '1px solid rgba(16,185,129,0.3)', cursor: 'pointer',
+                                opacity: graduatingId === deal.id ? 0.5 : 1,
+                                whiteSpace: 'nowrap', flexShrink: 0,
+                              }}
+                            >
+                              {graduatingId === deal.id ? '...' : 'Graduate'}
+                            </button>
+                          )}
+                          {/* Graduated Early badge — in Completed tab for manually graduated advisors */}
+                          {advisorTab === 'completed' && graduatedSet.has(deal.id) && (deal.daysSinceLaunch ?? 0) < 90 && (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                              <span style={{
+                                padding: '1px 6px', borderRadius: 4, fontSize: 10, fontWeight: 600,
+                                background: 'rgba(245,158,11,0.12)', color: '#f59e0b',
+                                border: '1px solid rgba(245,158,11,0.3)', whiteSpace: 'nowrap',
+                              }}>
+                                Graduated Early
+                              </span>
+                              <button
+                                onClick={() => ungraduateDeal(deal.id)}
+                                disabled={graduatingId === deal.id}
+                                title="Undo early graduation"
+                                style={{
+                                  padding: '0px 4px', borderRadius: 3, fontSize: 10, fontWeight: 600,
+                                  background: 'rgba(239,68,68,0.08)', color: '#ef4444',
+                                  border: '1px solid rgba(239,68,68,0.2)', cursor: 'pointer',
+                                  opacity: graduatingId === deal.id ? 0.5 : 1,
+                                  lineHeight: '16px',
+                                }}
+                              >
+                                {graduatingId === deal.id ? '...' : '×'}
+                              </button>
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td style={{ padding: '10px 14px' }}>
                         {(() => {

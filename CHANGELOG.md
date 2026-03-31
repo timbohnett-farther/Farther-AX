@@ -6,6 +6,29 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Manual "Graduate Early" Override — 2026-03-31
+
+**What**: Added ability to manually graduate an advisor early from "Launch to Graduation" to "Completed Transitions" regardless of 90-day rule
+
+**Impact**: Sticky graduation persists in Postgres — survives page refreshes and cache clears, with optimistic SWR updates for instant UI feedback
+
+**Scope:**
+- New `advisor_graduations` Postgres table (auto-created on first API call)
+- POST/DELETE API for graduating/un-graduating a deal
+- GET API returning all graduated deal IDs
+- Graduate button in Launch to Graduation tab for Launched advisors
+- "Graduated Early" badge + undo button in Completed Transitions tab
+- Tab counts updated to respect graduation state
+- Advisor Hub page also respects graduation filtering
+
+**Files:**
+- `app/api/command-center/deal/[id]/graduate/route.ts` (NEW)
+- `app/api/command-center/graduations/route.ts` (NEW)
+- `app/command-center/page.tsx` (updated filtering + UI)
+- `app/command-center/advisor-hub/page.tsx` (updated filtering)
+
+---
+
 ## [Completed] Email Alias Support — Lauren Moone Multi-Email Identity — 2026-03-31
 
 **What**: Added email alias mapping in NextAuth so team members with multiple @farther.com emails are recognized as the same person regardless of which Google account they sign in with.

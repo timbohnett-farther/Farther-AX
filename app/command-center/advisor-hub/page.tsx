@@ -521,6 +521,7 @@ export default function AdvisorHubPage() {
   const { data: aumData, isLoading: aumLoading } = useSWR('/api/command-center/aum-tracker', fetcher, SWR_OPTS);
   const { data: taskSummaryData } = useSWR('/api/command-center/tasks/summary', fetcher, SWR_OPTS);
   const { data: alertsData } = useSWR('/api/command-center/alerts', fetcher, SWR_OPTS);
+  const { data: graduationsData } = useSWR('/api/command-center/graduations', fetcher, SWR_OPTS);
   const [activeTab, setActiveTab] = useState<TabKey>('launch');
   const [search, setSearch] = useState('');
   const [scoring, setScoring] = useState<Record<string, boolean>>({});
@@ -558,26 +559,35 @@ export default function AdvisorHubPage() {
     return map;
   }, [sentimentData]);
 
+  // Set of deal IDs that have been graduated early
+  const graduatedSet = useMemo(() => {
+    const set = new Set<string>();
+    if (graduationsData?.dealIds) {
+      for (const id of graduationsData.dealIds) set.add(id);
+    }
+    return set;
+  }, [graduationsData]);
+
   const { launchDeals, earlyDeals, completedDeals } = useMemo(() => {
     if (!data?.deals) return { launchDeals: [], earlyDeals: [], completedDeals: [] };
     const deals = (data.deals as Deal[]).filter(d => !d.dealname?.toLowerCase().includes('test'));
 
     const early = deals.filter(d => EARLY_STAGE_IDS.includes(d.dealstage));
 
-    // Launch to Graduation: Steps 5-6 (all), Step 7 only if launched within 90 days
+    // Launch to Graduation: Steps 5-6 (all), Step 7 only if launched within 90 days AND not graduated
     const launch = deals.filter(d => {
       if (!LAUNCH_STAGE_IDS.includes(d.dealstage)) return false;
       if (d.dealstage === LAUNCHED_STAGE_ID) {
-        // Only keep launched advisors with a known date AND within 90 days
+        if (graduatedSet.has(d.id)) return false; // graduated → goes to completed
         return d.daysSinceLaunch !== null && d.daysSinceLaunch <= GRADUATION_DAYS;
       }
       return true;
     });
 
-    // Completed Transitions: Launched advisors > 90 days, or launched with no date set
+    // Completed Transitions: Launched advisors > 90 days, launched with no date set, OR graduated early
     const completed = deals.filter(d => {
       if (d.dealstage !== LAUNCHED_STAGE_ID) return false;
-      // No date set = can't track graduation, treat as completed
+      if (graduatedSet.has(d.id)) return true; // graduated early → always completed
       if (d.daysSinceLaunch === null) return true;
       return d.daysSinceLaunch > GRADUATION_DAYS;
     });
@@ -587,7 +597,7 @@ export default function AdvisorHubPage() {
       earlyDeals: sortByLastName(early),
       completedDeals: sortByLastName(completed),
     };
-  }, [data]);
+  }, [data, graduatedSet]);
 
   const currentDeals = useMemo(() => {
     if (activeTab === 'aum') return [];
