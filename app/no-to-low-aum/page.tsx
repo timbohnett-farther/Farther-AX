@@ -1,10 +1,7 @@
 'use client';
 
 import PageLayout from '@/components/PageLayout';
-import { useTheme } from '@/lib/theme-provider';
-
 export default function NoToLowAUMPage() {
-  const { THEME } = useTheme();
 
   return (
     <PageLayout
@@ -20,11 +17,6 @@ export default function NoToLowAUMPage() {
         {/* Intro */}
         <p
           className="text-base leading-relaxed mb-12"
-          style={{
-            color: THEME.colors.text,
-            borderLeft: `3px solid ${THEME.colors.teal}`,
-            paddingLeft: '1.5rem',
-          }}
         >
           The No to Low AUM pathway applies to advisors bringing fewer than $15-20 million in assets
           under management to Farther. While Farther welcomes advisors at all stages, advisors below
@@ -34,13 +26,12 @@ export default function NoToLowAUMPage() {
 
         {/* When This Pathway Applies */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
             When This Pathway Applies
           </h2>
           <div
             className="rounded-xl p-6"
             style={{
-              backgroundColor: THEME.colors.surface,
               border: `1px solid ${THEME.colors.teal}`,
               borderLeft: `4px solid ${THEME.colors.teal}`,
             }}
@@ -48,11 +39,11 @@ export default function NoToLowAUMPage() {
             <div className="flex items-start gap-4">
               <span
                 className="text-xl shrink-0"
-                style={{ color: THEME.colors.teal }}
+                className="text-[#3B5A69]"
               >
                 ℹ️
               </span>
-              <p className="text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
+              <p className="text-sm leading-relaxed" className="text-[var(--color-text)]">
                 This pathway is triggered when an advisor's projected AUM at launch is below $15-20M.
                 The exact threshold is assessed case-by-case with input from the Focus Team, which
                 evaluates the advisor's growth trajectory, client quality, and strategic fit.
@@ -63,7 +54,7 @@ export default function NoToLowAUMPage() {
 
         {/* Key Characteristics */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-8" style={{ color: THEME.colors.text }}>
+          <h2 className="text-3xl font-bold mb-8" className="text-[var(--color-text)]">
             Key Characteristics
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -88,21 +79,17 @@ export default function NoToLowAUMPage() {
               <div
                 key={idx}
                 className="rounded-xl p-6"
-                style={{
-                  backgroundColor: THEME.colors.surface,
-                  border: `1px solid ${THEME.colors.border}`,
-                }}
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: THEME.colors.teal }}
                   />
-                  <h3 className="text-lg font-bold" style={{ color: THEME.colors.text }}>
+                  <h3 className="text-lg font-bold" className="text-[var(--color-text)]">
                     {item.title}
                   </h3>
                 </div>
-                <p className="text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                <p className="text-sm leading-relaxed" className="text-[var(--color-text-secondary)]">
                   {item.body}
                 </p>
               </div>
@@ -112,21 +99,17 @@ export default function NoToLowAUMPage() {
 
         {/* Focus Team Review */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
             The Focus Team Review
           </h2>
           <div
             className="rounded-xl overflow-hidden"
-            style={{
-              backgroundColor: THEME.colors.surface,
-              border: `1px solid ${THEME.colors.border}`,
-            }}
           >
             <div
               className="px-8 py-6"
               style={{ borderBottom: `1px solid ${THEME.colors.border}` }}
             >
-              <p className="text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
+              <p className="text-sm leading-relaxed" className="text-[var(--color-text)]">
                 The Focus Team is an internal Farther committee that reviews borderline advisor
                 candidates. Their assessment covers the following areas. The AXM must present the
                 advisor's profile to the Focus Team before initiating any onboarding steps.
@@ -140,8 +123,8 @@ export default function NoToLowAUMPage() {
                   'The advisor\'s prior firm performance record',
                   'Strategic alignment with Farther\'s growth goals',
                 ].map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
-                    <span style={{ color: THEME.colors.teal }}>•</span>
+                  <li key={idx} className="flex items-start gap-3 text-sm leading-relaxed" className="text-[var(--color-text)]">
+                    <span className="text-[#3B5A69]">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -152,15 +135,11 @@ export default function NoToLowAUMPage() {
 
         {/* Training Curriculum */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
             Training Curriculum Priority
           </h2>
           <div
             className="rounded-xl overflow-hidden"
-            style={{
-              backgroundColor: THEME.colors.surface,
-              border: `1px solid ${THEME.colors.border}`,
-            }}
           >
             <div
               className="px-8 py-4"
@@ -168,7 +147,7 @@ export default function NoToLowAUMPage() {
             >
               <span
                 className="text-xs uppercase tracking-wider font-semibold"
-                style={{ color: THEME.colors.teal }}
+                className="text-[#3B5A69]"
               >
                 Required Training Modules — In Order
               </span>
@@ -192,7 +171,7 @@ export default function NoToLowAUMPage() {
                     >
                       {String(idx + 1).padStart(2, '0')}
                     </span>
-                    <span className="text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
+                    <span className="text-sm leading-relaxed" className="text-[var(--color-text)]">
                       {item}
                     </span>
                   </div>

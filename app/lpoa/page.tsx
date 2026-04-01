@@ -1,10 +1,7 @@
 'use client';
 
 import PageLayout from '@/components/PageLayout';
-import { useTheme } from '@/lib/theme-provider';
-
 export default function LPOAPage() {
-  const { THEME } = useTheme();
 
   return (
     <PageLayout
@@ -20,11 +17,6 @@ export default function LPOAPage() {
         {/* Intro */}
         <p
           className="text-base leading-relaxed mb-12"
-          style={{
-            color: THEME.colors.text,
-            borderLeft: `3px solid ${THEME.colors.teal}`,
-            paddingLeft: '1.5rem',
-          }}
         >
           The LPOA (Limited Power of Attorney) transition method allows Farther to transfer client
           assets without requiring individual client signatures on new paperwork. Instead, the advisor
@@ -34,7 +26,7 @@ export default function LPOAPage() {
 
         {/* At a Glance */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
             At a Glance
           </h2>
           <div className="grid md:grid-cols-3 gap-4">
@@ -46,18 +38,14 @@ export default function LPOAPage() {
               <div
                 key={card.label}
                 className="rounded-xl p-6 text-center"
-                style={{
-                  backgroundColor: THEME.colors.surface,
-                  border: `1px solid ${THEME.colors.border}`,
-                }}
               >
                 <p
                   className="text-xs uppercase tracking-wider mb-3"
-                  style={{ color: THEME.colors.textSecondary }}
+                  className="text-[var(--color-text-secondary)]"
                 >
                   {card.label}
                 </p>
-                <p className="text-xl leading-snug" style={{ color: THEME.colors.teal }}>
+                <p className="text-xl leading-snug" className="text-[#3B5A69]">
                   {card.value}
                 </p>
               </div>
@@ -67,7 +55,7 @@ export default function LPOAPage() {
 
         {/* How LPOA Works */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
             How LPOA Works
           </h2>
           <div className="space-y-0">
@@ -100,7 +88,7 @@ export default function LPOAPage() {
                   )}
                 </div>
                 <div className="pb-8">
-                  <p className="text-sm leading-relaxed pt-1" style={{ color: THEME.colors.text }}>
+                  <p className="text-sm leading-relaxed pt-1" className="text-[var(--color-text)]">
                     {step}
                   </p>
                 </div>
@@ -111,7 +99,7 @@ export default function LPOAPage() {
 
         {/* Custodian Availability */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
             Custodian Availability
           </h2>
           <div className="grid md:grid-cols-3 gap-4">
@@ -123,10 +111,6 @@ export default function LPOAPage() {
               <div
                 key={c.name}
                 className="rounded-xl p-6"
-                style={{
-                  backgroundColor: THEME.colors.surface,
-                  border: `1px solid ${THEME.colors.border}`,
-                }}
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div
@@ -138,11 +122,11 @@ export default function LPOAPage() {
                   >
                     {c.icon}
                   </div>
-                  <h3 className="text-lg font-bold" style={{ color: THEME.colors.text }}>
+                  <h3 className="text-lg font-bold" className="text-[var(--color-text)]">
                     {c.name}
                   </h3>
                 </div>
-                <p className="text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                <p className="text-sm leading-relaxed" className="text-[var(--color-text-secondary)]">
                   {c.body}
                 </p>
               </div>
@@ -152,15 +136,11 @@ export default function LPOAPage() {
 
         {/* Key Considerations */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
             Key Considerations
           </h2>
           <div
             className="rounded-xl overflow-hidden"
-            style={{
-              backgroundColor: THEME.colors.surface,
-              border: `1px solid ${THEME.colors.border}`,
-            }}
           >
             <div
               className="px-8 py-4"
@@ -168,7 +148,7 @@ export default function LPOAPage() {
             >
               <span
                 className="text-xs uppercase tracking-wider font-semibold"
-                style={{ color: THEME.colors.teal }}
+                className="text-[#3B5A69]"
               >
                 Important Notes
               </span>
@@ -180,8 +160,8 @@ export default function LPOAPage() {
                 'ACATs may still be needed for non-LPOA-eligible accounts within an otherwise LPOA transition',
                 'The LPOA document must be stored in the client file and Transition Tracker',
               ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
-                  <span style={{ color: THEME.colors.teal }}>•</span>
+                <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" className="text-[var(--color-text)]">
+                  <span className="text-[#3B5A69]">•</span>
                   <span>{item}</span>
                 </li>
               ))}

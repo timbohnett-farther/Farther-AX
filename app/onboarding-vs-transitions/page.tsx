@@ -1,10 +1,7 @@
 'use client';
 
 import PageLayout from '@/components/PageLayout';
-import { useTheme } from '@/lib/theme-provider';
-
 export default function OnboardingVsTransitionsPage() {
-  const { THEME } = useTheme();
 
   return (
     <PageLayout

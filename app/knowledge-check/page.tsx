@@ -28,7 +28,6 @@ const QUIZ_TOPICS = [
 ];
 
 export default function KnowledgeCheckPage() {
-  const { THEME } = useTheme();
   const { data: session } = useSession();
   const [results, setResults] = useState<QuizResult[]>([]);
   const [loading, setLoading] = useState(true);

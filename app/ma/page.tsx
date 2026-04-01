@@ -1,10 +1,7 @@
 'use client';
 
 import PageLayout from '@/components/PageLayout';
-import { useTheme } from '@/lib/theme-provider';
-
 export default function MAPage() {
-  const { THEME } = useTheme();
 
   const phases = [
     { num: '1', name: 'Initial Assessment', lead: 'M&A Strategist', question: 'Is this a strategic fit? Go/No-Go for full diligence?' },

@@ -1,10 +1,7 @@
 'use client';
 
 import PageLayout from '@/components/PageLayout';
-import { useTheme } from '@/lib/theme-provider';
-
 export default function KeyDocumentsPage() {
-  const { THEME } = useTheme();
 
   const documents = [
     { code: 'IAA', name: 'Investment Advisory Agreement', breakaway: '✓', indRIA: '✓', ma: '✓', noLowAUM: '✓', masterMerge: '–', lpoa: '–', repaperACAT: '–' },

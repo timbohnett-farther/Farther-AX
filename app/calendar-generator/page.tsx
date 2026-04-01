@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import PageLayout from "@/components/PageLayout";
-import { useTheme } from '@/lib/theme-provider';
-
 // --- Types ---
 
 type Attendee = { name: string; email: string };
@@ -103,7 +101,6 @@ function AttendeeBadge({ attendee }: { attendee: Attendee }) {
 // --- Page ---
 
 export default function CalendarGeneratorPage() {
-  const { THEME } = useTheme();
   const [advisorName, setAdvisorName] = useState("");
   const [pathway, setPathway] = useState("breakaway");
   const [launchDate, setLaunchDate] = useState("");
