@@ -23,7 +23,7 @@ Format: Each entry includes completion status, feature name, date, scope, status
 **Files:**
 - `app/command-center/advisor-hub/page.tsx` - Added type guards and error handling
 
-**Commit**: TBD
+**Commit**: `f09a3f6`
 
 ---
 
