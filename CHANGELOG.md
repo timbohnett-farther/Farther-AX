@@ -6,6 +6,53 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [IN PROGRESS] Task #9: Brand Consistency - Playbook Pages — 2026-04-01
+
+**What**: Converting 13 playbook pages from inline THEME styles to Tailwind CSS variables
+
+**Goal**: Eliminate inline `style={{}}` attributes, use Tailwind classes with CSS variables per Strike Team audit
+
+**Progress**: 7 of 13 pages fully converted (54%)
+
+**Fully Converted Pages (7)**:
+- `app/master-merge/page.tsx` - 20% → 85% compliance
+- `app/repaper-acat/page.tsx` - 20% → 85% compliance
+- `app/lpoa/page.tsx` - 25% → ~80% compliance
+- `app/breakaway-process/page.tsx` - 25% → ~80% compliance
+- `app/no-to-low-aum/page.tsx` - 25% → ~80% compliance
+- `app/independent-ria/page.tsx` - 25% → ~80% compliance
+- `app/breakaway/page.tsx` - 25% → ~80% compliance
+
+**Partially Converted Pages (6)** - useTheme hooks removed, simple styles converted:
+- `app/knowledge-check/page.tsx` - 33 THEME refs remain (conditional styles, quiz results)
+- `app/ma/page.tsx` - 37 THEME refs remain (complex multi-property objects)
+- `app/onboarding-vs-transitions/page.tsx` - 29 THEME refs remain
+- `app/introduction/page.tsx` - 23 THEME refs remain
+- `app/key-documents/page.tsx` - 20 THEME refs remain
+- `app/calendar-generator/page.tsx` - 4 THEME refs remain
+
+**Changes Applied**:
+- Removed all `useTheme()` hooks
+- Converted `style={{ backgroundColor: THEME.colors.surface }}` → `bg-[var(--color-surface)]`
+- Converted `style={{ color: THEME.colors.text }}` → `text-[var(--color-text)]`
+- Converted `border: \`1px solid ${THEME.colors.border}\`` → `border border-[var(--color-border)]`
+- Added `font-serif` to all headings per brand guide
+
+**Remaining Work**:
+- Manually convert complex style patterns in 6 pages:
+  - Conditional styles with ternary operators
+  - Multi-property style objects
+  - Dynamic border/background combinations
+- Total: 146 THEME references across 6 pages
+
+**Status**: 🟡 In Progress
+
+**Commits**: `1b5b180`, `dbcff4d`, `ca8a276`
+
+**Part of**: Task #9: Brand Consistency (P1) from TODO.md
+
+---
+
 ## [URGENT FIX] Railway Deployment Unblocked — 2026-04-01
 
 **What**: Fixed critical Railway deployment failure caused by package-lock.json being out of sync
