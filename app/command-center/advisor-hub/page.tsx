@@ -546,7 +546,9 @@ const STATUS_COLORS: Record<string, { color: string; bg: string; border: string 
 // ── Expandable Checklist Panel ──────────────────────────────────────────────
 function ExpandableChecklist({ dealId }: { dealId: string }) {
   const { THEME } = useTheme();
-  const { data, error, isLoading, mutate } = useSWR<{ dealId: string; tasks: ChecklistTask[] }>(
+  const { data, error, isLoading, mutate } = useSWR<
+    { dealId: string; tasks: ChecklistTask[] } | { error: string; details?: string }
+  >(
     `/api/command-center/checklist/${dealId}`, fetcher
   );
   const [collapsedPhases, setCollapsedPhases] = useState<Record<string, boolean>>({});
@@ -555,7 +557,7 @@ function ExpandableChecklist({ dealId }: { dealId: string }) {
   const togglePhase = (phase: string) => setCollapsedPhases(prev => ({ ...prev, [phase]: !prev[phase] }));
 
   const handleToggle = useCallback(async (taskId: string, currentCompleted: boolean) => {
-    if (!data) return;
+    if (!data || 'error' in data) return;
     setToggling(taskId);
     const newCompleted = !currentCompleted;
     // Optimistic update
@@ -582,10 +584,26 @@ function ExpandableChecklist({ dealId }: { dealId: string }) {
       </div>
     );
   }
-  if (error || !data) {
+  // Type guard: check if data is an error response
+  if (error || !data || 'error' in data) {
+    const errorMsg = data && 'error' in data ? (data.details || data.error) : 'Failed to load tasks';
     return (
       <div style={{ padding: '24px', textAlign: 'center', color: THEME.colors.textSecondary, fontSize: 13 }}>
         Failed to load tasks
+        {errorMsg && (
+          <div style={{ fontSize: 11, marginTop: 8, color: '#ef4444' }}>
+            {errorMsg}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Type guard: check if tasks array exists
+  if (!data.tasks || !Array.isArray(data.tasks)) {
+    return (
+      <div style={{ padding: '24px', textAlign: 'center', color: THEME.colors.textSecondary, fontSize: 13 }}>
+        No tasks available
       </div>
     );
   }

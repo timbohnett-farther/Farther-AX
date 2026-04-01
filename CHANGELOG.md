@@ -6,6 +6,27 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Advisor Hub Checklist Error — 2026-04-01
+
+**What**: Fixed "Cannot read properties of undefined (reading 'filter')" error when clicking on advisors in the Advisor Hub
+
+**Root Cause**: When the checklist API encounters an error (e.g., TASKS import fails), it returns `{ error: "...", details: "..." }` without a `tasks` array. The frontend tried to call `.filter()` on `data.tasks` without checking if the response was an error response first.
+
+**Scope:**
+- Added proper type guards to check for error responses before accessing `data.tasks`
+- Updated TypeScript type definition to union type: `{ dealId: string; tasks: ChecklistTask[] } | { error: string; details?: string }`
+- Added defensive checks in both the render logic and the `handleToggle` callback
+- Now shows error details to user when checklist fails to load
+
+**Status**: ✅ Fixed and deployed
+
+**Files:**
+- `app/command-center/advisor-hub/page.tsx` - Added type guards and error handling
+
+**Commit**: TBD
+
+---
+
 ## [Completed] Fix Application Error / Crash on Page Load — 2026-03-31
 
 **What**: Fixed "Application error: a client-side exception has occurred" crash caused by the SWR Prefetcher hitting a non-existent API route during hydration
