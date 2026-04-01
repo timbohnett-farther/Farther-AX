@@ -2,25 +2,27 @@ import { NextAuthOptions } from "next-auth";
 import { getServerSession } from "next-auth/next";
 import GoogleProvider from "next-auth/providers/google";
 
-// Validate required NextAuth environment variables at startup
-if (!process.env.NEXTAUTH_URL) {
-  console.error('FATAL: NEXTAUTH_URL environment variable is not set');
-  console.error('NextAuth requires NEXTAUTH_URL to function properly');
-  console.error('Set it to your application URL (e.g., https://yourapp.railway.app or http://localhost:3000)');
-  process.exit(1);
-}
+// Validate required NextAuth environment variables at startup (skip in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  if (!process.env.NEXTAUTH_URL) {
+    console.error('FATAL: NEXTAUTH_URL environment variable is not set');
+    console.error('NextAuth requires NEXTAUTH_URL to function properly');
+    console.error('Set it to your application URL (e.g., https://yourapp.railway.app or http://localhost:3000)');
+    process.exit(1);
+  }
 
-if (!process.env.NEXTAUTH_SECRET) {
-  console.error('FATAL: NEXTAUTH_SECRET environment variable is not set');
-  console.error('NextAuth requires NEXTAUTH_SECRET for session encryption');
-  console.error('Generate one with: openssl rand -base64 32');
-  process.exit(1);
-}
+  if (!process.env.NEXTAUTH_SECRET) {
+    console.error('FATAL: NEXTAUTH_SECRET environment variable is not set');
+    console.error('NextAuth requires NEXTAUTH_SECRET for session encryption');
+    console.error('Generate one with: openssl rand -base64 32');
+    process.exit(1);
+  }
 
-if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-  console.error('FATAL: GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be set');
-  console.error('These are required for Google OAuth authentication');
-  process.exit(1);
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    console.error('FATAL: GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be set');
+    console.error('These are required for Google OAuth authentication');
+    process.exit(1);
+  }
 }
 
 /**

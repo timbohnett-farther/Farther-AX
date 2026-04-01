@@ -1,6 +1,9 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom'
 
+// Set test environment
+process.env.NODE_ENV = 'test'
+
 // Mock environment variables for tests
 process.env.NEXTAUTH_URL = 'http://localhost:3000'
 process.env.NEXTAUTH_SECRET = 'test-secret'
