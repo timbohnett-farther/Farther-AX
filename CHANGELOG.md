@@ -6,24 +6,34 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
-## [Completed] Fix Advisor Hub Checklist Error — 2026-04-01
+## [Completed] Fix Advisor Hub Checklist Errors — 2026-04-01
 
-**What**: Fixed "Cannot read properties of undefined (reading 'filter')" error when clicking on advisors in the Advisor Hub
+**What**: Fixed two critical issues preventing task checklists from loading:
+1. "Cannot read properties of undefined (reading 'filter')" error
+2. "Invalid time value" errors causing checklist failures
 
-**Root Cause**: When the checklist API encounters an error (e.g., TASKS import fails), it returns `{ error: "...", details: "..." }` without a `tasks` array. The frontend tried to call `.filter()` on `data.tasks` without checking if the response was an error response first.
+**Root Causes**:
+1. When checklist API returned errors, frontend tried to access `data.tasks` without type checking
+2. Date parsing assumed YYYY-MM-DD format but HubSpot returns various formats (ISO timestamps, null, malformed dates)
 
 **Scope:**
 - Added proper type guards to check for error responses before accessing `data.tasks`
-- Updated TypeScript type definition to union type: `{ dealId: string; tasks: ChecklistTask[] } | { error: string; details?: string }`
-- Added defensive checks in both the render logic and the `handleToggle` callback
-- Now shows error details to user when checklist fails to load
+- Updated TypeScript type to union: `{ dealId: string; tasks: ChecklistTask[] } | { error: string; details?: string }`
+- Added `safeParseDate()` helper with format detection and validation
+- Updated `addDays()` in `due-date-calculator.ts` to handle ISO timestamps
+- Added try-catch around `calculateDueDate()` and `calculateTaskStatus()` with fallback values
+- Return "Invalid due date" status instead of crashing on bad dates
+- Added error logging to diagnose date parsing issues
 
 **Status**: ✅ Fixed and deployed
 
 **Files:**
-- `app/command-center/advisor-hub/page.tsx` - Added type guards and error handling
+- `app/command-center/advisor-hub/page.tsx` - Type guards and error handling
+- `lib/due-date-calculator.ts` - Defensive date parsing in addDays()
+- `lib/task-status.ts` - Safe date parsing throughout
+- `app/api/command-center/checklist/[dealId]/route.ts` - Try-catch error handling
 
-**Commit**: `f09a3f6`
+**Commits**: `f09a3f6`, `9307677`
 
 ---
 
