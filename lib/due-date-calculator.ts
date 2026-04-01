@@ -201,7 +201,24 @@ export function calculateDueDate(input: DueDateInput): DueDateResult {
  * Add days to a date string
  */
 function addDays(dateString: string, days: number): string {
-  const date = new Date(dateString + 'T00:00:00Z');
+  // Handle various date formats from HubSpot
+  let date: Date;
+
+  // If already includes time (ISO format), parse directly
+  if (dateString.includes('T') || dateString.includes('Z')) {
+    date = new Date(dateString);
+  } else {
+    // Assume YYYY-MM-DD format, add time for UTC parsing
+    date = new Date(dateString + 'T00:00:00Z');
+  }
+
+  // Validate the date
+  if (isNaN(date.getTime())) {
+    console.error('[due-date-calculator] Invalid date string:', dateString);
+    // Return a default date (today) to prevent crashes
+    return new Date().toISOString().split('T')[0];
+  }
+
   date.setUTCDate(date.getUTCDate() + days);
   return date.toISOString().split('T')[0];
 }

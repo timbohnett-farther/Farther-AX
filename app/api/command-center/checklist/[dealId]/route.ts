@@ -152,20 +152,38 @@ export async function GET(
 
     const tasks = TASKS.map(task => {
       // Calculate due date
-      const dueDateResult = calculateDueDate({
-        timing: task.timing,
-        day0_date,
-        launch_date,
-      });
+      let dueDateResult;
+      try {
+        dueDateResult = calculateDueDate({
+          timing: task.timing,
+          day0_date,
+          launch_date,
+        });
+      } catch (err) {
+        console.error('[checklist] Error calculating due date for task:', task.id, err);
+        dueDateResult = { due_date: null, anchor: 'day0', offset_days: 0 };
+      }
 
       const finalDueDate = saved[task.id]?.due_date || dueDateResult.due_date;
 
       // Calculate task status (countdown, overdue, etc.)
-      const taskStatus = calculateTaskStatus(
-        finalDueDate,
-        saved[task.id]?.completed ?? false,
-        saved[task.id]?.completed_at ?? null
-      );
+      let taskStatus;
+      try {
+        taskStatus = calculateTaskStatus(
+          finalDueDate,
+          saved[task.id]?.completed ?? false,
+          saved[task.id]?.completed_at ?? null
+        );
+      } catch (err) {
+        console.error('[checklist] Error calculating task status for task:', task.id, err);
+        taskStatus = {
+          status: 'no_due_date',
+          displayText: 'Error calculating status',
+          daysRemaining: null,
+          needsAlert: false,
+          needsDirectorAlert: false,
+        };
+      }
 
       // Get responsible person based on task owner and assignments
       const responsiblePerson = getTaskResponsiblePerson(task.owner, assignments);

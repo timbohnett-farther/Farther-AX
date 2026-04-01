@@ -31,6 +31,24 @@ function getBusinessDays(startDate: Date, endDate: Date): number {
 }
 
 /**
+ * Safely parse a date string, handling various formats
+ */
+function safeParseDate(dateString: string): Date {
+  // Handle various date formats from HubSpot/database
+  let date: Date;
+
+  if (dateString.includes('T') || dateString.includes('Z')) {
+    date = new Date(dateString);
+  } else {
+    // Assume YYYY-MM-DD format
+    date = new Date(dateString + 'T00:00:00Z');
+  }
+
+  // Return invalid date as-is (caller should check isNaN)
+  return date;
+}
+
+/**
  * Calculate task status and countdown timer
  */
 export function calculateTaskStatus(
@@ -39,12 +57,17 @@ export function calculateTaskStatus(
   completedAt: string | null
 ): TaskStatus {
   if (completed) {
+    let completedDisplay = 'Completed';
+    if (completedAt) {
+      const completedDate = safeParseDate(completedAt);
+      if (!isNaN(completedDate.getTime())) {
+        completedDisplay = `Completed ${completedDate.toLocaleDateString()}`;
+      }
+    }
     return {
       status: 'completed',
       daysRemaining: null,
-      displayText: completedAt
-        ? `Completed ${new Date(completedAt).toLocaleDateString()}`
-        : 'Completed',
+      displayText: completedDisplay,
       needsAlert: false,
       needsDirectorAlert: false,
     };
@@ -63,7 +86,20 @@ export function calculateTaskStatus(
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const due = new Date(dueDate + 'T00:00:00Z');
+  const due = safeParseDate(dueDate);
+
+  // If due date is invalid, treat as no due date
+  if (isNaN(due.getTime())) {
+    console.error('[task-status] Invalid due date:', dueDate);
+    return {
+      status: 'no_due_date',
+      daysRemaining: null,
+      displayText: 'Invalid due date',
+      needsAlert: false,
+      needsDirectorAlert: false,
+    };
+  }
+
   due.setHours(0, 0, 0, 0);
 
   const diffMs = due.getTime() - today.getTime();
@@ -182,6 +218,9 @@ export function formatTaskAlert(alert: TaskAlert): {
 } {
   const { dealName, taskLabel, status, responsiblePerson, dueDate } = alert;
 
+  const parsedDate = safeParseDate(dueDate);
+  const dueDateStr = isNaN(parsedDate.getTime()) ? dueDate : parsedDate.toLocaleDateString();
+
   if (status.status === 'critical') {
     return {
       subject: `🚨 CRITICAL: Task Overdue - ${dealName}`,
@@ -190,7 +229,7 @@ The following task is critically overdue:
 
 Advisor: ${dealName}
 Task: ${taskLabel}
-Due Date: ${new Date(dueDate).toLocaleDateString()}
+Due Date: ${dueDateStr}
 Status: ${status.displayText}
 Assigned To: ${responsiblePerson.name} (${responsiblePerson.role})
 
@@ -210,7 +249,7 @@ The following task is overdue:
 
 Advisor: ${dealName}
 Task: ${taskLabel}
-Due Date: ${new Date(dueDate).toLocaleDateString()}
+Due Date: ${dueDateStr}
 Status: ${status.displayText}
 Assigned To: ${responsiblePerson.name} (${responsiblePerson.role})
 
@@ -227,7 +266,7 @@ The following task is due soon:
 
 Advisor: ${dealName}
 Task: ${taskLabel}
-Due Date: ${new Date(dueDate).toLocaleDateString()}
+Due Date: ${dueDateStr}
 Status: ${status.displayText}
 Assigned To: ${responsiblePerson.name} (${responsiblePerson.role})
 
