@@ -68,7 +68,7 @@ const CRITICAL_ENDPOINTS = [
   '/api/command-center/alerts',
   '/api/command-center/team',
   '/api/command-center/metrics',
-  '/api/command-center/complexity/scores',
+  '/api/command-center/complexity',
 ];
 
 function Prefetcher() {
@@ -81,8 +81,10 @@ function Prefetcher() {
     // Fire all critical fetches in parallel on app entry.
     // mutate() populates the global SWR cache so any page that uses
     // useSWR(key) will find data already available.
+    // Each fetch is wrapped in .catch() so a single failed endpoint
+    // never crashes the app during hydration.
     CRITICAL_ENDPOINTS.forEach(url => {
-      mutate(url, globalFetcher(url), { revalidate: false });
+      mutate(url, globalFetcher(url).catch(() => undefined), { revalidate: false });
     });
   }, []);
 

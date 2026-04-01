@@ -6,6 +6,25 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Application Error / Crash on Page Load — 2026-03-31
+
+**What**: Fixed "Application error: a client-side exception has occurred" crash caused by the SWR Prefetcher hitting a non-existent API route during hydration
+
+**Root Cause**: `lib/swr-provider.tsx` prefetched `/api/command-center/complexity/scores` (doesn't exist — correct path is `/api/command-center/complexity`). The 404 response threw an unhandled error during React hydration, crashing the entire app.
+
+**Scope:**
+- Fixed incorrect endpoint URL in CRITICAL_ENDPOINTS array
+- Added `.catch()` to all prefetch calls so a single failed endpoint never crashes the app
+- Added `error.tsx` error boundary for all command-center routes — errors now show a "Try Again" button instead of crashing
+
+**Status**: Deployed
+
+**Files:**
+- `lib/swr-provider.tsx` (fixed URL + resilient prefetch)
+- `app/command-center/error.tsx` (NEW — error boundary)
+
+---
+
 ## [Completed] Auto-Initialize Onboarding Tasks with Due Dates — 2026-03-31
 
 **What**: When a deal reaches Stage 6 (Offer Accepted), all ~107 onboarding tasks are now auto-created in the DB with calculated due dates. Previously tasks only entered the DB on manual checkbox toggle, causing wrong summary counts and missing overdue alerts.
