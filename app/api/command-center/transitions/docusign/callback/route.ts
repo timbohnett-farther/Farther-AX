@@ -10,10 +10,38 @@ const NEXTAUTH_URL = process.env.NEXTAUTH_URL ?? '';
 // DocuSign redirects here with ?code=... after the user authorizes the app.
 
 export async function GET(req: NextRequest) {
+  // Validate required environment variables
+  if (!INTEGRATION_KEY || !SECRET_KEY) {
+    console.error('[docusign/callback] Missing DOCUSIGN_INTEGRATION_KEY or DOCUSIGN_SECRET_KEY');
+    return NextResponse.json(
+      { error: 'DocuSign configuration missing. Please contact support.' },
+      { status: 500 }
+    );
+  }
+
+  if (!NEXTAUTH_URL) {
+    console.error('[docusign/callback] Missing NEXTAUTH_URL');
+    return NextResponse.json(
+      { error: 'Application configuration error. Please contact support.' },
+      { status: 500 }
+    );
+  }
+
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
+  const error = searchParams.get('error');
+  const errorDescription = searchParams.get('error_description');
+
+  // Handle OAuth errors from DocuSign
+  if (error) {
+    console.error('[docusign/callback] OAuth error:', error, errorDescription);
+    return NextResponse.redirect(
+      `${NEXTAUTH_URL}/command-center/transitions?docusign=error&reason=${encodeURIComponent(error)}`,
+    );
+  }
 
   if (!code) {
+    console.warn('[docusign/callback] Missing authorization code');
     return NextResponse.redirect(
       `${NEXTAUTH_URL}/command-center/transitions?docusign=error&reason=missing_code`,
     );
@@ -44,22 +72,38 @@ export async function GET(req: NextRequest) {
     }
 
     const tokenData = await tokenRes.json() as {
-      access_token: string;
-      refresh_token: string;
-      expires_in: number;
-      token_type: string;
+      access_token?: string;
+      refresh_token?: string;
+      expires_in?: number;
+      token_type?: string;
     };
+
+    // Validate token response structure
+    if (!tokenData.access_token || !tokenData.refresh_token || !tokenData.expires_in) {
+      console.error('[docusign/callback] Invalid token response:', tokenData);
+      return NextResponse.redirect(
+        `${NEXTAUTH_URL}/command-center/transitions?docusign=error&reason=invalid_token_response`,
+      );
+    }
 
     const expiresAt = new Date(Date.now() + tokenData.expires_in * 1000);
 
     // ── Persist tokens to docusign_tokens table ──────────────────────────────
-    await pool.query(
-      `
-      INSERT INTO docusign_tokens (access_token, refresh_token, expires_at, created_at)
-      VALUES ($1, $2, $3, NOW())
-      `,
-      [tokenData.access_token, tokenData.refresh_token, expiresAt],
-    );
+    try {
+      await pool.query(
+        `
+        INSERT INTO docusign_tokens (access_token, refresh_token, expires_at, created_at)
+        VALUES ($1, $2, $3, NOW())
+        `,
+        [tokenData.access_token, tokenData.refresh_token, expiresAt],
+      );
+      console.log('[docusign/callback] Tokens successfully stored');
+    } catch (dbErr) {
+      console.error('[docusign/callback] Database error storing tokens:', dbErr);
+      return NextResponse.redirect(
+        `${NEXTAUTH_URL}/command-center/transitions?docusign=error&reason=db_error`,
+      );
+    }
 
     // ── Redirect back to the dashboard with a success signal ─────────────────
     return NextResponse.redirect(

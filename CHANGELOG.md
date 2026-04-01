@@ -6,6 +6,45 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Phase 0: Deploy Blocker Fixes — 2026-04-01
+
+**What**: Fixed 6 critical P0 issues preventing safe deployment to production
+
+**Fixes Applied:**
+
+1. **Healthcheck endpoint** - Railway deployment was failing because healthcheck expected 200 OK at `/` but got a redirect. Changed `railway.json` to use `/api/command-center/health` endpoint.
+
+2. **Migration validation** - Database migrations ran without validating DATABASE_URL, causing silent failures. Added validation at startup, connection error handling, structured logging, and proper cleanup.
+
+3. **Form email domain fallback** - U4/2B and Tech Intake form submission emails used hardcoded addresses without environment variable fallbacks. Added `COMPLIANCE_EMAIL`, `AXM_EMAIL`, and `AX_SENDER_EMAIL` env vars with fallback values.
+
+4. **NEXTAUTH_URL validation** - NextAuth silently failed when required environment variables were missing. Added startup validation for `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_ID`, and `GOOGLE_CLIENT_SECRET` with clear error messages.
+
+5. **Missing complexity/scores route** - Dashboard and recruiting tab fetched `/api/command-center/complexity/scores` (didn't exist), causing 404 errors and breaking score displays. Created new endpoint that fetches all active deals and returns complexity scores map.
+
+6. **DocuSign OAuth callback validation** - OAuth callback had no validation for missing credentials, error responses, or malformed tokens. Added env var validation, OAuth error handling, token structure validation, and database error handling.
+
+**Impact**:
+- Application is now safe to deploy to production
+- Clear error messages guide operators when configuration is missing
+- No silent failures that could corrupt data or break user flows
+- All critical user paths now have proper error handling
+
+**Status**: ✅ Complete
+
+**Files Modified:**
+- `railway.json` - Updated healthcheckPath
+- `scripts/migrate.ts` - Added DATABASE_URL validation and logging
+- `lib/auth.ts` - Added NextAuth env var validation
+- `app/api/u4-2b/[token]/submit/route.ts` - Email configuration fallbacks
+- `app/api/tech-intake/[token]/submit/route.ts` - Email configuration fallbacks
+- `app/api/command-center/complexity/scores/route.ts` - New endpoint (created)
+- `app/api/command-center/transitions/docusign/callback/route.ts` - OAuth validation
+
+**Next Phase**: Phase 1 Quick Wins (P1 priority issues)
+
+---
+
 ## [Completed] Fix Advisor Hub Checklist Errors — 2026-04-01
 
 **What**: Fixed two critical issues preventing task checklists from loading:

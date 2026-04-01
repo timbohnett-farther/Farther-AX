@@ -1,12 +1,32 @@
 import { Pool } from 'pg';
 
+// Validate required environment variables
+if (!process.env.DATABASE_URL) {
+  console.error('FATAL: DATABASE_URL environment variable is not set');
+  console.error('Database migrations cannot proceed without a valid database connection');
+  process.exit(1);
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  max: 5,  // Reduced for Railway shared Postgres
+  connectionTimeoutMillis: 5000,
 });
 
 async function migrate() {
-  const client = await pool.connect();
+  console.log('[migrate] Starting database migrations...');
+
+  let client;
+  try {
+    client = await pool.connect();
+    console.log('[migrate] Database connection established');
+  } catch (err) {
+    console.error('[migrate] Failed to connect to database:', err);
+    console.error('[migrate] Please verify DATABASE_URL is correct');
+    process.exit(1);
+  }
+
   try {
     await client.query(`
       CREATE TABLE IF NOT EXISTS onboarding_tasks (
@@ -263,10 +283,17 @@ async function migrate() {
       CREATE INDEX IF NOT EXISTS idx_advisor_tran_aum_advisor_name
         ON advisor_tran_aum(advisor_name);
     `);
-    console.log('Migration complete.');
+    console.log('[migrate] ✓ All tables and indexes created successfully');
+    console.log('[migrate] Migration complete.');
+  } catch (err) {
+    console.error('[migrate] Migration failed:', err);
+    console.error('[migrate] Rolling back any partial changes...');
+    throw err;
   } finally {
+    console.log('[migrate] Cleaning up database connection...');
     client.release();
     await pool.end();
+    console.log('[migrate] Database connection closed.');
   }
 }
 

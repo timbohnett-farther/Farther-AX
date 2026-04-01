@@ -5,7 +5,8 @@
   },
   "deploy": {
     "startCommand": "npx tsx scripts/migrate.ts && npm start",
-    "healthcheckPath": "/",
+    "healthcheckPath": "/api/command-center/health",
+    "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3
   }

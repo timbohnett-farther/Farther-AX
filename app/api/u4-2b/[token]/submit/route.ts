@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
-const COMPLIANCE_EMAIL = 'compliance@farther.com';
+const COMPLIANCE_EMAIL = process.env.COMPLIANCE_EMAIL || 'compliance@farther.com';
+const SENDER_EMAIL = process.env.AX_SENDER_EMAIL || 'ax@farther.com';
 
 export async function POST(
   req: NextRequest,
@@ -128,7 +129,7 @@ export async function POST(
             hs_email_direction: 'EMAIL',
             hs_email_status: 'SEND',
             hs_timestamp: new Date().toISOString(),
-            hs_email_sender_email: 'ax@farther.com',
+            hs_email_sender_email: SENDER_EMAIL,
             hs_email_sender_firstname: 'AX',
             hs_email_sender_lastname: 'Command Center',
             hs_email_to_email: COMPLIANCE_EMAIL,
