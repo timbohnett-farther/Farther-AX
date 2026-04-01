@@ -70,20 +70,20 @@ export default function KnowledgeCheckPage() {
           className="rounded-xl p-8 mb-8"
           style={{
             backgroundColor: THEME.colors.surface,
-            border: `1px solid ${THEME.colors.border}`,
+            
           }}
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
               <h2
                 className="text-2xl font-bold"
-                style={{ color: THEME.colors.text, fontFamily: THEME.typography.fontFamily.sans }}
+                style={{ color: THEME.colors.text }}
               >
                 Training Progress
               </h2>
               <p
                 className="text-sm mt-1"
-                style={{ color: THEME.colors.textMuted, fontFamily: THEME.typography.fontFamily.sans }}
+                style={{ color: THEME.colors.textMuted }}
               >
                 {session?.user?.name || "User"} &middot; {session?.user?.email}
               </p>
@@ -92,13 +92,13 @@ export default function KnowledgeCheckPage() {
               <div className="text-right">
                 <p
                   className="text-3xl font-bold tabular-nums"
-                  style={{ color: THEME.colors.text, fontFamily: THEME.typography.fontFamily.mono }}
+                  style={{ color: THEME.colors.text }}
                 >
                   {passedCount}/{totalTopics}
                 </p>
                 <p
                   className="text-xs"
-                  style={{ color: THEME.colors.textFaint, fontFamily: THEME.typography.fontFamily.sans }}
+                  style={{ color: THEME.colors.textFaint }}
                 >
                   quizzes passed
                 </p>
@@ -118,7 +118,7 @@ export default function KnowledgeCheckPage() {
           </div>
           <p
             className="text-xs text-right"
-            style={{ color: THEME.colors.textFaint, fontFamily: THEME.typography.fontFamily.sans }}
+            style={{ color: THEME.colors.textFaint }}
           >
             {completionPct}% complete
           </p>
@@ -133,7 +133,7 @@ export default function KnowledgeCheckPage() {
             >
               <p
                 className="text-sm font-medium"
-                style={{ color: THEME.colors.success, fontFamily: THEME.typography.fontFamily.sans }}
+                style={{ color: THEME.colors.success }}
               >
                 All training quizzes completed. You are fully certified on the AX Playbook.
               </p>
@@ -192,13 +192,13 @@ export default function KnowledgeCheckPage() {
                     <div className="flex-1 min-w-0">
                       <p
                         className="text-sm font-medium truncate"
-                        style={{ color: THEME.colors.text, fontFamily: THEME.typography.fontFamily.sans }}
+                        style={{ color: THEME.colors.text }}
                       >
                         {topic.label}
                       </p>
                       <p
                         className="text-xs mt-0.5"
-                        style={{ color: THEME.colors.textFaint, fontFamily: THEME.typography.fontFamily.sans }}
+                        style={{ color: THEME.colors.textFaint }}
                       >
                         {attemptsUsed === 0
                           ? "Not started"
@@ -260,7 +260,7 @@ export default function KnowledgeCheckPage() {
                         <div
                           key={`${r.topic_slug}-${r.attempt_number}`}
                           className="flex items-center gap-2 text-xs"
-                          style={{ color: THEME.colors.textFaint, fontFamily: THEME.typography.fontFamily.sans }}
+                          style={{ color: THEME.colors.textFaint }}
                         >
                           <span className="tabular-nums" style={{ fontFamily: THEME.typography.fontFamily.mono }}>
                             Attempt {r.attempt_number}: {r.score}/{r.total_questions}

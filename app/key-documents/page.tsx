@@ -92,7 +92,7 @@ export default function KeyDocumentsPage() {
     >
       <div className="max-w-6xl mx-auto">
         {/* Introduction */}
-        <p className="text-base leading-relaxed mb-12" style={{ color: THEME.colors.text }}>
+        <p className="text-base leading-relaxed mb-12" className="text-[var(--color-text)]">
           Every advisor onboarding involves a set of core documents. Which documents apply depends on the
           advisor's pathway and the transition method selected. Use the matrix below to quickly identify
           which documents are required for any given scenario, then refer to the definitions section for
@@ -101,7 +101,7 @@ export default function KeyDocumentsPage() {
 
         {/* Matrix Table */}
         <div className="mb-16">
-          <h2 className="text-3xl font-bold mb-8" style={{ color: THEME.colors.text }}>
+          <h2 className="text-3xl font-bold mb-8" className="text-[var(--color-text)]">
             Document Applicability <span style={{ color: THEME.colors.gold }}>Matrix</span>
           </h2>
 
@@ -154,7 +154,7 @@ export default function KeyDocumentsPage() {
                       {doc.name !== doc.code && (
                         <span
                           className="block text-xs mt-1"
-                          style={{ color: THEME.colors.textSecondary }}
+                          className="text-[var(--color-text-secondary)]"
                         >
                           {doc.name}
                         </span>
@@ -184,7 +184,7 @@ export default function KeyDocumentsPage() {
           </div>
 
           {/* Legend */}
-          <div className="mt-6 flex gap-8 text-sm" style={{ color: THEME.colors.textSecondary }}>
+          <div className="mt-6 flex gap-8 text-sm" className="text-[var(--color-text-secondary)]">
             <span className="flex items-center gap-2">
               <span
                 className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
@@ -217,7 +217,7 @@ export default function KeyDocumentsPage() {
 
         {/* Definitions */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-8" style={{ color: THEME.colors.text }}>
+          <h2 className="text-3xl font-bold mb-8" className="text-[var(--color-text)]">
             Document <span style={{ color: THEME.colors.gold }}>Definitions</span>
           </h2>
 
@@ -228,7 +228,7 @@ export default function KeyDocumentsPage() {
                 className="rounded-xl p-8"
                 style={{
                   backgroundColor: THEME.colors.surface,
-                  border: `1px solid ${THEME.colors.border}`,
+                  
                 }}
               >
                 <div className="flex items-start gap-4 mb-4">
@@ -239,14 +239,14 @@ export default function KeyDocumentsPage() {
                     {String(idx + 1).padStart(2, '0')}
                   </span>
                   <div>
-                    <h3 className="text-2xl font-bold" style={{ color: THEME.colors.text }}>
+                    <h3 className="text-2xl font-bold" className="text-[var(--color-text)]">
                       <span style={{ color: THEME.colors.gold }}>{def.code}</span>
                       {def.code !== def.title && <span> — {def.title}</span>}
                     </h3>
                   </div>
                 </div>
 
-                <p className="text-base leading-relaxed mb-6 pl-14" style={{ color: THEME.colors.text }}>
+                <p className="text-base leading-relaxed mb-6 pl-14" className="text-[var(--color-text)]">
                   {def.body}
                 </p>
 
@@ -254,22 +254,22 @@ export default function KeyDocumentsPage() {
                   <div>
                     <span
                       className="font-semibold uppercase tracking-wide text-xs block mb-1"
-                      style={{ color: THEME.colors.textSecondary }}
+                      className="text-[var(--color-text-secondary)]"
                     >
                       Owner
                     </span>
-                    <p className="font-medium" style={{ color: THEME.colors.text }}>
+                    <p className="font-medium" className="text-[var(--color-text)]">
                       {def.owner}
                     </p>
                   </div>
                   <div>
                     <span
                       className="font-semibold uppercase tracking-wide text-xs block mb-1"
-                      style={{ color: THEME.colors.textSecondary }}
+                      className="text-[var(--color-text-secondary)]"
                     >
                       Timing
                     </span>
-                    <p className="font-medium" style={{ color: THEME.colors.text }}>
+                    <p className="font-medium" className="text-[var(--color-text)]">
                       {def.timing}
                     </p>
                   </div>

@@ -56,13 +56,13 @@ export default function MAPage() {
           className="rounded-xl p-8 mb-12"
           style={{
             backgroundColor: THEME.colors.surface,
-            border: `1px solid ${THEME.colors.border}`,
+            
           }}
         >
-          <h2 className="text-2xl font-bold mb-4" style={{ color: THEME.colors.text }}>
-            Why This Matters at <span style={{ color: THEME.colors.teal }}>Farther</span>
+          <h2 className="text-2xl font-bold mb-4" className="text-[var(--color-text)]">
+            Why This Matters at <span className="text-[#3B5A69]">Farther</span>
           </h2>
-          <p className="text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+          <p className="text-sm leading-relaxed" className="text-[var(--color-text-secondary)]">
             Farther's growth strategy is built on combining top-tier advisor talent with proprietary
             technology — and RIA acquisitions are a meaningful accelerant to that mission. When Farther
             brings on an acquired book of business, the Advisor Experience and Onboarding team sits at the
@@ -81,11 +81,11 @@ export default function MAPage() {
             >
               1
             </div>
-            <h2 className="text-2xl font-bold" style={{ color: THEME.colors.text }}>
+            <h2 className="text-2xl font-bold" className="text-[var(--color-text)]">
               How Farther Evaluates an RIA Before We Buy
             </h2>
           </div>
-          <p className="text-sm leading-relaxed mb-6" style={{ color: THEME.colors.textSecondary }}>
+          <p className="text-sm leading-relaxed mb-6" className="text-[var(--color-text-secondary)]">
             Before our team touches a deal, it has already gone through a rigorous six-phase evaluation process.
             Knowing where a deal stands in this pipeline helps the Onboarding team anticipate what's coming
             and prepare accordingly.
@@ -98,7 +98,7 @@ export default function MAPage() {
                 className="rounded-xl p-6"
                 style={{
                   backgroundColor: THEME.colors.surface,
-                  border: `1px solid ${THEME.colors.border}`,
+                  
                 }}
               >
                 <div className="flex items-center gap-3 mb-3">
@@ -108,14 +108,14 @@ export default function MAPage() {
                   >
                     {p.num}
                   </div>
-                  <h4 className="text-sm font-semibold" style={{ color: THEME.colors.text }}>
+                  <h4 className="text-sm font-semibold" className="text-[var(--color-text)]">
                     {p.name}
                   </h4>
                 </div>
                 <p className="text-xs uppercase tracking-wider mb-2" style={{ color: THEME.colors.gold }}>
                   {p.lead}
                 </p>
-                <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                <p className="text-xs leading-relaxed" className="text-[var(--color-text-secondary)]">
                   {p.question}
                 </p>
               </div>
@@ -130,7 +130,7 @@ export default function MAPage() {
               borderLeft: `4px solid ${THEME.colors.teal}`,
             }}
           >
-            <p className="text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
+            <p className="text-sm leading-relaxed" className="text-[var(--color-text)]">
               By the time the Advisor Experience team is activated, Phases 1–5 are largely complete.{' '}
               <strong>Your work begins in earnest at Phase 6</strong> — and everything
               you do either validates or undermines the thesis built in Phases 1–5.
@@ -147,15 +147,15 @@ export default function MAPage() {
             >
               2
             </div>
-            <h2 className="text-2xl font-bold" style={{ color: THEME.colors.text }}>
+            <h2 className="text-2xl font-bold" className="text-[var(--color-text)]">
               Understanding the Deal Structure
             </h2>
           </div>
 
-          <h3 className="text-lg font-bold mb-4" style={{ color: THEME.colors.text }}>
+          <h3 className="text-lg font-bold mb-4" className="text-[var(--color-text)]">
             Earnouts: The Deal Structure You'll Encounter Most
           </h3>
-          <p className="text-sm leading-relaxed mb-6" style={{ color: THEME.colors.textSecondary }}>
+          <p className="text-sm leading-relaxed mb-6" className="text-[var(--color-text-secondary)]">
             Nearly every RIA acquisition at scale includes an <strong>earnout</strong>, where
             a portion of the purchase price is deferred and paid based on post-close performance. This is critically
             important for the Onboarding team to understand because{' '}
@@ -174,13 +174,13 @@ export default function MAPage() {
                 className="rounded-xl p-6"
                 style={{
                   backgroundColor: THEME.colors.surface,
-                  border: `1px solid ${THEME.colors.border}`,
+                  
                 }}
               >
-                <p className="text-xl font-bold mb-1" style={{ color: THEME.colors.teal }}>
+                <p className="text-xl font-bold mb-1" className="text-[#3B5A69]">
                   {s.label}
                 </p>
-                <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                <p className="text-xs leading-relaxed" className="text-[var(--color-text-secondary)]">
                   {s.sub}
                 </p>
               </div>
@@ -195,7 +195,7 @@ export default function MAPage() {
               borderLeft: `4px solid ${THEME.colors.gold}`,
             }}
           >
-            <p className="text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
+            <p className="text-sm leading-relaxed" className="text-[var(--color-text)]">
               <strong style={{ color: THEME.colors.gold }}>Onboarding team takeaway:</strong> A delayed technology migration,
               a poor client communication rollout, or a rocky first 90 days can directly reduce earnout payments —
               and damage Farther's reputation as an acquirer.
@@ -212,19 +212,19 @@ export default function MAPage() {
             >
               3
             </div>
-            <h2 className="text-2xl font-bold" style={{ color: THEME.colors.text }}>
+            <h2 className="text-2xl font-bold" className="text-[var(--color-text)]">
               Compliance — What the Onboarding Team Must Know
             </h2>
           </div>
-          <p className="text-sm leading-relaxed mb-6" style={{ color: THEME.colors.textSecondary }}>
+          <p className="text-sm leading-relaxed mb-6" className="text-[var(--color-text-secondary)]">
             Compliance is the highest-stakes area for any RIA acquisition. Errors here have regulatory, financial,
             and reputational consequences.
           </p>
 
-          <h3 className="text-lg font-bold mb-4" style={{ color: THEME.colors.text }}>
+          <h3 className="text-lg font-bold mb-4" className="text-[var(--color-text)]">
             The 30-Day Advisor Onboarding Compliance Standard
           </h3>
-          <p className="text-sm leading-relaxed mb-6" style={{ color: THEME.colors.textSecondary }}>
+          <p className="text-sm leading-relaxed mb-6" className="text-[var(--color-text-secondary)]">
             Documentation must be complete, accessible, and defensible before the advisor is deployed. SEC and state
             examiners do not accept partial onboarding as a defense.
           </p>
@@ -254,11 +254,11 @@ export default function MAPage() {
                     >
                       {step.days}
                     </span>
-                    <span className="text-sm font-semibold" style={{ color: THEME.colors.text }}>
+                    <span className="text-sm font-semibold" className="text-[var(--color-text)]">
                       {step.title}
                     </span>
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                  <p className="text-xs leading-relaxed" className="text-[var(--color-text-secondary)]">
                     {step.items}
                   </p>
                 </div>
@@ -274,7 +274,7 @@ export default function MAPage() {
               borderLeft: `4px solid ${THEME.colors.gold}`,
             }}
           >
-            <p className="text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
+            <p className="text-sm leading-relaxed" className="text-[var(--color-text)]">
               <strong style={{ color: THEME.colors.gold }}>Slow onboarding is not an operational nuisance</strong> —
               it is a compliance failure vector.
             </p>
@@ -290,11 +290,11 @@ export default function MAPage() {
             >
               4
             </div>
-            <h2 className="text-2xl font-bold" style={{ color: THEME.colors.text }}>
+            <h2 className="text-2xl font-bold" className="text-[var(--color-text)]">
               Client Retention — The Metric That Drives Everything
             </h2>
           </div>
-          <p className="text-sm leading-relaxed mb-6" style={{ color: THEME.colors.textSecondary }}>
+          <p className="text-sm leading-relaxed mb-6" className="text-[var(--color-text-secondary)]">
             Client retention is the single most important post-acquisition metric. Earnout payments depend on it.
             Farther's reputation as an acquirer depends on it.
           </p>
@@ -306,20 +306,20 @@ export default function MAPage() {
                 className="rounded-xl p-6 text-center"
                 style={{
                   backgroundColor: THEME.colors.surface,
-                  border: `1px solid ${THEME.colors.border}`,
+                  
                 }}
               >
-                <p className="text-2xl font-bold mb-2" style={{ color: THEME.colors.teal }}>
+                <p className="text-2xl font-bold mb-2" className="text-[#3B5A69]">
                   {s.value}
                 </p>
-                <p className="text-xs uppercase tracking-wide" style={{ color: THEME.colors.textSecondary }}>
+                <p className="text-xs uppercase tracking-wide" className="text-[var(--color-text-secondary)]">
                   {s.label}
                 </p>
               </div>
             ))}
           </div>
 
-          <h3 className="text-lg font-bold mb-4" style={{ color: THEME.colors.text }}>
+          <h3 className="text-lg font-bold mb-4" className="text-[var(--color-text)]">
             What Actually Drives Retention
           </h3>
           <ul className="space-y-3 mb-6">
@@ -329,8 +329,8 @@ export default function MAPage() {
               'Frame the transition around client benefit — better technology, more personalized planning, stronger support',
               'Get clients into Farther\'s service rhythm (reviews, communications, events) as fast as possible',
             ].map((item, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
-                <span style={{ color: THEME.colors.teal }}>•</span>
+              <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" className="text-[var(--color-text)]">
+                <span className="text-[#3B5A69]">•</span>
                 <span>{item}</span>
               </li>
             ))}
@@ -344,7 +344,7 @@ export default function MAPage() {
               borderLeft: `4px solid ${THEME.colors.teal}`,
             }}
           >
-            <p className="text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
+            <p className="text-sm leading-relaxed" className="text-[var(--color-text)]">
               <strong>The client doesn't follow the firm — they follow the mechanic.</strong>{' '}
               The job is to make sure they understand Farther's team <em>is</em> their mechanic going forward.
             </p>
@@ -360,12 +360,12 @@ export default function MAPage() {
             >
               5
             </div>
-            <h2 className="text-2xl font-bold" style={{ color: THEME.colors.text }}>
+            <h2 className="text-2xl font-bold" className="text-[var(--color-text)]">
               Technology Integration — Farther's Competitive Advantage
             </h2>
           </div>
 
-          <h3 className="text-lg font-bold mb-4" style={{ color: THEME.colors.text }}>
+          <h3 className="text-lg font-bold mb-4" className="text-[var(--color-text)]">
             What Makes Farther's Tech Stack Different
           </h3>
           <div className="grid md:grid-cols-2 gap-4 mb-6">
@@ -380,13 +380,13 @@ export default function MAPage() {
                 className="rounded-xl p-6"
                 style={{
                   backgroundColor: THEME.colors.surface,
-                  border: `1px solid ${THEME.colors.border}`,
+                  
                 }}
               >
-                <h4 className="text-sm font-semibold mb-2" style={{ color: THEME.colors.text }}>
+                <h4 className="text-sm font-semibold mb-2" className="text-[var(--color-text)]">
                   {t.label}
                 </h4>
-                <p className="text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                <p className="text-xs leading-relaxed" className="text-[var(--color-text-secondary)]">
                   {t.desc}
                 </p>
               </div>
@@ -403,11 +403,11 @@ export default function MAPage() {
             >
               6
             </div>
-            <h2 className="text-2xl font-bold" style={{ color: THEME.colors.text }}>
+            <h2 className="text-2xl font-bold" className="text-[var(--color-text)]">
               Red Flags Onboarding Should Escalate Immediately
             </h2>
           </div>
-          <p className="text-sm leading-relaxed mb-6" style={{ color: THEME.colors.textSecondary }}>
+          <p className="text-sm leading-relaxed mb-6" className="text-[var(--color-text-secondary)]">
             The onboarding team is often the first to interact with acquired advisors and clients at a human level.
             This gives the team unique visibility into issues that due diligence may not have surfaced.{' '}
             <strong>Escalate immediately if you observe:</strong>
@@ -436,15 +436,15 @@ export default function MAPage() {
                 className="rounded-xl p-6"
                 style={{
                   backgroundColor: THEME.colors.surface,
-                  border: `1px solid ${THEME.colors.border}`,
+                  
                 }}
               >
-                <h4 className="text-sm font-bold mb-4" style={{ color: THEME.colors.text }}>
+                <h4 className="text-sm font-bold mb-4" className="text-[var(--color-text)]">
                   {section.title}
                 </h4>
                 <ul className="space-y-3">
                   {section.items.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+                    <li key={i} className="flex items-start gap-2 text-xs leading-relaxed" className="text-[var(--color-text-secondary)]">
                       <span style={{ color: THEME.colors.gold }}>•</span>
                       <span>{item}</span>
                     </li>
@@ -457,7 +457,7 @@ export default function MAPage() {
 
         {/* Glossary */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+          <h2 className="text-2xl font-bold mb-6" className="text-[var(--color-text)]">
             Quick Reference: Key Terms
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -467,7 +467,7 @@ export default function MAPage() {
                 className="rounded-xl p-4"
                 style={{
                   backgroundColor: THEME.colors.surface,
-                  border: `1px solid ${THEME.colors.border}`,
+                  
                 }}
               >
                 <span
@@ -476,7 +476,7 @@ export default function MAPage() {
                 >
                   {g.term}
                 </span>
-                <p className="text-xs leading-relaxed mt-2" style={{ color: THEME.colors.textSecondary }}>
+                <p className="text-xs leading-relaxed mt-2" className="text-[var(--color-text-secondary)]">
                   {g.def}
                 </p>
               </div>
@@ -489,23 +489,23 @@ export default function MAPage() {
           className="rounded-xl p-8 text-center mb-12"
           style={{
             backgroundColor: THEME.colors.surface,
-            border: `1px solid ${THEME.colors.border}`,
+            
           }}
         >
           <p className="text-xs uppercase tracking-wider font-semibold mb-3" style={{ color: THEME.colors.gold }}>
             The Onboarding Team's North Star
           </p>
-          <p className="text-lg leading-relaxed mb-4" style={{ color: THEME.colors.text }}>
+          <p className="text-lg leading-relaxed mb-4" className="text-[var(--color-text)]">
             Making the transition so seamless for clients and advisors that they never question
-            their decision to be part of <span style={{ color: THEME.colors.teal }}>Farther</span>.
+            their decision to be part of <span className="text-[#3B5A69]">Farther</span>.
           </p>
-          <p className="text-sm leading-relaxed" style={{ color: THEME.colors.textSecondary }}>
+          <p className="text-sm leading-relaxed" className="text-[var(--color-text-secondary)]">
             That means compliance documentation that holds up under exam scrutiny, technology that works from
             Day 1, communication that is personal and proactive, and a culture introduction that makes advisors
             feel they've upgraded — not just changed firms.
           </p>
           <div className="mt-6 h-px w-24 mx-auto" style={{ backgroundColor: THEME.colors.teal }} />
-          <p className="mt-4 text-xs font-medium" style={{ color: THEME.colors.teal }}>
+          <p className="mt-4 text-xs font-medium" className="text-[#3B5A69]">
             The deals are won in due diligence. The value is created — or destroyed — in onboarding.
           </p>
         </div>
