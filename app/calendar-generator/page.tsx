@@ -186,13 +186,7 @@ export default function CalendarGeneratorPage() {
       <div className="max-w-3xl">
 
         {/* -- Advisor Details -- */}
-        <div
-          className="rounded-xl p-6 mb-6"
-          style={{
-            backgroundColor: THEME.colors.surface,
-            border: `1px solid ${THEME.colors.border}`
-          }}
-        >
+        <div className="rounded-xl p-6 mb-6 bg-[var(--color-surface)] border border-[var(--color-border)]">
           <h2 className="text-xl font-bold font-sans text-cream mb-5">
             Advisor Details
           </h2>
@@ -239,13 +233,7 @@ export default function CalendarGeneratorPage() {
         </div>
 
         {/* -- Team & Attendees -- */}
-        <div
-          className="rounded-xl p-6 mb-6"
-          style={{
-            backgroundColor: THEME.colors.surface,
-            border: `1px solid ${THEME.colors.border}`
-          }}
-        >
+        <div className="rounded-xl p-6 mb-6 bg-[var(--color-surface)] border border-[var(--color-border)]">
           <h2 className="text-xl font-bold font-sans text-cream mb-5">
             Team &amp; Attendees
           </h2>
