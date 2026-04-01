@@ -1,11 +1,8 @@
 'use client';
 
 import PageLayout from '@/components/PageLayout';
-import { useTheme } from '@/lib/theme-provider';
 
 export default function MasterMergePage() {
-  const { THEME } = useTheme();
-
   return (
     <PageLayout
       step={8}
@@ -26,19 +23,12 @@ export default function MasterMergePage() {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="rounded-xl p-6 text-center"
-              style={{
-                backgroundColor: THEME.colors.surface,
-                border: `1px solid ${THEME.colors.border}`,
-              }}
+              className="rounded-xl p-6 text-center bg-[var(--color-surface)] border border-[var(--color-border)]"
             >
-              <p
-                className="text-xs uppercase tracking-wider mb-2"
-                style={{ color: THEME.colors.textSecondary }}
-              >
+              <p className="text-xs uppercase tracking-wider mb-2 text-[var(--color-text-secondary)]">
                 {stat.label}
               </p>
-              <p className="text-2xl font-bold" style={{ color: THEME.colors.text }}>
+              <p className="text-2xl font-bold text-[var(--color-text)]">
                 {stat.value}
               </p>
             </div>
@@ -46,20 +36,14 @@ export default function MasterMergePage() {
         </div>
 
         {/* Coming Soon Banner */}
-        <div
-          className="rounded-xl p-12 mb-12 text-center"
-          style={{
-            backgroundColor: THEME.colors.surface,
-            border: `1px solid ${THEME.colors.border}`,
-          }}
-        >
-          <div className="text-6xl mb-6" style={{ color: THEME.colors.teal }}>
+        <div className="rounded-xl p-12 mb-12 text-center bg-[var(--color-surface)] border border-[var(--color-border)]">
+          <div className="text-6xl mb-6 text-[#3B5A69]">
             ◆
           </div>
-          <h2 className="text-3xl font-bold mb-4" style={{ color: THEME.colors.text }}>
+          <h2 className="text-3xl font-bold mb-4 font-serif text-[var(--color-text)]">
             Detailed Content Coming Soon
           </h2>
-          <p className="text-base leading-relaxed max-w-2xl mx-auto" style={{ color: THEME.colors.textSecondary }}>
+          <p className="text-base leading-relaxed max-w-2xl mx-auto text-[var(--color-text-secondary)]">
             The Master Merge section will provide a complete step-by-step guide to
             executing the fastest available transition method, including custodian
             requirements, eligibility criteria, and the full workflow.
@@ -67,14 +51,8 @@ export default function MasterMergePage() {
         </div>
 
         {/* Preview */}
-        <div
-          className="rounded-xl p-8"
-          style={{
-            backgroundColor: THEME.colors.surface,
-            border: `1px solid ${THEME.colors.border}`,
-          }}
-        >
-          <h3 className="text-xl font-bold mb-6" style={{ color: THEME.colors.text }}>
+        <div className="rounded-xl p-8 bg-[var(--color-surface)] border border-[var(--color-border)]">
+          <h3 className="text-xl font-bold mb-6 font-serif text-[var(--color-text)]">
             What This Section Will Cover
           </h3>
           <ul className="space-y-3">
@@ -86,8 +64,8 @@ export default function MasterMergePage() {
               'Common failure points and how to resolve them',
               'Post-merge verification and reconciliation',
             ].map((item, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: THEME.colors.text }}>
-                <span style={{ color: THEME.colors.teal }}>•</span>
+              <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
+                <span className="text-[#3B5A69]">•</span>
                 <span>{item}</span>
               </li>
             ))}
