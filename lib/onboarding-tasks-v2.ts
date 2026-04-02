@@ -1,8 +1,10 @@
 /**
  * Farther Advisor Onboarding Tasks
  * Source: ADVISOR ONBOARDING - Task-Based Operating Guide v1.2 (December 2025)
+ * Updated: 2026-04-01 - Added RIA Advisor Onboarding Content & Task Hub requirements
  *
- * 8 Phases (0-7) with ~100 tasks total
+ * 8 Phases (0-7) with 141 tasks total
+ * Added: 4 new owner roles, 34 new tasks across all phases
  */
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -37,6 +39,10 @@ export type Owner =
   | 'FIG Team'
   | 'Biz Ops'
   | 'RIA Leadership'
+  | 'Trust & Estate'
+  | 'Farther Institutional'
+  | 'Insurance & Annuities'
+  | '401k/Pontera'
   | 'Advisor'
 ;
 
@@ -308,6 +314,31 @@ export const TASKS: Task[] = [
     phase: 'phase_1',
     owner: 'AXA',
     timing: 'Within 3 days',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p1_transition_guide',
+    label: 'Send Transition Preparation Guide to advisor',
+    phase: 'phase_1',
+    owner: 'AXM',
+    timing: 'Within 24 hrs',
+    is_hard_gate: true,
+    resources: 'https://drive.google.com/drive/folders/transition-prep-guide',
+  },
+  {
+    id: 'p1_data_backup',
+    label: 'Provide data backup instructions',
+    phase: 'phase_1',
+    owner: 'AXA',
+    timing: 'Within 24 hrs',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p1_what_not_to_take',
+    label: 'Send "What NOT to Take" compliance checklist',
+    phase: 'phase_1',
+    owner: 'Compliance',
+    timing: 'Within 48 hrs',
     is_hard_gate: true,
   },
 
@@ -712,6 +743,30 @@ export const TASKS: Task[] = [
     is_hard_gate: true,
   },
   {
+    id: 'p4_advisor_prelaunch_checklist',
+    label: 'Advisor completes pre-launch responsibilities checklist',
+    phase: 'phase_4',
+    owner: 'Advisor',
+    timing: 'T-5 to T-3',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p4_team_dryrun',
+    label: 'Onboarding team prep (dry-run systems access)',
+    phase: 'phase_4',
+    owner: 'AXA',
+    timing: 'T-3',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p4_marketing_branding',
+    label: 'Marketing logo/branding prep finalized',
+    phase: 'phase_4',
+    owner: 'Marketing',
+    timing: 'T-2',
+    is_hard_gate: true,
+  },
+  {
     id: 'p4_go_nogo',
     label: 'Final "Go/No-Go" decision',
     phase: 'phase_4',
@@ -721,7 +776,7 @@ export const TASKS: Task[] = [
   },
 
   // ──────────────────────────────────────────────────────────────────────────
-  // PHASE 5: LAUNCH DAY (13 tasks)
+  // PHASE 5: LAUNCH DAY (19 tasks - expanded for technology activation)
   // ──────────────────────────────────────────────────────────────────────────
 
   // Morning Setup
@@ -747,6 +802,54 @@ export const TASKS: Task[] = [
     phase: 'phase_5',
     owner: 'IT',
     timing: 'Morning',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p5_google_workspace',
+    label: 'Activate Google Workspace access',
+    phase: 'phase_5',
+    owner: 'IT',
+    timing: 'Morning',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p5_hubspot_access',
+    label: 'Provision HubSpot CRM access',
+    phase: 'phase_5',
+    owner: 'IT',
+    timing: 'Morning',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p5_zoom_phone',
+    label: 'Set up Zoom & Zoom Phone',
+    phase: 'phase_5',
+    owner: 'IT',
+    timing: 'Morning',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p5_scheduler',
+    label: 'Configure scheduler (Calendly/HubSpot)',
+    phase: 'phase_5',
+    owner: 'IT',
+    timing: 'Morning',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p5_chrome_extension',
+    label: 'Install Chrome extension (if applicable)',
+    phase: 'phase_5',
+    owner: 'Advisor',
+    timing: 'Day 1',
+    is_hard_gate: false,
+  },
+  {
+    id: 'p5_email_signatures',
+    label: 'Set up email signatures',
+    phase: 'phase_5',
+    owner: 'Marketing',
+    timing: 'Day 1',
     is_hard_gate: true,
   },
 
@@ -836,7 +939,7 @@ export const TASKS: Task[] = [
   },
 
   // ──────────────────────────────────────────────────────────────────────────
-  // PHASE 6: ACTIVE TRANSITION (20 tasks)
+  // PHASE 6: ACTIVE TRANSITION (34 tasks - expanded for 10 dept intros + First Week tech setup)
   // ──────────────────────────────────────────────────────────────────────────
 
   // Week 1 Department Meetings
@@ -887,6 +990,112 @@ export const TASKS: Task[] = [
     owner: 'CXM',
     timing: 'Week 1',
     is_hard_gate: true,
+  },
+  {
+    id: 'p6_trust_estate_intro',
+    label: 'Introduce to Trust & Estate Team (1 hr)',
+    phase: 'phase_6',
+    owner: 'AXA',
+    timing: 'Week 2-3',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p6_institutional_intro',
+    label: 'Introduce to Farther Institutional Team (1 hr)',
+    phase: 'phase_6',
+    owner: 'AXA',
+    timing: 'Week 2-3',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p6_insurance_annuities_intro',
+    label: 'Introduce to Insurance & Annuities Team (1 hr)',
+    phase: 'phase_6',
+    owner: 'AXA',
+    timing: 'Week 2-3',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p6_client_welcome_calls',
+    label: 'Client welcome calls (batch 1)',
+    phase: 'phase_6',
+    owner: 'Advisor',
+    timing: 'Week 1',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p6_welcome_email',
+    label: 'Send "Welcome to Farther" email workflow',
+    phase: 'phase_6',
+    owner: 'Marketing',
+    timing: 'Week 1',
+    is_hard_gate: true,
+    resources: 'https://app.hubspot.com/email/templates/welcome-workflow',
+  },
+  {
+    id: 'p6_ramp_setup',
+    label: 'Set up Ramp (corporate card)',
+    phase: 'phase_6',
+    owner: 'Finance',
+    timing: 'Week 1',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p6_navan_setup',
+    label: 'Set up Navan (travel)',
+    phase: 'phase_6',
+    owner: 'Finance',
+    timing: 'Week 1',
+    is_hard_gate: false,
+  },
+  {
+    id: 'p6_rightcapital',
+    label: 'Provision RightCapital access',
+    phase: 'phase_6',
+    owner: 'FP Team',
+    timing: 'Week 1',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p6_advicepay',
+    label: 'Provision AdvicePay access',
+    phase: 'phase_6',
+    owner: 'Finance',
+    timing: 'Week 1',
+    is_hard_gate: false,
+  },
+  {
+    id: 'p6_pontera',
+    label: 'Provision Pontera access',
+    phase: 'phase_6',
+    owner: '401k/Pontera',
+    timing: 'Week 1',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p6_smartria',
+    label: 'Provision SmartRIA access',
+    phase: 'phase_6',
+    owner: 'IT',
+    timing: 'Week 1',
+    is_hard_gate: false,
+  },
+  {
+    id: 'p6_ai_notetaker',
+    label: 'Set up AI note-taker (Fathom/Otter/Grain)',
+    phase: 'phase_6',
+    owner: 'IT',
+    timing: 'Week 1',
+    is_hard_gate: false,
+  },
+  {
+    id: 'p6_docusign_workflow',
+    label: 'Deploy automated DocuSign workflow',
+    phase: 'phase_6',
+    owner: 'CTM',
+    timing: 'Week 1',
+    is_hard_gate: true,
+    resources: 'https://app.docusign.com/templates/automated-workflow',
   },
 
   // Weekly Cadence
@@ -949,6 +1158,14 @@ export const TASKS: Task[] = [
     owner: 'CTM',
     timing: 'Ongoing',
     is_hard_gate: false,
+  },
+  {
+    id: 'p6_digital_vault',
+    label: 'Complete document migration to Digital Vault',
+    phase: 'phase_6',
+    owner: 'CTM',
+    timing: 'Week 3-4',
+    is_hard_gate: true,
   },
 
   // Billing & Performance
@@ -1015,7 +1232,7 @@ export const TASKS: Task[] = [
   },
 
   // ──────────────────────────────────────────────────────────────────────────
-  // PHASE 7: GRADUATION & HANDOFF (7 tasks)
+  // PHASE 7: GRADUATION & HANDOFF (11 tasks - expanded for 90-day KPIs)
   // ──────────────────────────────────────────────────────────────────────────
 
   {
@@ -1025,6 +1242,38 @@ export const TASKS: Task[] = [
     owner: 'AXM',
     timing: 'Day 60',
     is_hard_gate: false,
+  },
+  {
+    id: 'p7_kpi_dashboard',
+    label: 'Establish KPI tracking dashboard (Net New AUM, Net Flows, Revenue per HH, Pipeline Velocity, Client NPS)',
+    phase: 'phase_7',
+    owner: 'Director',
+    timing: 'Day 30',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p7_service_tier',
+    label: 'Service tier assignment for all clients',
+    phase: 'phase_7',
+    owner: 'CXM',
+    timing: 'Day 60',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p7_compliance_training',
+    label: 'Complete compliance training modules',
+    phase: 'phase_7',
+    owner: 'Advisor',
+    timing: 'Day 90',
+    is_hard_gate: true,
+  },
+  {
+    id: 'p7_business_continuity',
+    label: 'Business continuity planning session',
+    phase: 'phase_7',
+    owner: 'RIA Leadership',
+    timing: 'Day 90',
+    is_hard_gate: true,
   },
   {
     id: 'p7_compliance_review',

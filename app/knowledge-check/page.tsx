@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import PageLayout from "@/components/PageLayout";
 import { useTheme } from "@/lib/theme-provider";
+import { THEME } from "@/lib/theme";
 
 interface QuizResult {
   topic_slug: string;
@@ -69,7 +70,7 @@ export default function KnowledgeCheckPage() {
         <div
           className="rounded-xl p-8 mb-8"
           style={{
-            backgroundColor: THEME.colors.surface,
+            backgroundColor: 'var(--color-surface)',
             
           }}
         >
@@ -77,13 +78,13 @@ export default function KnowledgeCheckPage() {
             <div>
               <h2
                 className="text-2xl font-bold"
-                style={{ color: THEME.colors.text }}
+                style={{ color: 'var(--color-text)' }}
               >
                 Training Progress
               </h2>
               <p
                 className="text-sm mt-1"
-                style={{ color: THEME.colors.textMuted }}
+                style={{ color: 'var(--color-text-muted)' }}
               >
                 {session?.user?.name || "User"} &middot; {session?.user?.email}
               </p>
@@ -92,13 +93,13 @@ export default function KnowledgeCheckPage() {
               <div className="text-right">
                 <p
                   className="text-3xl font-bold tabular-nums"
-                  style={{ color: THEME.colors.text }}
+                  style={{ color: 'var(--color-text)' }}
                 >
                   {passedCount}/{totalTopics}
                 </p>
                 <p
                   className="text-xs"
-                  style={{ color: THEME.colors.textFaint }}
+                  style={{ color: 'var(--color-text-faint)' }}
                 >
                   quizzes passed
                 </p>
@@ -109,16 +110,16 @@ export default function KnowledgeCheckPage() {
           {/* Progress bar */}
           <div
             className="w-full h-3 rounded-full overflow-hidden mb-2"
-            style={{ backgroundColor: THEME.colors.surfaceSubtle }}
+            style={{ backgroundColor: 'var(--color-surface-subtle)' }}
           >
             <div
               className="h-full rounded-full transition-all duration-500"
-              style={{ width: `${completionPct}%`, backgroundColor: THEME.colors.teal }}
+              style={{ width: `${completionPct}%`, backgroundColor: '#3B5A69' }}
             />
           </div>
           <p
             className="text-xs text-right"
-            style={{ color: THEME.colors.textFaint }}
+            style={{ color: 'var(--color-text-faint)' }}
           >
             {completionPct}% complete
           </p>
@@ -166,13 +167,13 @@ export default function KnowledgeCheckPage() {
                         ? THEME.colors.successBorder
                         : attemptsUsed > 0
                         ? THEME.colors.warningBorder
-                        : THEME.colors.border
+                        : 'var(--color-border)'
                     }`,
                     backgroundColor: passed
                       ? THEME.colors.successBg
                       : attemptsUsed > 0
                       ? THEME.colors.warningBg
-                      : THEME.colors.surfaceSubtle,
+                      : 'var(--color-surface-subtle)',
                   }}
                 >
                   <div className="flex items-center gap-4">
@@ -180,8 +181,8 @@ export default function KnowledgeCheckPage() {
                     <span
                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold"
                       style={{
-                        backgroundColor: THEME.colors.surfaceSubtle,
-                        color: THEME.colors.teal,
+                        backgroundColor: 'var(--color-surface-subtle)',
+                        color: '#3B5A69',
                         fontFamily: THEME.typography.fontFamily.mono,
                       }}
                     >
@@ -192,13 +193,13 @@ export default function KnowledgeCheckPage() {
                     <div className="flex-1 min-w-0">
                       <p
                         className="text-sm font-medium truncate"
-                        style={{ color: THEME.colors.text }}
+                        style={{ color: 'var(--color-text)' }}
                       >
                         {topic.label}
                       </p>
                       <p
                         className="text-xs mt-0.5"
-                        style={{ color: THEME.colors.textFaint }}
+                        style={{ color: 'var(--color-text-faint)' }}
                       >
                         {attemptsUsed === 0
                           ? "Not started"
@@ -242,9 +243,9 @@ export default function KnowledgeCheckPage() {
                           href={topic.href}
                           className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-medium transition-colors"
                           style={{
-                            backgroundColor: THEME.colors.teal + '26',
-                            border: `1px solid ${THEME.colors.teal}4D`,
-                            color: THEME.colors.teal,
+                            backgroundColor: '#3B5A69' + '26',
+                            border: `1px solid ${'#3B5A69'}4D`,
+                            color: '#3B5A69',
                           }}
                         >
                           {attemptsUsed > 0 ? "Retake" : "Take Quiz"} →
@@ -260,7 +261,7 @@ export default function KnowledgeCheckPage() {
                         <div
                           key={`${r.topic_slug}-${r.attempt_number}`}
                           className="flex items-center gap-2 text-xs"
-                          style={{ color: THEME.colors.textFaint }}
+                          style={{ color: 'var(--color-text-faint)' }}
                         >
                           <span className="tabular-nums" style={{ fontFamily: THEME.typography.fontFamily.mono }}>
                             Attempt {r.attempt_number}: {r.score}/{r.total_questions}

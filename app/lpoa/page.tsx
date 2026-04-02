@@ -26,7 +26,7 @@ export default function LPOAPage() {
 
         {/* At a Glance */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
+          <h2 className="text-3xl font-bold mb-6 text-[var(--color-text)]">
             At a Glance
           </h2>
           <div className="grid md:grid-cols-3 gap-4">
@@ -40,12 +40,11 @@ export default function LPOAPage() {
                 className="rounded-xl p-6 text-center"
               >
                 <p
-                  className="text-xs uppercase tracking-wider mb-3"
-                  className="text-[var(--color-text-secondary)]"
+                  className="text-xs uppercase tracking-wider mb-3 text-[var(--color-text-secondary)]"
                 >
                   {card.label}
                 </p>
-                <p className="text-xl leading-snug" className="text-[#3B5A69]">
+                <p className="text-xl leading-snug text-[#3B5A69]">
                   {card.value}
                 </p>
               </div>
@@ -55,7 +54,7 @@ export default function LPOAPage() {
 
         {/* How LPOA Works */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
+          <h2 className="text-3xl font-bold mb-6 text-[var(--color-text)]">
             How LPOA Works
           </h2>
           <div className="space-y-0">
@@ -74,7 +73,7 @@ export default function LPOAPage() {
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
                     style={{
-                      backgroundColor: i === arr.length - 1 ? THEME.colors.teal : THEME.colors.text,
+                      backgroundColor: i === arr.length - 1 ? '#3B5A69' : 'var(--color-text)',
                       color: '#FFFFFF',
                     }}
                   >
@@ -83,12 +82,12 @@ export default function LPOAPage() {
                   {i < arr.length - 1 && (
                     <div
                       className="w-px flex-1 min-h-8"
-                      style={{ backgroundColor: THEME.colors.border }}
+                      style={{ backgroundColor: 'var(--color-border)' }}
                     />
                   )}
                 </div>
                 <div className="pb-8">
-                  <p className="text-sm leading-relaxed pt-1" className="text-[var(--color-text)]">
+                  <p className="text-sm leading-relaxed pt-1 text-[var(--color-text)]">
                     {step}
                   </p>
                 </div>
@@ -99,7 +98,7 @@ export default function LPOAPage() {
 
         {/* Custodian Availability */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
+          <h2 className="text-3xl font-bold mb-6 text-[var(--color-text)]">
             Custodian Availability
           </h2>
           <div className="grid md:grid-cols-3 gap-4">
@@ -116,17 +115,17 @@ export default function LPOAPage() {
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold"
                     style={{
-                      backgroundColor: THEME.colors.teal,
+                      backgroundColor: '#3B5A69',
                       color: '#FFFFFF',
                     }}
                   >
                     {c.icon}
                   </div>
-                  <h3 className="text-lg font-bold" className="text-[var(--color-text)]">
+                  <h3 className="text-lg font-bold text-[var(--color-text)]">
                     {c.name}
                   </h3>
                 </div>
-                <p className="text-sm leading-relaxed" className="text-[var(--color-text-secondary)]">
+                <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                   {c.body}
                 </p>
               </div>
@@ -136,7 +135,7 @@ export default function LPOAPage() {
 
         {/* Key Considerations */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
+          <h2 className="text-3xl font-bold mb-6 text-[var(--color-text)]">
             Key Considerations
           </h2>
           <div
@@ -144,11 +143,10 @@ export default function LPOAPage() {
           >
             <div
               className="px-8 py-4"
-              style={{ borderBottom: `1px solid ${THEME.colors.border}` }}
+              style={{ borderBottom: `1px solid ${'var(--color-border)'}` }}
             >
               <span
-                className="text-xs uppercase tracking-wider font-semibold"
-                className="text-[#3B5A69]"
+                className="text-xs uppercase tracking-wider font-semibold text-[#3B5A69]"
               >
                 Important Notes
               </span>
@@ -160,7 +158,7 @@ export default function LPOAPage() {
                 'ACATs may still be needed for non-LPOA-eligible accounts within an otherwise LPOA transition',
                 'The LPOA document must be stored in the client file and Transition Tracker',
               ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" className="text-[var(--color-text)]">
+                <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
                   <span className="text-[#3B5A69]">•</span>
                   <span>{item}</span>
                 </li>

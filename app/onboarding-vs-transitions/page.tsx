@@ -16,12 +16,11 @@ export default function OnboardingVsTransitionsPage() {
         {/* Two Distinct Workstreams */}
         <div className="mb-16">
           <h2
-            className="text-3xl font-bold mb-6"
-            className="text-[var(--color-text)]"
+            className="text-3xl font-bold mb-6 text-[var(--color-text)]"
           >
-            Two Distinct <span style={{ color: THEME.colors.gold }}>Workstreams</span>
+            Two Distinct <span style={{ color: '#B68A4C' }}>Workstreams</span>
           </h2>
-          <p className="text-base leading-relaxed mb-8" className="text-[var(--color-text)]">
+          <p className="text-base leading-relaxed mb-8 text-[var(--color-text)]">
             Onboarding and Transitions are distinct processes with different owners, timelines, and
             success metrics. Understanding the boundary between these two workstreams is critical to
             ensuring nothing falls through the cracks.
@@ -32,23 +31,23 @@ export default function OnboardingVsTransitionsPage() {
             <div
               className="rounded-xl p-8"
               style={{
-                backgroundColor: THEME.colors.surface,
+                backgroundColor: 'var(--color-surface)',
                 
               }}
             >
               <div
                 className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-xl font-bold"
                 style={{
-                  backgroundColor: THEME.colors.gold,
+                  backgroundColor: '#B68A4C',
                   color: '#FFFFFF',
                 }}
               >
                 ◈
               </div>
-              <h3 className="text-xl font-bold mb-4" className="text-[var(--color-text)]">
+              <h3 className="text-xl font-bold mb-4 text-[var(--color-text)]">
                 Onboarding
               </h3>
-              <p className="text-sm leading-relaxed" className="text-[var(--color-text-secondary)]">
+              <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                 Owned by the <span className="font-medium">AX Manager (AXM)</span>. Covers everything
                 related to setting up the advisor as a Farther professional — their technology access,
                 compliance filings, training, introductions to internal teams, and graduation milestones.
@@ -59,24 +58,24 @@ export default function OnboardingVsTransitionsPage() {
             <div
               className="rounded-xl p-8"
               style={{
-                backgroundColor: THEME.colors.surface,
+                backgroundColor: 'var(--color-surface)',
                 
               }}
             >
               <div
                 className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-xl font-bold"
                 style={{
-                  backgroundColor: THEME.colors.surface,
-                  color: THEME.colors.text,
+                  backgroundColor: 'var(--color-surface)',
+                  color: 'var(--color-text)',
                   
                 }}
               >
                 ⇌
               </div>
-              <h3 className="text-xl font-bold mb-4" className="text-[var(--color-text)]">
+              <h3 className="text-xl font-bold mb-4 text-[var(--color-text)]">
                 Transitions
               </h3>
-              <p className="text-sm leading-relaxed" className="text-[var(--color-text-secondary)]">
+              <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                 Owned by the <span className="font-medium">Transitions team (CTM/CTA)</span>. Covers the
                 movement of client assets from the advisor's previous custodian to Farther's custodians.
                 This process runs in parallel with onboarding but has its own timeline and dependencies.
@@ -88,44 +87,43 @@ export default function OnboardingVsTransitionsPage() {
         {/* AXM Role */}
         <div className="mb-16">
           <h2
-            className="text-3xl font-bold mb-8"
-            className="text-[var(--color-text)]"
+            className="text-3xl font-bold mb-8 text-[var(--color-text)]"
           >
-            AXM — <span style={{ color: THEME.colors.gold }}>Advisor Experience Manager</span>
+            AXM — <span style={{ color: '#B68A4C' }}>Advisor Experience Manager</span>
           </h2>
 
           <div
             className="rounded-xl overflow-hidden"
             style={{
-              backgroundColor: THEME.colors.surface,
+              backgroundColor: 'var(--color-surface)',
               
             }}
           >
             {/* Header */}
             <div
               className="px-8 py-6"
-              style={{ borderBottom: `1px solid ${THEME.colors.border}` }}
+              style={{ borderBottom: `1px solid ${'var(--color-border)'}` }}
             >
               <div className="flex items-center gap-4 mb-3">
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold"
-                  style={{ backgroundColor: THEME.colors.gold, color: '#FFFFFF' }}
+                  style={{ backgroundColor: '#B68A4C', color: '#FFFFFF' }}
                 >
                   A
                 </div>
                 <div>
                   <p
                     className="text-xs uppercase tracking-wider font-medium mb-1"
-                    style={{ color: THEME.colors.gold }}
+                    style={{ color: '#B68A4C' }}
                   >
                     Primary Ownership
                   </p>
-                  <p className="font-medium" className="text-[var(--color-text)]">
+                  <p className="font-medium text-[var(--color-text)]">
                     Onboarding workstream
                   </p>
                 </div>
               </div>
-              <p className="text-xs uppercase tracking-wider" className="text-[var(--color-text-secondary)]">
+              <p className="text-xs uppercase tracking-wider text-[var(--color-text-secondary)]">
                 Reports to: Head of Advisor Experience
               </p>
             </div>
@@ -134,7 +132,7 @@ export default function OnboardingVsTransitionsPage() {
             <div className="px-8 py-8">
               <h4
                 className="text-xs uppercase tracking-wider font-medium mb-4"
-                style={{ color: THEME.colors.gold }}
+                style={{ color: '#B68A4C' }}
               >
                 Core Responsibilities
               </h4>
@@ -149,8 +147,8 @@ export default function OnboardingVsTransitionsPage() {
                   'Escalate issues to legal, compliance, or executive sponsors as needed',
                   'Maintain accurate records in the Transition Tracker',
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" className="text-[var(--color-text)]">
-                    <span style={{ color: THEME.colors.gold }}>▸</span>
+                  <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
+                    <span style={{ color: '#B68A4C' }}>▸</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -158,7 +156,7 @@ export default function OnboardingVsTransitionsPage() {
 
               <h4
                 className="text-xs uppercase tracking-wider font-medium mb-4"
-                style={{ color: THEME.colors.gold }}
+                style={{ color: '#B68A4C' }}
               >
                 Success Metrics
               </h4>
@@ -169,8 +167,8 @@ export default function OnboardingVsTransitionsPage() {
                   'Advisor NPS / satisfaction score post-graduation',
                   'No compliance violations during the onboarding window',
                 ].map((metric, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" className="text-[var(--color-text)]">
-                    <span style={{ color: THEME.colors.gold }}>◆</span>
+                  <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
+                    <span style={{ color: '#B68A4C' }}>◆</span>
                     <span>{metric}</span>
                   </li>
                 ))}
@@ -182,30 +180,29 @@ export default function OnboardingVsTransitionsPage() {
         {/* AXA Role */}
         <div className="mb-16">
           <h2
-            className="text-3xl font-bold mb-8"
-            className="text-[var(--color-text)]"
+            className="text-3xl font-bold mb-8 text-[var(--color-text)]"
           >
-            AXA — <span style={{ color: THEME.colors.gold }}>Advisor Experience Associate</span>
+            AXA — <span style={{ color: '#B68A4C' }}>Advisor Experience Associate</span>
           </h2>
 
           <div
             className="rounded-xl overflow-hidden"
             style={{
-              backgroundColor: THEME.colors.surface,
+              backgroundColor: 'var(--color-surface)',
               
             }}
           >
             {/* Header */}
             <div
               className="px-8 py-6"
-              style={{ borderBottom: `1px solid ${THEME.colors.border}` }}
+              style={{ borderBottom: `1px solid ${'var(--color-border)'}` }}
             >
               <div className="flex items-center gap-4 mb-3">
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold"
                   style={{
-                    backgroundColor: THEME.colors.surface,
-                    color: THEME.colors.text,
+                    backgroundColor: 'var(--color-surface)',
+                    color: 'var(--color-text)',
                     
                   }}
                 >
@@ -214,16 +211,16 @@ export default function OnboardingVsTransitionsPage() {
                 <div>
                   <p
                     className="text-xs uppercase tracking-wider font-medium mb-1"
-                    style={{ color: THEME.colors.gold }}
+                    style={{ color: '#B68A4C' }}
                   >
                     Primary Ownership
                   </p>
-                  <p className="font-medium" className="text-[var(--color-text)]">
+                  <p className="font-medium text-[var(--color-text)]">
                     Day-to-day execution and logistics support
                   </p>
                 </div>
               </div>
-              <p className="text-xs uppercase tracking-wider" className="text-[var(--color-text-secondary)]">
+              <p className="text-xs uppercase tracking-wider text-[var(--color-text-secondary)]">
                 Reports to: AXM
               </p>
             </div>
@@ -232,7 +229,7 @@ export default function OnboardingVsTransitionsPage() {
             <div className="px-8 py-8">
               <h4
                 className="text-xs uppercase tracking-wider font-medium mb-4"
-                style={{ color: THEME.colors.gold }}
+                style={{ color: '#B68A4C' }}
               >
                 Core Responsibilities
               </h4>
@@ -247,8 +244,8 @@ export default function OnboardingVsTransitionsPage() {
                   'Prepare meeting agendas and send follow-up summaries after each session',
                   'Manage the Holiday List distribution and scheduling considerations',
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" className="text-[var(--color-text)]">
-                    <span style={{ color: THEME.colors.gold }}>▸</span>
+                  <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
+                    <span style={{ color: '#B68A4C' }}>▸</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -256,7 +253,7 @@ export default function OnboardingVsTransitionsPage() {
 
               <h4
                 className="text-xs uppercase tracking-wider font-medium mb-4"
-                style={{ color: THEME.colors.gold }}
+                style={{ color: '#B68A4C' }}
               >
                 Success Metrics
               </h4>
@@ -266,8 +263,8 @@ export default function OnboardingVsTransitionsPage() {
                   'No missed meetings or scheduling gaps',
                   'Transition Tracker kept current (updated within 24 hours of each touchpoint)',
                 ].map((metric, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" className="text-[var(--color-text)]">
-                    <span style={{ color: THEME.colors.gold }}>◆</span>
+                  <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
+                    <span style={{ color: '#B68A4C' }}>◆</span>
                     <span>{metric}</span>
                   </li>
                 ))}
@@ -280,16 +277,16 @@ export default function OnboardingVsTransitionsPage() {
         <div
           className="rounded-xl p-8 mb-12"
           style={{
-            backgroundColor: THEME.colors.surface,
+            backgroundColor: 'var(--color-surface)',
             
-            borderLeft: `4px solid ${THEME.colors.gold}`,
+            borderLeft: `4px solid ${'#B68A4C'}`,
           }}
         >
-          <h2 className="text-2xl font-bold mb-6" className="text-[var(--color-text)]">
-            The <span style={{ color: THEME.colors.gold }}>Handoff Moment</span>
+          <h2 className="text-2xl font-bold mb-6 text-[var(--color-text)]">
+            The <span style={{ color: '#B68A4C' }}>Handoff Moment</span>
           </h2>
-          <p className="text-sm leading-relaxed" className="text-[var(--color-text-secondary)]">
-            <span className="font-medium" style={{ color: THEME.colors.gold }}>
+          <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+            <span className="font-medium" style={{ color: '#B68A4C' }}>
               Onboarding begins at deal-signed.
             </span>{' '}
             Transitions begin when the advisor's chosen transition method is confirmed and custodian

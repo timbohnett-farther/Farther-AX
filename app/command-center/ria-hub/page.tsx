@@ -417,8 +417,8 @@ function DealCard({ deal, expanded, onToggle }: { deal: Deal; expanded: boolean;
     <Card
       className={`overflow-hidden transition-smooth ${expanded ? 'shadow-glass-hover' : ''}`}
       style={{
-        backgroundColor: THEME.colors.surface,
-        border: `1px solid ${THEME.colors.border}`
+        backgroundColor: 'var(--color-surface)',
+        border: `1px solid ${'var(--color-border)'}`
       }}
     >
       {/* Header — always visible */}
@@ -578,8 +578,8 @@ export default function RiaHubPage() {
           <Card
             className="text-center py-12"
             style={{
-              backgroundColor: THEME.colors.surface,
-              border: `1px solid ${THEME.colors.border}`
+              backgroundColor: 'var(--color-surface)',
+              border: `1px solid ${'var(--color-border)'}`
             }}
           >
             <Text className="text-slate">No advisors match your search.</Text>

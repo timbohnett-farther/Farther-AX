@@ -64,10 +64,7 @@ export default function BreakawayProcessPage() {
       nextHref="/calendar-generator"
     >
       <div className="max-w-4xl">
-        <p
-          className="text-base leading-relaxed mb-8"
-          className="text-[var(--color-text)]"
-        >
+        <p className="text-base leading-relaxed mb-8 text-[var(--color-text)]">
           The following workflow maps every phase of a Breakaway advisor onboarding — from the
           moment the deal is signed through graduation. Each phase shows the key meetings,
           required attendees, agenda items, and follow-up actions with assigned owners.
@@ -81,24 +78,22 @@ export default function BreakawayProcessPage() {
                 <div
                   className="px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase text-white"
                   style={{
-                    backgroundColor: THEME.colors.teal,
-                    boxShadow: `0 0 10px ${THEME.colors.teal}50`
+                    backgroundColor: '#3B5A69',
+                    boxShadow: `0 0 10px ${'#3B5A69'}50`
                   }}
                 >
                   {phase.phase}
                 </div>
                 <h3
-                  className="text-xl font-bold font-sans"
-                  className="text-[var(--color-text)]"
+                  className="text-xl font-bold font-sans text-[var(--color-text)]"
                 >
                   {phase.title}
                 </h3>
                 <span
                   className="text-sm px-2 py-0.5 border rounded-full"
                   style={{
-                    Secondary,
-                    borderColor: THEME.colors.border,
-                    boxShadow: `0 0 6px ${THEME.colors.teal}25`
+                    borderColor: 'var(--color-border)',
+                    boxShadow: `0 0 6px ${'#3B5A69'}25`
                   }}
                 >
                   {phase.duration}
@@ -109,40 +104,35 @@ export default function BreakawayProcessPage() {
               <div
                 className="rounded-lg border overflow-hidden transition-all duration-200"
                 style={{
-                  borderColor: THEME.colors.border,
-                  boxShadow: `0 0 16px ${THEME.colors.teal}25`
+                  borderColor: 'var(--color-border)',
+                  boxShadow: `0 0 16px ${'#3B5A69'}25`
                 }}
               >
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-[var(--color-surface)]">
                       <th
-                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[22%]"
-                        className="text-[var(--color-text-secondary)]"
+                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[22%] text-[var(--color-text-secondary)]"
                       >
                         Meeting
                       </th>
                       <th
-                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[20%]"
-                        className="text-[var(--color-text-secondary)]"
+                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[20%] text-[var(--color-text-secondary)]"
                       >
                         Attendees
                       </th>
                       <th
-                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[28%]"
-                        className="text-[var(--color-text-secondary)]"
+                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[28%] text-[var(--color-text-secondary)]"
                       >
                         Agenda
                       </th>
                       <th
-                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[22%]"
-                        className="text-[var(--color-text-secondary)]"
+                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[22%] text-[var(--color-text-secondary)]"
                       >
                         Follow-Up
                       </th>
                       <th
-                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[8%]"
-                        className="text-[var(--color-text-secondary)]"
+                        className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider w-[8%] text-[var(--color-text-secondary)]"
                       >
                         Owner
                       </th>
@@ -154,31 +144,27 @@ export default function BreakawayProcessPage() {
                         key={itemIdx}
                         className="transition-colors duration-200 hover:bg-white/5 border-t"
                         style={{
-                          backgroundColor: itemIdx % 2 === 0 ? THEME.colors.surface : THEME.colors.bg,
-                          borderColor: THEME.colors.border
+                          backgroundColor: itemIdx % 2 === 0 ? 'var(--color-surface)' : 'var(--color-bg)',
+                          borderColor: 'var(--color-border)'
                         }}
                       >
                         <td
-                          className="px-4 py-3 font-medium"
-                          className="text-[var(--color-text)]"
+                          className="px-4 py-3 font-medium text-[var(--color-text)]"
                         >
                           {item.meeting}
                         </td>
                         <td
-                          className="px-4 py-3"
-                          className="text-[var(--color-text)]"
+                          className="px-4 py-3 text-[var(--color-text)]"
                         >
                           {item.attendees}
                         </td>
                         <td
-                          className="px-4 py-3"
-                          className="text-[var(--color-text)]"
+                          className="px-4 py-3 text-[var(--color-text)]"
                         >
                           {item.agenda}
                         </td>
                         <td
-                          className="px-4 py-3"
-                          className="text-[var(--color-text)]"
+                          className="px-4 py-3 text-[var(--color-text)]"
                         >
                           {item.followUp}
                         </td>
@@ -186,7 +172,7 @@ export default function BreakawayProcessPage() {
                           <span
                             className="px-2 py-0.5 text-xs font-semibold rounded-full"
                             style={{
-                              boxShadow: `0 0 6px ${THEME.colors.teal}33`
+                              boxShadow: `0 0 6px ${'#3B5A69'}33`
                             }}
                           >
                             {item.owner}

@@ -26,24 +26,23 @@ export default function NoToLowAUMPage() {
 
         {/* When This Pathway Applies */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
+          <h2 className="text-3xl font-bold mb-6 text-[var(--color-text)]">
             When This Pathway Applies
           </h2>
           <div
             className="rounded-xl p-6"
             style={{
-              border: `1px solid ${THEME.colors.teal}`,
-              borderLeft: `4px solid ${THEME.colors.teal}`,
+              border: `1px solid ${'#3B5A69'}`,
+              borderLeft: `4px solid ${'#3B5A69'}`,
             }}
           >
             <div className="flex items-start gap-4">
               <span
-                className="text-xl shrink-0"
-                className="text-[#3B5A69]"
+                className="text-xl shrink-0 text-[#3B5A69]"
               >
                 ℹ️
               </span>
-              <p className="text-sm leading-relaxed" className="text-[var(--color-text)]">
+              <p className="text-sm leading-relaxed text-[var(--color-text)]">
                 This pathway is triggered when an advisor's projected AUM at launch is below $15-20M.
                 The exact threshold is assessed case-by-case with input from the Focus Team, which
                 evaluates the advisor's growth trajectory, client quality, and strategic fit.
@@ -54,7 +53,7 @@ export default function NoToLowAUMPage() {
 
         {/* Key Characteristics */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-8" className="text-[var(--color-text)]">
+          <h2 className="text-3xl font-bold mb-8 text-[var(--color-text)]">
             Key Characteristics
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -83,13 +82,13 @@ export default function NoToLowAUMPage() {
                 <div className="flex items-center gap-3 mb-3">
                   <div
                     className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: THEME.colors.teal }}
+                    style={{ backgroundColor: '#3B5A69' }}
                   />
-                  <h3 className="text-lg font-bold" className="text-[var(--color-text)]">
+                  <h3 className="text-lg font-bold text-[var(--color-text)]">
                     {item.title}
                   </h3>
                 </div>
-                <p className="text-sm leading-relaxed" className="text-[var(--color-text-secondary)]">
+                <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                   {item.body}
                 </p>
               </div>
@@ -99,7 +98,7 @@ export default function NoToLowAUMPage() {
 
         {/* Focus Team Review */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
+          <h2 className="text-3xl font-bold mb-6 text-[var(--color-text)]">
             The Focus Team Review
           </h2>
           <div
@@ -107,9 +106,9 @@ export default function NoToLowAUMPage() {
           >
             <div
               className="px-8 py-6"
-              style={{ borderBottom: `1px solid ${THEME.colors.border}` }}
+              style={{ borderBottom: `1px solid ${'var(--color-border)'}` }}
             >
-              <p className="text-sm leading-relaxed" className="text-[var(--color-text)]">
+              <p className="text-sm leading-relaxed text-[var(--color-text)]">
                 The Focus Team is an internal Farther committee that reviews borderline advisor
                 candidates. Their assessment covers the following areas. The AXM must present the
                 advisor's profile to the Focus Team before initiating any onboarding steps.
@@ -123,7 +122,7 @@ export default function NoToLowAUMPage() {
                   'The advisor\'s prior firm performance record',
                   'Strategic alignment with Farther\'s growth goals',
                 ].map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-sm leading-relaxed" className="text-[var(--color-text)]">
+                  <li key={idx} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
                     <span className="text-[#3B5A69]">•</span>
                     <span>{item}</span>
                   </li>
@@ -135,7 +134,7 @@ export default function NoToLowAUMPage() {
 
         {/* Training Curriculum */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6" className="text-[var(--color-text)]">
+          <h2 className="text-3xl font-bold mb-6 text-[var(--color-text)]">
             Training Curriculum Priority
           </h2>
           <div
@@ -143,11 +142,10 @@ export default function NoToLowAUMPage() {
           >
             <div
               className="px-8 py-4"
-              style={{ borderBottom: `1px solid ${THEME.colors.border}` }}
+              style={{ borderBottom: `1px solid ${'var(--color-border)'}` }}
             >
               <span
-                className="text-xs uppercase tracking-wider font-semibold"
-                className="text-[#3B5A69]"
+                className="text-xs uppercase tracking-wider font-semibold text-[#3B5A69]"
               >
                 Required Training Modules — In Order
               </span>
@@ -165,13 +163,13 @@ export default function NoToLowAUMPage() {
                     <span
                       className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
                       style={{
-                        backgroundColor: THEME.colors.teal,
+                        backgroundColor: '#3B5A69',
                         color: '#FFFFFF',
                       }}
                     >
                       {String(idx + 1).padStart(2, '0')}
                     </span>
-                    <span className="text-sm leading-relaxed" className="text-[var(--color-text)]">
+                    <span className="text-sm leading-relaxed text-[var(--color-text)]">
                       {item}
                     </span>
                   </div>
