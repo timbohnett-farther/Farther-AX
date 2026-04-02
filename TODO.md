@@ -130,6 +130,7 @@ When you report a fix:
 
 | Fix | Date | Commits | Summary |
 |-----|------|---------|---------|
+| Build errors causing 5 consecutive deployment failures | 2026-04-02 | `d74fd8e`, `06b7433` | Fixed duplicate className attributes, missing THEME imports, and malformed CSS variables in 11 training pages |
 | TypeScript build error blocking deployment | 2026-03-30 | `54c6b59` | Fixed THEME.colors.background to THEME.colors.bg in 2 training pages |
 | AI Assistant chat window unreadable | 2026-03-25 | `4944cc1` | Fixed white-on-white text by changing bg-cream to bg-charcoal |
 | Metrics cards detail view | 2026-03-25 | `bad934d` | Added interactive slide-in panel with onClick handlers for all 20+ cards |
