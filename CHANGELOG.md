@@ -6,6 +6,40 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Fix Build Errors in Training Pages — 2026-04-02
+
+**What**: Resolved 5 consecutive deployment failures caused by TypeScript build errors in training/playbook pages
+
+**Root Causes**:
+1. Duplicate `className` attributes from merge conflicts (e.g., `className="..." className="..."`)
+2. Missing `THEME` imports in files referencing `THEME.colors.*`
+3. Malformed CSS variable references from incomplete replacements (`'var(--color-text)'Secondary` → should be `'var(--color-text-secondary)'`)
+
+**Scope**:
+- Fixed 11 training/playbook page files
+- Added missing `THEME` imports where needed
+- Corrected malformed CSS variable references throughout
+- Verified local build passes successfully
+
+**Status**: ✅ Fixed and pushed to main (commit `d74fd8e`)
+
+**Files**:
+- `app/breakaway-process/page.tsx`
+- `app/breakaway/page.tsx`
+- `app/command-center/advisor-hub/page.tsx`
+- `app/command-center/ria-hub/page.tsx`
+- `app/independent-ria/page.tsx`
+- `app/introduction/page.tsx`
+- `app/knowledge-check/page.tsx`
+- `app/lpoa/page.tsx`
+- `app/ma/page.tsx`
+- `app/no-to-low-aum/page.tsx`
+- `app/onboarding-vs-transitions/page.tsx`
+
+**Impact**: Railway deployments should now succeed. Last 5 deployment failures resolved.
+
+---
+
 ## [Completed] Autonomous AI Agent Orchestration System — 2026-04-02
 
 **What**: Built a fully autonomous agent scheduling system with 8 AI agents (Sentinel-7, Pattern-31, Control-91, Archive-365 + Weekly/Monthly/Quarterly/Annual reviews). Agents run autonomously via a Railway cron job that calls a smart scheduler every 5 minutes. The scheduler respects dependency chains, retries failures with exponential backoff, detects zombie processes via heartbeats, and surfaces live health on a new dashboard page.
