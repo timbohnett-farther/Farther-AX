@@ -120,3 +120,165 @@ model SyncJob {
   @@index([started_at])
   @@map("sync_jobs")
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TRANSITIONS MANAGEMENT (Google Sheets → PostgreSQL Cache)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Transition client records from Google Sheets workbooks
+model TransitionClient {
+  id                              Int       @id @default(autoincrement())
+
+  // Sheet Metadata
+  sheet_id                        String
+  sheet_row_index                 Int
+  workbook_name                   String?
+
+  // Assignment & Ownership
+  farther_contact                 String?
+  advisor_name                    String?
+
+  // Account Details
+  custodian                       String?
+  account_type                    String?
+  account_name                    String?
+  new_account_number              String?
+  contra_account_firm             String?
+  contra_account_numbers          String?
+
+  // Status Tracking
+  document_readiness              String?
+  status_of_iaa                   String?
+  status_of_account_paperwork     String?
+  portal_status                   String?
+
+  // DocuSign Integration
+  docusign_iaa_status             String?
+  docusign_paperwork_status       String?
+  docusign_iaa_envelope_id        String?
+  docusign_paperwork_envelope_id  String?
+
+  // Household & Billing
+  household_name                  String?
+  billing_group                   String?
+  fee_schedule                    String?
+  billing_exceptions              String?
+  billing_exception_explanation   String?
+  billing_setup                   String?
+
+  // Primary Contact
+  primary_first_name              String?
+  primary_middle_name             String?
+  primary_last_name               String?
+  primary_email                   String?
+  primary_phone                   String?
+  primary_dob                     String?
+  primary_ssn_last4               String?
+  primary_street                  String?
+  primary_city                    String?
+  primary_state                   String?
+  primary_zip                     String?
+  primary_country                 String?
+
+  // Secondary Contact
+  secondary_first_name            String?
+  secondary_middle_name           String?
+  secondary_last_name             String?
+  secondary_email                 String?
+  secondary_phone                 String?
+  secondary_dob                   String?
+  secondary_ssn_last4             String?
+  secondary_street                String?
+  secondary_city                  String?
+  secondary_state                 String?
+  secondary_zip                   String?
+  secondary_country               String?
+
+  // Mailing Address
+  mailing_street                  String?
+  mailing_city                    String?
+  mailing_state                   String?
+  mailing_zip                     String?
+  mailing_country                 String?
+
+  // Operations
+  portal_invites                  String?
+  welcome_gift_box                String?
+  notes                           String?  @db.Text
+
+  // Sync Metadata
+  synced_at                       DateTime  @default(now())
+  created_at                      DateTime  @default(now())
+  updated_at                      DateTime  @updatedAt
+
+  @@unique([sheet_id, sheet_row_index])
+  @@index([sheet_id])
+  @@index([advisor_name])
+  @@index([farther_contact])
+  @@index([status_of_iaa])
+  @@index([status_of_account_paperwork])
+  @@index([portal_status])
+  @@index([household_name])
+  @@index([primary_email])
+  @@index([docusign_iaa_status])
+  @@index([docusign_paperwork_status])
+  @@index([synced_at])
+  @@map("transition_clients")
+}
+
+// Workbook metadata with Google Drive sync tracking
+model TransitionWorkbook {
+  id                      String    @id @default(cuid())
+  sheet_id                String    @unique
+
+  // Workbook Details
+  workbook_name           String
+  sheet_url               String?
+
+  // Advisor Assignment
+  detected_advisor_name   String?
+  assigned_advisor_name   String?   // Manual override
+  assignment_locked       Boolean   @default(false)
+
+  // Google Drive Sync
+  drive_modified_time     DateTime?
+  last_synced_at          DateTime  @default(now())
+
+  // Metadata
+  created_at              DateTime  @default(now())
+  updated_at              DateTime  @updatedAt
+
+  @@index([sheet_id])
+  @@index([assigned_advisor_name])
+  @@index([last_synced_at])
+  @@map("transition_workbooks")
+}
+
+// Advisor team name mappings (individual → team)
+model AdvisorTeamMapping {
+  id                Int      @id @default(autoincrement())
+  individual_name   String   @unique
+  team_name         String
+
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  @@index([team_name])
+  @@map("advisor_team_mappings")
+}
+
+// Advisor transition AUM and revenue aggregates
+model AdvisorTranAum {
+  id            Int      @id @default(autoincrement())
+  advisor_name  String   @unique
+
+  tran_aum      Decimal  @default(0) @db.Decimal(15,2)
+  revenue       Decimal  @default(0) @db.Decimal(15,2)
+
+  last_updated  DateTime @default(now())
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@index([advisor_name])
+  @@map("advisor_tran_aum")
+}
