@@ -6,6 +6,47 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] DocuSign Webhook Prisma Migration — 2026-04-02
+
+**What**: Migrated DocuSign webhook handler from raw SQL to Prisma ORM with email-based client linking
+
+**Scope**:
+- **Prisma Migration**:
+  - Replaced `pool.query()` with `prisma.transitionClient.updateMany()`
+  - Added case-insensitive email matching: `mode: 'insensitive'`
+  - Cleaner, type-safe queries with automatic parameter escaping
+- **Email-Based Linking**:
+  - Links DocuSign envelopes to transition clients via signer email addresses
+  - Matches `primary_email` field (case-insensitive)
+  - Updates multiple clients if multiple signers match
+- **Envelope Type Detection**:
+  - IAA envelopes: Updates `docusign_iaa_status` + `docusign_iaa_envelope_id`
+  - Paperwork envelopes: Updates `docusign_paperwork_status` + `docusign_paperwork_envelope_id`
+  - Detection logic: Email subject contains "IAA" (case-insensitive)
+- **Improved Logging**:
+  - Logs signer email list for debugging
+  - Logs envelope type (IAA/Paperwork)
+  - Returns signer emails in webhook response
+
+**Webhook Flow**:
+1. Verify HMAC signature (X-DocuSign-Signature-1 header)
+2. Parse webhook payload (envelope ID, status, signers)
+3. Extract signer emails and determine envelope type
+4. Update all transition_clients where primary_email matches any signer email
+5. Return 200 OK with envelope details
+
+**Status**: ✅ Complete and deployed
+
+**Files**:
+- `app/api/webhooks/docusign/route.ts` (migrated to Prisma, improved email linking)
+
+**Documentation**:
+- `TRANSITIONS_DOCUSIGN_INTEGRATION.md` (complete integration guide)
+
+**Impact**: Enables real-time DocuSign status tracking for all transition clients, with type-safe queries and automatic email-based linking.
+
+---
+
 ## [Completed] Transitions Data Caching with 30-Minute Sync + DocuSign Integration — 2026-04-02
 
 **What**: Migrated Transitions system to Prisma ORM with automated 30-minute sync and DocuSign status tracking
