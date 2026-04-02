@@ -1,6 +1,7 @@
 'use client';
 
 import PageLayout from '@/components/PageLayout';
+import { THEME } from '@/lib/theme';
 export default function NoToLowAUMPage() {
 
   return (
@@ -32,13 +33,13 @@ export default function NoToLowAUMPage() {
           <div
             className="rounded-xl p-6"
             style={{
-              border: `1px solid ${'#3B5A69'}`,
-              borderLeft: `4px solid ${'#3B5A69'}`,
+              border: `1px solid ${THEME.colors.teal}`,
+              borderLeft: `4px solid ${THEME.colors.teal}`,
             }}
           >
             <div className="flex items-start gap-4">
               <span
-                className="text-xl shrink-0 text-[#3B5A69]"
+                className="text-xl shrink-0 text-[THEME.colors.teal]"
               >
                 ℹ️
               </span>
@@ -82,7 +83,7 @@ export default function NoToLowAUMPage() {
                 <div className="flex items-center gap-3 mb-3">
                   <div
                     className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: '#3B5A69' }}
+                    style={{ backgroundColor: THEME.colors.teal }}
                   />
                   <h3 className="text-lg font-bold text-[var(--color-text)]">
                     {item.title}
@@ -123,7 +124,7 @@ export default function NoToLowAUMPage() {
                   'Strategic alignment with Farther\'s growth goals',
                 ].map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
-                    <span className="text-[#3B5A69]">•</span>
+                    <span className="text-[THEME.colors.teal]">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -145,7 +146,7 @@ export default function NoToLowAUMPage() {
               style={{ borderBottom: `1px solid ${'var(--color-border)'}` }}
             >
               <span
-                className="text-xs uppercase tracking-wider font-semibold text-[#3B5A69]"
+                className="text-xs uppercase tracking-wider font-semibold text-[THEME.colors.teal]"
               >
                 Required Training Modules — In Order
               </span>
@@ -163,7 +164,7 @@ export default function NoToLowAUMPage() {
                     <span
                       className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
                       style={{
-                        backgroundColor: '#3B5A69',
+                        backgroundColor: THEME.colors.teal,
                         color: '#FFFFFF',
                       }}
                     >

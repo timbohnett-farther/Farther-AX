@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import PageLayout from "@/components/PageLayout";
+import { THEME } from '@/lib/theme';
 // --- Types ---
 
 type Attendee = { name: string; email: string };

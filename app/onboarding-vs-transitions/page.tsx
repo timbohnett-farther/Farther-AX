@@ -1,6 +1,7 @@
 'use client';
 
 import PageLayout from '@/components/PageLayout';
+import { THEME } from '@/lib/theme';
 export default function OnboardingVsTransitionsPage() {
 
   return (
@@ -18,7 +19,7 @@ export default function OnboardingVsTransitionsPage() {
           <h2
             className="text-3xl font-bold mb-6 text-[var(--color-text)]"
           >
-            Two Distinct <span style={{ color: '#B68A4C' }}>Workstreams</span>
+            Two Distinct <span style={{ color: THEME.colors.gold }}>Workstreams</span>
           </h2>
           <p className="text-base leading-relaxed mb-8 text-[var(--color-text)]">
             Onboarding and Transitions are distinct processes with different owners, timelines, and
@@ -38,7 +39,7 @@ export default function OnboardingVsTransitionsPage() {
               <div
                 className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-xl font-bold"
                 style={{
-                  backgroundColor: '#B68A4C',
+                  backgroundColor: THEME.colors.gold,
                   color: '#FFFFFF',
                 }}
               >
@@ -89,7 +90,7 @@ export default function OnboardingVsTransitionsPage() {
           <h2
             className="text-3xl font-bold mb-8 text-[var(--color-text)]"
           >
-            AXM — <span style={{ color: '#B68A4C' }}>Advisor Experience Manager</span>
+            AXM — <span style={{ color: THEME.colors.gold }}>Advisor Experience Manager</span>
           </h2>
 
           <div
@@ -107,14 +108,14 @@ export default function OnboardingVsTransitionsPage() {
               <div className="flex items-center gap-4 mb-3">
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold"
-                  style={{ backgroundColor: '#B68A4C', color: '#FFFFFF' }}
+                  style={{ backgroundColor: THEME.colors.gold, color: '#FFFFFF' }}
                 >
                   A
                 </div>
                 <div>
                   <p
                     className="text-xs uppercase tracking-wider font-medium mb-1"
-                    style={{ color: '#B68A4C' }}
+                    style={{ color: THEME.colors.gold }}
                   >
                     Primary Ownership
                   </p>
@@ -132,7 +133,7 @@ export default function OnboardingVsTransitionsPage() {
             <div className="px-8 py-8">
               <h4
                 className="text-xs uppercase tracking-wider font-medium mb-4"
-                style={{ color: '#B68A4C' }}
+                style={{ color: THEME.colors.gold }}
               >
                 Core Responsibilities
               </h4>
@@ -148,7 +149,7 @@ export default function OnboardingVsTransitionsPage() {
                   'Maintain accurate records in the Transition Tracker',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
-                    <span style={{ color: '#B68A4C' }}>▸</span>
+                    <span style={{ color: THEME.colors.gold }}>▸</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -156,7 +157,7 @@ export default function OnboardingVsTransitionsPage() {
 
               <h4
                 className="text-xs uppercase tracking-wider font-medium mb-4"
-                style={{ color: '#B68A4C' }}
+                style={{ color: THEME.colors.gold }}
               >
                 Success Metrics
               </h4>
@@ -168,7 +169,7 @@ export default function OnboardingVsTransitionsPage() {
                   'No compliance violations during the onboarding window',
                 ].map((metric, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
-                    <span style={{ color: '#B68A4C' }}>◆</span>
+                    <span style={{ color: THEME.colors.gold }}>◆</span>
                     <span>{metric}</span>
                   </li>
                 ))}
@@ -182,7 +183,7 @@ export default function OnboardingVsTransitionsPage() {
           <h2
             className="text-3xl font-bold mb-8 text-[var(--color-text)]"
           >
-            AXA — <span style={{ color: '#B68A4C' }}>Advisor Experience Associate</span>
+            AXA — <span style={{ color: THEME.colors.gold }}>Advisor Experience Associate</span>
           </h2>
 
           <div
@@ -211,7 +212,7 @@ export default function OnboardingVsTransitionsPage() {
                 <div>
                   <p
                     className="text-xs uppercase tracking-wider font-medium mb-1"
-                    style={{ color: '#B68A4C' }}
+                    style={{ color: THEME.colors.gold }}
                   >
                     Primary Ownership
                   </p>
@@ -229,7 +230,7 @@ export default function OnboardingVsTransitionsPage() {
             <div className="px-8 py-8">
               <h4
                 className="text-xs uppercase tracking-wider font-medium mb-4"
-                style={{ color: '#B68A4C' }}
+                style={{ color: THEME.colors.gold }}
               >
                 Core Responsibilities
               </h4>
@@ -245,7 +246,7 @@ export default function OnboardingVsTransitionsPage() {
                   'Manage the Holiday List distribution and scheduling considerations',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
-                    <span style={{ color: '#B68A4C' }}>▸</span>
+                    <span style={{ color: THEME.colors.gold }}>▸</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -253,7 +254,7 @@ export default function OnboardingVsTransitionsPage() {
 
               <h4
                 className="text-xs uppercase tracking-wider font-medium mb-4"
-                style={{ color: '#B68A4C' }}
+                style={{ color: THEME.colors.gold }}
               >
                 Success Metrics
               </h4>
@@ -264,7 +265,7 @@ export default function OnboardingVsTransitionsPage() {
                   'Transition Tracker kept current (updated within 24 hours of each touchpoint)',
                 ].map((metric, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
-                    <span style={{ color: '#B68A4C' }}>◆</span>
+                    <span style={{ color: THEME.colors.gold }}>◆</span>
                     <span>{metric}</span>
                   </li>
                 ))}
@@ -279,14 +280,14 @@ export default function OnboardingVsTransitionsPage() {
           style={{
             backgroundColor: 'var(--color-surface)',
             
-            borderLeft: `4px solid ${'#B68A4C'}`,
+            borderLeft: `4px solid ${THEME.colors.gold}`,
           }}
         >
           <h2 className="text-2xl font-bold mb-6 text-[var(--color-text)]">
-            The <span style={{ color: '#B68A4C' }}>Handoff Moment</span>
+            The <span style={{ color: THEME.colors.gold }}>Handoff Moment</span>
           </h2>
           <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
-            <span className="font-medium" style={{ color: '#B68A4C' }}>
+            <span className="font-medium" style={{ color: THEME.colors.gold }}>
               Onboarding begins at deal-signed.
             </span>{' '}
             Transitions begin when the advisor's chosen transition method is confirmed and custodian

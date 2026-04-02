@@ -1,6 +1,7 @@
 'use client';
 
 import PageLayout from '@/components/PageLayout';
+import { THEME } from '@/lib/theme';
 export default function LPOAPage() {
 
   return (
@@ -44,7 +45,7 @@ export default function LPOAPage() {
                 >
                   {card.label}
                 </p>
-                <p className="text-xl leading-snug text-[#3B5A69]">
+                <p className="text-xl leading-snug text-[THEME.colors.teal]">
                   {card.value}
                 </p>
               </div>
@@ -73,7 +74,7 @@ export default function LPOAPage() {
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
                     style={{
-                      backgroundColor: i === arr.length - 1 ? '#3B5A69' : 'var(--color-text)',
+                      backgroundColor: i === arr.length - 1 ? THEME.colors.teal : 'var(--color-text)',
                       color: '#FFFFFF',
                     }}
                   >
@@ -115,7 +116,7 @@ export default function LPOAPage() {
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold"
                     style={{
-                      backgroundColor: '#3B5A69',
+                      backgroundColor: THEME.colors.teal,
                       color: '#FFFFFF',
                     }}
                   >
@@ -146,7 +147,7 @@ export default function LPOAPage() {
               style={{ borderBottom: `1px solid ${'var(--color-border)'}` }}
             >
               <span
-                className="text-xs uppercase tracking-wider font-semibold text-[#3B5A69]"
+                className="text-xs uppercase tracking-wider font-semibold text-[THEME.colors.teal]"
               >
                 Important Notes
               </span>
@@ -159,7 +160,7 @@ export default function LPOAPage() {
                 'The LPOA document must be stored in the client file and Transition Tracker',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
-                  <span className="text-[#3B5A69]">•</span>
+                  <span className="text-[THEME.colors.teal]">•</span>
                   <span>{item}</span>
                 </li>
               ))}

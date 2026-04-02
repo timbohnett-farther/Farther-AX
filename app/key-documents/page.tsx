@@ -1,6 +1,7 @@
 'use client';
 
 import PageLayout from '@/components/PageLayout';
+import { THEME } from '@/lib/theme';
 
 export default function KeyDocumentsPage() {
 
@@ -83,8 +84,8 @@ export default function KeyDocumentsPage() {
   ];
 
   const getCellStyle = (val: string) => {
-    if (val === '✓') return 'bg-[#3B5A69] text-white';
-    if (val === 'C') return 'bg-[#B68A4C] text-white';
+    if (val === '✓') return 'bg-[THEME.colors.teal] text-white';
+    if (val === 'C') return 'bg-[THEME.colors.gold] text-white';
     return 'bg-[var(--color-border)] text-[var(--color-text-secondary)]';
   };
 
@@ -109,7 +110,7 @@ export default function KeyDocumentsPage() {
         {/* Matrix Table */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold mb-8 font-serif text-[var(--color-text)]">
-            Document Applicability <span className="text-[#B68A4C]">Matrix</span>
+            Document Applicability <span className="text-[THEME.colors.gold]">Matrix</span>
           </h2>
 
           <div className="rounded-xl overflow-x-auto border border-[var(--color-border)]">
@@ -137,7 +138,7 @@ export default function KeyDocumentsPage() {
                   >
                     <td className="px-6 py-4 text-[var(--color-text)] border-b border-[var(--color-border)]">
                       <div>
-                        <div className="font-semibold text-[#B68A4C]">{doc.code}</div>
+                        <div className="font-semibold text-[THEME.colors.gold]">{doc.code}</div>
                         <div className="text-xs text-[var(--color-text-secondary)] mt-0.5">{doc.name}</div>
                       </div>
                     </td>
@@ -160,7 +161,7 @@ export default function KeyDocumentsPage() {
           {/* Legend */}
           <div className="flex items-center gap-6 mt-6 text-xs">
             <div className="flex items-center gap-2">
-              <span className="inline-block w-6 h-6 rounded-full bg-[#3B5A69] text-white flex items-center justify-center font-bold">✓</span>
+              <span className="inline-block w-6 h-6 rounded-full bg-[THEME.colors.teal] text-white flex items-center justify-center font-bold">✓</span>
               <span className="text-[var(--color-text-secondary)]">Required</span>
             </div>
             <div className="flex items-center gap-2">
@@ -168,7 +169,7 @@ export default function KeyDocumentsPage() {
               <span className="text-[var(--color-text-secondary)]">Not Applicable</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="inline-block w-6 h-6 rounded-full bg-[#B68A4C] text-white flex items-center justify-center font-bold">C</span>
+              <span className="inline-block w-6 h-6 rounded-full bg-[THEME.colors.gold] text-white flex items-center justify-center font-bold">C</span>
               <span className="text-[var(--color-text-secondary)]">Conditional</span>
             </div>
           </div>
@@ -177,7 +178,7 @@ export default function KeyDocumentsPage() {
         {/* Definitions */}
         <div>
           <h2 className="text-3xl font-bold mb-8 font-serif text-[var(--color-text)]">
-            Document <span className="text-[#B68A4C]">Definitions</span>
+            Document <span className="text-[THEME.colors.gold]">Definitions</span>
           </h2>
 
           <div className="space-y-6">
@@ -187,11 +188,11 @@ export default function KeyDocumentsPage() {
                 className="rounded-xl p-6 bg-[var(--color-surface)] border border-[var(--color-border)]"
               >
                 <div className="flex items-start gap-3 mb-3">
-                  <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#B68A4C] text-white">
+                  <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[THEME.colors.gold] text-white">
                     {def.code}
                   </span>
                   <h3 className="text-lg font-bold font-serif text-[var(--color-text)]">
-                    <span className="text-[#B68A4C]">{def.code}</span> — {def.title}
+                    <span className="text-[THEME.colors.gold]">{def.code}</span> — {def.title}
                   </h3>
                 </div>
                 <p className="text-sm leading-relaxed mb-4 text-[var(--color-text)]">{def.body}</p>

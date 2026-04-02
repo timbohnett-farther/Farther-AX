@@ -1,6 +1,7 @@
 'use client';
 
 import PageLayout from "@/components/PageLayout";
+import { THEME } from '@/lib/theme';
 import QuizSection from "@/components/QuizSection";
 export default function BreakawayProcessPage() {
 
@@ -78,8 +79,8 @@ export default function BreakawayProcessPage() {
                 <div
                   className="px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase text-white"
                   style={{
-                    backgroundColor: '#3B5A69',
-                    boxShadow: `0 0 10px ${'#3B5A69'}50`
+                    backgroundColor: THEME.colors.teal,
+                    boxShadow: `0 0 10px ${THEME.colors.teal}50`
                   }}
                 >
                   {phase.phase}
@@ -93,7 +94,7 @@ export default function BreakawayProcessPage() {
                   className="text-sm px-2 py-0.5 border rounded-full"
                   style={{
                     borderColor: 'var(--color-border)',
-                    boxShadow: `0 0 6px ${'#3B5A69'}25`
+                    boxShadow: `0 0 6px ${THEME.colors.teal}25`
                   }}
                 >
                   {phase.duration}
@@ -105,7 +106,7 @@ export default function BreakawayProcessPage() {
                 className="rounded-lg border overflow-hidden transition-all duration-200"
                 style={{
                   borderColor: 'var(--color-border)',
-                  boxShadow: `0 0 16px ${'#3B5A69'}25`
+                  boxShadow: `0 0 16px ${THEME.colors.teal}25`
                 }}
               >
                 <table className="w-full text-sm">
@@ -172,7 +173,7 @@ export default function BreakawayProcessPage() {
                           <span
                             className="px-2 py-0.5 text-xs font-semibold rounded-full"
                             style={{
-                              boxShadow: `0 0 6px ${'#3B5A69'}33`
+                              boxShadow: `0 0 6px ${THEME.colors.teal}33`
                             }}
                           >
                             {item.owner}

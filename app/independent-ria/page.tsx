@@ -1,6 +1,7 @@
 'use client';
 
 import PageLayout from '@/components/PageLayout';
+import { THEME } from '@/lib/theme';
 export default function IndependentRIAPage() {
 
   return (
@@ -27,14 +28,14 @@ export default function IndependentRIAPage() {
         <div
           className="rounded-xl p-8 mb-12"
           style={{
-            border: `1px solid ${'#3B5A69'}`,
-            borderLeft: `4px solid ${'#3B5A69'}`,
+            border: `1px solid ${THEME.colors.teal}`,
+            borderLeft: `4px solid ${THEME.colors.teal}`,
           }}
         >
           <div className="flex items-center gap-2 mb-4">
             <span className="text-xl">ℹ️</span>
             <span
-              className="text-xs uppercase tracking-wider font-bold text-[#3B5A69]"
+              className="text-xs uppercase tracking-wider font-bold text-[THEME.colors.teal]"
             >
               90-Day Regulatory Deadline
             </span>
@@ -60,7 +61,7 @@ export default function IndependentRIAPage() {
               <div className="flex items-center gap-3 mb-4">
                 <div
                   className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: '#B68A4C' }}
+                  style={{ backgroundColor: THEME.colors.gold }}
                 />
                 <h3 className="text-lg font-bold text-[var(--color-text)]">
                   Dual Registration States
@@ -79,7 +80,7 @@ export default function IndependentRIAPage() {
               <div className="flex items-center gap-3 mb-4">
                 <div
                   className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: '#3B5A69' }}
+                  style={{ backgroundColor: THEME.colors.teal }}
                 />
                 <h3 className="text-lg font-bold text-[var(--color-text)]">
                   Non-Dual Registration States
@@ -108,7 +109,7 @@ export default function IndependentRIAPage() {
               'Master Merge is rare but possible depending on prior custodian arrangements',
             ].map((item) => (
               <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
-                <span className="text-[#3B5A69]">•</span>
+                <span className="text-[THEME.colors.teal]">•</span>
                 <span>{item}</span>
               </li>
             ))}

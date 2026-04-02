@@ -1,6 +1,7 @@
 'use client';
 
 import PageLayout from '@/components/PageLayout';
+import { THEME } from '@/lib/theme';
 export default function MAPage() {
 
   const phases = [
@@ -60,7 +61,7 @@ export default function MAPage() {
           }}
         >
           <h2 className="text-2xl font-bold mb-4 text-[var(--color-text)]">
-            Why This Matters at <span className="text-[#3B5A69]">Farther</span>
+            Why This Matters at <span className="text-[THEME.colors.teal]">Farther</span>
           </h2>
           <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
             Farther's growth strategy is built on combining top-tier advisor talent with proprietary
@@ -77,7 +78,7 @@ export default function MAPage() {
           <div className="flex items-center gap-3 mb-6">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-              style={{ backgroundColor: '#3B5A69', color: '#FFFFFF' }}
+              style={{ backgroundColor: THEME.colors.teal, color: '#FFFFFF' }}
             >
               1
             </div>
@@ -104,7 +105,7 @@ export default function MAPage() {
                 <div className="flex items-center gap-3 mb-3">
                   <div
                     className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-                    style={{ backgroundColor: '#3B5A69', color: '#FFFFFF' }}
+                    style={{ backgroundColor: THEME.colors.teal, color: '#FFFFFF' }}
                   >
                     {p.num}
                   </div>
@@ -112,7 +113,7 @@ export default function MAPage() {
                     {p.name}
                   </h4>
                 </div>
-                <p className="text-xs uppercase tracking-wider mb-2" style={{ color: '#B68A4C' }}>
+                <p className="text-xs uppercase tracking-wider mb-2" style={{ color: THEME.colors.gold }}>
                   {p.lead}
                 </p>
                 <p className="text-xs leading-relaxed text-[var(--color-text-secondary)]">
@@ -126,8 +127,8 @@ export default function MAPage() {
             className="rounded-xl p-6"
             style={{
               backgroundColor: 'var(--color-surface)',
-              border: `1px solid ${'#3B5A69'}`,
-              borderLeft: `4px solid ${'#3B5A69'}`,
+              border: `1px solid ${THEME.colors.teal}`,
+              borderLeft: `4px solid ${THEME.colors.teal}`,
             }}
           >
             <p className="text-sm leading-relaxed text-[var(--color-text)]">
@@ -143,7 +144,7 @@ export default function MAPage() {
           <div className="flex items-center gap-3 mb-6">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-              style={{ backgroundColor: '#3B5A69', color: '#FFFFFF' }}
+              style={{ backgroundColor: THEME.colors.teal, color: '#FFFFFF' }}
             >
               2
             </div>
@@ -177,7 +178,7 @@ export default function MAPage() {
                   
                 }}
               >
-                <p className="text-xl font-bold mb-1 text-[#3B5A69]">
+                <p className="text-xl font-bold mb-1 text-[THEME.colors.teal]">
                   {s.label}
                 </p>
                 <p className="text-xs leading-relaxed text-[var(--color-text-secondary)]">
@@ -191,12 +192,12 @@ export default function MAPage() {
             className="rounded-xl p-6"
             style={{
               backgroundColor: 'var(--color-surface)',
-              border: `1px solid ${'#B68A4C'}`,
-              borderLeft: `4px solid ${'#B68A4C'}`,
+              border: `1px solid ${THEME.colors.gold}`,
+              borderLeft: `4px solid ${THEME.colors.gold}`,
             }}
           >
             <p className="text-sm leading-relaxed text-[var(--color-text)]">
-              <strong style={{ color: '#B68A4C' }}>Onboarding team takeaway:</strong> A delayed technology migration,
+              <strong style={{ color: THEME.colors.gold }}>Onboarding team takeaway:</strong> A delayed technology migration,
               a poor client communication rollout, or a rocky first 90 days can directly reduce earnout payments —
               and damage Farther's reputation as an acquirer.
             </p>
@@ -208,7 +209,7 @@ export default function MAPage() {
           <div className="flex items-center gap-3 mb-6">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-              style={{ backgroundColor: '#3B5A69', color: '#FFFFFF' }}
+              style={{ backgroundColor: THEME.colors.teal, color: '#FFFFFF' }}
             >
               3
             </div>
@@ -235,7 +236,7 @@ export default function MAPage() {
                 <div className="flex flex-col items-center shrink-0">
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-                    style={{ backgroundColor: '#3B5A69', color: '#FFFFFF' }}
+                    style={{ backgroundColor: THEME.colors.teal, color: '#FFFFFF' }}
                   >
                     {i + 1}
                   </div>
@@ -250,7 +251,7 @@ export default function MAPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <span
                       className="text-xs font-bold uppercase px-3 py-1 rounded-full"
-                      style={{ backgroundColor: '#3B5A69', color: '#FFFFFF' }}
+                      style={{ backgroundColor: THEME.colors.teal, color: '#FFFFFF' }}
                     >
                       {step.days}
                     </span>
@@ -270,12 +271,12 @@ export default function MAPage() {
             className="rounded-xl p-6"
             style={{
               backgroundColor: 'var(--color-surface)',
-              border: `1px solid ${'#B68A4C'}`,
-              borderLeft: `4px solid ${'#B68A4C'}`,
+              border: `1px solid ${THEME.colors.gold}`,
+              borderLeft: `4px solid ${THEME.colors.gold}`,
             }}
           >
             <p className="text-sm leading-relaxed text-[var(--color-text)]">
-              <strong style={{ color: '#B68A4C' }}>Slow onboarding is not an operational nuisance</strong> —
+              <strong style={{ color: THEME.colors.gold }}>Slow onboarding is not an operational nuisance</strong> —
               it is a compliance failure vector.
             </p>
           </div>
@@ -286,7 +287,7 @@ export default function MAPage() {
           <div className="flex items-center gap-3 mb-6">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-              style={{ backgroundColor: '#3B5A69', color: '#FFFFFF' }}
+              style={{ backgroundColor: THEME.colors.teal, color: '#FFFFFF' }}
             >
               4
             </div>
@@ -309,7 +310,7 @@ export default function MAPage() {
                   
                 }}
               >
-                <p className="text-2xl font-bold mb-2 text-[#3B5A69]">
+                <p className="text-2xl font-bold mb-2 text-[THEME.colors.teal]">
                   {s.value}
                 </p>
                 <p className="text-xs uppercase tracking-wide text-[var(--color-text-secondary)]">
@@ -330,7 +331,7 @@ export default function MAPage() {
               'Get clients into Farther\'s service rhythm (reviews, communications, events) as fast as possible',
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[var(--color-text)]">
-                <span className="text-[#3B5A69]">•</span>
+                <span className="text-[THEME.colors.teal]">•</span>
                 <span>{item}</span>
               </li>
             ))}
@@ -340,8 +341,8 @@ export default function MAPage() {
             className="rounded-xl p-6"
             style={{
               backgroundColor: 'var(--color-surface)',
-              border: `1px solid ${'#3B5A69'}`,
-              borderLeft: `4px solid ${'#3B5A69'}`,
+              border: `1px solid ${THEME.colors.teal}`,
+              borderLeft: `4px solid ${THEME.colors.teal}`,
             }}
           >
             <p className="text-sm leading-relaxed text-[var(--color-text)]">
@@ -356,7 +357,7 @@ export default function MAPage() {
           <div className="flex items-center gap-3 mb-6">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-              style={{ backgroundColor: '#3B5A69', color: '#FFFFFF' }}
+              style={{ backgroundColor: THEME.colors.teal, color: '#FFFFFF' }}
             >
               5
             </div>
@@ -399,7 +400,7 @@ export default function MAPage() {
           <div className="flex items-center gap-3 mb-6">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-              style={{ backgroundColor: '#3B5A69', color: '#FFFFFF' }}
+              style={{ backgroundColor: THEME.colors.teal, color: '#FFFFFF' }}
             >
               6
             </div>
@@ -445,7 +446,7 @@ export default function MAPage() {
                 <ul className="space-y-3">
                   {section.items.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-xs leading-relaxed text-[var(--color-text-secondary)]">
-                      <span style={{ color: '#B68A4C' }}>•</span>
+                      <span style={{ color: THEME.colors.gold }}>•</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -472,7 +473,7 @@ export default function MAPage() {
               >
                 <span
                   className="text-xs font-bold uppercase px-3 py-1 rounded-full"
-                  style={{ backgroundColor: '#3B5A69', color: '#FFFFFF' }}
+                  style={{ backgroundColor: THEME.colors.teal, color: '#FFFFFF' }}
                 >
                   {g.term}
                 </span>
@@ -492,20 +493,20 @@ export default function MAPage() {
             
           }}
         >
-          <p className="text-xs uppercase tracking-wider font-semibold mb-3" style={{ color: '#B68A4C' }}>
+          <p className="text-xs uppercase tracking-wider font-semibold mb-3" style={{ color: THEME.colors.gold }}>
             The Onboarding Team's North Star
           </p>
           <p className="text-lg leading-relaxed mb-4 text-[var(--color-text)]">
             Making the transition so seamless for clients and advisors that they never question
-            their decision to be part of <span className="text-[#3B5A69]">Farther</span>.
+            their decision to be part of <span className="text-[THEME.colors.teal]">Farther</span>.
           </p>
           <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
             That means compliance documentation that holds up under exam scrutiny, technology that works from
             Day 1, communication that is personal and proactive, and a culture introduction that makes advisors
             feel they've upgraded — not just changed firms.
           </p>
-          <div className="mt-6 h-px w-24 mx-auto" style={{ backgroundColor: '#3B5A69' }} />
-          <p className="mt-4 text-xs font-medium text-[#3B5A69]">
+          <div className="mt-6 h-px w-24 mx-auto" style={{ backgroundColor: THEME.colors.teal }} />
+          <p className="mt-4 text-xs font-medium text-[THEME.colors.teal]">
             The deals are won in due diligence. The value is created — or destroyed — in onboarding.
           </p>
         </div>
