@@ -188,6 +188,157 @@ export default function BreakawayProcessPage() {
           ))}
         </div>
 
+        {/* Day One Activation Checklist */}
+        <div className="mt-16">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold mb-3 font-serif text-[var(--color-text)]">
+              Day One <span style={{ color: THEME.colors.gold }}>Activation Checklist</span>
+            </h2>
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              Technology activation items to be completed on the advisor&apos;s first official day with Farther. AXA owns coordination; advisor completes activation.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              { system: 'Google Workspace', items: ['Email account created and active', 'Calendar access configured', 'Google Drive folder structure created', 'Shared team drives access granted'] },
+              { system: 'HubSpot CRM', items: ['User account provisioned', 'Contact and pipeline access configured', 'Training on household/contact views', 'Mobile app installed and configured'] },
+              { system: 'Zoom & Zoom Phone', items: ['Meeting host license activated', 'Personal Meeting ID configured', 'Phone number assigned and forwarded', 'Desktop and mobile apps installed'] },
+              { system: 'Scheduling & Communication', items: ['Calendly/scheduling tool configured', 'Chrome extension installed', 'Email signature template applied', 'Voicemail greeting recorded'] },
+            ].map((group, i) => (
+              <div
+                key={i}
+                className="rounded-xl p-6 bg-[var(--color-surface)] border border-[var(--color-border)]"
+              >
+                <h3 className="text-base font-bold mb-4 text-[var(--color-text)]" style={{ color: THEME.colors.teal }}>
+                  {group.system}
+                </h3>
+                <ul className="space-y-2">
+                  {group.items.map((item, j) => (
+                    <li key={j} className="flex items-start gap-2 text-sm text-[var(--color-text)]">
+                      <span className="text-xs mt-0.5" style={{ color: THEME.colors.teal }}>✓</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* First Week Technology Setup */}
+        <div className="mt-16">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold mb-3 font-serif text-[var(--color-text)]">
+              First Week <span style={{ color: THEME.colors.gold }}>Technology Setup</span>
+            </h2>
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              Additional platforms and tools to be configured during the first week. Advisor completes setup with AXA support as needed.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              { category: 'Financial Operations', items: ['Ramp (corporate card)', 'Navan (travel & expense)'] },
+              { category: 'Planning & Analysis', items: ['RightCapital (financial planning)', 'AdvicePay (billing platform)', 'Pontera (held-away account management)', 'SmartRIA (risk assessment)'] },
+              { category: 'Client Communication', items: ['AI note-taker (meeting transcription)', 'DocuSign (automated envelope workflow)', '"Welcome to Farther" email templates', 'Client portal access setup'] },
+            ].map((section, i) => (
+              <div
+                key={i}
+                className="rounded-xl p-6 bg-[var(--color-surface)] border border-[var(--color-border)]"
+              >
+                <h3 className="text-base font-bold mb-3 text-[var(--color-text)]">
+                  {section.category}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {section.items.map((item, j) => (
+                    <span
+                      key={j}
+                      className="px-3 py-1.5 rounded-full text-xs font-medium border"
+                      style={{
+                        backgroundColor: THEME.colors.teal + '1A',
+                        borderColor: THEME.colors.teal + '4D',
+                        color: THEME.colors.teal,
+                      }}
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 rounded-lg p-4 border" style={{ borderColor: THEME.colors.gold + '4D', backgroundColor: THEME.colors.gold + '0D' }}>
+            <p className="text-sm text-[var(--color-text)]">
+              <strong style={{ color: THEME.colors.gold }}>Timeline:</strong> All technology platforms should be fully configured and accessible by end of Week 1. AXA schedules 30-minute setup sessions for each platform as needed.
+            </p>
+          </div>
+        </div>
+
+        {/* First Month Department Meetings */}
+        <div className="mt-16 mb-8">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold mb-3 font-serif text-[var(--color-text)]">
+              First Month <span style={{ color: THEME.colors.gold }}>Department Meetings</span>
+            </h2>
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              10 introduction meetings scheduled throughout the first month to connect advisors with key Farther departments. AXM coordinates scheduling; each meeting is 30 minutes.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              { dept: 'RIA Leadership', topics: ['Farther RIA structure and governance', 'Strategic priorities and vision', 'Leadership team introductions'] },
+              { dept: 'Planning', topics: ['Financial planning philosophy', 'RightCapital workflows', 'Planning deliverables and cadence'] },
+              { dept: 'Investment Strategy', topics: ['Investment philosophy and process', 'Model portfolios overview', 'Rebalancing and tax-loss harvesting'] },
+              { dept: 'FAM (Financial Advisor Marketing)', topics: ['Marketing support and resources', 'Social media guidelines', 'Event planning and sponsorship'] },
+              { dept: 'Trust & Estate', topics: ['Estate planning services', 'Trust administration', 'Referral process for complex cases'] },
+              { dept: 'Farther Institutional', topics: ['Institutional client services', 'Corporate retirement plans (401k)', 'Group benefits and executive compensation'] },
+              { dept: 'Client Experience (CX)', topics: ['Client service model and expectations', 'Service tier definitions', 'CX team workflows and escalation'] },
+              { dept: 'Insurance & Annuities', topics: ['Insurance product offerings', 'Annuity solutions', 'Underwriting and carrier relationships'] },
+              { dept: '401k / Pontera', topics: ['401k plan management', 'Pontera platform for held-away accounts', 'Rollover coordination'] },
+              { dept: 'Marketing', topics: ['Brand guidelines and logo usage', 'Content creation and approval process', 'Marketing collateral library'] },
+            ].map((meeting, i) => (
+              <div
+                key={i}
+                className="rounded-xl p-5 bg-[var(--color-surface)] border border-[var(--color-border)]"
+              >
+                <div className="flex items-start gap-3 mb-3">
+                  <span
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold"
+                    style={{
+                      backgroundColor: THEME.colors.teal + '26',
+                      border: `1px solid ${THEME.colors.teal}4D`,
+                      color: THEME.colors.teal,
+                      fontFamily: "'DM Mono', monospace",
+                    }}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <h3 className="text-base font-bold text-[var(--color-text)] mt-0.5">
+                    {meeting.dept}
+                  </h3>
+                </div>
+                <ul className="ml-11 space-y-1.5">
+                  {meeting.topics.map((topic, j) => (
+                    <li key={j} className="flex items-start gap-2 text-xs text-[var(--color-text-secondary)]">
+                      <span style={{ color: THEME.colors.teal }}>•</span>
+                      <span>{topic}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 rounded-lg p-4 border" style={{ borderColor: THEME.colors.gold + '4D', backgroundColor: THEME.colors.gold + '0D' }}>
+            <p className="text-sm text-[var(--color-text)]">
+              <strong style={{ color: THEME.colors.gold }}>Scheduling:</strong> AXM books all 10 meetings within the first 30 days. Meetings can be grouped (2-3 per week) to avoid overwhelming the advisor&apos;s calendar during the busy launch period.
+            </p>
+          </div>
+        </div>
+
         <QuizSection topicSlug="breakaway-process" topicTitle="Breakaway Process" />
       </div>
     </PageLayout>
