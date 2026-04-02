@@ -114,7 +114,7 @@ export default function KnowledgeCheckPage() {
           >
             <div
               className="h-full rounded-full transition-all duration-500"
-              style={{ width: `${completionPct}%`, backgroundColor: '#3B5A69' }}
+              style={{ width: `${completionPct}%`, backgroundColor: THEME.colors.teal }}
             />
           </div>
           <p
@@ -182,7 +182,7 @@ export default function KnowledgeCheckPage() {
                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold"
                       style={{
                         backgroundColor: 'var(--color-surface-subtle)',
-                        color: '#3B5A69',
+                        color: THEME.colors.teal,
                         fontFamily: THEME.typography.fontFamily.mono,
                       }}
                     >
@@ -243,9 +243,9 @@ export default function KnowledgeCheckPage() {
                           href={topic.href}
                           className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-medium transition-colors"
                           style={{
-                            backgroundColor: '#3B5A69' + '26',
-                            border: `1px solid ${'#3B5A69'}4D`,
-                            color: '#3B5A69',
+                            backgroundColor: THEME.colors.teal + '26',
+                            border: `1px solid ${THEME.colors.teal}4D`,
+                            color: THEME.colors.teal,
                           }}
                         >
                           {attemptsUsed > 0 ? "Retake" : "Take Quiz"} →

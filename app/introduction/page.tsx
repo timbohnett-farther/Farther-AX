@@ -38,7 +38,7 @@ export default function IntroductionPage() {
           <h2
             className="text-3xl font-bold mb-8 text-center text-[var(--color-text)]"
           >
-            The Four Advisor <span style={{ color: '#B68A4C' }}>Onboarding Paths</span>
+            The Four Advisor <span style={{ color: THEME.colors.gold }}>Onboarding Paths</span>
           </h2>
           <p className="text-center mb-12 text-[var(--color-text-secondary)]">
             Every advisor follows one of four distinct paths based on their background and book of business.
@@ -56,14 +56,14 @@ export default function IntroductionPage() {
               <div className="flex items-start justify-between mb-4">
                 <span
                   className="text-5xl font-bold opacity-20"
-                  style={{ color: '#B68A4C' }}
+                  style={{ color: THEME.colors.gold }}
                 >
                   01
                 </span>
                 <span
                   className="text-xs uppercase tracking-wider px-3 py-1 rounded-full"
                   style={{
-                    backgroundColor: '#B68A4C',
+                    backgroundColor: THEME.colors.gold,
                     color: '#FFFFFF',
                   }}
                 >
@@ -94,14 +94,14 @@ export default function IntroductionPage() {
               <div className="flex items-start justify-between mb-4">
                 <span
                   className="text-5xl font-bold opacity-20"
-                  style={{ color: '#B68A4C' }}
+                  style={{ color: THEME.colors.gold }}
                 >
                   02
                 </span>
                 <span
                   className="text-xs uppercase tracking-wider px-3 py-1 rounded-full"
                   style={{
-                    backgroundColor: '#3B5A69',
+                    backgroundColor: THEME.colors.teal,
                     color: '#FFFFFF',
                   }}
                 >
@@ -132,7 +132,7 @@ export default function IntroductionPage() {
               <div className="flex items-start justify-between mb-4">
                 <span
                   className="text-5xl font-bold opacity-20"
-                  style={{ color: '#B68A4C' }}
+                  style={{ color: THEME.colors.gold }}
                 >
                   03
                 </span>
@@ -170,14 +170,14 @@ export default function IntroductionPage() {
               <div className="flex items-start justify-between mb-4">
                 <span
                   className="text-5xl font-bold opacity-20"
-                  style={{ color: '#B68A4C' }}
+                  style={{ color: THEME.colors.gold }}
                 >
                   04
                 </span>
                 <span
                   className="text-xs uppercase tracking-wider px-3 py-1 rounded-full"
                   style={{
-                    backgroundColor: '#B68A4C',
+                    backgroundColor: THEME.colors.gold,
                     color: '#FFFFFF',
                   }}
                 >
@@ -204,7 +204,7 @@ export default function IntroductionPage() {
           <h2
             className="text-3xl font-bold mb-8 text-center text-[var(--color-text)]"
           >
-            The Three <span style={{ color: '#B68A4C' }}>Transition Methods</span>
+            The Three <span style={{ color: THEME.colors.gold }}>Transition Methods</span>
           </h2>
           <p className="text-center mb-12 text-[var(--color-text-secondary)]">
             After an advisor joins, client assets must transition to Farther's custodians via one of three methods.
@@ -223,7 +223,7 @@ export default function IntroductionPage() {
                 <span
                   className="text-xs uppercase tracking-wider px-4 py-2 rounded-full shrink-0"
                   style={{
-                    backgroundColor: '#B68A4C',
+                    backgroundColor: THEME.colors.gold,
                     color: '#FFFFFF',
                   }}
                 >
@@ -257,7 +257,7 @@ export default function IntroductionPage() {
                 <span
                   className="text-xs uppercase tracking-wider px-4 py-2 rounded-full shrink-0"
                   style={{
-                    backgroundColor: '#B68A4C',
+                    backgroundColor: THEME.colors.gold,
                     color: '#FFFFFF',
                   }}
                 >
@@ -291,7 +291,7 @@ export default function IntroductionPage() {
                 <span
                   className="text-xs uppercase tracking-wider px-4 py-2 rounded-full shrink-0"
                   style={{
-                    backgroundColor: '#B68A4C',
+                    backgroundColor: THEME.colors.gold,
                     color: '#FFFFFF',
                   }}
                 >
@@ -324,7 +324,7 @@ export default function IntroductionPage() {
           }}
         >
           <h2 className="text-2xl font-bold mb-4 text-[var(--color-text)]">
-            How to Use <span style={{ color: '#B68A4C' }}>This Playbook</span>
+            How to Use <span style={{ color: THEME.colors.gold }}>This Playbook</span>
           </h2>
           <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
             Use the navigation on the left to move through each section of this playbook. The step
