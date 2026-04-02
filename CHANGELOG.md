@@ -6,6 +6,34 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Design Token Migration for Training Pages — 2026-04-02
+
+**What**: Migrated all 11 training/playbook pages from hardcoded colors to THEME design tokens
+
+**Scope**:
+- Replaced 103 hardcoded color values (#B68A4C → THEME.colors.gold, #3B5A69 → THEME.colors.teal)
+- Added THEME import to 9 pages that were missing it
+- All brand colors now use design system tokens for consistency
+
+**Status**: ✅ Completed (commits `2e60eae`, `e6c019b`)
+
+**Files**:
+- `app/introduction/page.tsx` (18 replacements)
+- `app/knowledge-check/page.tsx` (5 replacements)
+- `app/breakaway/page.tsx` (5 replacements)
+- `app/breakaway-process/page.tsx` (5 replacements)
+- `app/calendar-generator/page.tsx`
+- `app/independent-ria/page.tsx` (6 replacements)
+- `app/key-documents/page.tsx` (9 replacements)
+- `app/lpoa/page.tsx` (5 replacements)
+- `app/ma/page.tsx` (30 replacements)
+- `app/no-to-low-aum/page.tsx` (7 replacements)
+- `app/onboarding-vs-transitions/page.tsx` (18 replacements)
+
+**Impact**: Improved brand consistency across all training pages. Colors now centrally managed through design tokens, making future theme changes easier.
+
+---
+
 ## [Completed] Advisor Tasks Tab in Advisor Hub — 2026-04-02
 
 **What**: Added new "Advisor Tasks" tab to Advisor Hub for displaying and managing tasks assigned to advisors
