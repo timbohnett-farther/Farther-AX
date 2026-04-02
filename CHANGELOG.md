@@ -6,6 +6,28 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Tabular Nums for Financial Displays — 2026-04-02
+
+**What**: Added tabular-nums font variant to all financial number displays across command center
+
+**Scope**:
+- Added `fontVariantNumeric: 'tabular-nums'` to 35+ inline styles displaying financial numbers
+- Ensures proper vertical alignment of numbers in tables and dashboards
+- Improves readability of AUM, revenue, and metric displays
+
+**Status**: ✅ Completed (commit `b7de5e7`)
+
+**Files**:
+- `app/command-center/page.tsx` (24 additions)
+- `app/command-center/advisor-hub/page.tsx` (multiple additions)
+- `app/command-center/advisor/[id]/page.tsx` (9 additions)
+- `app/command-center/transitions/page.tsx` (2 additions)
+- `app/command-center/metrics/page.tsx`
+
+**Impact**: All financial numbers now display with proper tabular alignment, improving dashboard readability and professional appearance.
+
+---
+
 ## [Completed] Design Token Migration for Training Pages — 2026-04-02
 
 **What**: Migrated all 11 training/playbook pages from hardcoded colors to THEME design tokens
