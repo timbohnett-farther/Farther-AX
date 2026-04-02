@@ -37,9 +37,9 @@ export async function POST(request: Request) {
     const result = await syncAllAdvisors();
 
     return NextResponse.json({
+      ...result,
       success: true,
       timestamp: new Date().toISOString(),
-      ...result,
     });
   } catch (error) {
     console.error('[Sync API] Sync failed:', error);

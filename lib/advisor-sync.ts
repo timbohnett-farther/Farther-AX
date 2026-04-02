@@ -63,7 +63,7 @@ async function fetchAllAdvisorsFromHubSpot(): Promise<HubSpotAdvisor[]> {
   do {
     const url = new URL('https://api.hubapi.com/crm/v3/objects/contacts/search');
 
-    const requestBody = {
+    const requestBody: any = {
       filterGroups: [
         {
           filters: [

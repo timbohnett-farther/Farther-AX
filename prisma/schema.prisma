@@ -206,6 +206,12 @@ model TransitionClient {
   welcome_gift_box                String?
   notes                           String?  @db.Text
 
+  // Data Quality Tracking (Phase 1)
+  data_quality                    Json?     // Field-level quality metadata
+  completeness_pct                Float?    // 0-100 percentage of non-null fields
+  critical_fields_ok              Boolean   @default(false) // All 3 critical fields present
+  quality_alerts                  String?   @db.Text // JSON array of alert objects
+
   // Sync Metadata
   synced_at                       DateTime  @default(now())
   created_at                      DateTime  @default(now())
@@ -222,6 +228,8 @@ model TransitionClient {
   @@index([primary_email])
   @@index([docusign_iaa_status])
   @@index([docusign_paperwork_status])
+  @@index([completeness_pct])
+  @@index([critical_fields_ok])
   @@index([synced_at])
   @@map("transition_clients")
 }
@@ -244,12 +252,20 @@ model TransitionWorkbook {
   drive_modified_time     DateTime?
   last_synced_at          DateTime  @default(now())
 
+  // Import Quality Tracking (Phase 1)
+  import_metadata         Json?     // Workbook-level import stats
+  data_quality_score      Float?    // 0-100 average completeness of all rows
+  critical_rows_ok        Int       @default(0) // Count of rows with all critical fields
+  total_rows              Int       @default(0)
+  last_import_errors      String?   @db.Text // JSON array of import errors
+
   // Metadata
   created_at              DateTime  @default(now())
   updated_at              DateTime  @updatedAt
 
   @@index([sheet_id])
   @@index([assigned_advisor_name])
+  @@index([data_quality_score])
   @@index([last_synced_at])
   @@map("transition_workbooks")
 }

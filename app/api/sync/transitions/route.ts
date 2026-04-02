@@ -36,10 +36,22 @@ export async function POST(request: Request) {
     // Run the sync
     const result = await syncAllTransitions();
 
+    // Enhanced response with quality metrics
     return NextResponse.json({
       success: true,
       timestamp: new Date().toISOString(),
-      ...result,
+      workbooks: result.workbooks.map(wb => ({
+        sheetId: wb.sheetId,
+        workbookName: wb.workbookName,
+        synced: wb.synced,
+        failed: wb.failed || 0,
+        total: wb.total,
+        skipped: wb.skipped || false,
+        quality: wb.quality,
+      })),
+      summary: result.summary,
+      alerts: result.alerts,
+      docusign: result.docusign,
     });
   } catch (error) {
     console.error('[Transitions Sync API] Sync failed:', error);

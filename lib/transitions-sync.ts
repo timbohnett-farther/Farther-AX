@@ -1,5 +1,11 @@
 import { prisma } from '@/lib/prisma';
 import { fetchSheetData, listSheetsInFolder } from '@/lib/google-sheets';
+import {
+  calculateRecordQuality,
+  aggregateWorkbookQuality,
+  type RecordQuality,
+  type WorkbookQuality,
+} from '@/lib/transitions-quality';
 
 interface TransitionRecord {
   farther_contact: string;
@@ -308,8 +314,20 @@ interface WorkbookSyncResult {
   synced: number;
   total: number;
   mappedCount: number;
+  failed?: number; // Count of rows that failed to sync
   skipped?: boolean;
   error?: string;
+  quality?: {
+    data_quality_score: number;
+    critical_rows_ok: number;
+    total_rows: number;
+    completeness_breakdown: {
+      excellent: number;
+      good: number;
+      fair: number;
+      poor: number;
+    };
+  };
 }
 
 async function syncWorkbook(
@@ -318,11 +336,16 @@ async function syncWorkbook(
   range: string,
   teamMappings: Map<string, string>,
 ): Promise<WorkbookSyncResult> {
+  // Fix: Validate workbookName to prevent "workbook_name is not defined" errors
+  const safeWorkbookName = workbookName && workbookName.trim() !== ''
+    ? workbookName
+    : 'Unknown Workbook';
+
   try {
     const allRows = await fetchSheetData(sheetId, range);
 
     if (allRows.length < 2) {
-      return { sheetId, workbookName, detectedAdvisor: null, synced: 0, total: 0, mappedCount: 0 };
+      return { sheetId, workbookName: safeWorkbookName, detectedAdvisor: null, synced: 0, total: 0, mappedCount: 0 };
     }
 
     const headers = allRows[0];
@@ -342,26 +365,29 @@ async function syncWorkbook(
       }
     }
 
-    // Upsert workbook metadata
+    // Upsert workbook metadata with advisor detection
     const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}`;
     await prisma.transitionWorkbook.upsert({
       where: { sheet_id: sheetId },
       update: {
-        workbook_name: workbookName,
+        workbook_name: safeWorkbookName,
         sheet_url: sheetUrl,
         detected_advisor_name: detectedAdvisor,
         last_synced_at: new Date(),
       },
       create: {
         sheet_id: sheetId,
-        workbook_name: workbookName,
+        workbook_name: safeWorkbookName,
         sheet_url: sheetUrl,
         detected_advisor_name: detectedAdvisor,
       },
     });
 
     let synced = 0;
+    let failed = 0;
     let mappedCount = 0;
+    const recordQualities: RecordQuality[] = [];
+    const importErrors: string[] = [];
 
     for (let i = 0; i < dataRows.length; i++) {
       const cells = dataRows[i];
@@ -380,8 +406,14 @@ async function syncWorkbook(
 
       record.advisor_name = mappedAdvisorName ?? record.advisor_name;
 
-      // Upsert transition client
-      await prisma.transitionClient.upsert({
+      // Calculate quality metrics for this record
+      const quality = calculateRecordQuality(record as Record<string, string | null>);
+      recordQualities.push(quality);
+
+      // Graceful error handling: wrap upsert in try-catch so one bad row doesn't fail entire workbook
+      try {
+        // Upsert transition client
+        await prisma.transitionClient.upsert({
         where: {
           sheet_id_sheet_row_index: {
             sheet_id: sheetId,
@@ -389,7 +421,7 @@ async function syncWorkbook(
           },
         },
         update: {
-          workbook_name,
+          workbook_name: safeWorkbookName,
           farther_contact: record.farther_contact || null,
           advisor_name: record.advisor_name || null,
           custodian: record.custodian || null,
@@ -440,12 +472,17 @@ async function syncWorkbook(
           welcome_gift_box: record.welcome_gift_box || null,
           notes: record.notes || null,
           billing_setup: record.billing_setup || null,
+          // Quality tracking
+          data_quality: quality as any,
+          completeness_pct: quality.completeness_pct,
+          critical_fields_ok: quality.critical_fields_ok,
+          quality_alerts: JSON.stringify(quality.alerts),
           synced_at: new Date(),
         },
         create: {
           sheet_id: sheetId,
           sheet_row_index: sheetRowIndex,
-          workbook_name,
+          workbook_name: safeWorkbookName,
           farther_contact: record.farther_contact || null,
           advisor_name: record.advisor_name || null,
           custodian: record.custodian || null,
@@ -496,17 +533,82 @@ async function syncWorkbook(
           welcome_gift_box: record.welcome_gift_box || null,
           notes: record.notes || null,
           billing_setup: record.billing_setup || null,
+          // Quality tracking
+          data_quality: quality as any,
+          completeness_pct: quality.completeness_pct,
+          critical_fields_ok: quality.critical_fields_ok,
+          quality_alerts: JSON.stringify(quality.alerts),
         },
       });
 
-      synced += 1;
+        synced += 1;
+      } catch (rowError) {
+        // Graceful error handling: log error but continue processing other rows
+        const errorMsg = rowError instanceof Error ? rowError.message : String(rowError);
+        console.error(
+          `[transitions-sync] Failed to sync row ${sheetRowIndex} in "${safeWorkbookName}": ${errorMsg}`
+        );
+        importErrors.push(`Row ${sheetRowIndex}: ${errorMsg}`);
+        failed += 1;
+      }
     }
 
-    return { sheetId, workbookName, detectedAdvisor, synced, total: dataRows.length, mappedCount };
+    // Aggregate workbook-level quality metrics
+    const workbookQuality = aggregateWorkbookQuality(recordQualities);
+
+    // Update workbook metadata with quality metrics
+    await prisma.transitionWorkbook.upsert({
+      where: { sheet_id: sheetId },
+      update: {
+        import_metadata: {
+          synced,
+          failed,
+          total: dataRows.length,
+          last_sync: new Date().toISOString(),
+        } as any,
+        data_quality_score: workbookQuality.avg_completeness_pct,
+        critical_rows_ok: workbookQuality.critical_rows_ok,
+        total_rows: workbookQuality.total_rows,
+        last_import_errors: importErrors.length > 0 ? JSON.stringify(importErrors) : null,
+        last_synced_at: new Date(),
+      },
+      create: {
+        sheet_id: sheetId,
+        workbook_name: safeWorkbookName,
+        sheet_url: `https://docs.google.com/spreadsheets/d/${sheetId}`,
+        detected_advisor_name: detectedAdvisor,
+        import_metadata: {
+          synced,
+          failed,
+          total: dataRows.length,
+          last_sync: new Date().toISOString(),
+        } as any,
+        data_quality_score: workbookQuality.avg_completeness_pct,
+        critical_rows_ok: workbookQuality.critical_rows_ok,
+        total_rows: workbookQuality.total_rows,
+        last_import_errors: importErrors.length > 0 ? JSON.stringify(importErrors) : null,
+      },
+    });
+
+    return {
+      sheetId,
+      workbookName: safeWorkbookName,
+      detectedAdvisor,
+      synced,
+      failed,
+      total: dataRows.length,
+      mappedCount,
+      quality: {
+        data_quality_score: workbookQuality.avg_completeness_pct,
+        critical_rows_ok: workbookQuality.critical_rows_ok,
+        total_rows: workbookQuality.total_rows,
+        completeness_breakdown: workbookQuality.completeness_breakdown,
+      },
+    };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`[transitions-sync] Error syncing "${workbookName}" (${sheetId}):`, message);
-    return { sheetId, workbookName, detectedAdvisor: null, synced: 0, total: 0, mappedCount: 0, error: message };
+    console.error(`[transitions-sync] Error syncing "${safeWorkbookName}" (${sheetId}):`, message);
+    return { sheetId, workbookName: safeWorkbookName, detectedAdvisor: null, synced: 0, total: 0, mappedCount: 0, error: message };
   }
 }
 
@@ -520,9 +622,26 @@ export interface TransitionsSyncResult {
     total_synced: number;
     total_rows: number;
     total_mapped: number;
+    total_failed: number;
     skipped: number;
     errors: number;
+    avg_data_quality: number;
+    critical_rows_ok: number;
+    critical_rows_missing: number;
+    completeness_breakdown: {
+      excellent: number;
+      good: number;
+      fair: number;
+      poor: number;
+    };
   };
+  alerts: Array<{
+    severity: 'critical' | 'warning' | 'info';
+    workbook: string;
+    message: string;
+    count: number;
+    remediation?: string;
+  }>;
 }
 
 /**
@@ -586,11 +705,13 @@ export async function syncAllTransitions(): Promise<TransitionsSyncResult> {
       const result = await syncWorkbook(sheet.id, sheet.name, range, teamMappings);
       results.push(result);
 
-      // Update modified time after successful sync
+      // Update drive modified time after successful sync (quality metrics already saved in syncWorkbook)
       if (!result.error && sheet.modifiedTime) {
         await prisma.transitionWorkbook.update({
           where: { sheet_id: sheet.id },
-          data: { drive_modified_time: new Date(sheet.modifiedTime) },
+          data: {
+            drive_modified_time: new Date(sheet.modifiedTime),
+          },
         });
       }
     }
@@ -598,15 +719,70 @@ export async function syncAllTransitions(): Promise<TransitionsSyncResult> {
     // Sync DocuSign statuses for all clients
     const docusignResult = await syncDocuSignStatuses();
 
+    // Aggregate summary metrics
     const totalSynced = results.reduce((sum, r) => sum + r.synced, 0);
+    const totalFailed = results.reduce((sum, r) => sum + (r.failed || 0), 0);
     const totalRows = results.reduce((sum, r) => sum + r.total, 0);
     const totalMapped = results.reduce((sum, r) => sum + r.mappedCount, 0);
     const errors = results.filter(r => r.error).length;
 
+    // Aggregate quality metrics
+    let sumQuality = 0;
+    let qualityCount = 0;
+    let critical_rows_ok = 0;
+    let critical_rows_missing = 0;
+    const completeness_breakdown = {
+      excellent: 0,
+      good: 0,
+      fair: 0,
+      poor: 0,
+    };
+
+    const alertMap = new Map<string, { severity: 'critical' | 'warning' | 'info'; workbook: string; count: number; remediation?: string }>();
+
+    for (const result of results) {
+      if (result.quality) {
+        sumQuality += result.quality.data_quality_score * result.quality.total_rows;
+        qualityCount += result.quality.total_rows;
+        critical_rows_ok += result.quality.critical_rows_ok;
+        critical_rows_missing += (result.quality.total_rows - result.quality.critical_rows_ok);
+
+        completeness_breakdown.excellent += result.quality.completeness_breakdown.excellent;
+        completeness_breakdown.good += result.quality.completeness_breakdown.good;
+        completeness_breakdown.fair += result.quality.completeness_breakdown.fair;
+        completeness_breakdown.poor += result.quality.completeness_breakdown.poor;
+      }
+    }
+
+    const avg_data_quality = qualityCount > 0 ? Math.round((sumQuality / qualityCount) * 10) / 10 : 0;
+
+    // Generate top alerts (placeholder - in real implementation would aggregate from all records)
+    const alerts: Array<{
+      severity: 'critical' | 'warning' | 'info';
+      workbook: string;
+      message: string;
+      count: number;
+      remediation?: string;
+    }> = [];
+
+    // Add summary alert for critical fields
+    if (critical_rows_missing > 0) {
+      alerts.push({
+        severity: 'critical',
+        workbook: 'All Workbooks',
+        message: `${critical_rows_missing} rows missing critical fields (email, household name, or advisor name)`,
+        count: critical_rows_missing,
+        remediation: 'Update Google Sheets to populate required fields',
+      });
+    }
+
     const duration = Date.now() - startTime;
 
     console.log(
-      `[transitions-sync] ✓ Sync complete: ${totalSynced} records synced, ${skippedCount} skipped, ${errors} errors in ${duration}ms`
+      `[transitions-sync] ✓ Sync complete: ${totalSynced} synced, ${totalFailed} failed, ${skippedCount} skipped, ${errors} errors in ${duration}ms`
+    );
+    console.log(
+      `[transitions-sync] ✓ Quality: ${avg_data_quality}% avg completeness, ${critical_rows_ok}/${qualityCount} rows have critical fields`
     );
 
     return {
@@ -615,11 +791,17 @@ export async function syncAllTransitions(): Promise<TransitionsSyncResult> {
       summary: {
         total_workbooks: sheets.length,
         total_synced: totalSynced,
+        total_failed: totalFailed,
         total_rows: totalRows,
         total_mapped: totalMapped,
         skipped: skippedCount,
         errors,
+        avg_data_quality,
+        critical_rows_ok,
+        critical_rows_missing,
+        completeness_breakdown,
       },
+      alerts,
     };
   } catch (error) {
     console.error('[transitions-sync] Sync failed:', error);
