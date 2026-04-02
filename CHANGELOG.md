@@ -6,6 +6,35 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Master Merge & Repaper/ACAT Training Content — 2026-04-02
+
+**What**: Enhanced Master Merge and Repaper/ACAT training pages with comprehensive operational content
+
+**Scope**:
+- **Master Merge Page** (4–6 week transition method):
+  - Added complete overview and eligibility criteria
+  - Step-by-step 4-phase process breakdown (Week 1-6)
+  - Common issues and resolutions (4 scenarios)
+  - Best practices checklist (6 practices)
+  - Fixed hardcoded color to THEME.colors.teal
+- **Repaper/ACAT Page** (8–12 week transition method):
+  - Added complete overview and requirements
+  - Step-by-step 4-phase process breakdown (Week 1-12)
+  - Common ACAT rejections and solutions (6 rejection types)
+  - Client communication strategy (5 milestone templates)
+  - Best practices checklist (8 practices)
+  - Fixed hardcoded color to THEME.colors.teal
+
+**Status**: ✅ Completed (commit `389aace`)
+
+**Files**:
+- `app/master-merge/page.tsx` (803 lines added, stub replaced with full content)
+- `app/repaper-acat/page.tsx` (803 lines added, stub replaced with full content)
+
+**Impact**: AX team now has complete operational guidance for the two most complex transition methods, reducing reliance on tribal knowledge and improving process consistency across onboarding workflows.
+
+---
+
 ## [Completed] Tabular Nums for Financial Displays — 2026-04-02
 
 **What**: Added tabular-nums font variant to all financial number displays across command center

@@ -245,7 +245,7 @@ When you report a fix:
   - [x] P1: Add missing Tailwind color definitions (gold, cream-muted, cream-border, cream-dark)
 
 ### **Task #12: RIA Advisor Onboarding Content & Advisor Task Hub**
-- **Status:** 🟡 In Progress (40% complete)
+- **Status:** 🟡 In Progress (60% complete)
 - **Priority:** High
 - **Description:** Comprehensive update based on new RIA Advisor Onboarding & Client Transition documentation. Review all training pages and advisor hub tasks, then enhance content without creating duplication. Also create an advisor-facing task assignment section in the advisor hub.
 - **Sub-tasks:**
@@ -269,7 +269,9 @@ When you report a fix:
     - 90-day maturity/KPI tracking content
   - [x] **New Roles** — Add missing task owner roles: Trust & Estate, Farther Institutional, Insurance & Annuities, 401k/Pontera ✅ Already completed (4 new roles added to lib/onboarding-tasks-v2.ts)
   - [ ] **Schwab Custodian Positioning** — Add Schwab benefits and custodian positioning content to relevant training pages
-  - [ ] **Master Merge & Repaper/ACAT Pages** — Build out the stub "Coming Soon" pages with actual content
+  - [x] **Master Merge & Repaper/ACAT Pages** — Build out the stub "Coming Soon" pages with actual content ✅ Completed 2026-04-02
+    - Master Merge: Complete 4-6 week process guide with eligibility, 4-phase breakdown, common issues, best practices
+    - Repaper/ACAT: Complete 8-12 week process guide with requirements, 4-phase breakdown, ACAT rejections, client communication strategy, best practices
 
 ---
 
