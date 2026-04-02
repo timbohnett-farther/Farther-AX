@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '@/lib/theme-provider';
 import { getStageColors } from '@/lib/theme';
-import { PHASES, PHASE_ORDER, type Phase } from '@/lib/onboarding-tasks-v2';
+import { PHASES, PHASE_ORDER, TASKS, type Phase } from '@/lib/onboarding-tasks-v2';
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 const SWR_OPTS = {
@@ -98,13 +98,14 @@ function sortByLastName(deals: Deal[]): Deal[] {
 }
 
 // ── Tab definitions ──────────────────────────────────────────────────────────
-type TabKey = 'launch' | 'early' | 'completed' | 'aum';
+type TabKey = 'launch' | 'early' | 'completed' | 'aum' | 'advisor-tasks';
 
 const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'launch', label: 'Launch to Graduation', icon: '▲' },
   { key: 'early', label: 'Early Deals', icon: '◈' },
   { key: 'completed', label: 'Completed Transitions', icon: '✓' },
   { key: 'aum', label: 'AUM Tracker', icon: '◎' },
+  { key: 'advisor-tasks', label: 'Advisor Tasks', icon: '✦' },
 ];
 
 // ── Sentiment Badge Component ────────────────────────────────────────────────
@@ -783,6 +784,179 @@ function ExpandableChecklist({ dealId }: { dealId: string }) {
   );
 }
 
+// ── Advisor Tasks Tab Component ──────────────────────────────────────────────
+function AdvisorTasksTab() {
+  const { THEME } = useTheme();
+  const { data } = useSWR('/api/command-center/pipeline', fetcher, SWR_OPTS);
+  const [selectedAdvisor, setSelectedAdvisor] = useState<string>('all');
+  const [selectedPhase, setSelectedPhase] = useState<Phase | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed'>('all');
+
+  // Get list of launched advisors from deals data
+  const advisors = useMemo(() => {
+    if (!data?.deals) return [];
+    return (data.deals as Deal[])
+      .filter(d => d.dealstage === '100411705') // Launched only
+      .filter(d => !d.dealname?.toLowerCase().includes('test'))
+      .sort((a, b) => (a.dealname ?? '').localeCompare(b.dealname ?? ''));
+  }, [data]);
+
+  // Get tasks from TASKS array that are advisor-visible (owner = 'Advisor')
+  const advisorTasks = useMemo(() => {
+    return TASKS.filter(t => t.owner === 'Advisor');
+  }, []);
+
+  // Filtered tasks
+  const filteredTasks = useMemo(() => {
+    let tasks = advisorTasks;
+    if (selectedPhase !== 'all') {
+      tasks = tasks.filter(t => t.phase === selectedPhase);
+    }
+    return tasks;
+  }, [advisorTasks, selectedPhase]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Filter bar */}
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
+        {/* Advisor filter */}
+        <select
+          value={selectedAdvisor}
+          onChange={e => setSelectedAdvisor(e.target.value)}
+          style={{
+            padding: '8px 12px', borderRadius: 8, border: `1px solid ${'var(--color-border)'}`,
+            fontSize: 12, background: 'var(--color-surface)', color: 'var(--color-text)',
+            cursor: 'pointer', outline: 'none', flex: 1,
+          }}
+        >
+          <option value="all">All Advisors</option>
+          {advisors.map(a => (
+            <option key={a.id} value={a.id}>{a.dealname}</option>
+          ))}
+        </select>
+
+        {/* Phase filter */}
+        <select
+          value={selectedPhase}
+          onChange={e => setSelectedPhase(e.target.value as Phase | 'all')}
+          style={{
+            padding: '8px 12px', borderRadius: 8, border: `1px solid ${'var(--color-border)'}`,
+            fontSize: 12, background: 'var(--color-surface)', color: 'var(--color-text)',
+            cursor: 'pointer', outline: 'none', minWidth: 180,
+          }}
+        >
+          <option value="all">All Phases</option>
+          {PHASE_ORDER.map(phaseKey => (
+            <option key={phaseKey} value={phaseKey}>{PHASES[phaseKey].label}</option>
+          ))}
+        </select>
+
+        {/* Status filter */}
+        <select
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value as 'all' | 'pending' | 'completed')}
+          style={{
+            padding: '8px 12px', borderRadius: 8, border: `1px solid ${'var(--color-border)'}`,
+            fontSize: 12, background: 'var(--color-surface)', color: 'var(--color-text)',
+            cursor: 'pointer', outline: 'none', minWidth: 140,
+          }}
+        >
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+
+      {/* Summary */}
+      <div style={{
+        padding: '16px 20px', background: 'rgba(59,90,105,0.05)',
+        border: `1px solid ${'var(--color-border)'}`, borderRadius: 8,
+      }}>
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+          <div>
+            <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+              Total Advisor Tasks
+            </p>
+            <p style={{ fontSize: 24, fontWeight: 700, color: '#3B5A69', fontFamily: "'Inter', system-ui, sans-serif" }}>
+              {filteredTasks.length}
+            </p>
+          </div>
+          <div style={{ flex: 1, height: 1, background: 'var(--color-border)' }} />
+          <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
+            {advisors.length} launched advisor{advisors.length !== 1 ? 's' : ''}
+          </div>
+        </div>
+      </div>
+
+      {/* Tasks list */}
+      {filteredTasks.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--color-text-secondary)', fontSize: 14 }}>
+          No advisor tasks found for the selected filters
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {filteredTasks.map(task => {
+            const phase = PHASES[task.phase];
+            return (
+              <div
+                key={task.id}
+                style={{
+                  padding: '16px 20px', background: 'var(--color-surface)',
+                  border: `1px solid ${'var(--color-border)'}`, borderRadius: 8,
+                  transition: 'border-color 150ms ease, box-shadow 150ms ease',
+                }}
+              >
+                <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                  {/* Phase badge */}
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, padding: '4px 8px', borderRadius: 4,
+                    background: 'rgba(59,90,105,0.1)', color: '#3B5A69',
+                    textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap',
+                  }}>
+                    {phase.label.replace('Phase ', 'P')}
+                  </span>
+
+                  {/* Task info */}
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text)', marginBottom: 4 }}>
+                      {task.label}
+                    </p>
+                    <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                      <span>Timing: {task.timing}</span>
+                      {task.is_hard_gate && (
+                        <span style={{ color: '#f59e0b', fontWeight: 600 }}>★ Hard Gate</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Resource link */}
+                  {task.resources && (
+                    <a
+                      href={task.resources}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: 32, height: 32, borderRadius: 6, flexShrink: 0,
+                        background: 'rgba(59,130,246,0.1)', color: '#3b82f6',
+                        fontSize: 14, textDecoration: 'none',
+                        transition: 'background 0.15s ease',
+                      }}
+                      title="View resources"
+                    >
+                      ↗
+                    </a>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main Component ───────────────────────────────────────────────────────────
 export default function AdvisorHubPage() {
   const { THEME } = useTheme();
@@ -1119,7 +1293,7 @@ export default function AdvisorHubPage() {
         <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${'var(--color-border)'}` }}>
           {TABS.map(tab => {
             const isActive = activeTab === tab.key;
-            const count = tab.key === 'launch' ? launchDeals.length : tab.key === 'early' ? earlyDeals.length : tab.key === 'completed' ? completedDeals.length : (aumData?.total ?? 0);
+            const count = tab.key === 'launch' ? launchDeals.length : tab.key === 'early' ? earlyDeals.length : tab.key === 'completed' ? completedDeals.length : tab.key === 'aum' ? (aumData?.total ?? 0) : 0;
             return (
               <button
                 key={tab.key}
@@ -1255,12 +1429,12 @@ export default function AdvisorHubPage() {
       </div>
 
       {/* Loading / Error */}
-      {isLoading && activeTab !== 'aum' && (
+      {isLoading && activeTab !== 'aum' && activeTab !== 'advisor-tasks' && (
         <div className="px-4 py-4 space-y-3">
           {[1,2,3,4,5].map(i => <div key={i} className="shimmer h-16 rounded-lg" />)}
         </div>
       )}
-      {error && activeTab !== 'aum' && (
+      {error && activeTab !== 'aum' && activeTab !== 'advisor-tasks' && (
         <div style={{ textAlign: 'center', padding: 60, color: THEME.colors.error, fontSize: 14 }}>
           Failed to load pipeline data
         </div>
@@ -1271,8 +1445,13 @@ export default function AdvisorHubPage() {
         <AumTrackerTab advisors={filteredAumAdvisors} loading={aumLoading} search={search} />
       )}
 
+      {/* ═══════ ADVISOR TASKS TAB ═══════ */}
+      {activeTab === 'advisor-tasks' && (
+        <AdvisorTasksTab />
+      )}
+
       {/* ═══════ PIPELINE TABS (Launch / Early / Completed) ═══════ */}
-      {activeTab !== 'aum' && !isLoading && !error && (
+      {activeTab !== 'aum' && activeTab !== 'advisor-tasks' && !isLoading && !error && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {/* Table header — sortable */}
           {(() => {
@@ -1487,7 +1666,7 @@ export default function AdvisorHubPage() {
       )}
 
       {/* Total footer */}
-      {activeTab !== 'aum' && !isLoading && !error && data?.deals && (
+      {activeTab !== 'aum' && activeTab !== 'advisor-tasks' && !isLoading && !error && data?.deals && (
         <div style={{
           marginTop: 24, padding: '12px 20px',
           fontSize: 12, color: 'var(--color-text-secondary)', textAlign: 'right',

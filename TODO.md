@@ -245,13 +245,14 @@ When you report a fix:
   - [x] P1: Add missing Tailwind color definitions (gold, cream-muted, cream-border, cream-dark)
 
 ### **Task #12: RIA Advisor Onboarding Content & Advisor Task Hub**
-- **Status:** 🔴 Not Started
+- **Status:** 🟡 In Progress (40% complete)
 - **Priority:** High
 - **Description:** Comprehensive update based on new RIA Advisor Onboarding & Client Transition documentation. Review all training pages and advisor hub tasks, then enhance content without creating duplication. Also create an advisor-facing task assignment section in the advisor hub.
 - **Sub-tasks:**
-  - [ ] **Gap Analysis** — Compare new documentation against existing V2 onboarding tasks (`lib/onboarding-tasks-v2.ts`) and training pages to identify what's new vs. what already exists
-  - [ ] **Create Advisor Task Section in Advisor Hub** — Build new component/section in `app/command-center/advisor-hub/page.tsx` that shows advisor-assigned tasks and allows task assignment to advisors
-  - [ ] **Update Onboarding Task Definitions** — Add missing tasks to `lib/onboarding-tasks-v2.ts`:
+  - [x] **Gap Analysis** — Compare new documentation against existing V2 onboarding tasks (`lib/onboarding-tasks-v2.ts`) and training pages to identify what's new vs. what already exists ✅ Completed 2026-04-02
+  - [x] **Create Advisor Task Section in Advisor Hub** — Build new component/section in `app/command-center/advisor-hub/page.tsx` that shows advisor-assigned tasks and allows task assignment to advisors ✅ Completed 2026-04-02 (basic version with filtering; task assignment UI for future enhancement)
+  - [x] **Update Onboarding Task Definitions** — Add missing tasks to `lib/onboarding-tasks-v2.ts` ✅ Already completed (141 tasks total: 107 original + 34 new tasks)
+    - All 34 new tasks added across phases:
     - Pre-signing: Welcome video recording, tech stack mapping, commitment collection, custodian positioning
     - Post-signing: Transition Preparation Guide, data backup instructions, "What NOT to Take" compliance checklist
     - Week prior: Advisor pre-launch responsibilities, onboarding team prep, marketing logo/branding prep
@@ -266,10 +267,10 @@ When you report a fix:
     - First Week technology setup
     - Expanded department meeting schedule (10 departments)
     - 90-day maturity/KPI tracking content
-  - [ ] **New Roles** — Add missing task owner roles: Trust & Estate, Farther Institutional, Insurance & Annuities, 401k/Pontera
+  - [x] **New Roles** — Add missing task owner roles: Trust & Estate, Farther Institutional, Insurance & Annuities, 401k/Pontera ✅ Already completed (4 new roles added to lib/onboarding-tasks-v2.ts)
   - [ ] **Schwab Custodian Positioning** — Add Schwab benefits and custodian positioning content to relevant training pages
   - [ ] **Master Merge & Repaper/ACAT Pages** — Build out the stub "Coming Soon" pages with actual content
 
 ---
 
-**Last Updated:** 2026-03-26
+**Last Updated:** 2026-04-02

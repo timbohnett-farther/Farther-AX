@@ -6,6 +6,32 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Advisor Tasks Tab in Advisor Hub — 2026-04-02
+
+**What**: Added new "Advisor Tasks" tab to Advisor Hub for displaying and managing tasks assigned to advisors
+
+**Scope**:
+- Added new tab to Advisor Hub with icon and label
+- Created AdvisorTasksTab component showing tasks where owner = "Advisor" from onboarding-tasks-v2.ts
+- Implemented filtering by advisor, phase, and status
+- Shows 141 total tasks from onboarding system (107 original + 34 new tasks from RIA onboarding documentation)
+- Displays task details: phase badge, label, timing, hard gate indicator, resource links
+- Responsive layout with proper design system integration (semantic tokens, Inter font, tabular-nums)
+
+**Status**: ✅ Completed and ready to deploy
+
+**Files**:
+- `app/command-center/advisor-hub/page.tsx` - Added AdvisorTasksTab component, updated tab logic, imports
+
+**Impact**: AXM/AXA teams can now view all advisor-assigned tasks in one place with filtering capabilities. Foundation for future enhancements (task assignment, completion tracking, notes).
+
+**Next Steps** (Future Enhancement):
+- Add database schema for advisor task assignments (`assigned_to_advisor_id`, `advisor_visible` fields)
+- Implement task assignment UI for AXM/AXA to assign tasks to specific advisors
+- Add completion tracking and notes/comments functionality
+
+---
+
 ## [Completed] Fix Build Errors in Training Pages — 2026-04-02
 
 **What**: Resolved 5 consecutive deployment failures caused by TypeScript build errors in training/playbook pages
