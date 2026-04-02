@@ -330,7 +330,7 @@ function TransitionsPageInner() {
         <div style={{ position: 'relative', margin: '8px 0 4px' }}>
           <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />
           <div style={{ textAlign: 'center' }}>
-            <h1 style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 6 }}>
+            <h1 style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums', marginBottom: 6 }}>
               Client Transition Dashboard
             </h1>
             <p style={{ fontSize: 14, color: THEME.colors.textSecondary, margin: 0 }}>
@@ -601,7 +601,7 @@ function TransitionsPageInner() {
                 marginBottom: -2, cursor: 'pointer', transition: 'all 150ms ease',
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? THEME.colors.teal : THEME.colors.textSecondary, fontFamily: "'Inter', system-ui, sans-serif" }}>
+              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? THEME.colors.teal : THEME.colors.textSecondary, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>
                 {tab.label}
               </span>
               <span style={{ display: 'block', fontSize: 11, color: isActive ? THEME.colors.teal : THEME.colors.textSecondary, opacity: 0.6, marginTop: 2 }}>

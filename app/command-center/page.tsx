@@ -288,7 +288,7 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }
   const { THEME } = useTheme();
   return (
     <div style={{ marginBottom: 16 }}>
-      <h3 style={{ fontSize: 15, fontWeight: 600, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: subtitle ? 4 : 0 }}>{title}</h3>
+      <h3 style={{ fontSize: 15, fontWeight: 600, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums', marginBottom: subtitle ? 4 : 0 }}>{title}</h3>
       {subtitle && <p style={{ fontSize: 12, color: THEME.colors.textSecondary }}>{subtitle}</p>}
     </div>
   );
@@ -300,7 +300,7 @@ function ComplexityBadge({ score, tier, tierColor }: { score: number; tier: stri
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }} title={`${tier} complexity — Score: ${score}/105`}>
       <span style={{
         fontSize: 12, fontWeight: 700, color: tierColor,
-        fontFamily: "'Inter', system-ui, sans-serif",
+        fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums',
       }}>
         {score}
       </span>
@@ -369,7 +369,7 @@ function DrillDownPanel({ title, deals, onClose }: { title: string; deals: Deal[
         {/* Header */}
         <div style={{ padding: '20px 24px', borderBottom: `1px solid ${THEME.colors.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
           <div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 2 }}>{title}</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums', marginBottom: 2 }}>{title}</h3>
             <p style={{ fontSize: 12, color: THEME.colors.textSecondary }}>{deals.length} deals · {formatAUM(deals.reduce((s, d) => s + getAUM(d), 0))} total AUM</p>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: THEME.colors.textSecondary, fontSize: 20, cursor: 'pointer', padding: '4px 8px', borderRadius: 4 }}>✕</button>
@@ -677,7 +677,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
         {/* Header row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
           <div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 4 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums', marginBottom: 4 }}>
               2026 Launch Goal Tracker
             </h3>
             <p style={{ fontSize: 12, color: THEME.colors.textSecondary }}>
@@ -685,7 +685,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             </p>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 32, fontWeight: 700, color: a.ytdOnTrack ? THEME.colors.teal : THEME.colors.error, fontFamily: "'Inter', system-ui, sans-serif", lineHeight: 1 }}>
+            <div style={{ fontSize: 32, fontWeight: 700, color: a.ytdOnTrack ? THEME.colors.teal : THEME.colors.error, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
               {formatAUM(a.ytdAUM)}
             </div>
             <div style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 4 }}>
@@ -800,7 +800,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             >
               <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: '#3B5A69' }}>✦</span>
               <p style={{ fontSize: 11, color: THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Sentiment Tracking</p>
-              <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" }}>
+              <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>
                 {scores.length > 0 ? `${scores.length}` : '—'}
               </p>
               <p style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 4 }}>
@@ -837,7 +837,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             >
               <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: THEME.colors.teal }}>◎</span>
               <p style={{ fontSize: 11, color: THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Current vs Expected AUM</p>
-              <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" }}>
+              <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>
                 {totalExpectedAum > 0 ? `${transferPct}%` : '—'}
               </p>
               <p style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 4 }}>
@@ -871,7 +871,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             >
               <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: THEME.colors.success }}>$</span>
               <p style={{ fontSize: 11, color: THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>On Book Revenue</p>
-              <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.success, fontFamily: "'Inter', system-ui, sans-serif" }}>
+              <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.success, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>
                 {totalRevenue > 0 ? formatAUM(totalRevenue) : '—'}
               </p>
               <p style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 4 }}>
@@ -909,7 +909,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
             >
               <span style={{ position: 'absolute', top: 16, right: 18, fontSize: 20, opacity: 0.6, color: THEME.colors.bronze400 }}>★</span>
               <p style={{ fontSize: 11, color: THEME.colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Expected Revenue</p>
-              <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" }}>
+              <p style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>
                 {totalExpectedRevenue > 0 ? formatAUM(Math.round(totalExpectedRevenue)) : '—'}
               </p>
               <p style={{ fontSize: 12, color: THEME.colors.textSecondary, marginTop: 4 }}>
@@ -1075,7 +1075,7 @@ function CommandDashboard({ deals }: { deals: Deal[] }) {
                 onMouseEnter={e => { if (item.deals.length > 0) (e.currentTarget as HTMLDivElement).style.borderColor = item.color; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = `${item.color}30`; }}
               >
-                <div style={{ fontSize: 22, fontWeight: 700, color: item.color, fontFamily: "'Inter', system-ui, sans-serif" }}>
+                <div style={{ fontSize: 22, fontWeight: 700, color: item.color, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>
                   {item.count}
                 </div>
                 <div style={{ fontSize: 11, color: THEME.colors.textSecondary, marginTop: 2 }}>{item.label}</div>
@@ -1505,7 +1505,7 @@ function RecruitingTab() {
               style={{
                 flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
                 fontSize: 13, color: THEME.colors.text, background: "#FFFFFF", outline: 'none',
-                fontFamily: "'Inter', system-ui, sans-serif",
+                fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums',
               }}
             />
             <button
@@ -1516,7 +1516,7 @@ function RecruitingTab() {
                 background: aiInput.trim() && !aiLoading ? THEME.colors.teal : THEME.colors.border,
                 color: aiInput.trim() && !aiLoading ? "#FFFFFF" : THEME.colors.textSecondary,
                 fontSize: 13, fontWeight: 600, cursor: aiInput.trim() && !aiLoading ? 'pointer' : 'default',
-                fontFamily: "'Inter', system-ui, sans-serif",
+                fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums',
               }}
             >
               Send
@@ -1559,7 +1559,7 @@ function RecruitingTab() {
                 marginBottom: -2, cursor: 'pointer', transition: 'all 150ms ease',
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? THEME.colors.teal : THEME.colors.textSecondary, fontFamily: "'Inter', system-ui, sans-serif" }}>
+              <span style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? THEME.colors.teal : THEME.colors.textSecondary, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>
                 {tab.label}
               </span>
               <span style={{
@@ -1586,7 +1586,7 @@ function RecruitingTab() {
             style={{
               width: '100%', padding: '8px 12px 8px 32px', borderRadius: 8,
               border: `1px solid ${THEME.colors.border}`, fontSize: 13, color: THEME.colors.text,
-              background: THEME.colors.surface, outline: 'none', fontFamily: "'Inter', system-ui, sans-serif",
+              background: THEME.colors.surface, outline: 'none', fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums',
             }}
           />
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: THEME.colors.textSecondary }}>⌕</span>
@@ -1599,7 +1599,7 @@ function RecruitingTab() {
           style={{
             padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
             fontSize: 12, color: THEME.colors.text, background: THEME.colors.surface, outline: 'none',
-            fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer',
+            fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums', cursor: 'pointer',
           }}
         >
           <option value="all">All Stages</option>
@@ -1615,7 +1615,7 @@ function RecruitingTab() {
           style={{
             padding: '8px 12px', borderRadius: 8, border: `1px solid ${THEME.colors.border}`,
             fontSize: 12, color: THEME.colors.text, background: THEME.colors.surface, outline: 'none',
-            fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer',
+            fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums', cursor: 'pointer',
           }}
         >
           <option value="all">All Firm Types</option>
@@ -1643,7 +1643,7 @@ function RecruitingTab() {
               padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer',
               background: isSelected ? THEME.colors.teal : isLaunched ? 'rgba(29,118,130,0.22)' : isOfferAccepted ? 'rgba(245,158,11,0.2)' : 'rgba(91,106,113,0.15)',
               color: isSelected ? '#ffffff' : isLaunched ? '#5ec4cf' : isOfferAccepted ? '#fbbf24' : THEME.colors.text,
-              fontFamily: "'Inter', system-ui, sans-serif",
+              fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums',
             }}>
               {STAGE_LABELS[stageId]} · {count}
             </button>
@@ -2006,7 +2006,7 @@ function RecruitingTab() {
                                 return 'rgba(91,106,113,0.25)';
                               })()}`,
                               cursor: 'pointer', outline: 'none',
-                              fontFamily: "'Inter', system-ui, sans-serif",
+                              fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums',
                             }}
                           >
                             {ACTIVE_STAGE_IDS.map(sid => (
@@ -2082,7 +2082,7 @@ function RecruitingTab() {
                             background: 'transparent', border: `1px solid transparent`,
                             borderRadius: 4, padding: '2px 4px', fontSize: 12,
                             color: THEME.colors.textSecondary, cursor: 'pointer', outline: 'none',
-                            fontFamily: "'Inter', system-ui, sans-serif",
+                            fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums',
                             width: 120,
                           }}
                           onFocus={e => { (e.target as HTMLInputElement).style.borderColor = THEME.colors.teal; }}
@@ -2275,12 +2275,12 @@ export default function PipelineDashboard() {
   ];
 
   return (
-    <div style={{ padding: '40px 40px', minHeight: '100vh', fontFamily: "'Inter', system-ui, sans-serif", width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
+    <div style={{ padding: '40px 40px', minHeight: '100vh', fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums', width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
       {/* Header */}
       <div style={{ position: 'relative', marginBottom: 24 }}>
         <Image src="/images/Farther_Symbol_RGB_Cream.svg" alt="" width={32} height={32} style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5 }} />
         <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 6 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums', marginBottom: 6 }}>
             Pipeline Dashboard
           </h1>
           <p style={{ color: THEME.colors.textSecondary, fontSize: 14 }}>
@@ -2306,7 +2306,7 @@ export default function PipelineDashboard() {
               <span style={{
                 fontSize: 14, fontWeight: isActive ? 600 : 400,
                 color: isActive ? THEME.colors.teal : THEME.colors.textSecondary,
-                fontFamily: "'Inter', system-ui, sans-serif",
+                fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums',
               }}>
                 {tab.label}
               </span>

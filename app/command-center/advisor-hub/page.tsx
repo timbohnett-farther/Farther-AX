@@ -420,7 +420,7 @@ function AumTrackerTab({ advisors, loading }: { advisors: AumAdvisor[]; loading:
               <div>
                 <p style={{
                   fontSize: 15, fontWeight: 600, color: 'var(--color-text)',
-                  fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer',
+                  fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums', cursor: 'pointer',
                 }}>
                   {advisor.advisor_name}
                 </p>
@@ -877,7 +877,7 @@ function AdvisorTasksTab() {
             <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
               Total Advisor Tasks
             </p>
-            <p style={{ fontSize: 24, fontWeight: 700, color: '#3B5A69', fontFamily: "'Inter', system-ui, sans-serif" }}>
+            <p style={{ fontSize: 24, fontWeight: 700, color: '#3B5A69', fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>
               {filteredTasks.length}
             </p>
           </div>
@@ -1204,7 +1204,7 @@ export default function AdvisorHubPage() {
           style={{ position: 'absolute', top: 0, right: 0, opacity: 0.5, width: '120px', height: 'auto' }}
         />
         <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: 32, fontWeight: 700, color: 'var(--color-text)', fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 6 }}>
+          <h1 style={{ fontSize: 32, fontWeight: 700, color: 'var(--color-text)', fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums', marginBottom: 6 }}>
             Advisor Hub
           </h1>
           <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>
@@ -1230,7 +1230,7 @@ export default function AdvisorHubPage() {
             <p style={{ fontSize: 11, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
               {card.label}
             </p>
-            <p style={{ fontSize: 28, fontWeight: 700, color: 'var(--color-text)', fontFamily: "'Inter', system-ui, sans-serif" }}>
+            <p style={{ fontSize: 28, fontWeight: 700, color: 'var(--color-text)', fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>
               {card.value}
             </p>
             {card.sub && <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 4 }}>{card.sub}</p>}
@@ -1280,7 +1280,7 @@ export default function AdvisorHubPage() {
             <p style={{ fontSize: 11, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
               {card.label}
             </p>
-            <p style={{ fontSize: 28, fontWeight: 700, color: 'var(--color-text)', fontFamily: "'Inter', system-ui, sans-serif" }}>
+            <p style={{ fontSize: 28, fontWeight: 700, color: 'var(--color-text)', fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>
               {card.value}
             </p>
             {card.sub && <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 4 }}>{card.sub}</p>}
@@ -1303,7 +1303,7 @@ export default function AdvisorHubPage() {
                   color: isActive ? '#3B5A69' : 'var(--color-text-secondary)', background: 'none', border: 'none',
                   borderBottom: isActive ? `2px solid ${'#3B5A69'}` : '2px solid transparent',
                   marginBottom: -2, cursor: 'pointer',
-                  fontFamily: "'Inter', system-ui, sans-serif",
+                  fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums',
                   transition: 'color 150ms ease, border-color 150ms ease',
                 }}
               >
@@ -1331,7 +1331,7 @@ export default function AdvisorHubPage() {
                 padding: '8px 16px', fontSize: 12, fontWeight: 600, borderRadius: 6,
                 background: batchScoring ? 'var(--color-border)' : '#3B5A69', color: "#FFFFFF",
                 border: 'none', cursor: batchScoring ? 'not-allowed' : 'pointer',
-                fontFamily: "'Inter', system-ui, sans-serif",
+                fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums',
                 transition: 'background 150ms ease',
               }}
             >
@@ -1346,7 +1346,7 @@ export default function AdvisorHubPage() {
             style={{
               width: 240, padding: '10px 16px', fontSize: 13, borderRadius: 8,
               border: `1px solid ${'var(--color-border)'}`, background: 'var(--color-surface)', color: 'var(--color-text)',
-              fontFamily: "'Inter', system-ui, sans-serif",
+              fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums',
               outline: 'none',
             }}
           />
@@ -1542,7 +1542,7 @@ export default function AdvisorHubPage() {
                     </span>
                     <Link href={`/command-center/advisor/${deal.id}`} style={{ textDecoration: 'none' }} onClick={e => e.stopPropagation()}>
                       <div>
-                        <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-text)', fontFamily: "'Inter', system-ui, sans-serif", cursor: 'pointer' }}>
+                        <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-text)', fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums', cursor: 'pointer' }}>
                           {deal.dealname || '—'}
                         </p>
                         {deal.firm_type && (
@@ -1558,7 +1558,7 @@ export default function AdvisorHubPage() {
                   </p>
 
                   {/* AUM */}
-                  <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text)', textAlign: 'right', fontFamily: "'Inter', system-ui, sans-serif" }}>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text)', textAlign: 'right', fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>
                     {formatAUM(aum)}
                   </p>
 
@@ -1602,7 +1602,7 @@ export default function AdvisorHubPage() {
                             padding: '4px 10px', fontSize: 10, fontWeight: 600,
                             borderRadius: 4, border: `1px solid ${'var(--color-border)'}`,
                             background: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer',
-                            fontFamily: "'Inter', system-ui, sans-serif",
+                            fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums',
                             transition: 'color 150ms ease, border-color 150ms ease',
                           }}
                           onMouseEnter={e => { e.currentTarget.style.color = '#3B5A69'; e.currentTarget.style.borderColor = '#3B5A69'; }}
