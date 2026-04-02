@@ -13,7 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import {
   verifyWebhookHMAC,
   parseWebhookPayload,
@@ -66,37 +66,41 @@ export async function POST(req: NextRequest) {
     const subjectLower = (emailSubject ?? '').toLowerCase();
     const isIAA = subjectLower.includes('iaa');
 
-    // 6. Update database (upsert by signer email match)
+    // 6. Update database (upsert by signer email match) using Prisma
     if (signerEmails.length > 0) {
       if (isIAA) {
-        await pool.query(
-          `UPDATE transition_clients
-           SET docusign_iaa_status = $1,
-               docusign_iaa_envelope_id = $2,
-               docusign_last_checked = NOW()
-           WHERE EXISTS (
-             SELECT 1 FROM unnest($3::text[]) AS e
-             WHERE LOWER(transition_clients.primary_email) = e
-           )`,
-          [status, envelopeId, signerEmails]
-        );
+        // Update all transition clients matching any of the signer emails (IAA envelope)
+        await prisma.transitionClient.updateMany({
+          where: {
+            primary_email: {
+              in: signerEmails,
+              mode: 'insensitive', // Case-insensitive match
+            },
+          },
+          data: {
+            docusign_iaa_status: status,
+            docusign_iaa_envelope_id: envelopeId,
+          },
+        });
       } else {
-        await pool.query(
-          `UPDATE transition_clients
-           SET docusign_paperwork_status = $1,
-               docusign_paperwork_envelope_id = $2,
-               docusign_last_checked = NOW()
-           WHERE EXISTS (
-             SELECT 1 FROM unnest($3::text[]) AS e
-             WHERE LOWER(transition_clients.primary_email) = e
-           )`,
-          [status, envelopeId, signerEmails]
-        );
+        // Update all transition clients matching any of the signer emails (Paperwork envelope)
+        await prisma.transitionClient.updateMany({
+          where: {
+            primary_email: {
+              in: signerEmails,
+              mode: 'insensitive',
+            },
+          },
+          data: {
+            docusign_paperwork_status: status,
+            docusign_paperwork_envelope_id: envelopeId,
+          },
+        });
       }
     }
 
-    // 7. Log webhook event (optional - for debugging/audit trail)
-    await logWebhookEvent(data);
+    // 7. Log number of clients updated
+    console.log(`[docusign/webhook] Updated transition clients with ${isIAA ? 'IAA' : 'Paperwork'} status for emails: ${signerEmails.join(', ')}`);
 
     // 8. Return success (MUST return 200 or DocuSign will retry)
     return NextResponse.json({
@@ -104,6 +108,8 @@ export async function POST(req: NextRequest) {
       envelopeId,
       status,
       event: data.event,
+      signerEmails,
+      type: isIAA ? 'IAA' : 'Paperwork',
     });
 
   } catch (error) {
@@ -115,34 +121,6 @@ export async function POST(req: NextRequest) {
       received: true,
       error: 'Internal processing error (logged)',
     });
-  }
-}
-
-// ── Webhook Event Logging (Optional) ──────────────────────────────────────────
-
-async function logWebhookEvent(data: DocuSignWebhookPayload): Promise<void> {
-  try {
-    await pool.query(
-      `INSERT INTO docusign_webhook_events (
-        event_type,
-        envelope_id,
-        status,
-        email_subject,
-        received_at,
-        payload
-      ) VALUES ($1, $2, $3, $4, NOW(), $5)
-      ON CONFLICT (envelope_id, event_type, received_at) DO NOTHING`,
-      [
-        data.event,
-        data.data.envelopeId,
-        data.data.status,
-        data.data.emailSubject ?? '',
-        JSON.stringify(data),
-      ]
-    );
-  } catch (err) {
-    // Non-critical - just log and continue
-    console.warn('[docusign/webhook] Could not log event:', err);
   }
 }
 
