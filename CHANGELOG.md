@@ -6,6 +6,41 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Autonomous AI Agent Orchestration System — 2026-04-02
+
+**What**: Built a fully autonomous agent scheduling system with 8 AI agents (Sentinel-7, Pattern-31, Control-91, Archive-365 + Weekly/Monthly/Quarterly/Annual reviews). Agents run autonomously via a Railway cron job that calls a smart scheduler every 5 minutes. The scheduler respects dependency chains, retries failures with exponential backoff, detects zombie processes via heartbeats, and surfaces live health on a new dashboard page.
+
+**Scope:**
+- Created `agent_runs` and `agent_schedule` database tables with proper constraints and seed data for all 8 agents
+- Built health module: zombie recovery, success/failure tracking, heartbeat updates, dashboard aggregation
+- Built scheduler brain: freshness-based scheduling, dependency chain validation, exponential backoff retries, heartbeat monitoring
+- Built 8 agent processors: data quality scans, pattern analysis, control reviews, archival, weekly/monthly/quarterly/annual summaries
+- Created 3 new API routes: `/api/scheduler/tick` (Railway cron), `/api/agents/status` (health dashboard), `/api/agents/[type]/trigger` (manual Run Now)
+- Full dashboard page at `/command-center/agents` with health indicators, dependency diagram, run history table, 30s auto-refresh
+- Added Agents nav item to Sidebar
+
+**Architecture:**
+- Dependency chain: `sentinel_7 → pattern_31 → control_91` (must run in order), `archive_365` independent
+- Review agents (weekly, monthly, quarterly, annual) all independent
+- Railway cron `*/5 * * * *` → `GET /api/scheduler/tick?secret=CRON_SECRET`
+- Idempotent: safe to call multiple times — running lock prevents double-launches
+
+**Status**: Deployed
+
+**Files:**
+- `database/schema/007_agent_scheduler.sql` (NEW — schema + seed)
+- `lib/agents/types.ts` (NEW — TypeScript interfaces)
+- `lib/agents/health.ts` (NEW — health monitoring module)
+- `lib/agents/scheduler.ts` (NEW — scheduling brain)
+- `lib/agents/processors.ts` (NEW — 8 agent processors)
+- `app/api/scheduler/tick/route.ts` (NEW — cron endpoint)
+- `app/api/agents/status/route.ts` (NEW — health dashboard API)
+- `app/api/agents/[type]/trigger/route.ts` (NEW — manual trigger)
+- `app/command-center/agents/page.tsx` (NEW — dashboard UI)
+- `components/Sidebar.tsx` (MODIFIED — added Agents nav)
+
+---
+
 ## [IN PROGRESS] Task #9: Brand Consistency - Playbook Pages — 2026-04-01
 
 **What**: Converting 13 playbook pages from inline THEME styles to Tailwind CSS variables

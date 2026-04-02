@@ -14,6 +14,7 @@ import {
   ChartBarIcon,
   UserGroupIcon,
   BellAlertIcon,
+  CpuChipIcon,
 } from "@heroicons/react/24/outline";
 import { ThemeToggle } from "./ThemeToggle";
 import { useTheme } from "@/lib/theme-provider";
@@ -46,6 +47,7 @@ const coreOps = [
   { label: "Complexity", href: "/command-center/complexity", icon: ChartBarIcon },
   { label: "Metrics", href: "/command-center/metrics", icon: ChartBarIcon },
   { label: "AI Assistant", href: "/command-center/ai", icon: SparklesIcon },
+  { label: "Agents", href: "/command-center/agents", icon: CpuChipIcon },
 ];
 
 const externalLinks = [
