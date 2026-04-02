@@ -1,16 +1,19 @@
-/**
- * Database client compatibility layer
- *
- * This project uses PostgreSQL via `pg` pool (lib/db.ts), not Prisma ORM.
- * This file provides a compatibility export for legacy code that imports prisma.
- *
- * For new code, import `pool` from '@/lib/db' directly.
- */
+import { PrismaClient } from '@prisma/client';
 
-import pool from './db';
+// PrismaClient is attached to the `global` object in development to prevent
+// exhausting your database connection limit.
+//
+// Learn more:
+// https://pris.ly/d/help/next-js-best-practices
 
-// Export pool as default for compatibility with prisma imports
-export default pool;
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-// Also export as named export
-export { pool };
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  });
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+export default prisma;

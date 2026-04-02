@@ -1,0 +1,122 @@
+// Prisma schema for Farther AX Command Center
+// Database: PostgreSQL (Railway)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Advisor profile data cached from HubSpot
+model Advisor {
+  id                String   @id @default(cuid())
+  hubspot_id        String   @unique
+
+  // Core Profile
+  name              String
+  email             String?
+  phone             String?
+  pathway           String?   // breakaway, independent_ria, ma, no_low_aum
+
+  // Onboarding Status
+  status            String?   // pipeline, early_deal, launched, graduated
+  launch_date       DateTime?
+  graduation_date   DateTime?
+  axm_owner         String?
+  axa_owner         String?
+  ctm_owner         String?
+
+  // Financial Data
+  aum               Decimal?  @db.Decimal(15,2)
+  revenue           Decimal?  @db.Decimal(15,2)
+  account_count     Int?
+  household_count   Int?
+
+  // Complexity & Metrics
+  complexity_score  Int?
+  health_score      String?
+  sentiment         String?   // positive, neutral, negative, unknown
+
+  // Location & Background
+  city              String?
+  state             String?
+  previous_firm     String?
+
+  // Properties (Full HubSpot data as JSON for flexibility)
+  properties        Json?
+
+  // Activities
+  activities        AdvisorActivity[]
+
+  // Metadata
+  last_synced_at    DateTime  @default(now())
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  @@index([hubspot_id])
+  @@index([status])
+  @@index([pathway])
+  @@index([axm_owner])
+  @@index([launch_date])
+  @@index([last_synced_at])
+  @@map("advisors")
+}
+
+// Advisor activities (notes, emails, calls, meetings) cached from HubSpot
+model AdvisorActivity {
+  id              String   @id @default(cuid())
+  advisor_id      String
+  hubspot_id      String   @unique // HubSpot engagement/note ID
+
+  // Activity Details
+  type            String   // note, email, call, meeting, task
+  subject         String?
+  body            String?  @db.Text
+  timestamp       DateTime
+
+  // Metadata
+  created_by      String?  // HubSpot user who created it
+  owner_id        String?  // HubSpot owner ID
+
+  // Full HubSpot engagement data as JSON
+  properties      Json?
+
+  // Relations
+  advisor         Advisor  @relation(fields: [advisor_id], references: [id], onDelete: Cascade)
+
+  // Timestamps
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@index([advisor_id])
+  @@index([timestamp])
+  @@index([type])
+  @@index([hubspot_id])
+  @@map("advisor_activities")
+}
+
+// Sync job tracking to monitor daily syncs
+model SyncJob {
+  id              String   @id @default(cuid())
+
+  // Job Details
+  job_type        String   // full_sync, single_advisor, activities_sync
+  status          String   // pending, running, completed, failed
+
+  // Statistics
+  records_synced  Int?
+  records_failed  Int?
+  error_message   String?  @db.Text
+
+  // Timing
+  started_at      DateTime @default(now())
+  completed_at    DateTime?
+  duration_ms     Int?
+
+  @@index([job_type])
+  @@index([status])
+  @@index([started_at])
+  @@map("sync_jobs")
+}

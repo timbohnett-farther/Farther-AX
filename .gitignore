@@ -44,3 +44,5 @@ node_modules/
 
 # Claude worktrees
 .claude/worktrees/
+
+/lib/generated/prisma
