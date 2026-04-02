@@ -245,7 +245,7 @@ When you report a fix:
   - [x] P1: Add missing Tailwind color definitions (gold, cream-muted, cream-border, cream-dark)
 
 ### **Task #12: RIA Advisor Onboarding Content & Advisor Task Hub**
-- **Status:** 🟡 In Progress (60% complete)
+- **Status:** 🟡 In Progress (75% complete)
 - **Priority:** High
 - **Description:** Comprehensive update based on new RIA Advisor Onboarding & Client Transition documentation. Review all training pages and advisor hub tasks, then enhance content without creating duplication. Also create an advisor-facing task assignment section in the advisor hub.
 - **Sub-tasks:**
@@ -260,13 +260,13 @@ When you report a fix:
     - First Week: Client welcome calls, "Welcome to Farther" email workflow, technology setup (Ramp, Navan, RightCapital, AdvicePay, Pontera, SmartRIA, AI note-taker), automated DocuSign workflow
     - First Month: 10 department introduction meetings (RIA Leadership, Planning, Investment, FAM, Trust & Estate, Farther Institutional, CX, Insurance & Annuities, 401k/Pontera, Marketing), document migration to Digital Vault
     - First 90 Days: Transition completion, service tier assignment, compliance training, KPI tracking (Net New AUM, Net Flows, Revenue per Household, Pipeline Velocity, Client NPS), business continuity planning
-  - [ ] **Enhance Training Pages** — Add new content to relevant playbook pages without duplicating existing material:
-    - Pre-Signing guide (new page or section)
-    - Transition Preparation Guide with compliance data guidelines
-    - Day One activation checklist
-    - First Week technology setup
-    - Expanded department meeting schedule (10 departments)
-    - 90-day maturity/KPI tracking content
+  - [x] **Enhance Training Pages** — Add new content to relevant playbook pages without duplicating existing material ✅ Partially completed 2026-04-02
+    - [x] Day One activation checklist (added to breakaway-process page)
+    - [x] First Week technology setup (added to breakaway-process page)
+    - [x] Expanded department meeting schedule - 10 departments (added to breakaway-process page)
+    - [ ] Pre-Signing guide (new page or section)
+    - [ ] Transition Preparation Guide with compliance data guidelines
+    - [ ] 90-day maturity/KPI tracking content
   - [x] **New Roles** — Add missing task owner roles: Trust & Estate, Farther Institutional, Insurance & Annuities, 401k/Pontera ✅ Already completed (4 new roles added to lib/onboarding-tasks-v2.ts)
   - [ ] **Schwab Custodian Positioning** — Add Schwab benefits and custodian positioning content to relevant training pages
   - [x] **Master Merge & Repaper/ACAT Pages** — Build out the stub "Coming Soon" pages with actual content ✅ Completed 2026-04-02
