@@ -29,7 +29,13 @@ const BASE_URI = process.env.DOCUSIGN_BASE_URI ?? 'https://demo.docusign.net';
 const API_ACCOUNT_ID = process.env.DOCUSIGN_API_ACCOUNT_ID ?? '';
 const INTEGRATION_KEY = process.env.DOCUSIGN_INTEGRATION_KEY ?? '';
 const SECRET_KEY = process.env.DOCUSIGN_SECRET_KEY ?? '';
-const HMAC_SECRET = process.env.DOCUSIGN_HMAC_SECRET ?? '';
+
+/**
+ * Get HMAC secret at runtime for testability
+ */
+function getHmacSecret(): string {
+  return process.env.DOCUSIGN_HMAC_SECRET ?? '';
+}
 
 const MAX_RETRIES = 3;
 const INITIAL_BACKOFF_MS = 1000;
@@ -353,7 +359,9 @@ export function verifyWebhookHMAC(
   payload: string | Buffer,
   signature: string
 ): boolean {
-  if (!HMAC_SECRET) {
+  const hmacSecret = getHmacSecret();
+
+  if (!hmacSecret) {
     console.error('[docusign] HMAC_SECRET not configured');
     return false;
   }
@@ -367,7 +375,7 @@ export function verifyWebhookHMAC(
     const payloadStr = typeof payload === 'string' ? payload : payload.toString('utf8');
 
     const computed = crypto
-      .createHmac('sha256', HMAC_SECRET)
+      .createHmac('sha256', hmacSecret)
       .update(payloadStr)
       .digest('base64');
 
@@ -506,5 +514,6 @@ export function isDocuSignConfigured(): boolean {
  * Check if webhook HMAC secret is configured
  */
 export function isWebhookConfigured(): boolean {
-  return Boolean(HMAC_SECRET && HMAC_SECRET.length > 0);
+  const hmacSecret = getHmacSecret();
+  return Boolean(hmacSecret && hmacSecret.length > 0);
 }

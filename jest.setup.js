@@ -1,5 +1,10 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom'
+import { TextEncoder, TextDecoder } from 'util';
+
+// Polyfill for Web APIs in Node.js test environment
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 
 // Set test environment
 process.env.NODE_ENV = 'test'
