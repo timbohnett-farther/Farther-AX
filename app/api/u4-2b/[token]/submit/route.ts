@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const COMPLIANCE_EMAIL = process.env.COMPLIANCE_EMAIL || 'compliance@farther.com';
@@ -17,18 +17,25 @@ export async function POST(
 
   try {
     // Validate token
-    const tokenResult = await pool.query(
-      `SELECT id, deal_id, contact_id, contact_email, advisor_name, status, expires_at
-       FROM u4_2b_tokens
-       WHERE token = $1`,
-      [token]
-    );
+    const tokenResult = await prisma.$queryRaw<Array<{
+      id: number;
+      deal_id: string;
+      contact_id: string | null;
+      contact_email: string;
+      advisor_name: string;
+      status: string;
+      expires_at: Date;
+    }>>`
+      SELECT id, deal_id, contact_id, contact_email, advisor_name, status, expires_at
+      FROM u4_2b_tokens
+      WHERE token = ${token}
+    `;
 
-    if (tokenResult.rows.length === 0) {
+    if (tokenResult.length === 0) {
       return NextResponse.json({ error: 'Form not found' }, { status: 404 });
     }
 
-    const tokenRow = tokenResult.rows[0];
+    const tokenRow = tokenResult[0];
 
     if (tokenRow.status === 'completed') {
       return NextResponse.json({ error: 'This form has already been submitted' }, { status: 409 });
@@ -42,8 +49,8 @@ export async function POST(
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown';
 
     // Save submission
-    await pool.query(
-      `INSERT INTO u4_2b_submissions (
+    await prisma.$executeRaw`
+      INSERT INTO u4_2b_submissions (
         token_id, deal_id,
         full_name, business_address, other_jurisdictions, texas_clients,
         start_date, position_title, independent_contractor,
@@ -58,45 +65,34 @@ export async function POST(
         disclosures, income_new_client, compensation_asset_based,
         ip_address
       ) VALUES (
-        $1, $2,
-        $3, $4, $5, $6, $7, $8, $9,
-        $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21,
-        $22, $23, $24, $25, $26,
-        $27, $28, $29, $30, $31, $32, $33,
-        $34, $35, $36, $37,
-        $38, $39, $40, $41, $42, $43,
-        $44
-      )`,
-      [
-        tokenRow.id, tokenRow.deal_id,
-        body.full_name || null, body.business_address || null, body.other_jurisdictions || null, body.texas_clients ?? null,
-        body.start_date || null, body.position_title || null, body.independent_contractor ?? null,
-        body.personal_email || null, body.date_of_birth || null, body.state_of_birth || null,
-        body.height_ft ?? null, body.height_in ?? null,
-        body.weight ?? null, body.sex || null, body.hair_color || null, body.eye_color || null,
-        body.ssn || null, body.crd_number || null, body.series_65_registered ?? null,
-        body.iar_qualifications ? JSON.stringify(body.iar_qualifications) : null,
-        body.series_65_exam_date || null, body.other_designations || null,
-        body.designations_confirmed ?? null, body.designations_comments || null,
-        body.insurance_licensed ?? null, body.insurance_date || null, body.insurance_type || null,
-        body.agency_name || null, body.agency_address || null,
-        body.insurance_hours_month || null, body.insurance_trading_hours || null,
-        body.is_cpa ?? null, body.cpa_year || null, body.cpa_confirmed ?? null,
-        body.education ? JSON.stringify(body.education) : null,
-        body.other_business_activities ? JSON.stringify(body.other_business_activities) : null,
-        body.employment_history ? JSON.stringify(body.employment_history) : null,
-        body.residential_history ? JSON.stringify(body.residential_history) : null,
-        body.disclosures ? JSON.stringify(body.disclosures) : null,
-        body.income_new_client ?? null, body.compensation_asset_based ?? null,
-        ip,
-      ]
-    );
+        ${tokenRow.id}, ${tokenRow.deal_id},
+        ${body.full_name || null}, ${body.business_address || null}, ${body.other_jurisdictions || null}, ${body.texas_clients ?? null},
+        ${body.start_date || null}, ${body.position_title || null}, ${body.independent_contractor ?? null},
+        ${body.personal_email || null}, ${body.date_of_birth || null}, ${body.state_of_birth || null},
+        ${body.height_ft ?? null}, ${body.height_in ?? null},
+        ${body.weight ?? null}, ${body.sex || null}, ${body.hair_color || null}, ${body.eye_color || null},
+        ${body.ssn || null}, ${body.crd_number || null}, ${body.series_65_registered ?? null},
+        ${body.iar_qualifications ? JSON.stringify(body.iar_qualifications) : null},
+        ${body.series_65_exam_date || null}, ${body.other_designations || null},
+        ${body.designations_confirmed ?? null}, ${body.designations_comments || null},
+        ${body.insurance_licensed ?? null}, ${body.insurance_date || null}, ${body.insurance_type || null},
+        ${body.agency_name || null}, ${body.agency_address || null},
+        ${body.insurance_hours_month || null}, ${body.insurance_trading_hours || null},
+        ${body.is_cpa ?? null}, ${body.cpa_year || null}, ${body.cpa_confirmed ?? null},
+        ${body.education ? JSON.stringify(body.education) : null},
+        ${body.other_business_activities ? JSON.stringify(body.other_business_activities) : null},
+        ${body.employment_history ? JSON.stringify(body.employment_history) : null},
+        ${body.residential_history ? JSON.stringify(body.residential_history) : null},
+        ${body.disclosures ? JSON.stringify(body.disclosures) : null},
+        ${body.income_new_client ?? null}, ${body.compensation_asset_based ?? null},
+        ${ip}
+      )
+    `;
 
     // Mark token as completed
-    await pool.query(
-      `UPDATE u4_2b_tokens SET status = 'completed', completed_at = NOW() WHERE id = $1`,
-      [tokenRow.id]
-    );
+    await prisma.$executeRaw`
+      UPDATE u4_2b_tokens SET status = 'completed', completed_at = NOW() WHERE id = ${tokenRow.id}
+    `;
 
     // Update HubSpot contact with key fields (non-blocking)
     if (tokenRow.contact_id && HUBSPOT_PAT) {

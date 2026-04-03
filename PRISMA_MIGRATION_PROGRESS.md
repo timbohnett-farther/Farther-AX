@@ -5,8 +5,8 @@
 Migrating all API endpoints and library functions from raw SQL (`pool` from `@/lib/db`) to Prisma ORM for type safety, better error handling, and unified database access patterns.
 
 **Started**: 2026-04-03
-**Current Status**: **Phase 3 COMPLETE** ✅ | All dashboard & team management migrated
-**Overall Progress**: **34/52 files (65%)**
+**Current Status**: **Phase 4 COMPLETE** ✅ | All forms & utilities migrated
+**Overall Progress**: **40/52 files (77%)**
 
 ---
 
@@ -95,15 +95,20 @@ Migrated core advisor detail page endpoints and warm cache endpoints.
 
 ---
 
-### ⏭️ **Phase 4 - Forms & Utilities** (0% complete)
+### ✅ **Phase 4 - Forms & Utilities** (COMPLETE - 6/6 files)
 
-**Files Pending (6)**:
-1. `app/api/tech-intake/submit/route.ts`
-2. `app/api/tech-intake/verify/route.ts`
-3. `app/api/u4-2b/submit/route.ts`
-4. `app/api/u4-2b/verify/route.ts`
-5. `lib/tech-intake-store.ts`
-6. `lib/u4-2b-store.ts`
+**Files Completed (6/6)**:
+1. ✅ `app/api/tech-intake/[token]/route.ts` (2 queries: token validation, expiry update)
+2. ✅ `app/api/tech-intake/[token]/submit/route.ts` (3 queries: token validation, large INSERT, status update)
+3. ✅ `app/api/tech-intake/send/route.ts` (2 queries: AXM lookup with JOIN, token creation with RETURNING)
+4. ✅ `app/api/u4-2b/[token]/route.ts` (2 queries: token validation, expiry update)
+5. ✅ `app/api/u4-2b/[token]/submit/route.ts` (3 queries: token validation, large INSERT with 44 params, status update)
+6. ✅ `app/api/u4-2b/send/route.ts` (2 queries: AXM lookup with JOIN, token creation with RETURNING)
+
+**Commits**:
+- Phase 4 Batch 1: Token validation endpoints (2 files)
+- Phase 4 Batch 2: Form submission endpoints (2 files)
+- Phase 4 Batch 3: Email sending endpoints (2 files)
 
 ---
 
@@ -191,10 +196,10 @@ After each phase completion:
 
 ## Next Steps
 
-1. **Complete Phase 2**: Migrate remaining DocuSign files (5 files, 17 queries)
-2. **Begin Phase 3**: Dashboard and team management endpoints
-3. **Add Integration Tests**: Create test suite for Prisma queries
-4. **Performance Audit**: Compare query performance before/after migration
+1. **Begin Phase 5**: Library & Background Workers (7 files)
+2. **Add Integration Tests**: Create test suite for Prisma queries
+3. **Performance Audit**: Compare query performance before/after migration
+4. **Complete Migration**: Remaining miscellaneous files to reach 100%
 
 ---
 
@@ -208,4 +213,4 @@ If critical issues arise:
 ---
 
 **Last Updated**: 2026-04-03 (continued session)
-**Next Phase**: Phase 4 - Forms & Utilities (6 files)
+**Next Phase**: Phase 5 - Library & Background Workers (7 files)

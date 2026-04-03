@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const AXM_EMAIL = process.env.AXM_EMAIL || 'ax@farther.com';
@@ -17,18 +17,25 @@ export async function POST(
 
   try {
     // Validate token
-    const tokenResult = await pool.query(
-      `SELECT id, deal_id, contact_id, contact_email, advisor_name, status, expires_at
-       FROM tech_intake_tokens
-       WHERE token = $1`,
-      [token]
-    );
+    const tokenResult = await prisma.$queryRaw<Array<{
+      id: number;
+      deal_id: string;
+      contact_id: string | null;
+      contact_email: string;
+      advisor_name: string;
+      status: string;
+      expires_at: Date;
+    }>>`
+      SELECT id, deal_id, contact_id, contact_email, advisor_name, status, expires_at
+      FROM tech_intake_tokens
+      WHERE token = ${token}
+    `;
 
-    if (tokenResult.rows.length === 0) {
+    if (tokenResult.length === 0) {
       return NextResponse.json({ error: 'Form not found' }, { status: 404 });
     }
 
-    const tokenRow = tokenResult.rows[0];
+    const tokenRow = tokenResult[0];
 
     if (tokenRow.status === 'completed') {
       return NextResponse.json({ error: 'This form has already been submitted' }, { status: 409 });
@@ -42,8 +49,8 @@ export async function POST(
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown';
 
     // Save submission
-    await pool.query(
-      `INSERT INTO tech_intake_submissions (
+    await prisma.$executeRaw`
+      INSERT INTO tech_intake_submissions (
         token_id, deal_id,
         laptop_choice, has_monitors,
         ship_to, shipping_street, shipping_city, shipping_state, shipping_zip, phone,
@@ -54,36 +61,24 @@ export async function POST(
         launch_date,
         ip_address
       ) VALUES (
-        $1, $2,
-        $3, $4,
-        $5, $6, $7, $8, $9, $10,
-        $11,
-        $12, $13,
-        $14, $15, $16, $17,
-        $18, $19, $20,
-        $21,
-        $22
-      )`,
-      [
-        tokenRow.id, tokenRow.deal_id,
-        body.laptop_choice || null, body.has_monitors ?? null,
-        body.ship_to || null, body.shipping_street || null, body.shipping_city || null,
-        body.shipping_state || null, body.shipping_zip || null, body.phone || null,
-        body.travel_dates || null,
-        body.has_commercial_office ?? null, body.has_it_vendor ?? null,
-        body.it_vendor_company || null, body.it_vendor_contact || null,
-        body.it_vendor_phone || null, body.it_vendor_email || null,
-        body.software_suite || null, body.has_domain ?? null, body.domain_names || null,
-        body.launch_date || null,
-        ip,
-      ]
-    );
+        ${tokenRow.id}, ${tokenRow.deal_id},
+        ${body.laptop_choice || null}, ${body.has_monitors ?? null},
+        ${body.ship_to || null}, ${body.shipping_street || null}, ${body.shipping_city || null},
+        ${body.shipping_state || null}, ${body.shipping_zip || null}, ${body.phone || null},
+        ${body.travel_dates || null},
+        ${body.has_commercial_office ?? null}, ${body.has_it_vendor ?? null},
+        ${body.it_vendor_company || null}, ${body.it_vendor_contact || null},
+        ${body.it_vendor_phone || null}, ${body.it_vendor_email || null},
+        ${body.software_suite || null}, ${body.has_domain ?? null}, ${body.domain_names || null},
+        ${body.launch_date || null},
+        ${ip}
+      )
+    `;
 
     // Mark token as completed
-    await pool.query(
-      `UPDATE tech_intake_tokens SET status = 'completed', completed_at = NOW() WHERE id = $1`,
-      [tokenRow.id]
-    );
+    await prisma.$executeRaw`
+      UPDATE tech_intake_tokens SET status = 'completed', completed_at = NOW() WHERE id = ${tokenRow.id}
+    `;
 
     // Send notification email to AXM team via HubSpot engagement (non-blocking)
     if (HUBSPOT_PAT) {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getAppUrl } from '@/lib/app-url';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { chatCompletion, MODELS } from '@/lib/aizolo';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
@@ -123,16 +123,20 @@ export async function POST(req: NextRequest) {
 
   try {
     // ── Look up assigned AXM for this deal ──────────────────────────────────
-    const axmResult = await pool.query(
-      `SELECT t.name, t.email, t.phone, t.calendar_link
-       FROM advisor_assignments a
-       JOIN team_members t ON a.member_id = t.id
-       WHERE a.deal_id = $1 AND a.role = 'AXM'
-       LIMIT 1`,
-      [dealId]
-    );
+    const axmResult = await prisma.$queryRaw<Array<{
+      name: string;
+      email: string;
+      phone: string | null;
+      calendar_link: string | null;
+    }>>`
+      SELECT t.name, t.email, t.phone, t.calendar_link
+      FROM advisor_assignments a
+      JOIN team_members t ON a.member_id = t.id
+      WHERE a.deal_id = ${dealId} AND a.role = 'AXM'
+      LIMIT 1
+    `;
 
-    const axm = axmResult.rows[0] || null;
+    const axm = axmResult[0] || null;
     const axmName = axm?.name || session.user?.name || 'Farther AX Team';
     const axmEmail = axm?.email || session.user?.email || '';
     const axmPhone = axm?.phone || null;
@@ -141,13 +145,16 @@ export async function POST(req: NextRequest) {
     const advisorFirstName = advisorName.split(' ')[0];
 
     // ── Create token row ────────────────────────────────────────────────────
-    const tokenResult = await pool.query(
-      `INSERT INTO tech_intake_tokens (deal_id, contact_id, contact_email, advisor_name, sent_by)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, token, expires_at`,
-      [dealId, contactId || null, contactEmail, advisorName, axmEmail]
-    );
-    const { token, expires_at } = tokenResult.rows[0];
+    const tokenResult = await prisma.$queryRaw<Array<{
+      id: number;
+      token: string;
+      expires_at: Date;
+    }>>`
+      INSERT INTO tech_intake_tokens (deal_id, contact_id, contact_email, advisor_name, sent_by)
+      VALUES (${dealId}, ${contactId || null}, ${contactEmail}, ${advisorName}, ${axmEmail})
+      RETURNING id, token, expires_at
+    `;
+    const { token, expires_at } = tokenResult[0];
     const formLink = `${getAppUrl()}/forms/tech-intake/${token}`;
     const expiresDate = new Date(expires_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
