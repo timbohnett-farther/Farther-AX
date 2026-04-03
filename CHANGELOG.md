@@ -97,12 +97,11 @@ Format: Each entry includes completion status, feature name, date, scope, status
 **Phase 3 — Architecture (2026-04-03)** 🟡 In Progress (1/3)
 - Fixed pre-commit hooks to enforce TypeScript compilation (removed || true bypass)
 - Added jest.d.ts for @testing-library/jest-dom types globally
-- Fixed Railway deployment blockers: Added TypeScript type annotations to both map callbacks in quality/transitions route
-  - Added WorkbookResult type for workbooks.map() (line 175)
-  - Added ClientResult type for clients.map() (line 188)
-  - Both types extracted from Prisma query result shapes using `typeof array[number]` pattern
-  - Resolved implicit 'any' type errors after 15 failed deployments
-- **Commits**: f7a76c7, 15a4750, b803a2b, bc47e92
+- Fixed Railway deployment blockers:
+  - Added TypeScript type annotations to both map callbacks in quality/transitions route (WorkbookResult, ClientResult)
+  - Added postinstall script to generate Prisma Client (`prisma generate`) - was missing from package.json
+  - Resolved implicit 'any' type errors and missing PrismaClient export after 16 failed deployments
+- **Commits**: f7a76c7, 15a4750, b803a2b, bc47e92, ed8d091
 - **Remaining**: Split god components (<200 lines), centralize type definitions
 
 **Next Steps**:
