@@ -12,35 +12,36 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 **Context**: User switched entire database to Prisma, but most endpoints still use raw SQL `pool from '@/lib/db'`. This caused "column deal_id does not exist" error when clicking advisor names in Advisor Hub.
 
-**Scope**:
-- **Phase 0 (COMPLETE):** Fixed immediate advisor detail page error
-  - Migrated `lib/advisor-store.ts` to Prisma (maps `deal_id` → `hubspot_id`, uses `advisors` table)
-  - Updated `app/api/health/cache/route.ts` to use Prisma advisor count
-  - Synced `prisma/schema.prisma` with production database via `prisma db pull`
+**Progress**: **7/52 files (13.5%) migrated** — Phase 0 ✅ + Phase 1 ✅
 
-- **Remaining Work:** 50 files across 5 phases (28-38 hours estimated)
-  - Phase 1: Core advisor flows (6-8 hours)
-  - Phase 2: Transitions & client management (8-10 hours)
-  - Phase 3: Dashboard & team management (6-8 hours)
-  - Phase 4: Forms & utilities (4-6 hours)
-  - Phase 5: Library & background workers (4-6 hours)
+### **✅ Phase 0 (COMPLETE)** — Immediate Fixes
+- Migrated `lib/advisor-store.ts` to Prisma (maps `deal_id` → `hubspot_id`, uses `advisors` table)
+- Updated `app/api/health/cache/route.ts` to use Prisma advisor count
+- Synced `prisma/schema.prisma` with production database via `prisma db pull`
+
+### **✅ Phase 1 (COMPLETE)** — Core Advisor Flows
+- `app/api/command-center/advisor/[id]/route.ts` — Already using Prisma (via advisor-store)
+- `app/api/command-center/advisor/[id]/clients/route.ts` — Migrated with `$queryRaw` for complex LIKE patterns
+- `app/api/command-center/advisor/[id]/tech-intake/route.ts` — Migrated tech_intake_tokens JOIN query
+- `app/api/command-center/advisor/[id]/u4-2b/route.ts` — Migrated u4_2b_tokens JOIN query
+- `app/api/command-center/warm/route.ts` — Migrated 3 api_cache queries
+- `app/api/command-center/metrics/route.ts` — Migrated team_members aggregation
+
+### **🔴 Remaining Work:** 45 files across 4 phases (22-32 hours estimated)
+- Phase 2: Transitions & client management (25 files, 8-10 hours)
+- Phase 3: Dashboard & team management (12 files, 6-8 hours)
+- Phase 4: Forms & utilities (6 files, 4-6 hours)
+- Phase 5: Library & background workers (7 files, 4-6 hours)
 
 **Migration Strategy**:
-- Raw SQL: `pool.query('SELECT * FROM advisor_profiles WHERE deal_id = $1', [dealId])`
-- Prisma ORM: `prisma.advisor.findUnique({ where: { hubspot_id: dealId }, include: { activities: true } })`
-- Table mapping: `advisor_profiles` → `advisors`, `deal_id` → `hubspot_id`
+- Use `prisma.$queryRaw` for complex SQL (LIKE patterns, JOINs on non-Prisma tables)
+- Use `prisma.$executeRaw` for INSERT/UPDATE operations
+- Maintain exact same query logic and return types
+- Tables not yet in Prisma schema: api_cache, tech_intake_*, u4_2b_*, team_members
 
-**Status**: ✅ Phase 0 complete, advisor detail page should work now
+**Commits**: 1f59eae, de9f749, 1bc319f, 99b8c7f, 823d2ee, 46a1d59 (Phase 1), 326c7cd
 
-**Files**:
-- `lib/advisor-store.ts` - Fully migrated to Prisma
-- `app/api/health/cache/route.ts` - Updated advisor count query
-- `prisma/schema.prisma` - Synced with production database
-- `TODO.md` - Added comprehensive migration plan (Task #15)
-
-**Commits**: 1f59eae (revert wrong migration script), de9f749 (Prisma migration), 1bc319f (schema sync), 99b8c7f (migration plan)
-
-**Next Steps**: Test advisor detail page in production, then begin Phase 1 core advisor flows
+**Next Steps**: Begin Phase 2 — Transitions & Client Management (25 files)
 
 ---
 
