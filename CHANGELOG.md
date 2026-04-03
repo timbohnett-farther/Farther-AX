@@ -6,6 +6,44 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [In Progress] Prisma Migration — Raw SQL to ORM Migration — 2026-04-03
+
+**What**: Migrating 50+ API endpoints from raw SQL (pool queries) to Prisma ORM
+
+**Context**: User switched entire database to Prisma, but most endpoints still use raw SQL `pool from '@/lib/db'`. This caused "column deal_id does not exist" error when clicking advisor names in Advisor Hub.
+
+**Scope**:
+- **Phase 0 (COMPLETE):** Fixed immediate advisor detail page error
+  - Migrated `lib/advisor-store.ts` to Prisma (maps `deal_id` → `hubspot_id`, uses `advisors` table)
+  - Updated `app/api/health/cache/route.ts` to use Prisma advisor count
+  - Synced `prisma/schema.prisma` with production database via `prisma db pull`
+
+- **Remaining Work:** 50 files across 5 phases (28-38 hours estimated)
+  - Phase 1: Core advisor flows (6-8 hours)
+  - Phase 2: Transitions & client management (8-10 hours)
+  - Phase 3: Dashboard & team management (6-8 hours)
+  - Phase 4: Forms & utilities (4-6 hours)
+  - Phase 5: Library & background workers (4-6 hours)
+
+**Migration Strategy**:
+- Raw SQL: `pool.query('SELECT * FROM advisor_profiles WHERE deal_id = $1', [dealId])`
+- Prisma ORM: `prisma.advisor.findUnique({ where: { hubspot_id: dealId }, include: { activities: true } })`
+- Table mapping: `advisor_profiles` → `advisors`, `deal_id` → `hubspot_id`
+
+**Status**: ✅ Phase 0 complete, advisor detail page should work now
+
+**Files**:
+- `lib/advisor-store.ts` - Fully migrated to Prisma
+- `app/api/health/cache/route.ts` - Updated advisor count query
+- `prisma/schema.prisma` - Synced with production database
+- `TODO.md` - Added comprehensive migration plan (Task #15)
+
+**Commits**: 1f59eae (revert wrong migration script), de9f749 (Prisma migration), 1bc319f (schema sync), 99b8c7f (migration plan)
+
+**Next Steps**: Test advisor detail page in production, then begin Phase 1 core advisor flows
+
+---
+
 ## [Completed] Sign-In Page Layout Fix — 2026-04-03
 
 **What**: Fixed cramped sign-in page layout and removed sidebar
