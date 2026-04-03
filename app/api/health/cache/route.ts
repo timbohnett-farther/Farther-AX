@@ -14,7 +14,6 @@ import { NextResponse } from 'next/server';
 import { redisHealthCheck, getSyncState } from '@/lib/redis-client';
 import { bucketHealthCheck } from '@/lib/bucket-client';
 import { prisma } from '@/lib/prisma';
-import pool from '@/lib/db';
 
 export async function GET() {
   const status: Record<string, string | boolean | number | null> = {};
@@ -35,7 +34,7 @@ export async function GET() {
 
   // L3: PostgreSQL
   try {
-    await pool.query('SELECT 1');
+    await prisma.$queryRaw`SELECT 1`;
     status.postgres = 'healthy';
   } catch {
     status.postgres = 'unhealthy';
@@ -55,17 +54,21 @@ export async function GET() {
 
   // PostgreSQL cache stats
   try {
-    const cacheStats = await pool.query(`
+    const cacheStats = await prisma.$queryRaw<Array<{
+      total: bigint;
+      fresh: bigint;
+      stale: bigint;
+    }>>`
       SELECT
         COUNT(*) as total,
         COUNT(*) FILTER (WHERE expires_at > NOW()) as fresh,
         COUNT(*) FILTER (WHERE expires_at <= NOW()) as stale
       FROM api_cache
-    `);
-    const row = cacheStats.rows[0];
-    status.pgCacheTotal = row.total;
-    status.pgCacheFresh = row.fresh;
-    status.pgCacheStale = row.stale;
+    `;
+    const row = cacheStats[0];
+    status.pgCacheTotal = parseInt(row.total.toString());
+    status.pgCacheFresh = parseInt(row.fresh.toString());
+    status.pgCacheStale = parseInt(row.stale.toString());
   } catch {
     status.pgCacheTotal = 'unknown';
   }

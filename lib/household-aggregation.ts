@@ -1,4 +1,4 @@
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -176,34 +176,51 @@ export function computeHouseholdStatus(accounts: TransitionAccount[]): {
 export async function getHouseholdsByAdvisor(
   advisorName?: string,
 ): Promise<HouseholdGroup[]> {
-  const whereClause = advisorName
-    ? 'WHERE advisor_name = $1'
-    : 'WHERE advisor_name IS NOT NULL';
-  const params = advisorName ? [advisorName] : [];
+  let result: Array<TransitionAccount & { advisor_name: string }>;
 
-  const result = await pool.query<
-    TransitionAccount & { advisor_name: string }
-  >(
-    `SELECT
-      id,
-      advisor_name,
-      household_name,
-      account_type,
-      primary_first_name,
-      primary_last_name,
-      primary_email,
-      status_of_iaa,
-      status_of_account_paperwork,
-      portal_status,
-      document_readiness,
-      docusign_iaa_status,
-      docusign_paperwork_status,
-      fee_schedule
-    FROM transition_clients
-    ${whereClause}
-    ORDER BY advisor_name ASC, household_name ASC, id ASC`,
-    params,
-  );
+  if (advisorName) {
+    result = await prisma.$queryRaw`
+      SELECT
+        id,
+        advisor_name,
+        household_name,
+        account_type,
+        primary_first_name,
+        primary_last_name,
+        primary_email,
+        status_of_iaa,
+        status_of_account_paperwork,
+        portal_status,
+        document_readiness,
+        docusign_iaa_status,
+        docusign_paperwork_status,
+        fee_schedule
+      FROM transition_clients
+      WHERE advisor_name = ${advisorName}
+      ORDER BY advisor_name ASC, household_name ASC, id ASC
+    `;
+  } else {
+    result = await prisma.$queryRaw`
+      SELECT
+        id,
+        advisor_name,
+        household_name,
+        account_type,
+        primary_first_name,
+        primary_last_name,
+        primary_email,
+        status_of_iaa,
+        status_of_account_paperwork,
+        portal_status,
+        document_readiness,
+        docusign_iaa_status,
+        docusign_paperwork_status,
+        fee_schedule
+      FROM transition_clients
+      WHERE advisor_name IS NOT NULL
+      ORDER BY advisor_name ASC, household_name ASC, id ASC
+    `;
+  }
 
   // Group by (advisor_name, household_name)
   const groupKey = (row: { advisor_name: string; household_name: string }) =>
@@ -214,7 +231,7 @@ export async function getHouseholdsByAdvisor(
     { advisor_name: string; household_name: string; accounts: TransitionAccount[] }
   >();
 
-  for (const row of result.rows) {
+  for (const row of result) {
     const key = groupKey(row);
     if (!groupMap.has(key)) {
       groupMap.set(key, {

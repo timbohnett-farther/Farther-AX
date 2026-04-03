@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,7 @@ const CREATE_TABLE_SQL = `
 `;
 
 async function ensureTable() {
-  await pool.query(CREATE_TABLE_SQL);
+  await prisma.$executeRawUnsafe(CREATE_TABLE_SQL);
 }
 
 // ---------------------------------------------------------------------------
@@ -42,28 +43,30 @@ export async function GET(req: NextRequest) {
 
     await ensureTable();
 
-    let query: string;
-    let params: string[];
+    let rows: Array<{
+      topic_slug: string;
+      attempt_number: number;
+      score: number;
+      total_questions: number;
+      passed: boolean;
+      completed_at: Date;
+    }>;
 
     if (topic) {
-      query = `
+      rows = await prisma.$queryRaw`
         SELECT topic_slug, attempt_number, score, total_questions, passed, completed_at
-          FROM quiz_attempts
-         WHERE user_email = $1 AND topic_slug = $2
-         ORDER BY topic_slug ASC, attempt_number ASC
+        FROM quiz_attempts
+        WHERE user_email = ${userEmail} AND topic_slug = ${topic}
+        ORDER BY topic_slug ASC, attempt_number ASC
       `;
-      params = [userEmail, topic];
     } else {
-      query = `
+      rows = await prisma.$queryRaw`
         SELECT topic_slug, attempt_number, score, total_questions, passed, completed_at
-          FROM quiz_attempts
-         WHERE user_email = $1
-         ORDER BY topic_slug ASC, attempt_number ASC
+        FROM quiz_attempts
+        WHERE user_email = ${userEmail}
+        ORDER BY topic_slug ASC, attempt_number ASC
       `;
-      params = [userEmail];
     }
-
-    const { rows } = await pool.query(query, params);
 
     return NextResponse.json({ results: rows });
   } catch (err: unknown) {

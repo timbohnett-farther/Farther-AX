@@ -9,7 +9,7 @@
  * in null due dates (e.g. when launch_date was unknown and is now set).
  */
 
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { TASKS } from '@/lib/onboarding-tasks-v2';
 import { calculateDueDate } from '@/lib/due-date-calculator';
 
@@ -24,12 +24,11 @@ export async function initializeTasksForDeal(
   launch_date: string | null
 ): Promise<number> {
   // Fast-path: if all tasks already exist, skip
-  const countResult = await pool.query(
-    `SELECT COUNT(*) as cnt FROM onboarding_tasks
-     WHERE deal_id = $1 AND (is_legacy IS NULL OR is_legacy = FALSE)`,
-    [dealId]
-  );
-  const existingCount = parseInt(countResult.rows[0].cnt, 10);
+  const countResult = await prisma.$queryRaw<Array<{ cnt: bigint }>>`
+    SELECT COUNT(*) as cnt FROM onboarding_tasks
+    WHERE deal_id = ${dealId} AND (is_legacy IS NULL OR is_legacy = FALSE)
+  `;
+  const existingCount = parseInt(countResult[0].cnt.toString(), 10);
 
   if (existingCount >= TASKS.length) {
     return -1; // Already fully initialized
@@ -70,6 +69,6 @@ export async function initializeTasksForDeal(
           updated_at  = NOW()
   `;
 
-  const result = await pool.query(query, values);
-  return result.rowCount ?? 0;
+  await prisma.$executeRawUnsafe(query, ...values);
+  return TASKS.length; // Return number of tasks processed
 }

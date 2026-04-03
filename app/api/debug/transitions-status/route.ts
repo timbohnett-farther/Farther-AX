@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 /**
  * Debug endpoint to check transitions data status
@@ -17,10 +17,13 @@ export async function GET() {
 
     // Check transition_clients table
     try {
-      const clientsResult = await pool.query('SELECT COUNT(*) as count, MAX(synced_at) as last_sync FROM transition_clients');
+      const clientsResult = await prisma.$queryRaw<Array<{
+        count: bigint;
+        last_sync: Date | null;
+      }>>`SELECT COUNT(*) as count, MAX(synced_at) as last_sync FROM transition_clients`;
       checks.transition_clients = {
-        count: parseInt(clientsResult.rows[0]?.count || '0'),
-        last_synced: clientsResult.rows[0]?.last_sync?.toISOString() || null,
+        count: parseInt(clientsResult[0]?.count?.toString() || '0'),
+        last_synced: clientsResult[0]?.last_sync?.toISOString() || null,
       };
     } catch (err) {
       checks.transition_clients = { error: err instanceof Error ? err.message : String(err) };
@@ -28,10 +31,13 @@ export async function GET() {
 
     // Check advisor_tran_aum table
     try {
-      const aumResult = await pool.query('SELECT COUNT(*) as count, MAX(last_synced_at) as last_sync FROM advisor_tran_aum');
+      const aumResult = await prisma.$queryRaw<Array<{
+        count: bigint;
+        last_sync: Date | null;
+      }>>`SELECT COUNT(*) as count, MAX(last_synced_at) as last_sync FROM advisor_tran_aum`;
       checks.advisor_tran_aum = {
-        count: parseInt(aumResult.rows[0]?.count || '0'),
-        last_synced: aumResult.rows[0]?.last_sync?.toISOString() || null,
+        count: parseInt(aumResult[0]?.count?.toString() || '0'),
+        last_synced: aumResult[0]?.last_sync?.toISOString() || null,
       };
 
     } catch (err) {

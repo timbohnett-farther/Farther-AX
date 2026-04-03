@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { QUIZ_BANK } from '@/lib/quiz-questions';
 
 export const dynamic = 'force-dynamic';
@@ -26,7 +26,7 @@ const CREATE_TABLE_SQL = `
 `;
 
 async function ensureTable() {
-  await pool.query(CREATE_TABLE_SQL);
+  await prisma.$executeRawUnsafe(CREATE_TABLE_SQL);
 }
 
 /** Fisher-Yates shuffle, return first n items */
@@ -66,13 +66,18 @@ export async function GET(req: NextRequest) {
     await ensureTable();
 
     // Fetch previous attempts
-    const { rows: attempts } = await pool.query(
-      `SELECT attempt_number AS attempt, score, total_questions AS total, passed, completed_at AS "completedAt"
-         FROM quiz_attempts
-        WHERE user_email = $1 AND topic_slug = $2
-        ORDER BY attempt_number ASC`,
-      [userEmail, topic],
-    );
+    const attempts = await prisma.$queryRaw<Array<{
+      attempt: number;
+      score: number;
+      total: number;
+      passed: boolean;
+      completedAt: Date;
+    }>>`
+      SELECT attempt_number AS attempt, score, total_questions AS total, passed, completed_at AS "completedAt"
+      FROM quiz_attempts
+      WHERE user_email = ${userEmail} AND topic_slug = ${topic}
+      ORDER BY attempt_number ASC
+    `;
 
     const canTake = attempts.length < MAX_ATTEMPTS && !attempts.some((a: { passed: boolean }) => a.passed);
 
@@ -123,12 +128,14 @@ export async function POST(req: NextRequest) {
     await ensureTable();
 
     // Check existing attempts
-    const { rows: existing } = await pool.query(
-      `SELECT attempt_number, passed FROM quiz_attempts
-        WHERE user_email = $1 AND topic_slug = $2
-        ORDER BY attempt_number ASC`,
-      [userEmail, topic],
-    );
+    const existing = await prisma.$queryRaw<Array<{
+      attempt_number: number;
+      passed: boolean;
+    }>>`
+      SELECT attempt_number, passed FROM quiz_attempts
+      WHERE user_email = ${userEmail} AND topic_slug = ${topic}
+      ORDER BY attempt_number ASC
+    `;
 
     if (existing.length >= MAX_ATTEMPTS) {
       return NextResponse.json({ error: 'Maximum attempts reached' }, { status: 403 });
@@ -166,13 +173,12 @@ export async function POST(req: NextRequest) {
     const questionIds = answers.map(a => a.questionId);
     const answerIndices = answers.map(a => a.selectedIndex);
 
-    await pool.query(
-      `INSERT INTO quiz_attempts
-         (user_email, user_name, topic_slug, attempt_number, score, total_questions, passed, questions_json, answers_json)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [userEmail, userName || null, topic, attemptNumber, score, total, passed,
-       JSON.stringify(questionIds), JSON.stringify(answerIndices)],
-    );
+    await prisma.$executeRaw`
+      INSERT INTO quiz_attempts
+        (user_email, user_name, topic_slug, attempt_number, score, total_questions, passed, questions_json, answers_json)
+      VALUES (${userEmail}, ${userName || null}, ${topic}, ${attemptNumber}, ${score}, ${total}, ${passed},
+              ${JSON.stringify(questionIds)}::jsonb, ${JSON.stringify(answerIndices)}::jsonb)
+    `;
 
     return NextResponse.json({ score, total, passed, attempt: attemptNumber, answers: results });
   } catch (err: unknown) {

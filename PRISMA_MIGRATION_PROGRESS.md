@@ -5,8 +5,8 @@
 Migrating all API endpoints and library functions from raw SQL (`pool` from `@/lib/db`) to Prisma ORM for type safety, better error handling, and unified database access patterns.
 
 **Started**: 2026-04-03
-**Current Status**: **Phase 4 COMPLETE** ✅ | All forms & utilities migrated
-**Overall Progress**: **40/52 files (77%)**
+**Current Status**: **Phase 5 Batch 2 COMPLETE** ✅ | Health/Debug/Quiz routes + Task/Aggregation libs migrated
+**Overall Progress**: **46/52 files (88%)**
 
 ---
 
@@ -112,16 +112,24 @@ Migrated core advisor detail page endpoints and warm cache endpoints.
 
 ---
 
-### ⏭️ **Phase 5 - Library & Background Workers** (0% complete)
+### 🔄 **Phase 5 - Remaining Libraries** (IN PROGRESS - 6/11 files)
 
-**Files Pending (7)**:
-1. `lib/cache-utils.ts`
-2. `lib/data-fetcher.ts`
-3. `lib/hubspot-sync.ts`
-4. `lib/background-jobs.ts`
-5. `lib/change-detection.ts`
-6. `scripts/sync-advisors.ts`
-7. `scripts/sync-transitions.ts`
+**Batch 1 - Health & Debug Routes (4/4 COMPLETE):**
+1. ✅ `app/api/health/cache/route.ts` (2 queries: health check, cache stats with BigInt)
+2. ✅ `app/api/debug/transitions-status/route.ts` (2 queries: COUNT with BigInt)
+3. ✅ `app/api/quiz/route.ts` (4 queries: CREATE TABLE, 2 SELECTs, INSERT with JSONB)
+4. ✅ `app/api/quiz/results/route.ts` (2 queries: CREATE TABLE, conditional SELECT)
+
+**Batch 2 - Task & Aggregation Libraries (2/2 COMPLETE):**
+5. ✅ `lib/task-initializer.ts` (2 queries: COUNT, dynamic bulk INSERT with ON CONFLICT)
+6. ✅ `lib/household-aggregation.ts` (1 query: conditional WHERE clause)
+
+**Batch 3 - Cache & Agent Libraries (0/5 PENDING):**
+7. `lib/pg-cache.ts` (5+ queries: cache get/set/invalidate/clear)
+8. `lib/change-detection.ts` (5+ queries: snapshot comparison)
+9. `lib/agents/health.ts` (5+ queries: zombie detection, schedules)
+10. `lib/agents/processors.ts` (5+ queries: cache staleness, data quality)
+11. `lib/agents/scheduler.ts` (5+ queries: schedule management)
 
 ---
 
