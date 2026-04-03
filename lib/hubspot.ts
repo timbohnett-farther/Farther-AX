@@ -3,6 +3,7 @@
  *
  * Features:
  * - Automatic retry on 429/502/503 with exponential backoff
+ * - Request timeouts (30s default, prevents hanging)
  * - Pagination helpers for search API
  * - Batch upsert operations (max 100 per batch)
  * - Type-safe response interfaces
@@ -22,6 +23,8 @@
  * await batchUpsert('contacts', inputs);
  * ```
  */
+
+import { fetchWithTimeout, API_TIMEOUTS } from './api-timeout';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const BASE_URL = 'https://api.hubapi.com';
@@ -103,14 +106,14 @@ export async function hubspotFetch<T = any>(
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
-      const res = await fetch(url, {
+      const res = await fetchWithTimeout(url, {
         ...options,
         headers: {
           'Authorization': `Bearer ${HUBSPOT_PAT}`,
           'Content-Type': 'application/json',
           ...options.headers,
         },
-      });
+      }, API_TIMEOUTS.SYNC);
 
       // Success — return parsed JSON
       if (res.ok) {
