@@ -482,7 +482,9 @@ async function syncWorkbook(
     return { sheetId, workbookName, detectedAdvisor, synced, total: dataRows.length, mappedCount };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
+    const stack = err instanceof Error ? err.stack : undefined;
     console.error(`[transitions/sync] Error syncing "${workbookName}" (${sheetId}):`, message);
+    if (stack) console.error('[transitions/sync] Stack trace:', stack);
     return { sheetId, workbookName, detectedAdvisor: null, synced: 0, total: 0, mappedCount: 0, error: message };
   }
 }
