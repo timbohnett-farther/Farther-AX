@@ -63,11 +63,26 @@ const CONTACT_PROPS = [
 
 // ── Fetch deal ────────────────────────────────────────────────────────────────
 async function fetchDeal(id: string) {
+  console.log(`[advisor detail] Fetching deal ${id} from HubSpot`);
   const res = await fetch(
     `https://api.hubapi.com/crm/v3/objects/deals/${id}?properties=${DEAL_PROPS}&associations=contacts,notes`,
     { headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` } }
   );
-  if (!res.ok) throw new Error(`Deal fetch failed: ${res.status}`);
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error(`[advisor detail] Deal fetch failed:`, {
+      status: res.status,
+      statusText: res.statusText,
+      response: errorText
+    });
+    if (res.status === 404) {
+      throw new Error(`Deal ${id} not found in HubSpot. Please check the deal ID.`);
+    } else if (res.status === 401 || res.status === 403) {
+      throw new Error(`HubSpot API authentication failed. Please check HUBSPOT_ACCESS_TOKEN.`);
+    }
+    throw new Error(`Deal fetch failed: ${res.status} - ${errorText}`);
+  }
+  console.log(`[advisor detail] Successfully fetched deal ${id}`);
   return res.json();
 }
 
@@ -345,13 +360,15 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const { getCached, writeThroughCache } = await import('@/lib/cached-fetchers');
 
     const { data, source } = await getCached('advisor', params.id, async () => {
-      // ── This is the EXISTING fetch logic, unchanged ──────────────────
+      // ── DB-first with automatic HubSpot fallback ──────────────────
       await ensureAdvisorTables();
 
       // Try to serve from DB first
+      console.log(`[advisor detail] Checking database for deal ${params.id}`);
       const snapshot = await getAdvisorFromDB(params.id);
 
       if (snapshot.fromDB && snapshot.profile) {
+        console.log(`[advisor detail] ✓ Serving from database (cached data found)`);
         const formatted = formatDBDataForFrontend(snapshot);
 
         // Fire background sync (don't await)
@@ -360,10 +377,13 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         return formatted;
       }
 
-      // No DB data — full fetch from HubSpot (first visit)
+      // No DB data — automatic fallback to HubSpot (first visit or empty DB)
+      console.log(`[advisor detail] ⚠ Database empty for deal ${params.id} - fetching from HubSpot`);
       const freshData = await fetchAdvisorData(params.id);
+      console.log(`[advisor detail] ✓ Successfully fetched data from HubSpot`);
 
-      // Write to DB in background
+      // Write to DB in background (seed the database)
+      console.log(`[advisor detail] Writing data to database for future requests`);
       writeAdvisorToDB({
         deal: freshData.deal,
         allContacts: freshData.allContacts,
@@ -384,25 +404,48 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     res.headers.set('X-Cache', source.toUpperCase());
     return res;
   } catch (err) {
-    console.error('[advisor detail]', err);
+    console.error('[advisor detail] Error fetching advisor data:', err);
+
+    // Detailed error logging to help diagnose issues
+    if (!HUBSPOT_PAT) {
+      console.error('[advisor detail] HUBSPOT_ACCESS_TOKEN not configured');
+      return NextResponse.json({
+        error: 'HubSpot API credentials not configured',
+        details: 'Please set HUBSPOT_ACCESS_TOKEN environment variable'
+      }, { status: 500 });
+    }
 
     // Last resort: try serving stale DB data even if everything failed
     try {
       await ensureAdvisorTables();
       const snapshot = await getAdvisorFromDB(params.id);
       if (snapshot.fromDB) {
+        console.log('[advisor detail] Serving stale DB data as fallback');
         const formatted = formatDBDataForFrontend(snapshot);
         const res = NextResponse.json(formatted);
         res.headers.set('X-Data-Source', 'database-fallback');
         res.headers.set('X-Cache', 'FALLBACK');
         return res;
+      } else {
+        console.log('[advisor detail] No DB data available for fallback');
       }
-    } catch {
-      // DB also failed
+    } catch (dbErr) {
+      console.error('[advisor detail] DB fallback also failed:', dbErr);
     }
 
     const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: message }, { status: 500 });
+    const errorDetails = {
+      error: 'Failed to fetch advisor data',
+      message,
+      dealId: params.id,
+      hubspotConfigured: !!HUBSPOT_PAT,
+      suggestion: !HUBSPOT_PAT
+        ? 'Configure HUBSPOT_ACCESS_TOKEN environment variable'
+        : 'Check that the deal ID exists in HubSpot and API credentials are valid'
+    };
+
+    console.error('[advisor detail] Returning error:', errorDetails);
+    return NextResponse.json(errorDetails, { status: 500 });
   }
 }
 
