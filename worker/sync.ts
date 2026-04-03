@@ -13,50 +13,8 @@
 import { writeThroughCache } from '../lib/cached-fetchers';
 import { getSyncState, setSyncState, invalidatePattern } from '../lib/redis-client';
 import { withPgCache } from '../lib/pg-cache';
+import { getPipelineDeals } from '../lib/hubspot';
 import pool from '../lib/db';
-
-// ── Environment ─────────────────────────────────────────────────────────────
-
-const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
-const PIPELINE_ID = '751770';
-const ACTIVE_STAGE_IDS = [
-  '2496931', '2496932', '2496934', '100409509',
-  '2496935', '2496936', '100411705',
-];
-
-// ── HubSpot Helpers (replicated from existing routes — same API calls) ──────
-
-async function fetchPipelineDeals() {
-  const deals: Array<{ id: string; properties: Record<string, string | null> }> = [];
-  let after: string | undefined;
-
-  do {
-    const res = await fetch('https://api.hubapi.com/crm/v3/objects/deals/search', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${HUBSPOT_PAT}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        filterGroups: [{
-          filters: [
-            { propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID },
-            { propertyName: 'dealstage', operator: 'IN', values: ACTIVE_STAGE_IDS },
-          ],
-        }],
-        properties: ['dealname', 'dealstage', 'hs_lastmodifieddate'],
-        limit: 100,
-        ...(after ? { after } : {}),
-      }),
-    });
-    if (!res.ok) throw new Error(`Pipeline fetch failed: ${res.status}`);
-    const data = await res.json();
-    deals.push(...data.results);
-    after = data.paging?.next?.after;
-  } while (after);
-
-  return deals;
-}
 
 // ── Sync Advisors ───────────────────────────────────────────────────────────
 
@@ -66,8 +24,8 @@ async function syncAdvisors(): Promise<number> {
   const lastRunStr = await getSyncState('advisor_sync');
   const lastRun = lastRunStr ? new Date(lastRunStr) : new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-  // Get all active pipeline deals
-  const deals = await fetchPipelineDeals();
+  // Get all active pipeline deals (using shared function with 2-minute cache)
+  const deals = await getPipelineDeals(['dealname', 'dealstage', 'hs_lastmodifieddate']);
   console.log(`[Sync] Found ${deals.length} active pipeline deals`);
 
   // Check which advisors have been modified since last sync

@@ -405,3 +405,83 @@ export function formatHubSpotError(error: unknown): string {
 export function isHubSpotConfigured(): boolean {
   return Boolean(HUBSPOT_PAT && HUBSPOT_PAT.length > 0);
 }
+
+// ── Pipeline Deals Cache ──────────────────────────────────────────────────────
+
+const PIPELINE_ID = '751770';
+const ACTIVE_STAGE_IDS = [
+  '2496931',   // Step 1 – First Meeting
+  '2496932',   // Step 2 – Financial Model
+  '2496934',   // Step 3 – Advisor Demo
+  '100409509', // Step 4 – Discovery Day
+  '2496935',   // Step 5 – Offer Review
+  '2496936',   // Step 6 – Offer Accepted
+  '100411705', // Step 7 – Launched
+];
+
+interface PipelineCacheEntry {
+  data: HubSpotSearchResult[];
+  timestamp: number;
+}
+
+const pipelineCache = new Map<string, PipelineCacheEntry>();
+const PIPELINE_CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+
+/**
+ * Fetch all pipeline deals with internal caching (2 min TTL)
+ *
+ * Deduplicates identical requests within a 2-minute window to prevent
+ * redundant HubSpot API calls when multiple endpoints need pipeline data.
+ *
+ * @param properties - Array of property names to fetch (default: minimal set)
+ * @param includeClosed - Include closed/won deals (default: false, active only)
+ * @returns Array of pipeline deals
+ *
+ * @example
+ * ```ts
+ * // Minimal properties for IDs only
+ * const deals = await getPipelineDeals(['dealname']);
+ *
+ * // Full property set for detailed analysis
+ * const richDeals = await getPipelineDeals([
+ *   'dealname', 'transferable_aum', 'dealstage', 'actual_launch_date'
+ * ]);
+ * ```
+ */
+export async function getPipelineDeals(
+  properties: string[] = ['dealname', 'dealstage', 'hs_lastmodifieddate'],
+  includeClosed: boolean = false
+): Promise<HubSpotSearchResult[]> {
+  const cacheKey = `${properties.sort().join(',')}:${includeClosed}`;
+
+  // Check cache
+  const cached = pipelineCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < PIPELINE_CACHE_TTL) {
+    return cached.data;
+  }
+
+  // Cache miss — fetch from HubSpot
+  const stageIds = includeClosed ? [...ACTIVE_STAGE_IDS] : ACTIVE_STAGE_IDS;
+
+  const deals = await paginatedSearch<HubSpotSearchResult>(
+    'deals',
+    [
+      {
+        filters: [
+          { propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID },
+          { propertyName: 'dealstage', operator: 'IN', values: stageIds },
+        ],
+      },
+    ],
+    properties,
+    [{ propertyName: 'hs_lastmodifieddate', direction: 'DESCENDING' }]
+  );
+
+  // Update cache
+  pipelineCache.set(cacheKey, {
+    data: deals,
+    timestamp: Date.now(),
+  });
+
+  return deals;
+}

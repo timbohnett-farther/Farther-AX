@@ -1,46 +1,11 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { withPgCache } from '@/lib/pg-cache';
+import { getPipelineDeals, hubspotFetch } from '@/lib/hubspot';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
-const PIPELINE_ID = '751770';
 const LAUNCHED_STAGE = '100411705';
 const MANAGED_ACCOUNTS_OBJECT_TYPE = '2-13676628';
-
-interface DealResult {
-  properties: Record<string, string | null>;
-}
-
-// ── Fetch all pipeline deals (paginated) ────────────────────────────────────
-async function fetchPipelineDeals(): Promise<DealResult[]> {
-  const deals: DealResult[] = [];
-  let after: string | undefined;
-
-  do {
-    const body: Record<string, unknown> = {
-      filterGroups: [{ filters: [{ propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID }] }],
-      properties: [
-        'dealname', 'transferable_aum', 'dealstage', 'actual_launch_date',
-        'createdate', 'desired_start_date', 'transition_type', 'firm_type',
-        'client_households',
-      ],
-      limit: 100,
-    };
-    if (after) body.after = after;
-
-    const res = await fetch('https://api.hubapi.com/crm/v3/objects/deals/search', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) { const e = await res.text(); throw new Error(`HubSpot ${res.status}: ${e}`); }
-    const data = await res.json();
-    deals.push(...(data.results ?? []));
-    after = data.paging?.next?.after;
-  } while (after);
-
-  return deals;
-}
 
 // ── Fetch managed accounts totals ───────────────────────────────────────────
 async function fetchManagedAccountsTotals(): Promise<{ totalAUM: number; totalRevenue: number; advisorCount: number }> {
@@ -111,8 +76,17 @@ async function fetchTeamRoleCounts(): Promise<Record<string, number>> {
 }
 
 async function fetchMetricsData() {
-  const [deals, teamRoles, managed] = await Promise.all([
-    fetchPipelineDeals(),
+  // Fetch pipeline deals using shared function (2-minute cache)
+  const dealsRaw = await getPipelineDeals([
+    'dealname', 'transferable_aum', 'dealstage', 'actual_launch_date',
+    'createdate', 'desired_start_date', 'transition_type', 'firm_type',
+    'client_households',
+  ]);
+
+  // Transform to expected format
+  const deals = dealsRaw.map(d => ({ properties: d.properties }));
+
+  const [teamRoles, managed] = await Promise.all([
     fetchTeamRoleCounts(),
     fetchManagedAccountsTotals(),
   ]);

@@ -13,6 +13,7 @@
 
 import { NextResponse } from 'next/server';
 import { withPgCache } from '@/lib/pg-cache';
+import { getPipelineDeals } from '@/lib/hubspot';
 import pool from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -258,39 +259,13 @@ async function getDealIds(): Promise<{ id: string; dealname?: string }[]> {
     return result.rows[0].data.deals;
   }
 
-  // Pipeline cache is cold — fetch deal IDs directly from HubSpot
-  const PIPELINE_ID = '751770';
-  const ACTIVE_STAGE_IDS = ['2496931', '2496932', '2496934', '100409509', '2496935', '2496936', '100411705'];
-  const deals: { id: string; dealname?: string }[] = [];
-  let after: string | undefined;
+  // Pipeline cache is cold — fetch using shared function (2-minute cache)
+  const dealsRaw = await getPipelineDeals(['dealname']);
 
-  do {
-    const body: Record<string, unknown> = {
-      filterGroups: [{
-        filters: [
-          { propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID },
-          { propertyName: 'dealstage', operator: 'IN', values: ACTIVE_STAGE_IDS },
-        ],
-      }],
-      properties: ['dealname'],
-      limit: 100,
-    };
-    if (after) body.after = after;
-
-    const res = await fetch('https://api.hubapi.com/crm/v3/objects/deals/search', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${HUBSPOT_PAT}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) break;
-    const data = await res.json();
-    for (const d of data.results ?? []) {
-      deals.push({ id: d.id, dealname: d.properties?.dealname });
-    }
-    after = data.paging?.next?.after;
-  } while (after);
-
-  return deals;
+  return dealsRaw.map(d => ({
+    id: d.id,
+    dealname: d.properties.dealname ?? undefined,
+  }));
 }
 
 // ── Background warming logic ────────────────────────────────────────────────

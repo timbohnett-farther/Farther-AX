@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { withPgCache } from '@/lib/pg-cache';
-import { paginatedSearch, hubspotFetch } from '@/lib/hubspot';
-
-const PIPELINE_ID = '751770';
+import { getPipelineDeals, hubspotFetch } from '@/lib/hubspot';
 
 // ── Stage definitions ─────────────────────────────────────────────────────────
 // Active stages: deals currently progressing through the funnel
@@ -56,21 +54,8 @@ type DealResult = { id: string; properties: Record<string, string | null> };
 
 // ── Fetch active deals (in-progress stages) ───────────────────────────────────
 async function fetchActiveDeals(): Promise<DealResult[]> {
-  // HubSpot allows max 5 filterGroups. We use one group per active stage
-  // with AND logic: pipeline = X AND dealstage IN active stages.
-  return paginatedSearch<DealResult>(
-    'deals',
-    [
-      {
-        filters: [
-          { propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID },
-          { propertyName: 'dealstage', operator: 'IN', values: ACTIVE_STAGE_IDS },
-        ],
-      },
-    ],
-    DEAL_PROPERTIES,
-    [{ propertyName: 'hs_lastmodifieddate', direction: 'DESCENDING' }]
-  );
+  // Use shared function with 2-minute cache to prevent redundant HubSpot calls
+  return getPipelineDeals(DEAL_PROPERTIES) as Promise<DealResult[]>;
 }
 
 // ── Compute days since launch for graduated status ──────────────────────────
