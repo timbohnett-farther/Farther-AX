@@ -13,7 +13,7 @@
 
 import { NextResponse } from 'next/server';
 import { withPgCache } from '@/lib/pg-cache';
-import { getPipelineDeals } from '@/lib/hubspot';
+import { getPipelineDeals, batchRead } from '@/lib/hubspot';
 import pool from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -188,22 +188,30 @@ async function fetchAdvisorDetail(dealId: string) {
         }
       }
 
-      // Fetch additional associated contacts
+      // Fetch additional associated contacts (batch read for efficiency)
+      const contactIdsToFetch: string[] = [];
       for (const assoc of contactAssocs) {
         if (contact && assoc.toObjectId === primaryContactId) {
           allContacts.push(contact);
-          continue;
+        } else {
+          contactIdsToFetch.push(assoc.toObjectId);
         }
+      }
+
+      // Batch read all remaining contacts in a single API call
+      if (contactIdsToFetch.length > 0) {
         try {
-          const otherRes = await fetch(
-            `https://api.hubapi.com/crm/v3/objects/contacts/${assoc.toObjectId}?properties=firstname,lastname,email,phone,company,city,state`,
-            { headers }
+          const batchContacts = await batchRead(
+            'contacts',
+            contactIdsToFetch,
+            ['firstname', 'lastname', 'email', 'phone', 'company', 'city', 'state']
           );
-          if (otherRes.ok) {
-            const otherData = await otherRes.json();
-            allContacts.push({ id: otherData.id, ...otherData.properties });
+          for (const c of batchContacts) {
+            allContacts.push({ id: c.id, ...c.properties });
           }
-        } catch (err) { console.warn('[warm] Contact fetch skipped:', err instanceof Error ? err.message : String(err)); }
+        } catch (err) {
+          console.warn('[warm] Batch contact fetch failed:', err instanceof Error ? err.message : String(err));
+        }
       }
     }
   }
