@@ -163,20 +163,20 @@ When you report a fix:
   - `AUDIT_FIX_PLAN.md` - Ordered fix plan with code samples
   - `AUDIT_EXECUTIVE_SUMMARY.md` - High-level overview + roadmap
 
-- **Phase 0 — Deployment Blockers (90 minutes):**
-  - [ ] RAIL-001: Resolve merge conflicts in 4 training pages (30 min)
-  - [ ] RAIL-002: Move `tsx` from devDependencies to dependencies (5 min)
-  - [ ] RAIL-003: Change auth validation from `process.exit(1)` to `throw Error` (15 min)
-  - [ ] ROUTE-001: Fix APP_URL fallback to point to farther-ax (5 min)
-  - [ ] ARCH-003: Run `npm install` to install missing dependencies (1 min)
-  - [ ] RAIL-005: Create simple `/api/health` endpoint (10 min)
-  - [ ] Env validation: Add startup validation with clear errors (30 min)
+- **Phase 0 — Deployment Blockers (90 minutes):** ✅ COMPLETE (2026-04-03)
+  - [x] RAIL-001: Resolve merge conflicts in 4 training pages (30 min)
+  - [x] RAIL-002: Move `tsx` from devDependencies to dependencies (5 min)
+  - [x] RAIL-003: Change auth validation from `process.exit(1)` to `throw Error` (15 min)
+  - [x] ROUTE-001: Fix APP_URL fallback to point to farther-ax (5 min)
+  - [x] ARCH-003: Run `npm install` to install missing dependencies (1 min)
+  - [x] RAIL-005: Create simple `/api/health` endpoint (10 min)
+  - [x] Env validation: Add startup validation with clear errors (30 min)
 
-- **Phase 1 — Reliability Fixes (Week 1):**
-  - [ ] API-001: Add API request timeouts (fetchWithTimeout helper)
-  - [ ] DATA-001: Deduplicate HubSpot API calls (getPipelineDeals)
-  - [ ] DATA-002: Fix N+1 pattern with batch contact reads
-  - [ ] ROUTE-003: Centralize URL construction (lib/app-url.ts)
+- **Phase 1 — Reliability Fixes (Week 1):** ✅ COMPLETE (2026-04-03)
+  - [x] API-001: Add API request timeouts (fetchWithTimeout helper) — Commit fd96b4c
+  - [x] DATA-001: Deduplicate HubSpot API calls (getPipelineDeals) — Commit fd96b4c
+  - [x] DATA-002: Fix N+1 pattern with batch contact reads — Commit 32185c3
+  - [x] ROUTE-003: Centralize URL construction (lib/app-url.ts) — Commit 0a7e58b
 
 - **Phase 2 — Test Coverage (Week 2):**
   - [ ] TEST-001: Install jest-environment-jsdom
