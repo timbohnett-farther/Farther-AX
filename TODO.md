@@ -184,10 +184,10 @@ When you report a fix:
   - [x] TEST-002: Add DocuSign webhook security tests — Commit f1f3304
   - [x] TEST-003: Document database rollback procedure — Commit babda0b
 
-- **Phase 3 — Architecture (Week 3-4):**
-  - [ ] ARCH-001: Split god components (<200 lines)
+- **Phase 3 — Architecture (Week 3-4):** 🟡 In Progress (1/3 complete)
+  - [ ] ARCH-001: Split god components (<200 lines) — Large refactor, 4-6 hours
   - [ ] ARCH-009: Centralize type definitions (lib/types/)
-  - [ ] TEST-005: Fix pre-commit hooks (remove || true)
+  - [x] TEST-005: Fix pre-commit hooks (remove || true) — Commit f7a76c7
 
 - **Phase 4 — Performance (Week 5-6):**
   - [ ] DATA-003: Implement webhook-first architecture

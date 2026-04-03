@@ -64,7 +64,7 @@ Format: Each entry includes completion status, feature name, date, scope, status
   - Create simple healthcheck
   - Add env validation
 
-**Status**: 🟡 Phase 0-2 complete (2026-04-03), Phase 3-4 pending
+**Status**: 🟡 Phase 0-2 complete, Phase 3 in progress (2026-04-03), Phase 4 pending
 
 **Completed Phases**:
 
@@ -94,10 +94,15 @@ Format: Each entry includes completion status, feature name, date, scope, status
 - Documented comprehensive database rollback procedures (DATABASE_ROLLBACK.md)
 - **Commits**: d80708b, f1f3304, babda0b
 
+**Phase 3 — Architecture (2026-04-03)** 🟡 In Progress (1/3)
+- Fixed pre-commit hooks to enforce TypeScript compilation (removed || true bypass)
+- Added jest.d.ts for @testing-library/jest-dom types globally
+- **Commits**: f7a76c7
+- **Remaining**: Split god components (<200 lines), centralize type definitions
+
 **Next Steps**:
-1. Phase 2.4: Document database rollback procedure
-2. Phase 3: Architecture improvements (split god components, centralize types)
-3. Phase 4: Performance optimization (webhook-first, batch operations)
+1. Phase 3: Complete architecture improvements (god components, centralize types)
+2. Phase 4: Performance optimization (webhook-first, batch operations)
 
 **Impact**:
 - Unblocks Railway deployment
