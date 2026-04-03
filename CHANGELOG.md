@@ -97,8 +97,12 @@ Format: Each entry includes completion status, feature name, date, scope, status
 **Phase 3 — Architecture (2026-04-03)** 🟡 In Progress (1/3)
 - Fixed pre-commit hooks to enforce TypeScript compilation (removed || true bypass)
 - Added jest.d.ts for @testing-library/jest-dom types globally
-- Fixed Railway deployment blocker: Added TypeScript type annotation to workbooks.map() callback in quality/transitions route (resolved implicit 'any' type error after 14 failed deployments)
-- **Commits**: f7a76c7, 15a4750, b803a2b
+- Fixed Railway deployment blockers: Added TypeScript type annotations to both map callbacks in quality/transitions route
+  - Added WorkbookResult type for workbooks.map() (line 175)
+  - Added ClientResult type for clients.map() (line 188)
+  - Both types extracted from Prisma query result shapes using `typeof array[number]` pattern
+  - Resolved implicit 'any' type errors after 15 failed deployments
+- **Commits**: f7a76c7, 15a4750, b803a2b, bc47e92
 - **Remaining**: Split god components (<200 lines), centralize type definitions
 
 **Next Steps**:
