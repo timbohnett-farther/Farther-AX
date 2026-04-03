@@ -1,18 +1,19 @@
 /**
- * Advisor Data Store — Persistent DB-backed cache with incremental sync
+ * Advisor Data Store — Prisma-backed cache with incremental sync
  *
  * Strategy:
- *   1. First visit: Fetch everything from HubSpot, write to DB, serve
- *   2. Return visits: Serve from DB instantly
+ *   1. First visit: Fetch everything from HubSpot, write to Prisma DB, serve
+ *   2. Return visits: Serve from Prisma DB instantly
  *   3. Background: Silently fetch only NEW activities (notes, calls, emails)
  *      since last sync, plus deal stage updates. Compare & upsert changes.
  *
- * Tables:
- *   - advisor_profiles: Static CRM data (deal, contacts, team, pinned note)
+ * Tables (Prisma models):
+ *   - advisors: Static CRM data (deal, contacts, team, pinned note)
  *   - advisor_activities: Timestamped activities (notes, calls, emails, meetings)
  */
 
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -27,7 +28,7 @@ export interface StoredAdvisorProfile {
 }
 
 export interface StoredActivity {
-  id: number;
+  id: string;
   deal_id: string;
   activity_type: 'note' | 'email' | 'call' | 'meeting';
   hubspot_id: string;
@@ -42,69 +43,73 @@ export interface AdvisorSnapshot {
   fromDB: boolean;
 }
 
-// ── Table creation (idempotent) ──────────────────────────────────────────────
+// ── Table creation (no longer needed with Prisma migrations) ────────────────
 
+/**
+ * Prisma handles schema creation via migrations.
+ * This function is now a no-op but kept for backwards compatibility.
+ */
 export async function ensureAdvisorTables(): Promise<void> {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS advisor_profiles (
-      deal_id            VARCHAR(64) PRIMARY KEY,
-      deal_properties    JSONB NOT NULL DEFAULT '{}',
-      contacts           JSONB NOT NULL DEFAULT '[]',
-      team               JSONB,
-      pinned_note        JSONB,
-      last_synced_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-
-    CREATE TABLE IF NOT EXISTS advisor_activities (
-      id                 SERIAL PRIMARY KEY,
-      deal_id            VARCHAR(64) NOT NULL,
-      activity_type      VARCHAR(32) NOT NULL,
-      hubspot_id         VARCHAR(64) NOT NULL,
-      activity_timestamp TIMESTAMPTZ,
-      properties         JSONB NOT NULL DEFAULT '{}',
-      created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      UNIQUE(deal_id, hubspot_id)
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_advisor_activities_deal
-      ON advisor_activities(deal_id);
-    CREATE INDEX IF NOT EXISTS idx_advisor_activities_timestamp
-      ON advisor_activities(deal_id, activity_timestamp DESC);
-  `);
+  // Prisma migrations handle table creation
+  // Run: npx prisma migrate deploy
+  return;
 }
 
 // ── Read from DB ─────────────────────────────────────────────────────────────
 
 /**
- * Get advisor profile + activities from the database.
+ * Get advisor profile + activities from Prisma database.
  * Returns null profile if the advisor hasn't been synced yet.
  */
 export async function getAdvisorFromDB(dealId: string): Promise<AdvisorSnapshot> {
   try {
-    const [profileResult, activitiesResult] = await Promise.all([
-      pool.query<StoredAdvisorProfile>(
-        `SELECT deal_id, deal_properties, contacts, team, pinned_note,
-                last_synced_at::text, created_at::text
-         FROM advisor_profiles WHERE deal_id = $1`,
-        [dealId]
-      ),
-      pool.query<StoredActivity>(
-        `SELECT id, deal_id, activity_type, hubspot_id,
-                activity_timestamp::text, properties, created_at::text
-         FROM advisor_activities
-         WHERE deal_id = $1
-         ORDER BY activity_timestamp DESC
-         LIMIT 50`,
-        [dealId]
-      ),
-    ]);
+    // Find advisor by HubSpot deal ID
+    const advisor = await prisma.advisor.findUnique({
+      where: { hubspot_id: dealId },
+      include: {
+        activities: {
+          orderBy: { timestamp: 'desc' },
+          take: 50,
+        },
+      },
+    });
+
+    if (!advisor) {
+      return { profile: null, activities: [], fromDB: false };
+    }
+
+    // Map Prisma Advisor to StoredAdvisorProfile interface
+    const properties = (advisor.properties as Prisma.JsonObject) || {};
+    const dealProperties = properties.deal_properties as Record<string, unknown> || {};
+    const contacts = properties.contacts as unknown[] || [];
+    const team = properties.team as Record<string, unknown> | null;
+    const pinnedNote = properties.pinned_note as unknown | null;
+
+    const profile: StoredAdvisorProfile = {
+      deal_id: advisor.hubspot_id,
+      deal_properties: dealProperties,
+      contacts,
+      team,
+      pinned_note: pinnedNote,
+      last_synced_at: advisor.last_synced_at.toISOString(),
+      created_at: advisor.created_at.toISOString(),
+    };
+
+    // Map Prisma AdvisorActivity to StoredActivity interface
+    const activities: StoredActivity[] = advisor.activities.map(a => ({
+      id: a.id,
+      deal_id: advisor.hubspot_id,
+      activity_type: a.type as 'note' | 'email' | 'call' | 'meeting',
+      hubspot_id: a.hubspot_id,
+      activity_timestamp: a.timestamp.toISOString(),
+      properties: (a.properties as Record<string, unknown>) || {},
+      created_at: a.created_at.toISOString(),
+    }));
 
     return {
-      profile: profileResult.rows[0] ?? null,
-      activities: activitiesResult.rows,
-      fromDB: profileResult.rows.length > 0,
+      profile,
+      activities,
+      fromDB: true,
     };
   } catch (err) {
     console.error('[advisor-store] getAdvisorFromDB failed:', err);
@@ -124,66 +129,103 @@ interface FullAdvisorData {
 }
 
 /**
- * Write full advisor data to DB after initial HubSpot fetch.
- * Upserts profile and bulk-inserts activities.
+ * Write full advisor data to Prisma DB after initial HubSpot fetch.
+ * Upserts advisor profile and bulk-inserts activities.
  */
 export async function writeAdvisorToDB(data: FullAdvisorData): Promise<void> {
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    // Extract structured fields from deal properties for easier querying
+    const dealProps = data.deal.properties;
+    const name = (dealProps.dealname as string) || 'Unknown Advisor';
+    const email = (dealProps.email as string) || null;
+    const pathway = (dealProps.pathway as string) || null;
+    const status = (dealProps.dealstage as string) || null;
+    const aum = dealProps.aum ? parseFloat(String(dealProps.aum)) : null;
+    const revenue = dealProps.revenue ? parseFloat(String(dealProps.revenue)) : null;
 
-    // Upsert profile
-    await client.query(
-      `INSERT INTO advisor_profiles (deal_id, deal_properties, contacts, team, pinned_note, last_synced_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-       ON CONFLICT (deal_id) DO UPDATE SET
-         deal_properties = EXCLUDED.deal_properties,
-         contacts        = EXCLUDED.contacts,
-         team            = EXCLUDED.team,
-         pinned_note     = EXCLUDED.pinned_note,
-         last_synced_at  = NOW(),
-         updated_at      = NOW()`,
-      [
-        data.deal.id,
-        JSON.stringify(data.deal.properties),
-        JSON.stringify(data.allContacts),
-        data.team ? JSON.stringify(data.team) : null,
-        data.pinnedNote ? JSON.stringify(data.pinnedNote) : null,
-      ]
-    );
+    // Store full HubSpot data in properties JSON field
+    const properties = {
+      deal_properties: data.deal.properties,
+      contacts: data.allContacts,
+      team: data.team,
+      pinned_note: data.pinnedNote,
+    };
 
-    // Bulk upsert activities (notes)
+    // Upsert advisor profile
+    const advisor = await prisma.advisor.upsert({
+      where: { hubspot_id: data.deal.id },
+      create: {
+        hubspot_id: data.deal.id,
+        name,
+        email,
+        pathway,
+        status,
+        aum,
+        revenue,
+        properties: properties as Prisma.InputJsonValue,
+      },
+      update: {
+        name,
+        email,
+        pathway,
+        status,
+        aum,
+        revenue,
+        properties: properties as Prisma.InputJsonValue,
+        last_synced_at: new Date(),
+      },
+    });
+
+    // Upsert activities (notes)
     for (const note of data.notes) {
       const ts = note.properties?.hs_timestamp as string | undefined;
-      await client.query(
-        `INSERT INTO advisor_activities (deal_id, activity_type, hubspot_id, activity_timestamp, properties)
-         VALUES ($1, 'note', $2, $3, $4)
-         ON CONFLICT (deal_id, hubspot_id) DO UPDATE SET
-           properties = EXCLUDED.properties,
-           activity_timestamp = EXCLUDED.activity_timestamp`,
-        [data.deal.id, note.id, ts || null, JSON.stringify(note.properties)]
-      );
+      const timestamp = ts ? new Date(parseInt(ts)) : new Date();
+
+      await prisma.advisorActivity.upsert({
+        where: { hubspot_id: note.id },
+        create: {
+          advisor_id: advisor.id,
+          hubspot_id: note.id,
+          type: 'note',
+          subject: null,
+          body: (note.properties?.hs_note_body as string) || '',
+          timestamp,
+          properties: note.properties as Prisma.InputJsonValue,
+        },
+        update: {
+          timestamp,
+          body: (note.properties?.hs_note_body as string) || '',
+          properties: note.properties as Prisma.InputJsonValue,
+        },
+      });
     }
 
-    // Bulk upsert activities (engagements: emails, calls, meetings)
+    // Upsert activities (engagements: emails, calls, meetings)
     for (const eng of data.engagements) {
-      await client.query(
-        `INSERT INTO advisor_activities (deal_id, activity_type, hubspot_id, activity_timestamp, properties)
-         VALUES ($1, $2, $3, $4, $5)
-         ON CONFLICT (deal_id, hubspot_id) DO UPDATE SET
-           properties = EXCLUDED.properties,
-           activity_timestamp = EXCLUDED.activity_timestamp`,
-        [data.deal.id, eng.type, eng.id, eng.timestamp || null, JSON.stringify(eng.properties)]
-      );
-    }
+      const timestamp = eng.timestamp ? new Date(parseInt(eng.timestamp)) : new Date();
 
-    await client.query('COMMIT');
+      await prisma.advisorActivity.upsert({
+        where: { hubspot_id: eng.id },
+        create: {
+          advisor_id: advisor.id,
+          hubspot_id: eng.id,
+          type: eng.type,
+          subject: (eng.properties?.hs_engagement_subject as string) || null,
+          body: (eng.properties?.hs_engagement_body as string) || '',
+          timestamp,
+          properties: eng.properties as Prisma.InputJsonValue,
+        },
+        update: {
+          timestamp,
+          subject: (eng.properties?.hs_engagement_subject as string) || null,
+          body: (eng.properties?.hs_engagement_body as string) || '',
+          properties: eng.properties as Prisma.InputJsonValue,
+        },
+      });
+    }
   } catch (err) {
-    await client.query('ROLLBACK');
     console.error('[advisor-store] writeAdvisorToDB failed:', err);
     throw err;
-  } finally {
-    client.release();
   }
 }
 
@@ -201,73 +243,99 @@ interface IncrementalUpdate {
  * Only writes new/changed data — doesn't touch what hasn't changed.
  */
 export async function applyIncrementalUpdate(dealId: string, update: IncrementalUpdate): Promise<number> {
-  const client = await pool.connect();
   let changesApplied = 0;
 
   try {
-    await client.query('BEGIN');
+    // Find advisor
+    const advisor = await prisma.advisor.findUnique({
+      where: { hubspot_id: dealId },
+    });
+
+    if (!advisor) {
+      console.warn(`[advisor-store] Advisor ${dealId} not found for incremental update`);
+      return 0;
+    }
 
     // Update deal properties + contacts if provided
-    if (update.dealProperties) {
-      await client.query(
-        `UPDATE advisor_profiles
-         SET deal_properties = $2,
-             contacts = COALESCE($3, contacts),
-             last_synced_at = NOW(),
-             updated_at = NOW()
-         WHERE deal_id = $1`,
-        [
-          dealId,
-          JSON.stringify(update.dealProperties),
-          update.newContacts ? JSON.stringify(update.newContacts) : null,
-        ]
-      );
+    if (update.dealProperties || update.newContacts) {
+      const currentProps = (advisor.properties as Prisma.JsonObject) || {};
+
+      const updatedProps = {
+        ...currentProps,
+        ...(update.dealProperties && { deal_properties: update.dealProperties }),
+        ...(update.newContacts && { contacts: update.newContacts }),
+      };
+
+      await prisma.advisor.update({
+        where: { hubspot_id: dealId },
+        data: {
+          properties: updatedProps as Prisma.InputJsonValue,
+          last_synced_at: new Date(),
+        },
+      });
       changesApplied++;
     }
 
     // Upsert new notes
     for (const note of update.newNotes) {
       const ts = note.properties?.hs_timestamp as string | undefined;
-      const result = await client.query(
-        `INSERT INTO advisor_activities (deal_id, activity_type, hubspot_id, activity_timestamp, properties)
-         VALUES ($1, 'note', $2, $3, $4)
-         ON CONFLICT (deal_id, hubspot_id) DO UPDATE SET
-           properties = EXCLUDED.properties,
-           activity_timestamp = EXCLUDED.activity_timestamp
-         WHERE advisor_activities.properties IS DISTINCT FROM EXCLUDED.properties`,
-        [dealId, note.id, ts || null, JSON.stringify(note.properties)]
-      );
-      if (result.rowCount && result.rowCount > 0) changesApplied++;
+      const timestamp = ts ? new Date(parseInt(ts)) : new Date();
+
+      const result = await prisma.advisorActivity.upsert({
+        where: { hubspot_id: note.id },
+        create: {
+          advisor_id: advisor.id,
+          hubspot_id: note.id,
+          type: 'note',
+          subject: null,
+          body: (note.properties?.hs_note_body as string) || '',
+          timestamp,
+          properties: note.properties as Prisma.InputJsonValue,
+        },
+        update: {
+          timestamp,
+          body: (note.properties?.hs_note_body as string) || '',
+          properties: note.properties as Prisma.InputJsonValue,
+        },
+      });
+      changesApplied++;
     }
 
     // Upsert new engagements
     for (const eng of update.newEngagements) {
-      const result = await client.query(
-        `INSERT INTO advisor_activities (deal_id, activity_type, hubspot_id, activity_timestamp, properties)
-         VALUES ($1, $2, $3, $4, $5)
-         ON CONFLICT (deal_id, hubspot_id) DO UPDATE SET
-           properties = EXCLUDED.properties,
-           activity_timestamp = EXCLUDED.activity_timestamp
-         WHERE advisor_activities.properties IS DISTINCT FROM EXCLUDED.properties`,
-        [dealId, eng.type, eng.id, eng.timestamp || null, JSON.stringify(eng.properties)]
-      );
-      if (result.rowCount && result.rowCount > 0) changesApplied++;
+      const timestamp = eng.timestamp ? new Date(parseInt(eng.timestamp)) : new Date();
+
+      const result = await prisma.advisorActivity.upsert({
+        where: { hubspot_id: eng.id },
+        create: {
+          advisor_id: advisor.id,
+          hubspot_id: eng.id,
+          type: eng.type,
+          subject: (eng.properties?.hs_engagement_subject as string) || null,
+          body: (eng.properties?.hs_engagement_body as string) || '',
+          timestamp,
+          properties: eng.properties as Prisma.InputJsonValue,
+        },
+        update: {
+          timestamp,
+          subject: (eng.properties?.hs_engagement_subject as string) || null,
+          body: (eng.properties?.hs_engagement_body as string) || '',
+          properties: eng.properties as Prisma.InputJsonValue,
+        },
+      });
+      changesApplied++;
     }
 
-    // Update last_synced_at regardless
-    await client.query(
-      `UPDATE advisor_profiles SET last_synced_at = NOW() WHERE deal_id = $1`,
-      [dealId]
-    );
+    // Update last_synced_at
+    await prisma.advisor.update({
+      where: { hubspot_id: dealId },
+      data: { last_synced_at: new Date() },
+    });
 
-    await client.query('COMMIT');
     return changesApplied;
   } catch (err) {
-    await client.query('ROLLBACK');
     console.error('[advisor-store] applyIncrementalUpdate failed:', err);
     return 0;
-  } finally {
-    client.release();
   }
 }
 

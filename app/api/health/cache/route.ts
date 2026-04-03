@@ -13,6 +13,7 @@
 import { NextResponse } from 'next/server';
 import { redisHealthCheck, getSyncState } from '@/lib/redis-client';
 import { bucketHealthCheck } from '@/lib/bucket-client';
+import { prisma } from '@/lib/prisma';
 import pool from '@/lib/db';
 
 export async function GET() {
@@ -69,10 +70,10 @@ export async function GET() {
     status.pgCacheTotal = 'unknown';
   }
 
-  // Advisor profiles count
+  // Advisor profiles count (Prisma)
   try {
-    const advisorCount = await pool.query('SELECT COUNT(*) as count FROM advisor_profiles');
-    status.advisorProfilesCached = advisorCount.rows[0].count;
+    const advisorCount = await prisma.advisor.count();
+    status.advisorProfilesCached = advisorCount;
   } catch {
     status.advisorProfilesCached = 'unknown';
   }
