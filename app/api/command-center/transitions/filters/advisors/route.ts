@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    const result = await pool.query(`
+    const result = await prisma.$queryRaw<Array<{
+      advisor_name: string;
+      household_count: bigint;
+      account_count: bigint;
+      iaa_complete: bigint;
+      pw_complete: bigint;
+    }>>`
       SELECT
         advisor_name,
         COUNT(DISTINCT household_name) as household_count,
@@ -14,16 +20,16 @@ export async function GET() {
       WHERE advisor_name IS NOT NULL AND advisor_name != ''
       GROUP BY advisor_name
       ORDER BY advisor_name
-    `);
+    `;
 
     return NextResponse.json({
-      advisors: result.rows.map(r => ({
+      advisors: result.map(r => ({
         name: r.advisor_name,
         label: `${r.advisor_name} (${r.household_count} HH · ${r.account_count} Accts)`,
-        household_count: parseInt(r.household_count),
-        account_count: parseInt(r.account_count),
-        iaa_complete: parseInt(r.iaa_complete),
-        pw_complete: parseInt(r.pw_complete),
+        household_count: parseInt(r.household_count.toString()),
+        account_count: parseInt(r.account_count.toString()),
+        iaa_complete: parseInt(r.iaa_complete.toString()),
+        pw_complete: parseInt(r.pw_complete.toString()),
       }))
     });
   } catch (err) {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export async function GET(req: NextRequest) {
   try {
@@ -12,17 +13,25 @@ export async function GET(req: NextRequest) {
     }
 
     const [iaaResult, pwResult, portalResult, readinessResult] = await Promise.all([
-      pool.query(`SELECT DISTINCT status_of_iaa as val FROM transition_clients ${whereClause} AND status_of_iaa IS NOT NULL AND status_of_iaa != '' ORDER BY 1`, params),
-      pool.query(`SELECT DISTINCT status_of_account_paperwork as val FROM transition_clients ${whereClause} AND status_of_account_paperwork IS NOT NULL AND status_of_account_paperwork != '' ORDER BY 1`, params),
-      pool.query(`SELECT DISTINCT portal_status as val FROM transition_clients ${whereClause} AND portal_status IS NOT NULL AND portal_status != '' ORDER BY 1`, params),
-      pool.query(`SELECT DISTINCT document_readiness as val FROM transition_clients ${whereClause} AND document_readiness IS NOT NULL AND document_readiness != '' ORDER BY 1`, params),
+      prisma.$queryRaw<Array<{ val: string }>>(
+        Prisma.sql([`SELECT DISTINCT status_of_iaa as val FROM transition_clients ${whereClause} AND status_of_iaa IS NOT NULL AND status_of_iaa != '' ORDER BY 1`], ...params)
+      ),
+      prisma.$queryRaw<Array<{ val: string }>>(
+        Prisma.sql([`SELECT DISTINCT status_of_account_paperwork as val FROM transition_clients ${whereClause} AND status_of_account_paperwork IS NOT NULL AND status_of_account_paperwork != '' ORDER BY 1`], ...params)
+      ),
+      prisma.$queryRaw<Array<{ val: string }>>(
+        Prisma.sql([`SELECT DISTINCT portal_status as val FROM transition_clients ${whereClause} AND portal_status IS NOT NULL AND portal_status != '' ORDER BY 1`], ...params)
+      ),
+      prisma.$queryRaw<Array<{ val: string }>>(
+        Prisma.sql([`SELECT DISTINCT document_readiness as val FROM transition_clients ${whereClause} AND document_readiness IS NOT NULL AND document_readiness != '' ORDER BY 1`], ...params)
+      ),
     ]);
 
     return NextResponse.json({
-      iaa_statuses: iaaResult.rows.map(r => r.val),
-      paperwork_statuses: pwResult.rows.map(r => r.val),
-      portal_statuses: portalResult.rows.map(r => r.val),
-      readiness_statuses: readinessResult.rows.map(r => r.val),
+      iaa_statuses: iaaResult.map(r => r.val),
+      paperwork_statuses: pwResult.map(r => r.val),
+      portal_statuses: portalResult.map(r => r.val),
+      readiness_statuses: readinessResult.map(r => r.val),
     });
   } catch (err) {
     console.error('[transitions/filters/options]', err);

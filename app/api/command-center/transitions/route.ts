@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -80,11 +81,10 @@ export async function GET(req: NextRequest) {
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     // ── Count total matching rows ──────────────────────────────────────────
-    const countResult = await pool.query(
-      `SELECT COUNT(*) as total FROM transition_clients ${whereClause}`,
-      filterParams,
+    const countResult = await prisma.$queryRaw<Array<{ total: bigint }>>(
+      Prisma.sql([`SELECT COUNT(*) as total FROM transition_clients ${whereClause}`], ...filterParams)
     );
-    const total = parseInt(countResult.rows[0].total);
+    const total = parseInt(countResult[0].total.toString());
 
     // ── Fetch paginated rows ───────────────────────────────────────────────
     const offset = (page - 1) * perPage;
@@ -92,53 +92,53 @@ export async function GET(req: NextRequest) {
     const limitIdx = filterParams.length + 1;
     const offsetIdx = filterParams.length + 2;
 
-    const result = await pool.query<TransitionClientRow>(`
-      SELECT
-        id,
-        sheet_id,
-        workbook_name,
-        advisor_name,
-        farther_contact,
-        household_name,
-        account_type,
-        account_name,
-        status_of_iaa,
-        status_of_account_paperwork,
-        portal_status,
-        document_readiness,
-        primary_first_name,
-        primary_last_name,
-        primary_email,
-        new_account_number,
-        contra_account_firm,
-        contra_account_numbers,
-        fee_schedule,
-        notes,
-        docusign_iaa_status,
-        docusign_paperwork_status,
-        billing_setup,
-        welcome_gift_box,
-        portal_invites
-      FROM transition_clients
-      ${whereClause}
-      ORDER BY advisor_name ASC, id ASC
-      LIMIT $${limitIdx} OFFSET $${offsetIdx}
-    `, paginationParams);
-
-    const rows = result.rows;
+    const rows = await prisma.$queryRaw<TransitionClientRow[]>(
+      Prisma.sql([`
+        SELECT
+          id,
+          sheet_id,
+          workbook_name,
+          advisor_name,
+          farther_contact,
+          household_name,
+          account_type,
+          account_name,
+          status_of_iaa,
+          status_of_account_paperwork,
+          portal_status,
+          document_readiness,
+          primary_first_name,
+          primary_last_name,
+          primary_email,
+          new_account_number,
+          contra_account_firm,
+          contra_account_numbers,
+          fee_schedule,
+          notes,
+          docusign_iaa_status,
+          docusign_paperwork_status,
+          billing_setup,
+          welcome_gift_box,
+          portal_invites
+        FROM transition_clients
+        ${whereClause}
+        ORDER BY advisor_name ASC, id ASC
+        LIMIT $${limitIdx} OFFSET $${offsetIdx}
+      `], ...paginationParams)
+    );
 
     // ── Fetch TRAN AUM & Revenue data ────────────────────────────────────────
-    const tranAumResult = await pool.query<{
+    const tranAumResult = await prisma.$queryRaw<Array<{
       advisor_name: string;
       tran_aum: string;
       revenue: string;
-    }>(`
+    }>>`
       SELECT advisor_name, tran_aum, revenue
       FROM advisor_tran_aum
-    `);
+    `;
 
     const tranAumMap = new Map<string, { tran_aum: number; revenue: number }>();
-    for (const row of tranAumResult.rows) {
+    for (const row of tranAumResult) {
       tranAumMap.set(row.advisor_name, {
         tran_aum: parseFloat(row.tran_aum) || 0,
         revenue: parseFloat(row.revenue) || 0,
@@ -192,10 +192,10 @@ export async function GET(req: NextRequest) {
     ).length;
 
     // ── Last synced timestamp ──────────────────────────────────────────────────
-    const syncTimeResult = await pool.query<{ last_synced: Date | null }>(
-      `SELECT MAX(synced_at) AS last_synced FROM transition_clients`
-    );
-    const lastSyncedAt = syncTimeResult.rows[0]?.last_synced?.toISOString() ?? null;
+    const syncTimeResult = await prisma.$queryRaw<Array<{ last_synced: Date | null }>>`
+      SELECT MAX(synced_at) AS last_synced FROM transition_clients
+    `;
+    const lastSyncedAt = syncTimeResult[0]?.last_synced?.toISOString() ?? null;
 
     const responseData = {
       advisors,

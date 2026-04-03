@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,14 +22,14 @@ interface AdvisorSummary {
 
 export async function GET() {
   try {
-    const result = await pool.query<{
+    const result = await prisma.$queryRaw<Array<{
       advisor_name: string;
       total_accounts: string;
       total_households: string;
       iaa_complete: string;
       paperwork_complete: string;
       portal_complete: string;
-    }>(`
+    }>>`
       SELECT
         advisor_name,
         COUNT(*)::TEXT AS total_accounts,
@@ -49,27 +49,27 @@ export async function GET() {
       WHERE advisor_name IS NOT NULL
       GROUP BY advisor_name
       ORDER BY advisor_name ASC
-    `);
+    `;
 
     // Fetch TRAN AUM & Revenue data
-    const tranAumResult = await pool.query<{
+    const tranAumResult = await prisma.$queryRaw<Array<{
       advisor_name: string;
       tran_aum: string;
       revenue: string;
-    }>(`
+    }>>`
       SELECT advisor_name, tran_aum, revenue
       FROM advisor_tran_aum
-    `);
+    `;
 
     const tranAumMap = new Map<string, { tran_aum: number; revenue: number }>();
-    for (const row of tranAumResult.rows) {
+    for (const row of tranAumResult) {
       tranAumMap.set(row.advisor_name, {
         tran_aum: parseFloat(row.tran_aum) || 0,
         revenue: parseFloat(row.revenue) || 0,
       });
     }
 
-    const advisors: AdvisorSummary[] = result.rows.map((row) => {
+    const advisors: AdvisorSummary[] = result.map((row) => {
       const total = parseInt(row.total_accounts, 10);
       const iaa = parseInt(row.iaa_complete, 10);
       const paperwork = parseInt(row.paperwork_complete, 10);
