@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { withPgCache } from '@/lib/pg-cache';
 import { getPipelineDeals, hubspotFetch } from '@/lib/hubspot';
 
@@ -65,11 +65,11 @@ async function fetchManagedAccountsTotals(): Promise<{ totalAUM: number; totalRe
 
 // ── Fetch team role counts from DB ──────────────────────────────────────────
 async function fetchTeamRoleCounts(): Promise<Record<string, number>> {
-  const result = await pool.query(
-    `SELECT role, COUNT(*)::int AS count FROM team_members WHERE active = TRUE GROUP BY role`
-  );
+  const result = await prisma.$queryRaw<Array<{ role: string; count: number }>>`
+    SELECT role, COUNT(*)::int AS count FROM team_members WHERE active = TRUE GROUP BY role
+  `;
   const map: Record<string, number> = {};
-  for (const row of result.rows) {
+  for (const row of result) {
     map[row.role] = row.count;
   }
   return map;

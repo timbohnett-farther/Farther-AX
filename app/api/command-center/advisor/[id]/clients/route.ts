@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { getStoredToken, fetchEnvelopes, type DocuSignEnvelope } from '@/lib/docusign';
 
 export async function GET(
@@ -18,16 +19,14 @@ export async function GET(
     }
 
     // ── 1. Query transition_clients matched to this advisor ────────────────
-    const clientsResult = await pool.query(
-      `SELECT *
-       FROM transition_clients
-       WHERE LOWER(advisor_name) = LOWER($1)
-          OR LOWER($1) LIKE '%' || LOWER(advisor_name) || '%'
-       ORDER BY household_name, id`,
-      [dealName],
-    );
-
-    const clients = clientsResult.rows;
+    // Using $queryRaw to preserve complex LIKE pattern matching
+    const clients = await prisma.$queryRaw<Prisma.TransitionClientGetPayload<{}>[]>`
+      SELECT *
+      FROM transition_clients
+      WHERE LOWER(advisor_name) = LOWER(${dealName})
+         OR LOWER(${dealName}) LIKE '%' || LOWER(advisor_name) || '%'
+      ORDER BY household_name, id
+    `;
 
     // ── 2. Attempt DocuSign envelope enrichment ────────────────────────────
     let docusignConnected = false;

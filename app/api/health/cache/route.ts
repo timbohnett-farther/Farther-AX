@@ -17,7 +17,7 @@ import { prisma } from '@/lib/prisma';
 import pool from '@/lib/db';
 
 export async function GET() {
-  const status: Record<string, string | boolean | null> = {};
+  const status: Record<string, string | boolean | number | null> = {};
 
   // L1: Redis
   try {
