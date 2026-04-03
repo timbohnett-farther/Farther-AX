@@ -178,11 +178,11 @@ When you report a fix:
   - [x] DATA-002: Fix N+1 pattern with batch contact reads — Commit 32185c3
   - [x] ROUTE-003: Centralize URL construction (lib/app-url.ts) — Commit 0a7e58b
 
-- **Phase 2 — Test Coverage (Week 2):**
-  - [ ] TEST-001: Install jest-environment-jsdom
-  - [ ] TEST-004: Create smoke tests for 5 critical flows
-  - [ ] TEST-002: Add DocuSign webhook security tests
-  - [ ] TEST-003: Document database rollback procedure
+- **Phase 2 — Test Coverage (Week 2):** ✅ COMPLETE
+  - [x] TEST-001: Install jest-environment-jsdom — Already installed
+  - [x] TEST-004: Create smoke tests for 5 critical flows — Commit d80708b
+  - [x] TEST-002: Add DocuSign webhook security tests — Commit f1f3304
+  - [x] TEST-003: Document database rollback procedure — Commit babda0b
 
 - **Phase 3 — Architecture (Week 3-4):**
   - [ ] ARCH-001: Split god components (<200 lines)

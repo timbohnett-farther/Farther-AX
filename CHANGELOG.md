@@ -64,14 +64,40 @@ Format: Each entry includes completion status, feature name, date, scope, status
   - Create simple healthcheck
   - Add env validation
 
-**Status**: 🟡 Audit complete, remediation pending
+**Status**: 🟡 Phase 0-2 complete (2026-04-03), Phase 3-4 pending
+
+**Completed Phases**:
+
+**Phase 0 — Deployment Blockers (2026-04-03)** ✅
+- Resolved merge conflicts in 4 training pages
+- Moved `tsx` from devDependencies to dependencies
+- Changed auth validation from `process.exit(1)` to `throw Error`
+- Fixed APP_URL fallback to farther-ax domain
+- Ran `npm install` to install missing dependencies
+- Created `/api/health` endpoint
+- Added startup env validation
+- **Commits**: 5c82b67, 8e9fa41, 0e7b312, bb9d408, f8b6f98
+
+**Phase 1 — Reliability Fixes (2026-04-03)** ✅
+- Added API request timeouts (fetchWithTimeout helper)
+- Deduplicated HubSpot API calls (shared getPipelineDeals with 2-min cache)
+- Fixed N+1 pattern with batch contact reads in warm/route.ts
+- Centralized URL construction (lib/app-url.ts)
+- **Commits**: fd96b4c, 32185c3, 0a7e58b
+
+**Phase 2 — Test Coverage (2026-04-03)** ✅ COMPLETE
+- Verified jest-environment-jsdom installed
+- Created 5 smoke tests (health, pipeline, metrics, advisor detail, dashboard page)
+- Added comprehensive DocuSign webhook HMAC security tests (16 test cases)
+- Fixed docusign-client.ts to read HMAC_SECRET at runtime for testability
+- Added TextEncoder/TextDecoder polyfills for pg module
+- Documented comprehensive database rollback procedures (DATABASE_ROLLBACK.md)
+- **Commits**: d80708b, f1f3304, babda0b
 
 **Next Steps**:
-1. Review audit findings with team
-2. Implement Phase 0 fixes (90 minutes)
-3. Test in staging environment
-4. Deploy to Railway production
-5. Schedule Phases 1-4 over 6 weeks
+1. Phase 2.4: Document database rollback procedure
+2. Phase 3: Architecture improvements (split god components, centralize types)
+3. Phase 4: Performance optimization (webhook-first, batch operations)
 
 **Impact**:
 - Unblocks Railway deployment
