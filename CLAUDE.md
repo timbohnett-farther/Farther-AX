@@ -36,14 +36,24 @@ Every single push must include an updated `CHANGELOG.md` entry. No exceptions. D
 ### 3. Maintain the TODO Log — Auto-Proceed Without Asking
 `TODO.md` is the active task queue. When the user adds items (by saying "todo" or listing tasks), add them to `TODO.md` immediately. After completing any task, check `TODO.md` and **automatically proceed to the next item without asking permission**. Work through the list in priority order. Never ask "what's next?" if there are items on the TODO list.
 
-### 4. Optimize End-User Experience at All Times
+### 4. Push to Main After Every Completed Task
+**MANDATORY**: After completing any task, bug fix, or feature implementation, immediately push all commits to `origin main`. Do not wait for user instruction. The workflow is:
+1. Complete the work
+2. Test/verify the changes
+3. Commit with descriptive message
+4. **Immediately push to origin main**
+5. Proceed to next task
+
+**Exception**: Only skip auto-push if the user explicitly says "don't push yet" or "hold the push". Otherwise, push automatically after every completed task.
+
+### 5. Optimize End-User Experience at All Times
 Always prioritize the end-user experience. This means:
 - **Working connections** — every API call, link, and data source must function correctly
 - **Accurate calculations** — all numbers, scores, and metrics must compute properly
 - **Working pages** — no broken routes, no dead ends, no error states left unhandled
 - **Fast load times** — load times kill user engagement. Optimize data fetching, use proper loading states, leverage SWR caching, and minimize unnecessary re-renders. Slow pages are unacceptable.
 
-### 5. Follow the Brand Guide — Uniform Branding Everywhere
+### 6. Follow the Brand Guide — Uniform Branding Everywhere
 All pages must follow the Farther brand guide consistently. This includes:
 - **Design tokens** from `lib/design-tokens.ts` — use them, don't hardcode colors or spacing
 - **Typography** — Follow `Font-Gold-Standard.md` exactly. **Inter** is the only approved sans-serif font. **DM Mono** is the only approved monospace font. All financial numbers must use `tabular-nums` and right-align. See the full guide for scale, weights, and component patterns.
