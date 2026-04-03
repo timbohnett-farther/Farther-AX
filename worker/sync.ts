@@ -14,6 +14,7 @@ import { writeThroughCache } from '../lib/cached-fetchers';
 import { getSyncState, setSyncState, invalidatePattern } from '../lib/redis-client';
 import { withPgCache } from '../lib/pg-cache';
 import { getPipelineDeals } from '../lib/hubspot';
+import { getAppUrl } from '../lib/app-url';
 import pool from '../lib/db';
 
 // ── Sync Advisors ───────────────────────────────────────────────────────────
@@ -44,9 +45,7 @@ async function syncAdvisors(): Promise<number> {
 
         // Fetch full advisor data via the existing API route pattern
         // This triggers the existing DB-first + HubSpot logic
-        const baseUrl = process.env.NEXTAUTH_URL || process.env.RAILWAY_PUBLIC_DOMAIN
-          ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
-          : 'http://localhost:3000';
+        const baseUrl = getAppUrl();
 
         const res = await fetch(`${baseUrl}/api/command-center/advisor/${deal.id}`, {
           headers: { 'Cache-Control': 'no-cache' },
@@ -75,9 +74,7 @@ async function syncAdvisors(): Promise<number> {
 async function syncPipelineAndMetrics(): Promise<void> {
   console.log('[Sync] Refreshing pipeline and metrics caches...');
 
-  const baseUrl = process.env.NEXTAUTH_URL || process.env.RAILWAY_PUBLIC_DOMAIN
-    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
-    : 'http://localhost:3000';
+  const baseUrl = getAppUrl();
 
   // Hit the existing API endpoints to trigger cache refresh
   // The endpoints already handle withPgCache + Redis/S3 backfill
@@ -106,9 +103,7 @@ async function syncPipelineAndMetrics(): Promise<void> {
 async function syncTransitions(): Promise<void> {
   console.log('[Sync] Triggering transition sheet sync...');
 
-  const baseUrl = process.env.NEXTAUTH_URL || process.env.RAILWAY_PUBLIC_DOMAIN
-    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
-    : 'http://localhost:3000';
+  const baseUrl = getAppUrl();
 
   try {
     const res = await fetch(`${baseUrl}/api/command-center/transitions/sync`);

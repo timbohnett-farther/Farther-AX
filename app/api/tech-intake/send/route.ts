@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { getAppUrl } from '@/lib/app-url';
 import pool from '@/lib/db';
 import { chatCompletion, MODELS } from '@/lib/aizolo';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
-const APP_URL = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://farther-ax-production.up.railway.app';
 
 // ── Branded HTML email template ─────────────────────────────────────────────
 function buildBrandedEmail({
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
       [dealId, contactId || null, contactEmail, advisorName, axmEmail]
     );
     const { token, expires_at } = tokenResult.rows[0];
-    const formLink = `${APP_URL}/forms/tech-intake/${token}`;
+    const formLink = `${getAppUrl()}/forms/tech-intake/${token}`;
     const expiresDate = new Date(expires_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
     // ── Use AiZolo to write a personalized email body ──────────────────────
