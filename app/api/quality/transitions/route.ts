@@ -81,6 +81,8 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    type WorkbookResult = typeof workbooks[number];
+
     // Calculate overall statistics
     const totalRecords = await prisma.transitionClient.count();
     const recordsWithCriticalFields = await prisma.transitionClient.count({
@@ -168,7 +170,7 @@ export async function GET(request: NextRequest) {
           poor,
         },
       },
-      workbooks: workbooks.map(wb => ({
+      workbooks: workbooks.map((wb: WorkbookResult) => ({
         sheet_id: wb.sheet_id,
         workbook_name: wb.workbook_name,
         data_quality_score: wb.data_quality_score,
