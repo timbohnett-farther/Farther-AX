@@ -6,6 +6,26 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Sign-In Page Layout Fix — 2026-04-03
+
+**What**: Fixed cramped sign-in page layout and removed sidebar
+
+**Changes**:
+- Created auth-specific layout that removes sidebar from authentication pages
+- Logo now displays above card (240x60, larger and more visible)
+- Card width increased from max-w-xl to max-w-2xl (wider, less cramped)
+- Padding increased to p-16 for more breathing room
+- Text sizes increased (heading: text-3xl, body: text-lg)
+- Sign-in button made larger and more prominent
+- Better vertical spacing throughout
+
+**Before**: Sidebar visible on sign-in page, content cramped in narrow card
+**After**: Clean full-screen layout, generous spacing, larger logo at top
+
+**Commit**: 591e90b
+
+---
+
 ## [Completed] UI/UX Improvements & Error Handling — 2026-04-03
 
 **What**: Enhanced user experience with readable tooltips and better error diagnostics
