@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';  // AX Pipeline
@@ -136,7 +137,16 @@ export async function GET(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const result = await pool.query(`
+    const result = await prisma.$queryRaw<Array<{
+      individual_name: string;
+      team_name: string;
+      hubspot_contact_id: string;
+      hubspot_deal_id: string;
+      source: string;
+      notes: string | null;
+      created_at: Date;
+      updated_at: Date;
+    }>>`
       SELECT
         individual_name,
         team_name,
@@ -148,12 +158,12 @@ export async function GET(req: NextRequest) {
         updated_at
       FROM advisor_team_mappings
       ORDER BY team_name, individual_name
-    `);
+    `;
 
     // Group by team
     const teams: Record<string, any[]> = {};
 
-    for (const row of result.rows) {
+    for (const row of result) {
       const teamName = row.team_name;
       if (!teams[teamName]) {
         teams[teamName] = [];
@@ -168,10 +178,10 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({
-      totalMappings: result.rows.length,
+      totalMappings: result.length,
       totalTeams: Object.keys(teams).length,
       teams,
-      mappings: result.rows,
+      mappings: result,
     });
   } catch (err) {
     console.error('[team-mappings GET]', err);
@@ -199,8 +209,7 @@ export async function POST(req: NextRequest) {
     let updated = 0;
 
     for (const mapping of mappings) {
-      const result = await pool.query(
-        `
+      const result = await prisma.$queryRaw<Array<{ inserted: boolean }>>`
         INSERT INTO advisor_team_mappings (
           individual_name,
           team_name,
@@ -209,7 +218,7 @@ export async function POST(req: NextRequest) {
           source,
           updated_at
         )
-        VALUES ($1, $2, $3, $4, 'hubspot', NOW())
+        VALUES (${mapping.individualName}, ${mapping.teamName}, ${mapping.hubspotContactId}, ${mapping.hubspotDealId}, 'hubspot', NOW())
         ON CONFLICT (individual_name) DO UPDATE SET
           team_name = EXCLUDED.team_name,
           hubspot_contact_id = EXCLUDED.hubspot_contact_id,
@@ -217,16 +226,9 @@ export async function POST(req: NextRequest) {
           source = EXCLUDED.source,
           updated_at = NOW()
         RETURNING (xmax = 0) AS inserted
-        `,
-        [
-          mapping.individualName,
-          mapping.teamName,
-          mapping.hubspotContactId,
-          mapping.hubspotDealId,
-        ]
-      );
+      `;
 
-      if (result.rows[0]?.inserted) {
+      if (result[0]?.inserted) {
         inserted++;
       } else {
         updated++;

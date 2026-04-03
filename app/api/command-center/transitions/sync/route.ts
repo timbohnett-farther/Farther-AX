@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchSheetData, listSheetsInFolder, DriveFile } from '@/lib/google-sheets';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -181,12 +182,12 @@ async function loadTeamMappings(): Promise<Map<string, string>> {
     return teamMappingsCache;
   }
 
-  const result = await pool.query<{ individual_name: string; team_name: string }>(
-    `SELECT individual_name, team_name FROM advisor_team_mappings`
-  );
+  const result = await prisma.$queryRaw<Array<{ individual_name: string; team_name: string }>>`
+    SELECT individual_name, team_name FROM advisor_team_mappings
+  `;
 
   const mappings = new Map<string, string>();
-  for (const row of result.rows) {
+  for (const row of result) {
     mappings.set(row.individual_name.trim(), row.team_name.trim());
   }
 
@@ -238,11 +239,11 @@ interface WorkbookResult {
  */
 async function loadLastModifiedTimes(): Promise<Map<string, string>> {
   try {
-    const result = await pool.query<{ sheet_id: string; drive_modified_time: string }>(
-      `SELECT sheet_id, drive_modified_time::text FROM transition_workbooks WHERE drive_modified_time IS NOT NULL`
-    );
+    const result = await prisma.$queryRaw<Array<{ sheet_id: string; drive_modified_time: string }>>`
+      SELECT sheet_id, drive_modified_time::text FROM transition_workbooks WHERE drive_modified_time IS NOT NULL
+    `;
     const map = new Map<string, string>();
-    for (const row of result.rows) {
+    for (const row of result) {
       map.set(row.sheet_id, row.drive_modified_time);
     }
     return map;
@@ -257,10 +258,10 @@ async function loadLastModifiedTimes(): Promise<Map<string, string>> {
  */
 async function ensureModifiedTimeColumn(): Promise<void> {
   try {
-    await pool.query(`
+    await prisma.$executeRaw`
       ALTER TABLE transition_workbooks
       ADD COLUMN IF NOT EXISTS drive_modified_time TIMESTAMPTZ
-    `);
+    `;
   } catch (err) {
     console.warn('[transitions/sync] Column migration skipped:', err instanceof Error ? err.message : String(err));
   }
@@ -271,10 +272,9 @@ async function ensureModifiedTimeColumn(): Promise<void> {
  */
 async function updateWorkbookModifiedTime(sheetId: string, modifiedTime: string): Promise<void> {
   try {
-    await pool.query(
-      `UPDATE transition_workbooks SET drive_modified_time = $2 WHERE sheet_id = $1`,
-      [sheetId, modifiedTime]
-    );
+    await prisma.$executeRaw`
+      UPDATE transition_workbooks SET drive_modified_time = ${modifiedTime} WHERE sheet_id = ${sheetId}
+    `;
   } catch (err) {
     console.warn('[transitions/sync] Modified time update skipped:', err instanceof Error ? err.message : String(err));
   }
@@ -313,16 +313,15 @@ async function syncWorkbook(
 
     // Upsert workbook mapping (don't overwrite locked assignments)
     const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}`;
-    await pool.query(
-      `INSERT INTO transition_workbooks (sheet_id, workbook_name, sheet_url, detected_advisor_name, last_synced_at)
-       VALUES ($1, $2, $3, $4, NOW())
-       ON CONFLICT (sheet_id) DO UPDATE SET
-         workbook_name          = EXCLUDED.workbook_name,
-         sheet_url              = EXCLUDED.sheet_url,
-         detected_advisor_name  = EXCLUDED.detected_advisor_name,
-         last_synced_at         = NOW()`,
-      [sheetId, workbookName, sheetUrl, detectedAdvisor],
-    );
+    await prisma.$executeRaw`
+      INSERT INTO transition_workbooks (sheet_id, workbook_name, sheet_url, detected_advisor_name, last_synced_at)
+      VALUES (${sheetId}, ${workbookName}, ${sheetUrl}, ${detectedAdvisor}, NOW())
+      ON CONFLICT (sheet_id) DO UPDATE SET
+        workbook_name          = EXCLUDED.workbook_name,
+        sheet_url              = EXCLUDED.sheet_url,
+        detected_advisor_name  = EXCLUDED.detected_advisor_name,
+        last_synced_at         = NOW()
+    `;
 
     let synced = 0;
     let mappedCount = 0;
@@ -345,8 +344,7 @@ async function syncWorkbook(
       // Replace advisor_name with mapped team name
       record.advisor_name = mappedAdvisorName ?? record.advisor_name;
 
-      await pool.query(
-        `
+      await prisma.$executeRaw`
         INSERT INTO transition_clients (
           sheet_id,
           sheet_row_index,
@@ -404,12 +402,24 @@ async function syncWorkbook(
           synced_at
         )
         VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-          $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
-          $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
-          $31, $32, $33, $34, $35, $36, $37, $38, $39, $40,
-          $41, $42, $43, $44, $45, $46, $47, $48, $49, $50,
-          $51, $52, $53, NOW()
+          ${sheetId}, ${sheetRowIndex}, ${workbookName}, ${record.farther_contact ?? null}, ${record.advisor_name ?? null},
+          ${record.custodian ?? null}, ${record.document_readiness ?? null}, ${record.status_of_iaa ?? null},
+          ${record.status_of_account_paperwork ?? null}, ${record.portal_status ?? null}, ${record.household_name ?? null},
+          ${record.billing_group ?? null}, ${record.primary_first_name ?? null}, ${record.primary_middle_name ?? null},
+          ${record.primary_last_name ?? null}, ${record.primary_email ?? null}, ${record.primary_phone ?? null},
+          ${record.primary_dob ?? null}, ${record.primary_ssn_last4 ?? null}, ${record.primary_street ?? null},
+          ${record.primary_city ?? null}, ${record.primary_state ?? null}, ${record.primary_zip ?? null},
+          ${record.primary_country ?? null}, ${record.secondary_first_name ?? null}, ${record.secondary_middle_name ?? null},
+          ${record.secondary_last_name ?? null}, ${record.secondary_email ?? null}, ${record.secondary_phone ?? null},
+          ${record.secondary_dob ?? null}, ${record.secondary_ssn_last4 ?? null}, ${record.secondary_street ?? null},
+          ${record.secondary_city ?? null}, ${record.secondary_state ?? null}, ${record.secondary_zip ?? null},
+          ${record.secondary_country ?? null}, ${record.fee_schedule ?? null}, ${record.billing_exceptions ?? null},
+          ${record.billing_exception_explanation ?? null}, ${record.contra_account_firm ?? null},
+          ${record.contra_account_numbers ?? null}, ${record.new_account_number ?? null}, ${record.account_type ?? null},
+          ${record.account_name ?? null}, ${record.mailing_street ?? null}, ${record.mailing_city ?? null},
+          ${record.mailing_state ?? null}, ${record.mailing_zip ?? null}, ${record.mailing_country ?? null},
+          ${record.portal_invites ?? null}, ${record.welcome_gift_box ?? null}, ${record.notes ?? null},
+          ${record.billing_setup ?? null}, NOW()
         )
         ON CONFLICT (sheet_id, sheet_row_index) DO UPDATE SET
           workbook_name                  = EXCLUDED.workbook_name,
@@ -464,63 +474,7 @@ async function syncWorkbook(
           notes                          = EXCLUDED.notes,
           billing_setup                  = EXCLUDED.billing_setup,
           synced_at                      = NOW()
-        `,
-        [
-          sheetId,
-          sheetRowIndex,
-          workbookName,
-          record.farther_contact ?? null,
-          record.advisor_name ?? null,
-          record.custodian ?? null,
-          record.document_readiness ?? null,
-          record.status_of_iaa ?? null,
-          record.status_of_account_paperwork ?? null,
-          record.portal_status ?? null,
-          record.household_name ?? null,
-          record.billing_group ?? null,
-          record.primary_first_name ?? null,
-          record.primary_middle_name ?? null,
-          record.primary_last_name ?? null,
-          record.primary_email ?? null,
-          record.primary_phone ?? null,
-          record.primary_dob ?? null,
-          record.primary_ssn_last4 ?? null,
-          record.primary_street ?? null,
-          record.primary_city ?? null,
-          record.primary_state ?? null,
-          record.primary_zip ?? null,
-          record.primary_country ?? null,
-          record.secondary_first_name ?? null,
-          record.secondary_middle_name ?? null,
-          record.secondary_last_name ?? null,
-          record.secondary_email ?? null,
-          record.secondary_phone ?? null,
-          record.secondary_dob ?? null,
-          record.secondary_ssn_last4 ?? null,
-          record.secondary_street ?? null,
-          record.secondary_city ?? null,
-          record.secondary_state ?? null,
-          record.secondary_zip ?? null,
-          record.secondary_country ?? null,
-          record.fee_schedule ?? null,
-          record.billing_exceptions ?? null,
-          record.billing_exception_explanation ?? null,
-          record.contra_account_firm ?? null,
-          record.contra_account_numbers ?? null,
-          record.new_account_number ?? null,
-          record.account_type ?? null,
-          record.account_name ?? null,
-          record.mailing_street ?? null,
-          record.mailing_city ?? null,
-          record.mailing_state ?? null,
-          record.mailing_zip ?? null,
-          record.mailing_country ?? null,
-          record.portal_invites ?? null,
-          record.welcome_gift_box ?? null,
-          record.notes ?? null,
-          record.billing_setup ?? null,
-        ],
-      );
+      `;
 
       synced += 1;
     }

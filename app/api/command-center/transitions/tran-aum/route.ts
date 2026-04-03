@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const CUSTOM_OBJECT_TYPE = '2-13676628'; // Farther Managed Accounts
@@ -123,7 +124,13 @@ export async function GET(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const result = await pool.query(`
+    const result = await prisma.$queryRaw<Array<{
+      advisor_name: string;
+      tran_aum: string;
+      revenue: string;
+      record_count: number;
+      last_synced_at: Date;
+    }>>`
       SELECT
         advisor_name,
         tran_aum,
@@ -132,11 +139,11 @@ export async function GET(req: NextRequest) {
         last_synced_at
       FROM advisor_tran_aum
       ORDER BY advisor_name ASC
-    `);
+    `;
 
     return NextResponse.json({
-      advisors: result.rows,
-      total: result.rows.length,
+      advisors: result,
+      total: result.length,
     });
   } catch (err) {
     console.error('[tran-aum GET]', err);
@@ -195,8 +202,7 @@ export async function POST(req: NextRequest) {
     let updated = 0;
 
     for (const agg of aggregations) {
-      const result = await pool.query(
-        `
+      const result = await prisma.$queryRaw<Array<{ inserted: boolean }>>`
         INSERT INTO advisor_tran_aum (
           advisor_name,
           tran_aum,
@@ -205,7 +211,7 @@ export async function POST(req: NextRequest) {
           last_synced_at,
           updated_at
         )
-        VALUES ($1, $2, $3, $4, NOW(), NOW())
+        VALUES (${agg.advisor_name}, ${agg.tran_aum}, ${agg.revenue}, ${agg.record_count}, NOW(), NOW())
         ON CONFLICT (advisor_name) DO UPDATE SET
           tran_aum = EXCLUDED.tran_aum,
           revenue = EXCLUDED.revenue,
@@ -213,11 +219,9 @@ export async function POST(req: NextRequest) {
           last_synced_at = NOW(),
           updated_at = NOW()
         RETURNING (xmax = 0) AS inserted
-        `,
-        [agg.advisor_name, agg.tran_aum, agg.revenue, agg.record_count]
-      );
+      `;
 
-      if (result.rows[0]?.inserted) {
+      if (result[0]?.inserted) {
         inserted++;
       } else {
         updated++;

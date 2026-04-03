@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 /**
  * POST /api/command-center/transitions/init
@@ -109,14 +109,15 @@ export async function POST(req: NextRequest) {
     try {
       const counts: Record<string, number> = {};
 
-      const clientsResult = await pool.query('SELECT COUNT(*) as count FROM transition_clients');
-      counts.transition_clients = parseInt(clientsResult.rows[0]?.count || '0');
+      const [clientsResult, aumResult, teamResult] = await Promise.all([
+        prisma.$queryRaw<Array<{ count: bigint }>>`SELECT COUNT(*) as count FROM transition_clients`,
+        prisma.$queryRaw<Array<{ count: bigint }>>`SELECT COUNT(*) as count FROM advisor_tran_aum`,
+        prisma.$queryRaw<Array<{ count: bigint }>>`SELECT COUNT(*) as count FROM advisor_team_mappings`,
+      ]);
 
-      const aumResult = await pool.query('SELECT COUNT(*) as count FROM advisor_tran_aum');
-      counts.advisor_tran_aum = parseInt(aumResult.rows[0]?.count || '0');
-
-      const teamResult = await pool.query('SELECT COUNT(*) as count FROM advisor_team_mappings');
-      counts.advisor_team_mappings = parseInt(teamResult.rows[0]?.count || '0');
+      counts.transition_clients = parseInt(clientsResult[0]?.count?.toString() || '0');
+      counts.advisor_tran_aum = parseInt(aumResult[0]?.count?.toString() || '0');
+      counts.advisor_team_mappings = parseInt(teamResult[0]?.count?.toString() || '0');
 
       results.database_counts = counts;
     } catch (err) {

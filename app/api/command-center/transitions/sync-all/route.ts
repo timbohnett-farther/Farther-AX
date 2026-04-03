@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 const SYNC_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
 
 async function shouldSkip(): Promise<boolean> {
   try {
-    const result = await pool.query<{ expires_at: Date }>(
-      `SELECT expires_at FROM api_cache WHERE cache_key = 'transitions-sync-all-last-run'`
-    );
-    if (result.rows[0] && result.rows[0].expires_at > new Date()) return true;
+    const result = await prisma.$queryRaw<Array<{ expires_at: Date }>>`
+      SELECT expires_at FROM api_cache WHERE cache_key = 'transitions-sync-all-last-run'
+    `;
+    if (result[0] && result[0].expires_at > new Date()) return true;
   } catch (err) { console.warn('[sync-all] Cache check failed, proceeding:', err instanceof Error ? err.message : String(err)); }
   return false;
 }
@@ -16,13 +17,12 @@ async function shouldSkip(): Promise<boolean> {
 async function markRun(): Promise<void> {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + SYNC_COOLDOWN_MS);
-  await pool.query(
-    `INSERT INTO api_cache (cache_key, data, expires_at, created_at, updated_at)
-     VALUES ('transitions-sync-all-last-run', '"ok"', $1, $2, $2)
-     ON CONFLICT (cache_key) DO UPDATE
-       SET data = EXCLUDED.data, expires_at = EXCLUDED.expires_at, updated_at = EXCLUDED.updated_at`,
-    [expiresAt, now]
-  );
+  await prisma.$executeRaw`
+    INSERT INTO api_cache (cache_key, data, expires_at, created_at, updated_at)
+    VALUES ('transitions-sync-all-last-run', '"ok"', ${expiresAt}, ${now}, ${now})
+    ON CONFLICT (cache_key) DO UPDATE
+      SET data = EXCLUDED.data, expires_at = EXCLUDED.expires_at, updated_at = EXCLUDED.updated_at
+  `;
 }
 
 export async function GET() {
