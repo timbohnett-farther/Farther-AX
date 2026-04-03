@@ -146,6 +146,63 @@ When you report a fix:
 
 ---
 
+## 🚨 **Active Tasks (2026-04-03)**
+
+### **Task #14: CRITICAL — Multi-Agent Code Audit Findings**
+- **Status:** 🟡 In Progress (2026-04-03)
+- **Priority:** 🚨 CRITICAL
+- **What was found:**
+  - 6 specialized agents completed comprehensive audit
+  - **7 P0 deployment blockers** identified
+  - **8 P1 high-priority reliability issues**
+  - **6 P2 medium-priority improvements**
+  - **6 P3 low-priority cleanup items**
+
+- **Deliverables created:**
+  - `AUDIT_MASTER_FINDINGS.md` - Complete findings register (40+ issues)
+  - `AUDIT_FIX_PLAN.md` - Ordered fix plan with code samples
+  - `AUDIT_EXECUTIVE_SUMMARY.md` - High-level overview + roadmap
+
+- **Phase 0 — Deployment Blockers (90 minutes):**
+  - [ ] RAIL-001: Resolve merge conflicts in 4 training pages (30 min)
+  - [ ] RAIL-002: Move `tsx` from devDependencies to dependencies (5 min)
+  - [ ] RAIL-003: Change auth validation from `process.exit(1)` to `throw Error` (15 min)
+  - [ ] ROUTE-001: Fix APP_URL fallback to point to farther-ax (5 min)
+  - [ ] ARCH-003: Run `npm install` to install missing dependencies (1 min)
+  - [ ] RAIL-005: Create simple `/api/health` endpoint (10 min)
+  - [ ] Env validation: Add startup validation with clear errors (30 min)
+
+- **Phase 1 — Reliability Fixes (Week 1):**
+  - [ ] API-001: Add API request timeouts (fetchWithTimeout helper)
+  - [ ] DATA-001: Deduplicate HubSpot API calls (getPipelineDeals)
+  - [ ] DATA-002: Fix N+1 pattern with batch contact reads
+  - [ ] ROUTE-003: Centralize URL construction (lib/app-url.ts)
+
+- **Phase 2 — Test Coverage (Week 2):**
+  - [ ] TEST-001: Install jest-environment-jsdom
+  - [ ] TEST-004: Create smoke tests for 5 critical flows
+  - [ ] TEST-002: Add DocuSign webhook security tests
+  - [ ] TEST-003: Document database rollback procedure
+
+- **Phase 3 — Architecture (Week 3-4):**
+  - [ ] ARCH-001: Split god components (<200 lines)
+  - [ ] ARCH-009: Centralize type definitions (lib/types/)
+  - [ ] TEST-005: Fix pre-commit hooks (remove || true)
+
+- **Phase 4 — Performance (Week 5-6):**
+  - [ ] DATA-003: Implement webhook-first architecture
+  - [ ] DATA-005: Batch database operations
+  - [ ] Remove dead code (lib/api-cache.ts, lib/prisma.ts)
+
+- **Impact:**
+  - Unblocks Railway deployment
+  - 50-80% reduction in HubSpot API calls
+  - 4x faster advisor page load
+  - 60%+ test coverage
+  - Maintainable codebase (<200 line components)
+
+---
+
 ## 🚨 **Active Tasks (2026-03-30)**
 
 ### **Task #13: COMPLETED — Centralized HubSpot API Client**

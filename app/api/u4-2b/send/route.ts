@@ -5,7 +5,7 @@ import pool from '@/lib/db';
 import { chatCompletion, MODELS } from '@/lib/aizolo';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
-const APP_URL = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://farther-billing-portal-production.up.railway.app';
+const APP_URL = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://farther-ax-production.up.railway.app';
 
 // ── Branded HTML email template ─────────────────────────────────────────────
 function buildBrandedEmail({
