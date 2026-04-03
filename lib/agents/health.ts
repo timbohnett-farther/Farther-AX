@@ -1,6 +1,6 @@
 // lib/agents/health.ts — Agent health monitoring, zombie recovery, success/failure tracking
 
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import type { DbAgentSchedule, DbAgentRun, AgentHealth, HealthStatus } from './types';
 
 /**
@@ -12,7 +12,7 @@ export async function recoverZombies(): Promise<string[]> {
   const recovered: string[] = [];
 
   // Find running agents that have exceeded their timeout
-  const { rows: zombies } = await pool.query<DbAgentRun & { timeout_minutes: number }>(`
+  const zombies = await prisma.$queryRaw<Array<DbAgentRun & { timeout_minutes: number }>>`
     SELECT r.id, r.agent_name, r.started_at, r.last_heartbeat,
            COALESCE(s.timeout_minutes, 30) AS timeout_minutes
     FROM agent_runs r
@@ -21,38 +21,33 @@ export async function recoverZombies(): Promise<string[]> {
       AND (
         COALESCE(r.last_heartbeat, r.started_at) < NOW() - (COALESCE(s.timeout_minutes, 30) || ' minutes')::INTERVAL
       )
-  `);
+  `;
 
   for (const zombie of zombies) {
-    const client = await pool.connect();
     try {
-      await client.query('BEGIN');
+      await prisma.$transaction(async (tx) => {
+        // Mark run as failed
+        await tx.$executeRaw`
+          UPDATE agent_runs
+          SET run_status = 'failed',
+              completed_at = NOW(),
+              duration_ms = EXTRACT(EPOCH FROM (NOW() - started_at))::INTEGER * 1000,
+              error_message = 'Recovered zombie: heartbeat timeout exceeded'
+          WHERE id = ${zombie.id}
+        `;
 
-      // Mark run as failed
-      await client.query(`
-        UPDATE agent_runs
-        SET run_status = 'failed',
-            completed_at = NOW(),
-            duration_ms = EXTRACT(EPOCH FROM (NOW() - started_at))::INTEGER * 1000,
-            error_message = 'Recovered zombie: heartbeat timeout exceeded'
-        WHERE id = $1
-      `, [zombie.id]);
+        // Increment consecutive_failures on schedule
+        await tx.$executeRaw`
+          UPDATE agent_schedule
+          SET consecutive_failures = consecutive_failures + 1,
+              updated_at = NOW()
+          WHERE agent_name = ${zombie.agent_name}
+        `;
+      });
 
-      // Increment consecutive_failures on schedule
-      await client.query(`
-        UPDATE agent_schedule
-        SET consecutive_failures = consecutive_failures + 1,
-            updated_at = NOW()
-        WHERE agent_name = $1
-      `, [zombie.agent_name]);
-
-      await client.query('COMMIT');
       recovered.push(zombie.agent_name);
     } catch (err) {
-      await client.query('ROLLBACK');
       console.error(`[Health] Failed to recover zombie ${zombie.agent_name}:`, err);
-    } finally {
-      client.release();
     }
   }
 
@@ -68,38 +63,32 @@ export async function recoverZombies(): Promise<string[]> {
  * Resets consecutive_failures, updates last_success_at, computes next_due_at.
  */
 export async function markAgentSuccess(agentName: string, runId: number, recordsProcessed: number = 0, output?: Record<string, unknown>): Promise<void> {
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    await prisma.$transaction(async (tx) => {
+      // Update the run record
+      await tx.$executeRaw`
+        UPDATE agent_runs
+        SET run_status = 'completed',
+            completed_at = NOW(),
+            duration_ms = EXTRACT(EPOCH FROM (NOW() - started_at))::INTEGER * 1000,
+            records_processed = ${recordsProcessed},
+            output = ${output ? JSON.stringify(output) : null}::jsonb
+        WHERE id = ${runId}
+      `;
 
-    // Update the run record
-    await client.query(`
-      UPDATE agent_runs
-      SET run_status = 'completed',
-          completed_at = NOW(),
-          duration_ms = EXTRACT(EPOCH FROM (NOW() - started_at))::INTEGER * 1000,
-          records_processed = $2,
-          output = $3
-      WHERE id = $1
-    `, [runId, recordsProcessed, output ? JSON.stringify(output) : null]);
-
-    // Update the schedule: reset failures, set next_due_at
-    await client.query(`
-      UPDATE agent_schedule
-      SET last_success_at = NOW(),
-          consecutive_failures = 0,
-          next_due_at = NOW() + (freshness_interval_hours || ' hours')::INTERVAL,
-          updated_at = NOW()
-      WHERE agent_name = $1
-    `, [agentName]);
-
-    await client.query('COMMIT');
+      // Update the schedule: reset failures, set next_due_at
+      await tx.$executeRaw`
+        UPDATE agent_schedule
+        SET last_success_at = NOW(),
+            consecutive_failures = 0,
+            next_due_at = NOW() + (freshness_interval_hours || ' hours')::INTERVAL,
+            updated_at = NOW()
+        WHERE agent_name = ${agentName}
+      `;
+    });
   } catch (err) {
-    await client.query('ROLLBACK');
     console.error(`[Health] Failed to mark success for ${agentName}:`, err);
     throw err;
-  } finally {
-    client.release();
   }
 }
 
@@ -108,41 +97,37 @@ export async function markAgentSuccess(agentName: string, runId: number, records
  * Increments consecutive_failures. If >= max_retries, logs a critical alert.
  */
 export async function markAgentFailure(agentName: string, runId: number, errorMessage: string): Promise<void> {
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    const result = await prisma.$transaction(async (tx) => {
+      // Update the run record
+      await tx.$executeRaw`
+        UPDATE agent_runs
+        SET run_status = 'failed',
+            completed_at = NOW(),
+            duration_ms = EXTRACT(EPOCH FROM (NOW() - started_at))::INTEGER * 1000,
+            error_message = ${errorMessage}
+        WHERE id = ${runId}
+      `;
 
-    // Update the run record
-    await client.query(`
-      UPDATE agent_runs
-      SET run_status = 'failed',
-          completed_at = NOW(),
-          duration_ms = EXTRACT(EPOCH FROM (NOW() - started_at))::INTEGER * 1000,
-          error_message = $2
-      WHERE id = $1
-    `, [runId, errorMessage]);
+      // Increment consecutive_failures
+      const rows = await tx.$queryRaw<Array<{ consecutive_failures: number; max_retries: number }>>`
+        UPDATE agent_schedule
+        SET consecutive_failures = consecutive_failures + 1,
+            updated_at = NOW()
+        WHERE agent_name = ${agentName}
+        RETURNING consecutive_failures, max_retries
+      `;
 
-    // Increment consecutive_failures
-    const { rows } = await client.query<{ consecutive_failures: number; max_retries: number }>(`
-      UPDATE agent_schedule
-      SET consecutive_failures = consecutive_failures + 1,
-          updated_at = NOW()
-      WHERE agent_name = $1
-      RETURNING consecutive_failures, max_retries
-    `, [agentName]);
-
-    await client.query('COMMIT');
+      return rows;
+    });
 
     // Log critical alert if max retries exceeded
-    if (rows.length > 0 && rows[0].consecutive_failures >= rows[0].max_retries) {
-      console.error(`[Health] CRITICAL: Agent ${agentName} has failed ${rows[0].consecutive_failures} times (max: ${rows[0].max_retries}). Error: ${errorMessage}`);
+    if (result.length > 0 && result[0].consecutive_failures >= result[0].max_retries) {
+      console.error(`[Health] CRITICAL: Agent ${agentName} has failed ${result[0].consecutive_failures} times (max: ${result[0].max_retries}). Error: ${errorMessage}`);
     }
   } catch (err) {
-    await client.query('ROLLBACK');
     console.error(`[Health] Failed to mark failure for ${agentName}:`, err);
     throw err;
-  } finally {
-    client.release();
   }
 }
 
@@ -150,9 +135,9 @@ export async function markAgentFailure(agentName: string, runId: number, errorMe
  * Update heartbeat for a running agent.
  */
 export async function updateHeartbeat(runId: number): Promise<void> {
-  await pool.query(`
-    UPDATE agent_runs SET last_heartbeat = NOW() WHERE id = $1
-  `, [runId]);
+  await prisma.$executeRaw`
+    UPDATE agent_runs SET last_heartbeat = NOW() WHERE id = ${runId}
+  `;
 }
 
 /**
@@ -186,26 +171,26 @@ function computeHealth(schedule: DbAgentSchedule, latestRun: DbAgentRun | null, 
  */
 export async function getAgentDashboard(): Promise<AgentHealth[]> {
   // Fetch all schedules
-  const { rows: schedules } = await pool.query<DbAgentSchedule>(`
+  const schedules = await prisma.$queryRaw<Array<DbAgentSchedule>>`
     SELECT * FROM agent_schedule ORDER BY agent_group, agent_name
-  `);
+  `;
 
   // Fetch latest run per agent
-  const { rows: latestRuns } = await pool.query<DbAgentRun>(`
+  const latestRuns = await prisma.$queryRaw<Array<DbAgentRun>>`
     SELECT DISTINCT ON (agent_name) *
     FROM agent_runs
     ORDER BY agent_name, started_at DESC
-  `);
+  `;
 
   // Fetch 5 most recent runs per agent
-  const { rows: recentRuns } = await pool.query<DbAgentRun>(`
+  const recentRuns = await prisma.$queryRaw<Array<DbAgentRun>>`
     SELECT * FROM (
       SELECT *, ROW_NUMBER() OVER (PARTITION BY agent_name ORDER BY started_at DESC) AS rn
       FROM agent_runs
     ) sub
     WHERE rn <= 5
     ORDER BY agent_name, started_at DESC
-  `);
+  `;
 
   // Build lookup maps
   const latestRunMap = new Map<string, DbAgentRun>();

@@ -1,7 +1,7 @@
 // lib/agents/scheduler.ts — The core autonomy logic: scheduling brain
 // Called every 5 minutes by Railway cron via /api/scheduler/tick
 
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { recoverZombies, markAgentSuccess, markAgentFailure, updateHeartbeat } from './health';
 import { PROCESSORS } from './processors';
 import type { DbAgentSchedule, DbAgentRun, AgentName, TickResult } from './types';
@@ -10,11 +10,10 @@ import type { DbAgentSchedule, DbAgentRun, AgentName, TickResult } from './types
  * Check if an agent is currently running.
  */
 async function isAgentRunning(agentName: string): Promise<boolean> {
-  const { rows } = await pool.query<{ count: string }>(
-    `SELECT COUNT(*) as count FROM agent_runs WHERE agent_name = $1 AND run_status = 'running'`,
-    [agentName]
-  );
-  return parseInt(rows[0].count, 10) > 0;
+  const result = await prisma.$queryRaw<Array<{ count: bigint }>>`
+    SELECT COUNT(*) as count FROM agent_runs WHERE agent_name = ${agentName} AND run_status = 'running'
+  `;
+  return parseInt(result[0].count.toString(), 10) > 0;
 }
 
 /**
@@ -37,18 +36,17 @@ async function shouldRetry(schedule: DbAgentSchedule): Promise<boolean> {
   if (schedule.consecutive_failures >= schedule.max_retries) return false;
 
   // Get the last failed run's completion time
-  const { rows } = await pool.query<{ completed_at: Date }>(
-    `SELECT completed_at FROM agent_runs
-     WHERE agent_name = $1 AND run_status = 'failed'
-     ORDER BY completed_at DESC LIMIT 1`,
-    [schedule.agent_name]
-  );
+  const result = await prisma.$queryRaw<Array<{ completed_at: Date }>>`
+    SELECT completed_at FROM agent_runs
+    WHERE agent_name = ${schedule.agent_name} AND run_status = 'failed'
+    ORDER BY completed_at DESC LIMIT 1
+  `;
 
-  if (rows.length === 0 || !rows[0].completed_at) return true;
+  if (result.length === 0 || !result[0].completed_at) return true;
 
   const backoffMinutes = schedule.retry_delay_minutes * Math.pow(2, schedule.consecutive_failures - 1);
   const backoffMs = backoffMinutes * 60 * 1000;
-  const msSinceFailure = Date.now() - new Date(rows[0].completed_at).getTime();
+  const msSinceFailure = Date.now() - new Date(result[0].completed_at).getTime();
 
   return msSinceFailure >= backoffMs;
 }
@@ -64,18 +62,17 @@ async function areDependenciesMet(schedule: DbAgentSchedule): Promise<{ met: boo
 
   const stale: string[] = [];
   for (const dep of schedule.depends_on) {
-    const { rows } = await pool.query<DbAgentSchedule>(
-      `SELECT last_success_at, freshness_interval_hours FROM agent_schedule WHERE agent_name = $1`,
-      [dep]
-    );
+    const result = await prisma.$queryRaw<Array<DbAgentSchedule>>`
+      SELECT last_success_at, freshness_interval_hours FROM agent_schedule WHERE agent_name = ${dep}
+    `;
 
-    if (rows.length === 0 || !rows[0].last_success_at) {
+    if (result.length === 0 || !result[0].last_success_at) {
       stale.push(dep);
       continue;
     }
 
-    const hoursSince = (Date.now() - new Date(rows[0].last_success_at).getTime()) / (1000 * 60 * 60);
-    if (hoursSince > rows[0].freshness_interval_hours) {
+    const hoursSince = (Date.now() - new Date(result[0].last_success_at).getTime()) / (1000 * 60 * 60);
+    if (hoursSince > result[0].freshness_interval_hours) {
       stale.push(dep);
     }
   }
@@ -92,13 +89,12 @@ async function executeAgentWithHeartbeat(
   triggeredBy: 'scheduler' | 'manual' | 'cron' = 'scheduler'
 ): Promise<void> {
   // Create the agent_runs record
-  const { rows } = await pool.query<{ id: number }>(
-    `INSERT INTO agent_runs (agent_name, run_status, triggered_by, last_heartbeat)
-     VALUES ($1, 'running', $2, NOW())
-     RETURNING id`,
-    [agentName, triggeredBy]
-  );
-  const runId = rows[0].id;
+  const result = await prisma.$queryRaw<Array<{ id: number }>>`
+    INSERT INTO agent_runs (agent_name, run_status, triggered_by, last_heartbeat)
+    VALUES (${agentName}, 'running', ${triggeredBy}, NOW())
+    RETURNING id
+  `;
+  const runId = result[0].id;
 
   // Start heartbeat interval (every 60 seconds)
   const heartbeatInterval = setInterval(async () => {
@@ -151,9 +147,9 @@ export async function runSchedulerTick(): Promise<TickResult> {
     result.zombies_recovered = await recoverZombies();
 
     // Step 2: Load all enabled agent schedules
-    const { rows: schedules } = await pool.query<DbAgentSchedule>(
-      `SELECT * FROM agent_schedule WHERE enabled = TRUE ORDER BY agent_name`
-    );
+    const schedules = await prisma.$queryRaw<Array<DbAgentSchedule>>`
+      SELECT * FROM agent_schedule WHERE enabled = TRUE ORDER BY agent_name
+    `;
 
     // Step 3: Evaluate each agent
     for (const schedule of schedules) {

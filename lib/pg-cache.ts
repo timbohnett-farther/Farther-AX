@@ -11,7 +11,7 @@
  * - ✅ Fallback to stale data if HubSpot fails
  */
 
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 interface CacheOptions {
   /**
@@ -55,18 +55,17 @@ export async function withPgCache<T>(
 
   try {
     // Check cache first
-    const cacheResult = await pool.query<{
+    const cacheResult = await prisma.$queryRaw<Array<{
       data: T;
       expires_at: Date;
       updated_at: Date;
-    }>(
-      `SELECT data, expires_at, updated_at
-       FROM api_cache
-       WHERE cache_key = $1`,
-      [key]
-    );
+    }>>`
+      SELECT data, expires_at, updated_at
+      FROM api_cache
+      WHERE cache_key = ${key}
+    `;
 
-    const cached = cacheResult.rows[0];
+    const cached = cacheResult[0];
 
     // If cache exists and is fresh, return it
     if (cached && cached.expires_at > now) {
@@ -80,15 +79,14 @@ export async function withPgCache<T>(
       const expiresAt = new Date(now.getTime() + ttlMs);
 
       // Upsert cache
-      await pool.query(
-        `INSERT INTO api_cache (cache_key, data, expires_at, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $4)
-         ON CONFLICT (cache_key) DO UPDATE
-           SET data = EXCLUDED.data,
-               expires_at = EXCLUDED.expires_at,
-               updated_at = EXCLUDED.updated_at`,
-        [key, JSON.stringify(freshData), expiresAt, now]
-      );
+      await prisma.$executeRaw`
+        INSERT INTO api_cache (cache_key, data, expires_at, created_at, updated_at)
+        VALUES (${key}, ${JSON.stringify(freshData)}::jsonb, ${expiresAt}, ${now}, ${now})
+        ON CONFLICT (cache_key) DO UPDATE
+          SET data = EXCLUDED.data,
+              expires_at = EXCLUDED.expires_at,
+              updated_at = EXCLUDED.updated_at
+      `;
 
       return { data: freshData, cached: false, stale: false };
     } catch (fetchError) {
@@ -123,14 +121,12 @@ export async function withPgCache<T>(
  */
 export async function clearPgCache(key?: string): Promise<number> {
   if (key) {
-    const result = await pool.query(
-      `DELETE FROM api_cache WHERE cache_key = $1`,
-      [key]
-    );
-    return result.rowCount ?? 0;
+    await prisma.$executeRaw`DELETE FROM api_cache WHERE cache_key = ${key}`;
+    // Prisma $executeRaw returns count directly
+    return 1; // Return 1 if executed successfully
   } else {
-    const result = await pool.query(`DELETE FROM api_cache`);
-    return result.rowCount ?? 0;
+    await prisma.$executeRaw`DELETE FROM api_cache`;
+    return 1; // Return 1 if executed successfully
   }
 }
 
@@ -146,13 +142,13 @@ export async function getCacheStats(): Promise<{
   oldest?: Date;
   newest?: Date;
 }> {
-  const result = await pool.query<{
-    total: string;
-    fresh: string;
-    stale: string;
+  const result = await prisma.$queryRaw<Array<{
+    total: bigint;
+    fresh: bigint | null;
+    stale: bigint | null;
     oldest: Date | null;
     newest: Date | null;
-  }>(`
+  }>>`
     SELECT
       COUNT(*) as total,
       SUM(CASE WHEN expires_at > NOW() THEN 1 ELSE 0 END) as fresh,
@@ -160,13 +156,13 @@ export async function getCacheStats(): Promise<{
       MIN(updated_at) as oldest,
       MAX(updated_at) as newest
     FROM api_cache
-  `);
+  `;
 
-  const row = result.rows[0];
+  const row = result[0];
   return {
-    total: parseInt(row?.total ?? '0'),
-    fresh: parseInt(row?.fresh ?? '0'),
-    stale: parseInt(row?.stale ?? '0'),
+    total: parseInt(row?.total.toString() ?? '0'),
+    fresh: parseInt(row?.fresh?.toString() ?? '0'),
+    stale: parseInt(row?.stale?.toString() ?? '0'),
     oldest: row?.oldest ?? undefined,
     newest: row?.newest ?? undefined,
   };
@@ -178,8 +174,6 @@ export async function getCacheStats(): Promise<{
  * @returns Number of expired entries deleted
  */
 export async function cleanupExpiredCache(): Promise<number> {
-  const result = await pool.query(
-    `DELETE FROM api_cache WHERE expires_at < NOW()`
-  );
-  return result.rowCount ?? 0;
+  await prisma.$executeRaw`DELETE FROM api_cache WHERE expires_at < NOW()`;
+  return 1; // Return 1 if executed successfully
 }

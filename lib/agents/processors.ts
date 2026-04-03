@@ -1,7 +1,7 @@
 // lib/agents/processors.ts — Individual agent processor functions
 // Each processor performs its specific analysis task and returns results.
 
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import type { AgentName } from './types';
 
 interface ProcessorResult {
@@ -18,29 +18,29 @@ async function runSentinel7(): Promise<ProcessorResult> {
   let recordsProcessed = 0;
 
   // Check for stale api_cache entries
-  const { rows: staleCache } = await pool.query(`
+  const staleCache = await prisma.$queryRaw<Array<{ cache_key: string; expires_at: Date }>>`
     SELECT cache_key, expires_at
     FROM api_cache
     WHERE expires_at < NOW()
-  `);
+  `;
   checks.push({ check: 'stale_cache_entries', count: staleCache.length });
   recordsProcessed += staleCache.length;
 
   // Check for advisors missing key data in managed_accounts
-  const { rows: missingData } = await pool.query(`
+  const missingData = await prisma.$queryRaw<Array<{ advisor_name: string; account_count: bigint }>>`
     SELECT advisor_name, COUNT(*) as account_count
     FROM managed_accounts
     WHERE current_value IS NULL OR current_value = 0
     GROUP BY advisor_name
-  `);
+  `;
   checks.push({ check: 'advisors_missing_values', count: missingData.length, advisors: missingData.slice(0, 10) });
   recordsProcessed += missingData.length;
 
   // Check managed_accounts_summary freshness
-  const { rows: summaryAge } = await pool.query(`
+  const summaryAge = await prisma.$queryRaw<Array<{ oldest_sync: Date | null; newest_sync: Date | null; total: bigint }>>`
     SELECT MIN(synced_at) as oldest_sync, MAX(synced_at) as newest_sync, COUNT(*) as total
     FROM managed_accounts_summary
-  `);
+  `;
   checks.push({ check: 'summary_freshness', ...summaryAge[0] });
   recordsProcessed += 1;
 
@@ -60,7 +60,7 @@ async function runPattern31(): Promise<ProcessorResult> {
 
   // Analyze sentiment trends over last 31 days
   try {
-    const { rows: sentimentTrends } = await pool.query(`
+    const sentimentTrends = await prisma.$queryRaw<Array<{ tier: string; count: bigint; avg_score: number }>>`
       SELECT
         tier,
         COUNT(*) as count,
@@ -69,7 +69,7 @@ async function runPattern31(): Promise<ProcessorResult> {
       WHERE scored_at > NOW() - INTERVAL '31 days'
       GROUP BY tier
       ORDER BY count DESC
-    `);
+    `;
     patterns.push({ pattern: 'sentiment_distribution_31d', data: sentimentTrends });
     recordsProcessed += sentimentTrends.length;
   } catch {
@@ -77,14 +77,14 @@ async function runPattern31(): Promise<ProcessorResult> {
   }
 
   // Analyze managed accounts growth
-  const { rows: aumTrends } = await pool.query(`
+  const aumTrends = await prisma.$queryRaw<Array<{ total_accounts: bigint; total_aum: number; avg_account_value: number }>>`
     SELECT
       COUNT(*) as total_accounts,
       SUM(current_value) as total_aum,
       AVG(current_value) as avg_account_value
     FROM managed_accounts
     WHERE current_value > 0
-  `);
+  `;
   patterns.push({ pattern: 'aum_snapshot', data: aumTrends[0] });
   recordsProcessed += 1;
 
@@ -104,7 +104,11 @@ async function runControl91(): Promise<ProcessorResult> {
 
   // Check for long-running transitions
   try {
-    const { rows: longTransitions } = await pool.query(`
+    const longTransitions = await prisma.$queryRaw<Array<{
+      advisor_name: string;
+      client_count: bigint;
+      oldest_record: Date;
+    }>>`
       SELECT
         advisor_name,
         COUNT(*) as client_count,
@@ -113,7 +117,7 @@ async function runControl91(): Promise<ProcessorResult> {
       WHERE created_at < NOW() - INTERVAL '90 days'
       GROUP BY advisor_name
       HAVING COUNT(*) > 0
-    `);
+    `;
     controls.push({ control: 'long_running_transitions', count: longTransitions.length, details: longTransitions.slice(0, 10) });
     recordsProcessed += longTransitions.length;
   } catch {
@@ -122,10 +126,10 @@ async function runControl91(): Promise<ProcessorResult> {
 
   // Check team member coverage
   try {
-    const { rows: teamCoverage } = await pool.query(`
+    const teamCoverage = await prisma.$queryRaw<Array<{ total_mappings: bigint }>>`
       SELECT COUNT(*) as total_mappings FROM advisor_team_mappings
-    `);
-    controls.push({ control: 'team_coverage', ...teamCoverage[0] });
+    `;
+    controls.push({ control: 'team_coverage', total_mappings: parseInt(teamCoverage[0].total_mappings.toString(), 10) });
     recordsProcessed += 1;
   } catch {
     controls.push({ control: 'team_coverage', error: 'table not available' });
@@ -146,25 +150,30 @@ async function runArchive365(): Promise<ProcessorResult> {
   let recordsProcessed = 0;
 
   // Snapshot current state
-  const { rows: aumSnapshot } = await pool.query(`
+  const aumSnapshot = await prisma.$queryRaw<Array<{
+    advisor_count: bigint;
+    total_platform_aum: number | null;
+    avg_advisor_aum: number | null;
+    total_accounts: bigint | null;
+  }>>`
     SELECT
       COUNT(DISTINCT advisor_name) as advisor_count,
       SUM(total_aum) as total_platform_aum,
       AVG(total_aum) as avg_advisor_aum,
       SUM(account_count) as total_accounts
     FROM managed_accounts_summary
-  `);
+  `;
   archives.push({ archive: 'annual_aum_snapshot', data: aumSnapshot[0] });
   recordsProcessed += 1;
 
   // Count graduations this year
   try {
-    const { rows: gradCount } = await pool.query(`
+    const gradCount = await prisma.$queryRaw<Array<{ graduated_this_year: bigint }>>`
       SELECT COUNT(*) as graduated_this_year
       FROM advisor_graduations
       WHERE graduated_at >= DATE_TRUNC('year', NOW())
-    `);
-    archives.push({ archive: 'annual_graduations', ...gradCount[0] });
+    `;
+    archives.push({ archive: 'annual_graduations', graduated_this_year: parseInt(gradCount[0].graduated_this_year.toString(), 10) });
     recordsProcessed += 1;
   } catch {
     archives.push({ archive: 'annual_graduations', error: 'table not available' });
@@ -184,23 +193,31 @@ async function runWeekly(): Promise<ProcessorResult> {
   let recordsProcessed = 0;
 
   // Recent agent runs summary
-  const { rows: recentRuns } = await pool.query(`
+  const recentRuns = await prisma.$queryRaw<Array<{
+    agent_name: string;
+    run_status: string;
+    count: bigint;
+  }>>`
     SELECT agent_name, run_status, COUNT(*) as count
     FROM agent_runs
     WHERE started_at > NOW() - INTERVAL '7 days'
     GROUP BY agent_name, run_status
-  `);
+  `;
   summary.push({ metric: 'agent_runs_7d', data: recentRuns });
   recordsProcessed += recentRuns.length;
 
   // Managed accounts changes
-  const { rows: aumSummary } = await pool.query(`
+  const aumSummary = await prisma.$queryRaw<Array<{
+    total_advisors: bigint;
+    total_aum: number | null;
+    total_revenue: number | null;
+  }>>`
     SELECT
       COUNT(*) as total_advisors,
       SUM(total_aum) as total_aum,
       SUM(total_monthly_revenue) as total_revenue
     FROM managed_accounts_summary
-  `);
+  `;
   summary.push({ metric: 'aum_summary', data: aumSummary[0] });
   recordsProcessed += 1;
 
@@ -218,12 +235,17 @@ async function runMonthly(): Promise<ProcessorResult> {
   let recordsProcessed = 0;
 
   // Full AUM breakdown by advisor
-  const { rows: aumByAdvisor } = await pool.query(`
+  const aumByAdvisor = await prisma.$queryRaw<Array<{
+    advisor_name: string;
+    total_aum: number;
+    account_count: bigint;
+    weighted_fee_bps: number;
+  }>>`
     SELECT advisor_name, total_aum, account_count, weighted_fee_bps
     FROM managed_accounts_summary
     ORDER BY total_aum DESC
     LIMIT 20
-  `);
+  `;
   review.push({ metric: 'top_20_advisors_by_aum', data: aumByAdvisor });
   recordsProcessed += aumByAdvisor.length;
 
@@ -241,7 +263,13 @@ async function runQuarterly(): Promise<ProcessorResult> {
   let recordsProcessed = 0;
 
   // Quarter-over-quarter agent success rate
-  const { rows: agentStats } = await pool.query(`
+  const agentStats = await prisma.$queryRaw<Array<{
+    agent_name: string;
+    successes: bigint;
+    failures: bigint;
+    total_runs: bigint;
+    avg_duration_ms: number;
+  }>>`
     SELECT
       agent_name,
       COUNT(*) FILTER (WHERE run_status = 'completed') as successes,
@@ -251,7 +279,7 @@ async function runQuarterly(): Promise<ProcessorResult> {
     FROM agent_runs
     WHERE started_at > NOW() - INTERVAL '91 days'
     GROUP BY agent_name
-  `);
+  `;
   review.push({ metric: 'agent_performance_91d', data: agentStats });
   recordsProcessed += agentStats.length;
 
@@ -269,7 +297,14 @@ async function runAnnual(): Promise<ProcessorResult> {
   let recordsProcessed = 0;
 
   // Full year agent execution summary
-  const { rows: yearStats } = await pool.query(`
+  const yearStats = await prisma.$queryRaw<Array<{
+    agent_name: string;
+    total_runs: bigint;
+    successes: bigint;
+    failures: bigint;
+    first_run: Date;
+    last_run: Date;
+  }>>`
     SELECT
       agent_name,
       COUNT(*) as total_runs,
@@ -280,7 +315,7 @@ async function runAnnual(): Promise<ProcessorResult> {
     FROM agent_runs
     WHERE started_at > NOW() - INTERVAL '365 days'
     GROUP BY agent_name
-  `);
+  `;
   review.push({ metric: 'annual_agent_summary', data: yearStats });
   recordsProcessed += yearStats.length;
 
