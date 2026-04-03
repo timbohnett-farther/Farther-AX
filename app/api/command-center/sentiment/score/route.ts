@@ -17,7 +17,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { aiComplete } from '@/lib/ai-router';
 import {
   type Engagement,
@@ -338,14 +339,13 @@ interface PreviousScore {
 
 async function fetchPreviousScore(dealId: string): Promise<PreviousScore | null> {
   try {
-    const result = await pool.query<PreviousScore>(
-      `SELECT composite_score, activity_score, tone_score, milestone_score, recency_score, tier
-       FROM advisor_sentiment
-       WHERE deal_id = $1
-       LIMIT 1`,
-      [dealId]
-    );
-    return result.rows[0] ?? null;
+    const result = await prisma.$queryRaw<PreviousScore[]>`
+      SELECT composite_score, activity_score, tone_score, milestone_score, recency_score, tier
+      FROM advisor_sentiment
+      WHERE deal_id = ${dealId}
+      LIMIT 1
+    `;
+    return result[0] ?? null;
   } catch {
     // Table may not exist yet — treat as no previous score
     return null;
@@ -373,31 +373,28 @@ async function upsertSentimentScore(params: {
 
   const signalsJson = JSON.stringify(signals);
 
-  await pool.query(
-    `INSERT INTO advisor_sentiment (
-       deal_id, deal_name, contact_id, composite_score,
-       activity_score, tone_score, milestone_score, recency_score,
-       tier, deal_stage, engagements_analyzed, signals, updated_at
-     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::jsonb, NOW())
-     ON CONFLICT (deal_id) DO UPDATE SET
-       deal_name            = EXCLUDED.deal_name,
-       contact_id           = EXCLUDED.contact_id,
-       composite_score      = EXCLUDED.composite_score,
-       activity_score       = EXCLUDED.activity_score,
-       tone_score           = EXCLUDED.tone_score,
-       milestone_score      = EXCLUDED.milestone_score,
-       recency_score        = EXCLUDED.recency_score,
-       tier                 = EXCLUDED.tier,
-       deal_stage           = EXCLUDED.deal_stage,
-       engagements_analyzed = EXCLUDED.engagements_analyzed,
-       signals              = EXCLUDED.signals,
-       updated_at           = NOW()`,
-    [
-      dealId, dealName, contactId, compositeScore,
-      activityScore, toneScore, milestoneScore, recencyScore,
-      tier, dealStage, engagementsAnalyzed, signalsJson,
-    ]
-  );
+  await prisma.$executeRaw`
+    INSERT INTO advisor_sentiment (
+      deal_id, deal_name, contact_id, composite_score,
+      activity_score, tone_score, milestone_score, recency_score,
+      tier, deal_stage, engagements_analyzed, signals, updated_at
+    ) VALUES (${dealId}, ${dealName}, ${contactId}, ${compositeScore},
+              ${activityScore}, ${toneScore}, ${milestoneScore}, ${recencyScore},
+              ${tier}, ${dealStage}, ${engagementsAnalyzed}, ${signalsJson}::jsonb, NOW())
+    ON CONFLICT (deal_id) DO UPDATE SET
+      deal_name            = EXCLUDED.deal_name,
+      contact_id           = EXCLUDED.contact_id,
+      composite_score      = EXCLUDED.composite_score,
+      activity_score       = EXCLUDED.activity_score,
+      tone_score           = EXCLUDED.tone_score,
+      milestone_score      = EXCLUDED.milestone_score,
+      recency_score        = EXCLUDED.recency_score,
+      tier                 = EXCLUDED.tier,
+      deal_stage           = EXCLUDED.deal_stage,
+      engagements_analyzed = EXCLUDED.engagements_analyzed,
+      signals              = EXCLUDED.signals,
+      updated_at           = NOW()
+  `;
 }
 
 async function appendSentimentHistory(params: {
@@ -415,16 +412,13 @@ async function appendSentimentHistory(params: {
     milestoneScore, recencyScore, tier, engagementsAnalyzed,
   } = params;
 
-  await pool.query(
-    `INSERT INTO advisor_sentiment_history (
-       deal_id, composite_score, activity_score, tone_score,
-       milestone_score, recency_score, tier, engagements_analyzed, scored_at
-     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
-    [
-      dealId, compositeScore, activityScore, toneScore,
-      milestoneScore, recencyScore, tier, engagementsAnalyzed,
-    ]
-  );
+  await prisma.$executeRaw`
+    INSERT INTO advisor_sentiment_history (
+      deal_id, composite_score, activity_score, tone_score,
+      milestone_score, recency_score, tier, engagements_analyzed, scored_at
+    ) VALUES (${dealId}, ${compositeScore}, ${activityScore}, ${toneScore},
+              ${milestoneScore}, ${recencyScore}, ${tier}, ${engagementsAnalyzed}, NOW())
+  `;
 }
 
 // ── POST handler ──────────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const CUSTOM_OBJECT_TYPE = '2-13676628';
@@ -15,10 +15,10 @@ const PROPERTIES = [
 
 async function shouldSkipSync(): Promise<boolean> {
   try {
-    const result = await pool.query<{ expires_at: Date }>(
-      `SELECT expires_at FROM api_cache WHERE cache_key = 'managed-accounts-last-sync'`
-    );
-    if (result.rows[0] && result.rows[0].expires_at > new Date()) {
+    const result = await prisma.$queryRaw<Array<{ expires_at: Date }>>`
+      SELECT expires_at FROM api_cache WHERE cache_key = 'managed-accounts-last-sync'
+    `;
+    if (result[0] && result[0].expires_at > new Date()) {
       return true;
     }
   } catch (err) {
@@ -30,15 +30,14 @@ async function shouldSkipSync(): Promise<boolean> {
 async function markSyncRun(): Promise<void> {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + SYNC_COOLDOWN_MS);
-  await pool.query(
-    `INSERT INTO api_cache (cache_key, data, expires_at, created_at, updated_at)
-     VALUES ('managed-accounts-last-sync', '"ok"', $1, $2, $2)
-     ON CONFLICT (cache_key) DO UPDATE
-       SET data = EXCLUDED.data,
-           expires_at = EXCLUDED.expires_at,
-           updated_at = EXCLUDED.updated_at`,
-    [expiresAt, now]
-  );
+  await prisma.$executeRaw`
+    INSERT INTO api_cache (cache_key, data, expires_at, created_at, updated_at)
+    VALUES ('managed-accounts-last-sync', '"ok"', ${expiresAt}, ${now}, ${now})
+    ON CONFLICT (cache_key) DO UPDATE
+      SET data = EXCLUDED.data,
+          expires_at = EXCLUDED.expires_at,
+          updated_at = EXCLUDED.updated_at
+  `;
 }
 
 async function fetchAllManagedAccounts() {
@@ -104,11 +103,8 @@ export async function GET() {
     }
 
     // Truncate and reload inside a transaction to prevent data loss on crash
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-
-      await client.query('TRUNCATE managed_accounts');
+    await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`TRUNCATE managed_accounts`;
 
       // Insert in batches
       const batchSize = 50;
@@ -132,16 +128,18 @@ export async function GET() {
           );
         }
 
-        await client.query(
+        // Build raw query with values array
+        const placeholderStr = placeholders.join(', ');
+        await tx.$executeRawUnsafe(
           `INSERT INTO managed_accounts (advisor_name, current_value, fee_rate_bps, monthly_fee_amount, hubspot_object_id)
-           VALUES ${placeholders.join(', ')}`,
-          values
+           VALUES ${placeholderStr}`,
+          ...values
         );
       }
 
       // Rebuild summary table
-      await client.query('TRUNCATE managed_accounts_summary');
-      await client.query(`
+      await tx.$executeRaw`TRUNCATE managed_accounts_summary`;
+      await tx.$executeRaw`
         INSERT INTO managed_accounts_summary (advisor_name, total_aum, total_monthly_revenue, account_count, weighted_fee_bps, synced_at)
         SELECT
           advisor_name,
@@ -157,28 +155,21 @@ export async function GET() {
         FROM managed_accounts
         WHERE advisor_name IS NOT NULL AND advisor_name != ''
         GROUP BY advisor_name
-      `);
-
-      await client.query('COMMIT');
-    } catch (txErr) {
-      await client.query('ROLLBACK');
-      throw txErr;
-    } finally {
-      client.release();
-    }
+      `;
+    });
 
     // Mark sync timestamp
     await markSyncRun();
 
-    const summaryCount = await pool.query('SELECT COUNT(*) as cnt FROM managed_accounts_summary');
+    const summaryCount = await prisma.$queryRaw<Array<{ cnt: bigint }>>`SELECT COUNT(*) as cnt FROM managed_accounts_summary`;
     console.log(
-      `[managed-accounts-sync] Complete — ${records.length} accounts, ${summaryCount.rows[0].cnt} advisors`
+      `[managed-accounts-sync] Complete — ${records.length} accounts, ${summaryCount[0].cnt.toString()} advisors`
     );
 
     return NextResponse.json({
       status: 'complete',
       records: records.length,
-      advisors: parseInt(summaryCount.rows[0].cnt),
+      advisors: parseInt(summaryCount[0].cnt.toString()),
     });
   } catch (err) {
     console.error('[managed-accounts-sync]', err);

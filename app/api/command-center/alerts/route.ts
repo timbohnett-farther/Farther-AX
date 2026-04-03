@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { TASKS } from '@/lib/onboarding-tasks-v2';
 import { calculateDueDate, getDay0Date, getLaunchDate } from '@/lib/due-date-calculator';
 import { calculateTaskStatus, getTaskResponsiblePerson, formatTaskAlert, type TaskAlert as TaskAlertType, type ResponsiblePerson } from '@/lib/task-status';
@@ -217,32 +218,40 @@ export async function GET(req: NextRequest) {
   try {
     const [dealsResult, sentimentResult, managedResult] = await Promise.allSettled([
       fetchOnboardingDeals(),
-      pool.query(
-        `SELECT DISTINCT ON (h.deal_id)
-           h.deal_id,
-           s.deal_name,
-           h.tier AS current_tier,
-           h.composite_score AS current_score,
-           h.scored_at AS changed_at,
-           prev.tier AS previous_tier,
-           prev.composite_score AS previous_score
-         FROM advisor_sentiment_history h
-         JOIN advisor_sentiment s ON s.deal_id = h.deal_id
-         LEFT JOIN LATERAL (
-           SELECT tier, composite_score
-           FROM advisor_sentiment_history
-           WHERE deal_id = h.deal_id AND scored_at < h.scored_at
-           ORDER BY scored_at DESC
-           LIMIT 1
-         ) prev ON TRUE
-         WHERE prev.tier IS NOT NULL
-         ORDER BY h.deal_id, h.scored_at DESC`
-      ),
+      prisma.$queryRaw<Array<{
+        deal_id: string;
+        deal_name: string | null;
+        current_tier: string;
+        current_score: number;
+        changed_at: Date;
+        previous_tier: string | null;
+        previous_score: number | null;
+      }>>`
+        SELECT DISTINCT ON (h.deal_id)
+          h.deal_id,
+          s.deal_name,
+          h.tier AS current_tier,
+          h.composite_score AS current_score,
+          h.scored_at AS changed_at,
+          prev.tier AS previous_tier,
+          prev.composite_score AS previous_score
+        FROM advisor_sentiment_history h
+        JOIN advisor_sentiment s ON s.deal_id = h.deal_id
+        LEFT JOIN LATERAL (
+          SELECT tier, composite_score
+          FROM advisor_sentiment_history
+          WHERE deal_id = h.deal_id AND scored_at < h.scored_at
+          ORDER BY scored_at DESC
+          LIMIT 1
+        ) prev ON TRUE
+        WHERE prev.tier IS NOT NULL
+        ORDER BY h.deal_id, h.scored_at DESC
+      `,
       fetchManagedAccountsByAdvisor(),
     ]);
 
     deals = dealsResult.status === 'fulfilled' ? dealsResult.value : [];
-    sentimentRows = sentimentResult.status === 'fulfilled' ? sentimentResult.value.rows : [];
+    sentimentRows = sentimentResult.status === 'fulfilled' ? sentimentResult.value : [];
     managedAccounts = managedResult.status === 'fulfilled' ? managedResult.value : {};
 
     if (dealsResult.status === 'rejected') {
@@ -287,27 +296,36 @@ export async function GET(req: NextRequest) {
   if (dealIds.length > 0) {
     try {
       const [allAssignments, allTasks] = await Promise.all([
-        pool.query(
-          `SELECT aa.deal_id, aa.role, tm.name, tm.email
-           FROM advisor_assignments aa
-           JOIN team_members tm ON aa.member_id = tm.id
-           WHERE aa.deal_id = ANY($1) AND tm.active = TRUE`,
-          [dealIds]
-        ),
-        pool.query(
-          `SELECT deal_id, task_key, completed, completed_at, due_date
-           FROM onboarding_tasks
-           WHERE deal_id = ANY($1) AND (is_legacy IS NULL OR is_legacy = FALSE)`,
-          [dealIds]
-        ),
+        prisma.$queryRaw<Array<{
+          deal_id: string;
+          role: string;
+          name: string;
+          email: string;
+        }>>`
+          SELECT aa.deal_id, aa.role, tm.name, tm.email
+          FROM advisor_assignments aa
+          JOIN team_members tm ON aa.member_id = tm.id
+          WHERE aa.deal_id = ANY(ARRAY[${Prisma.join(dealIds)}]::text[]) AND tm.active = TRUE
+        `,
+        prisma.$queryRaw<Array<{
+          deal_id: string;
+          task_key: string;
+          completed: boolean;
+          completed_at: string | null;
+          due_date: string | null;
+        }>>`
+          SELECT deal_id, task_key, completed, completed_at, due_date
+          FROM onboarding_tasks
+          WHERE deal_id = ANY(ARRAY[${Prisma.join(dealIds)}]::text[]) AND (is_legacy IS NULL OR is_legacy = FALSE)
+        `,
       ]);
 
-      for (const row of allAssignments.rows) {
+      for (const row of allAssignments) {
         if (!allAssignmentsMap[row.deal_id]) allAssignmentsMap[row.deal_id] = {};
         allAssignmentsMap[row.deal_id][row.role] = { name: row.name, email: row.email, role: row.role };
       }
 
-      for (const row of allTasks.rows) {
+      for (const row of allTasks) {
         if (!allTasksMap[row.deal_id]) allTasksMap[row.deal_id] = {};
         allTasksMap[row.deal_id][row.task_key] = row;
       }

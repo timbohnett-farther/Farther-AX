@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // ── Valid roles ──────────────────────────────────────────────────────────────
 const TEAM_ROLES = [
@@ -21,26 +22,30 @@ export async function GET(request: Request) {
     const role = searchParams.get('role');
     const active = searchParams.get('active');
 
-    let query = 'SELECT *, active FROM team_members';
-    const conditions: string[] = [];
-    const params: (string | boolean)[] = [];
+    let whereClauses: string[] = [];
 
     if (role) {
-      conditions.push(`role = $${conditions.length + 1}`);
-      params.push(role);
+      whereClauses.push(`role = '${role}'`);
     }
     if (active !== null) {
-      conditions.push(`active = $${conditions.length + 1}`);
-      params.push(active !== 'false');
+      whereClauses.push(`active = ${active !== 'false'}`);
     }
 
-    if (conditions.length > 0) {
-      query += ' WHERE ' + conditions.join(' AND ');
-    }
-    query += ' ORDER BY role, name';
+    const whereClause = whereClauses.length > 0 ? ' WHERE ' + whereClauses.join(' AND ') : '';
 
-    const result = await pool.query(query, params);
-    return NextResponse.json({ members: result.rows });
+    const result = await prisma.$queryRaw<Array<{
+      id: number;
+      name: string;
+      email: string;
+      role: string;
+      phone: string | null;
+      calendar_link: string | null;
+      active: boolean;
+      created_at: Date;
+      updated_at: Date;
+    }>>`SELECT * FROM team_members${Prisma.raw(whereClause)} ORDER BY role, name`;
+
+    return NextResponse.json({ members: result });
   } catch (err) {
     console.error('[team GET]', err);
     const message = err instanceof Error ? err.message : String(err);
@@ -62,14 +67,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `Invalid role. Must be one of: ${TEAM_ROLES.join(', ')}` }, { status: 400 });
     }
 
-    const result = await pool.query(
-      `INSERT INTO team_members (name, email, role, phone, calendar_link)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING *`,
-      [name, email.toLowerCase().trim(), role, phone || null, calendar_link || null]
-    );
+    const result = await prisma.$queryRaw<Array<{
+      id: number;
+      name: string;
+      email: string;
+      role: string;
+      phone: string | null;
+      calendar_link: string | null;
+      active: boolean;
+      created_at: Date;
+      updated_at: Date;
+    }>>`
+      INSERT INTO team_members (name, email, role, phone, calendar_link)
+      VALUES (${name}, ${email.toLowerCase().trim()}, ${role}, ${phone || null}, ${calendar_link || null})
+      RETURNING *
+    `;
 
-    return NextResponse.json({ member: result.rows[0] }, { status: 201 });
+    return NextResponse.json({ member: result[0] }, { status: 201 });
   } catch (err) {
     console.error('[team POST]', err);
     const message = err instanceof Error ? err.message : String(err);
@@ -95,14 +109,12 @@ export async function PATCH(request: Request) {
     }
 
     const fields: string[] = [];
-    const values: unknown[] = [];
-    let idx = 1;
+    const values: Record<string, any> = {};
 
     for (const [key, value] of Object.entries(updates)) {
       if (['name', 'email', 'role', 'phone', 'calendar_link', 'active'].includes(key)) {
-        fields.push(`${key} = $${idx}`);
-        values.push(key === 'email' ? (value as string).toLowerCase().trim() : value);
-        idx++;
+        fields.push(`${key} = ${Prisma.sql`${key === 'email' ? (value as string).toLowerCase().trim() : value}`}`);
+        values[key] = key === 'email' ? (value as string).toLowerCase().trim() : value;
       }
     }
 
@@ -111,18 +123,33 @@ export async function PATCH(request: Request) {
     }
 
     fields.push(`updated_at = NOW()`);
-    values.push(id);
 
-    const result = await pool.query(
-      `UPDATE team_members SET ${fields.join(', ')} WHERE id = $${idx} RETURNING *`,
-      values
-    );
+    // Build dynamic SET clause
+    const setClause = Object.entries(values)
+      .map(([k, v]) => `${k} = ${typeof v === 'string' ? `'${v.replace(/'/g, "''")}'` : v}`)
+      .join(', ');
 
-    if (result.rows.length === 0) {
+    const result = await prisma.$queryRaw<Array<{
+      id: number;
+      name: string;
+      email: string;
+      role: string;
+      phone: string | null;
+      calendar_link: string | null;
+      active: boolean;
+      created_at: Date;
+      updated_at: Date;
+    }>>`
+      UPDATE team_members SET ${Prisma.raw(setClause)}, updated_at = NOW()
+      WHERE id = ${id}
+      RETURNING *
+    `;
+
+    if (result.length === 0) {
       return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ member: result.rows[0] });
+    return NextResponse.json({ member: result[0] });
   } catch (err) {
     console.error('[team PATCH]', err);
     const message = err instanceof Error ? err.message : String(err);
@@ -140,16 +167,27 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'id query param is required' }, { status: 400 });
     }
 
-    const result = await pool.query(
-      `UPDATE team_members SET active = FALSE, updated_at = NOW() WHERE id = $1 RETURNING *`,
-      [id]
-    );
+    const result = await prisma.$queryRaw<Array<{
+      id: number;
+      name: string;
+      email: string;
+      role: string;
+      phone: string | null;
+      calendar_link: string | null;
+      active: boolean;
+      created_at: Date;
+      updated_at: Date;
+    }>>`
+      UPDATE team_members SET active = FALSE, updated_at = NOW()
+      WHERE id = ${id}
+      RETURNING *
+    `;
 
-    if (result.rows.length === 0) {
+    if (result.length === 0) {
       return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ member: result.rows[0] });
+    return NextResponse.json({ member: result[0] });
   } catch (err) {
     console.error('[team DELETE]', err);
     const message = err instanceof Error ? err.message : String(err);

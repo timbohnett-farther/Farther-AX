@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 // Ensure table exists on first call
 let tableReady = false;
 async function ensureTable() {
   if (tableReady) return;
-  await pool.query(`
+  await prisma.$executeRaw`
     CREATE TABLE IF NOT EXISTS advisor_graduations (
       deal_id TEXT PRIMARY KEY,
       graduated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       graduated_by TEXT
     )
-  `);
+  `;
   tableReady = true;
 }
 
@@ -30,16 +30,19 @@ export async function POST(
     const body = await request.json().catch(() => ({}));
     const graduatedBy = body.graduated_by || null;
 
-    const result = await pool.query(
-      `INSERT INTO advisor_graduations (deal_id, graduated_by)
-       VALUES ($1, $2)
-       ON CONFLICT (deal_id)
-       DO UPDATE SET graduated_at = NOW(), graduated_by = $2
-       RETURNING *`,
-      [dealId, graduatedBy]
-    );
+    const result = await prisma.$queryRaw<Array<{
+      deal_id: string;
+      graduated_at: Date;
+      graduated_by: string | null;
+    }>>`
+      INSERT INTO advisor_graduations (deal_id, graduated_by)
+      VALUES (${dealId}, ${graduatedBy})
+      ON CONFLICT (deal_id)
+      DO UPDATE SET graduated_at = NOW(), graduated_by = ${graduatedBy}
+      RETURNING *
+    `;
 
-    return NextResponse.json({ graduation: result.rows[0] }, { status: 201 });
+    return NextResponse.json({ graduation: result[0] }, { status: 201 });
   } catch (err) {
     console.error('[graduate POST]', err);
     const message = err instanceof Error ? err.message : String(err);
@@ -59,16 +62,20 @@ export async function DELETE(
       return NextResponse.json({ error: 'Deal ID is required' }, { status: 400 });
     }
 
-    const result = await pool.query(
-      `DELETE FROM advisor_graduations WHERE deal_id = $1 RETURNING *`,
-      [dealId]
-    );
+    const result = await prisma.$queryRaw<Array<{
+      deal_id: string;
+      graduated_at: Date;
+      graduated_by: string | null;
+    }>>`
+      DELETE FROM advisor_graduations WHERE deal_id = ${dealId}
+      RETURNING *
+    `;
 
-    if (result.rows.length === 0) {
+    if (result.length === 0) {
       return NextResponse.json({ error: 'Graduation not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ deleted: result.rows[0] });
+    return NextResponse.json({ deleted: result[0] });
   } catch (err) {
     console.error('[graduate DELETE]', err);
     const message = err instanceof Error ? err.message : String(err);

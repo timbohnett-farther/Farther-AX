@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // ── GET: Get assignments for a deal (or all assignments) ────────────────────
 export async function GET(request: Request) {
@@ -8,31 +9,39 @@ export async function GET(request: Request) {
     const dealId = searchParams.get('dealId');
     const memberId = searchParams.get('memberId');
 
-    let query = `
+    let whereClauses: string[] = [];
+
+    if (dealId) {
+      whereClauses.push(`a.deal_id = '${dealId}'`);
+    }
+    if (memberId) {
+      whereClauses.push(`a.member_id = ${memberId}`);
+    }
+
+    const whereClause = whereClauses.length > 0 ? ' WHERE ' + whereClauses.join(' AND ') : '';
+
+    const result = await prisma.$queryRaw<Array<{
+      id: number;
+      deal_id: string;
+      role: string;
+      member_id: number;
+      assigned_by: string | null;
+      assigned_at: Date;
+      member_name: string;
+      member_email: string;
+      member_phone: string | null;
+      member_calendar: string | null;
+      member_role: string;
+    }>>`
       SELECT a.*, t.name as member_name, t.email as member_email, t.phone as member_phone,
              t.calendar_link as member_calendar, t.role as member_role
       FROM advisor_assignments a
       JOIN team_members t ON a.member_id = t.id
+      ${Prisma.raw(whereClause)}
+      ORDER BY a.role, a.assigned_at
     `;
-    const conditions: string[] = [];
-    const params: string[] = [];
 
-    if (dealId) {
-      conditions.push(`a.deal_id = $${conditions.length + 1}`);
-      params.push(dealId);
-    }
-    if (memberId) {
-      conditions.push(`a.member_id = $${conditions.length + 1}`);
-      params.push(memberId);
-    }
-
-    if (conditions.length > 0) {
-      query += ' WHERE ' + conditions.join(' AND ');
-    }
-    query += ' ORDER BY a.role, a.assigned_at';
-
-    const result = await pool.query(query, params);
-    return NextResponse.json({ assignments: result.rows });
+    return NextResponse.json({ assignments: result });
   } catch (err) {
     console.error('[assignments GET]', err);
     const message = err instanceof Error ? err.message : String(err);
@@ -51,16 +60,22 @@ export async function POST(request: Request) {
     }
 
     // Upsert: if this deal+role combo exists, update the member
-    const result = await pool.query(
-      `INSERT INTO advisor_assignments (deal_id, role, member_id, assigned_by)
-       VALUES ($1, $2, $3, $4)
-       ON CONFLICT (deal_id, role)
-       DO UPDATE SET member_id = $3, assigned_by = $4, assigned_at = NOW()
-       RETURNING *`,
-      [deal_id, role, member_id, assigned_by || null]
-    );
+    const result = await prisma.$queryRaw<Array<{
+      id: number;
+      deal_id: string;
+      role: string;
+      member_id: number;
+      assigned_by: string | null;
+      assigned_at: Date;
+    }>>`
+      INSERT INTO advisor_assignments (deal_id, role, member_id, assigned_by)
+      VALUES (${deal_id}, ${role}, ${member_id}, ${assigned_by || null})
+      ON CONFLICT (deal_id, role)
+      DO UPDATE SET member_id = ${member_id}, assigned_by = ${assigned_by || null}, assigned_at = NOW()
+      RETURNING *
+    `;
 
-    return NextResponse.json({ assignment: result.rows[0] }, { status: 201 });
+    return NextResponse.json({ assignment: result[0] }, { status: 201 });
   } catch (err) {
     console.error('[assignments POST]', err);
     const message = err instanceof Error ? err.message : String(err);
@@ -79,16 +94,24 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'dealId and role query params are required' }, { status: 400 });
     }
 
-    const result = await pool.query(
-      `DELETE FROM advisor_assignments WHERE deal_id = $1 AND role = $2 RETURNING *`,
-      [dealId, role]
-    );
+    const result = await prisma.$queryRaw<Array<{
+      id: number;
+      deal_id: string;
+      role: string;
+      member_id: number;
+      assigned_by: string | null;
+      assigned_at: Date;
+    }>>`
+      DELETE FROM advisor_assignments
+      WHERE deal_id = ${dealId} AND role = ${role}
+      RETURNING *
+    `;
 
-    if (result.rows.length === 0) {
+    if (result.length === 0) {
       return NextResponse.json({ error: 'Assignment not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ deleted: result.rows[0] });
+    return NextResponse.json({ deleted: result[0] });
   } catch (err) {
     console.error('[assignments DELETE]', err);
     const message = err instanceof Error ? err.message : String(err);

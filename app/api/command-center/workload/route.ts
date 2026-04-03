@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { computeComplexityScore } from '@/lib/complexity-score';
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -60,8 +61,13 @@ export async function GET(request: Request) {
     }
     memberQuery += ' ORDER BY name';
 
-    const membersResult = await pool.query(memberQuery, memberParams);
-    const members = membersResult.rows;
+    const members = await prisma.$queryRaw<Array<{
+      id: number;
+      name: string;
+      email: string;
+      role: string;
+      active: boolean;
+    }>>`${memberQuery}` as any;
 
     if (members.length === 0) {
       return NextResponse.json({ workload: [], maxCapacity: MAX_CAPACITY });
@@ -69,12 +75,15 @@ export async function GET(request: Request) {
 
     // 2. Get all assignments for these members
     const memberIds = members.map((m: { id: number }) => m.id);
-    const assignmentsResult = await pool.query(
-      `SELECT a.deal_id, a.member_id, a.role
-       FROM advisor_assignments a
-       WHERE a.member_id = ANY($1)`,
-      [memberIds]
-    );
+    const assignmentsResult = await prisma.$queryRaw<Array<{
+      deal_id: string;
+      member_id: number;
+      role: string;
+    }>>`
+      SELECT a.deal_id, a.member_id, a.role
+      FROM advisor_assignments a
+      WHERE a.member_id = ANY(ARRAY[${Prisma.join(memberIds)}]::int[])
+    ` as any;
 
     // 3. Get complexity scores for all assigned deals
     const dealIds = Array.from(new Set(assignmentsResult.rows.map((a: { deal_id: string }) => a.deal_id)));

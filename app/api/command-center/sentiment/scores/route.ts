@@ -9,7 +9,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,28 +31,28 @@ interface AdvisorSentimentRow {
 
 export async function GET() {
   try {
-    const result = await pool.query<AdvisorSentimentRow>(
-      `SELECT
-         deal_id,
-         deal_name,
-         contact_id,
-         composite_score,
-         activity_score,
-         tone_score,
-         milestone_score,
-         recency_score,
-         tier,
-         deal_stage,
-         engagements_analyzed,
-         signals,
-         updated_at
-       FROM advisor_sentiment
-       ORDER BY deal_name ASC`
-    );
+    const result = await prisma.$queryRaw<AdvisorSentimentRow[]>`
+      SELECT
+        deal_id,
+        deal_name,
+        contact_id,
+        composite_score,
+        activity_score,
+        tone_score,
+        milestone_score,
+        recency_score,
+        tier,
+        deal_stage,
+        engagements_analyzed,
+        signals,
+        updated_at
+      FROM advisor_sentiment
+      ORDER BY deal_name ASC
+    `;
 
     return NextResponse.json({
-      scores: result.rows,
-      count: result.rowCount ?? result.rows.length,
+      scores: result,
+      count: result.length,
     });
   } catch (err) {
     console.error('[sentiment/scores]', err);

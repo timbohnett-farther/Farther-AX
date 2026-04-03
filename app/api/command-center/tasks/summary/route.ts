@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    const result = await pool.query(`
+    const result = await prisma.$queryRaw<Array<{
+      deal_id: string;
+      open_tasks: bigint;
+      completed_tasks: bigint;
+      total_tasks: bigint;
+      current_phase: string | null;
+    }>>`
       SELECT
         deal_id,
         COUNT(*) FILTER (WHERE NOT completed) as open_tasks,
@@ -13,7 +19,7 @@ export async function GET() {
       FROM onboarding_tasks
       WHERE (is_legacy IS NULL OR is_legacy = FALSE)
       GROUP BY deal_id
-    `);
+    `;
 
     const summary: Record<string, {
       open_tasks: number;
@@ -22,11 +28,11 @@ export async function GET() {
       current_phase: string | null;
     }> = {};
 
-    for (const row of result.rows) {
+    for (const row of result) {
       summary[row.deal_id] = {
-        open_tasks: parseInt(row.open_tasks),
-        completed_tasks: parseInt(row.completed_tasks),
-        total_tasks: parseInt(row.total_tasks),
+        open_tasks: parseInt(row.open_tasks.toString()),
+        completed_tasks: parseInt(row.completed_tasks.toString()),
+        total_tasks: parseInt(row.total_tasks.toString()),
         current_phase: row.current_phase,
       };
     }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { TASKS } from '@/lib/onboarding-tasks-v2';
 import { calculateDueDate, getDay0Date, getLaunchDate } from '@/lib/due-date-calculator';
 import { calculateTaskStatus, getTaskResponsiblePerson, type ResponsiblePerson } from '@/lib/task-status';
@@ -33,16 +33,20 @@ export async function GET(
 
     // Fetch team member assignments for this deal
     console.log('[checklist] Fetching team assignments...');
-    const assignmentsResult = await pool.query(
-      `SELECT aa.role, tm.name, tm.email, tm.role as member_role
-       FROM advisor_assignments aa
-       JOIN team_members tm ON aa.member_id = tm.id
-       WHERE aa.deal_id = $1 AND tm.active = TRUE`,
-      [dealId]
-    );
+    const assignmentsResult = await prisma.$queryRaw<Array<{
+      role: string;
+      name: string;
+      email: string;
+      member_role: string;
+    }>>`
+      SELECT aa.role, tm.name, tm.email, tm.role as member_role
+      FROM advisor_assignments aa
+      JOIN team_members tm ON aa.member_id = tm.id
+      WHERE aa.deal_id = ${dealId} AND tm.active = TRUE
+    `;
 
     const assignments: Record<string, ResponsiblePerson> = {};
-    for (const row of assignmentsResult.rows) {
+    for (const row of assignmentsResult) {
       assignments[row.role] = {
         name: row.name,
         email: row.email,
@@ -107,37 +111,37 @@ export async function GET(
     }
 
     console.log('[checklist] Querying database for dealId:', dealId);
-    const result = await pool.query(
-      `SELECT task_key, completed, completed_by, completed_at, notes, due_date
-       FROM onboarding_tasks
-       WHERE deal_id = $1 AND (is_legacy IS NULL OR is_legacy = FALSE)`,
-      [dealId]
-    );
+    const result = await prisma.$queryRaw<Array<{
+      task_key: string;
+      completed: boolean;
+      completed_by: string | null;
+      completed_at: string | null;
+      notes: string | null;
+      due_date: string | null;
+    }>>`
+      SELECT task_key, completed, completed_by, completed_at, notes, due_date
+      FROM onboarding_tasks
+      WHERE deal_id = ${dealId} AND (is_legacy IS NULL OR is_legacy = FALSE)
+    `;
 
-    console.log('[checklist] Database returned', result.rows.length, 'saved tasks');
+    console.log('[checklist] Database returned', result.length, 'saved tasks');
 
-    const saved: Record<string, typeof result.rows[0]> = {};
-    for (const row of result.rows) saved[row.task_key] = row;
+    const saved: Record<string, typeof result[0]> = {};
+    for (const row of result) saved[row.task_key] = row;
 
     // Auto-complete the first task if deal is in Offer Accepted or Launched stage
     const shouldAutoComplete = dealData?.properties?.dealstage === '2496936' || dealData?.properties?.dealstage === '100411705';
     if (shouldAutoComplete && !saved['p0_mark_signed']?.completed) {
       console.log('[checklist] Auto-completing p0_mark_signed task');
-      await pool.query(`
+      await prisma.$executeRaw`
         INSERT INTO onboarding_tasks (deal_id, task_key, phase, completed, completed_by, completed_at, is_legacy, updated_at)
-        VALUES ($1, $2, $3, TRUE, $4, $5, FALSE, NOW())
+        VALUES (${dealId}, ${'p0_mark_signed'}, ${'phase_0'}, TRUE, ${'system-auto'}, ${day0_date || new Date().toISOString()}, FALSE, NOW())
         ON CONFLICT (deal_id, task_key) DO UPDATE
           SET completed    = TRUE,
               completed_by = EXCLUDED.completed_by,
               completed_at = EXCLUDED.completed_at,
               updated_at   = NOW()
-      `, [
-        dealId,
-        'p0_mark_signed',
-        'phase_0',
-        'system-auto',
-        day0_date || new Date().toISOString(),
-      ]);
+      `;
 
       // Update local cache
       saved['p0_mark_signed'] = {
@@ -255,9 +259,9 @@ export async function PATCH(
   const taskDef = TASKS.find(t => t.id === taskId);
   const phase = taskDef?.phase ?? 'phase_0';
 
-  await pool.query(`
+  await prisma.$executeRaw`
     INSERT INTO onboarding_tasks (deal_id, task_key, phase, completed, completed_by, completed_at, notes, due_date, is_legacy, updated_at)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, FALSE, NOW())
+    VALUES (${dealId}, ${taskId}, ${phase}, ${completed}, ${completed ? userEmail : null}, ${completed ? new Date().toISOString() : null}, ${notes ?? null}, ${due_date ?? null}, FALSE, NOW())
     ON CONFLICT (deal_id, task_key) DO UPDATE
       SET completed    = EXCLUDED.completed,
           completed_by = EXCLUDED.completed_by,
@@ -266,16 +270,7 @@ export async function PATCH(
           due_date     = COALESCE(EXCLUDED.due_date, onboarding_tasks.due_date),
           is_legacy    = FALSE,
           updated_at   = NOW()
-  `, [
-    dealId,
-    taskId,
-    phase,
-    completed,
-    completed ? userEmail : null,
-    completed ? new Date().toISOString() : null,
-    notes ?? null,
-    due_date ?? null,
-  ]);
+  `;
 
   return NextResponse.json({ ok: true });
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // STAFFING RECOMMENDATION ENGINE
@@ -54,20 +54,20 @@ export async function GET(request: Request) {
     }
 
     // 2. Get all active team members for relevant roles
-    const membersResult = await pool.query(
-      `SELECT * FROM team_members WHERE active = TRUE AND role IN ('AXM', 'AXA', 'CTM', 'CTA') ORDER BY role, name`
-    );
-    const members: TeamMember[] = membersResult.rows;
+    const members = await prisma.$queryRaw<TeamMember[]>`
+      SELECT * FROM team_members WHERE active = TRUE AND role IN ('AXM', 'AXA', 'CTM', 'CTA')
+      ORDER BY role, name
+    `;
 
     // 3. Get all current assignments with their deal complexity
-    const assignmentsResult = await pool.query(
-      `SELECT a.member_id, a.deal_id FROM advisor_assignments a
-       JOIN team_members t ON a.member_id = t.id
-       WHERE t.active = TRUE`
-    );
+    const assignmentsResult = await prisma.$queryRaw<Array<{ member_id: number; deal_id: string }>>`
+      SELECT a.member_id, a.deal_id FROM advisor_assignments a
+      JOIN team_members t ON a.member_id = t.id
+      WHERE t.active = TRUE
+    `;
 
     // 4. Get complexity scores for all currently assigned deals
-    const allDealIds = Array.from(new Set(assignmentsResult.rows.map((a: { deal_id: string }) => a.deal_id)));
+    const allDealIds = Array.from(new Set(assignmentsResult.map((a) => a.deal_id)));
     const dealScores: Record<string, number> = {};
 
     if (allDealIds.length > 0) {
@@ -94,7 +94,7 @@ export async function GET(request: Request) {
     for (const m of members) {
       memberLoads[m.id] = { totalComplexity: 0, dealCount: 0 };
     }
-    for (const a of assignmentsResult.rows) {
+    for (const a of assignmentsResult) {
       if (memberLoads[a.member_id]) {
         memberLoads[a.member_id].totalComplexity += dealScores[a.deal_id] || 0;
         memberLoads[a.member_id].dealCount++;
@@ -160,19 +160,27 @@ export async function GET(request: Request) {
     }
 
     // 8. Check if any existing assignments for this deal
-    const existingResult = await pool.query(
-      `SELECT a.*, t.name as member_name, t.role as member_role
-       FROM advisor_assignments a
-       JOIN team_members t ON a.member_id = t.id
-       WHERE a.deal_id = $1`,
-      [dealId]
-    );
+    const existingResult = await prisma.$queryRaw<Array<{
+      id: number;
+      deal_id: string;
+      role: string;
+      member_id: number;
+      assigned_by: string | null;
+      assigned_at: Date;
+      member_name: string;
+      member_role: string;
+    }>>`
+      SELECT a.*, t.name as member_name, t.role as member_role
+      FROM advisor_assignments a
+      JOIN team_members t ON a.member_id = t.id
+      WHERE a.deal_id = ${dealId}
+    `;
 
     return NextResponse.json({
       dealId,
       dealComplexity,
       recommendations,
-      existingAssignments: existingResult.rows,
+      existingAssignments: existingResult,
       allTeamAtCapacity: recommendations.filter(r => r.capacity_status === 'red').length === recommendations.length,
     });
   } catch (err) {
