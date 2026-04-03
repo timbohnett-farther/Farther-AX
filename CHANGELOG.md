@@ -97,7 +97,8 @@ Format: Each entry includes completion status, feature name, date, scope, status
 **Phase 3 — Architecture (2026-04-03)** 🟡 In Progress (1/3)
 - Fixed pre-commit hooks to enforce TypeScript compilation (removed || true bypass)
 - Added jest.d.ts for @testing-library/jest-dom types globally
-- **Commits**: f7a76c7
+- Fixed Railway deployment blocker: Added TypeScript type annotation to workbooks.map() callback in quality/transitions route (resolved implicit 'any' type error after 14 failed deployments)
+- **Commits**: f7a76c7, 15a4750, b803a2b
 - **Remaining**: Split god components (<200 lines), centralize type definitions
 
 **Next Steps**:
