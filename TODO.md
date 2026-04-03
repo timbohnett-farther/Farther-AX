@@ -347,16 +347,16 @@ When you report a fix:
 - [x] `prisma/schema.prisma` — Synced with production database via `prisma db pull`
 - [x] Push to Railway — Deployed, testing advisor detail page
 
-#### **🔴 Phase 1 — Core Advisor Flows (HIGH PRIORITY — 6-8 hours)**
+#### **✅ Phase 1 — Core Advisor Flows (COMPLETE — 2026-04-03)**
 
 **Advisor Hub & Detail Pages:**
-- [ ] `app/api/command-center/advisor/[id]/route.ts` — Main advisor detail endpoint ⚠️ BLOCKS ADVISOR DETAIL PAGE
-- [ ] `app/api/command-center/advisor/[id]/clients/route.ts` — Advisor's transition clients
-- [ ] `app/api/command-center/advisor/[id]/tech-intake/route.ts` — Tech intake data
-- [ ] `app/api/command-center/advisor/[id]/u4-2b/route.ts` — U4/2B compliance data
-- [ ] `app/api/command-center/warm/route.ts` — Pipeline warming (deals + contacts)
-- [ ] `app/api/command-center/pipeline/route.ts` — Main pipeline endpoint
-- [ ] `app/api/command-center/metrics/route.ts` — Dashboard metrics
+- [x] `app/api/command-center/advisor/[id]/route.ts` — Already using Prisma (via advisor-store)
+- [x] `app/api/command-center/advisor/[id]/clients/route.ts` — Migrated with $queryRaw
+- [x] `app/api/command-center/advisor/[id]/tech-intake/route.ts` — Migrated with $queryRaw
+- [x] `app/api/command-center/advisor/[id]/u4-2b/route.ts` — Migrated with $queryRaw
+- [x] `app/api/command-center/warm/route.ts` — Migrated 3 api_cache queries
+- [x] `app/api/command-center/pipeline/route.ts` — Not using pool (skip)
+- [x] `app/api/command-center/metrics/route.ts` — Migrated team_members query
 
 #### **🟠 Phase 2 — Transitions & Client Management (MEDIUM PRIORITY — 8-10 hours)**
 
@@ -434,9 +434,9 @@ When you report a fix:
 
 #### **📊 Migration Progress**
 - **Total Files:** 52
-- **Completed:** 2 (advisor-store, health/cache)
-- **Remaining:** 50
-- **Estimated Time:** 28-38 hours
+- **Completed:** 7 (13.5%) — Phase 0 + Phase 1 ✅
+- **Remaining:** 45
+- **Estimated Time Remaining:** 22-32 hours (Phase 2-5)
 - **Target Completion:** Week of 2026-04-07
 
 #### **🎯 Migration Strategy**
