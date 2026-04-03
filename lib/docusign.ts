@@ -1,4 +1,5 @@
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 const BASE_URI = process.env.DOCUSIGN_BASE_URI ?? 'https://demo.docusign.net';
 const API_ACCOUNT_ID = process.env.DOCUSIGN_API_ACCOUNT_ID ?? '';
@@ -12,17 +13,17 @@ export async function getStoredToken(): Promise<{
   expires_at: Date;
 } | null> {
   try {
-    const result = await pool.query<{
+    const result = await prisma.$queryRaw<Array<{
       access_token: string;
       refresh_token: string;
       expires_at: Date;
-    }>(`
+    }>>`
       SELECT access_token, refresh_token, expires_at
       FROM docusign_tokens
       ORDER BY created_at DESC
       LIMIT 1
-    `);
-    return result.rows[0] ?? null;
+    `;
+    return result[0] ?? null;
   } catch (err) {
     console.warn('[docusign] Could not read docusign_tokens:', err);
     return null;
@@ -63,11 +64,10 @@ export async function refreshAccessToken(): Promise<string | null> {
     const expiresAt = new Date(Date.now() + data.expires_in * 1000);
 
     // Upsert new tokens
-    await pool.query(
-      `INSERT INTO docusign_tokens (access_token, refresh_token, expires_at, created_at)
-       VALUES ($1, $2, $3, NOW())`,
-      [data.access_token, data.refresh_token, expiresAt],
-    );
+    await prisma.$executeRaw`
+      INSERT INTO docusign_tokens (access_token, refresh_token, expires_at, created_at)
+      VALUES (${data.access_token}, ${data.refresh_token}, ${expiresAt}, NOW())
+    `;
 
     console.log('[docusign] Token refreshed successfully');
     return data.access_token;

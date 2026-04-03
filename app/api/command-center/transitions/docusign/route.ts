@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import {
   getValidToken,
   fetchEnvelopes,
@@ -57,17 +58,17 @@ export async function POST() {
     }
 
     // 3. Query transition_clients to build advisor → email mappings
-    const clientsResult = await pool.query<{
+    const clientsResult = await prisma.$queryRaw<Array<{
       advisor_name: string;
       primary_email: string | null;
-    }>(`
+    }>>`
       SELECT DISTINCT advisor_name, primary_email
       FROM transition_clients
       WHERE advisor_name IS NOT NULL
-    `);
+    `;
 
     const advisorEmails = new Map<string, string[]>();
-    for (const row of clientsResult.rows) {
+    for (const row of clientsResult) {
       const name = row.advisor_name;
       if (!advisorEmails.has(name)) advisorEmails.set(name, []);
       if (row.primary_email) {
@@ -86,41 +87,31 @@ export async function POST() {
         const isIAA = subjectLower.includes('iaa');
 
         if (isIAA) {
-          await pool.query(
-            `UPDATE transition_clients
-             SET docusign_iaa_status = $1,
-                 docusign_iaa_envelope_id = $2,
-                 docusign_last_checked = NOW()
-             WHERE advisor_name = $3
-               AND EXISTS (
-                 SELECT 1 FROM unnest($4::text[]) AS e
-                 WHERE LOWER(transition_clients.primary_email) = e
-               )`,
-            [
-              env.status,
-              env.envelopeId,
-              advisorName,
-              env.signers.map(s => s.email.toLowerCase()),
-            ],
-          );
+          const signerEmails = env.signers.map(s => s.email.toLowerCase());
+          await prisma.$executeRaw`
+            UPDATE transition_clients
+            SET docusign_iaa_status = ${env.status},
+                docusign_iaa_envelope_id = ${env.envelopeId},
+                docusign_last_checked = NOW()
+            WHERE advisor_name = ${advisorName}
+              AND EXISTS (
+                SELECT 1 FROM unnest(ARRAY[${Prisma.join(signerEmails)}]::text[]) AS e
+                WHERE LOWER(transition_clients.primary_email) = e
+              )
+          `;
         } else {
-          await pool.query(
-            `UPDATE transition_clients
-             SET docusign_paperwork_status = $1,
-                 docusign_paperwork_envelope_id = $2,
-                 docusign_last_checked = NOW()
-             WHERE advisor_name = $3
-               AND EXISTS (
-                 SELECT 1 FROM unnest($4::text[]) AS e
-                 WHERE LOWER(transition_clients.primary_email) = e
-               )`,
-            [
-              env.status,
-              env.envelopeId,
-              advisorName,
-              env.signers.map(s => s.email.toLowerCase()),
-            ],
-          );
+          const signerEmails = env.signers.map(s => s.email.toLowerCase());
+          await prisma.$executeRaw`
+            UPDATE transition_clients
+            SET docusign_paperwork_status = ${env.status},
+                docusign_paperwork_envelope_id = ${env.envelopeId},
+                docusign_last_checked = NOW()
+            WHERE advisor_name = ${advisorName}
+              AND EXISTS (
+                SELECT 1 FROM unnest(ARRAY[${Prisma.join(signerEmails)}]::text[]) AS e
+                WHERE LOWER(transition_clients.primary_email) = e
+              )
+          `;
         }
       }
     }

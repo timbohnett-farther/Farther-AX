@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 // ── Env vars ──────────────────────────────────────────────────────────────────
 const INTEGRATION_KEY = process.env.DOCUSIGN_INTEGRATION_KEY ?? '';
@@ -90,13 +90,10 @@ export async function GET(req: NextRequest) {
 
     // ── Persist tokens to docusign_tokens table ──────────────────────────────
     try {
-      await pool.query(
-        `
+      await prisma.$executeRaw`
         INSERT INTO docusign_tokens (access_token, refresh_token, expires_at, created_at)
-        VALUES ($1, $2, $3, NOW())
-        `,
-        [tokenData.access_token, tokenData.refresh_token, expiresAt],
-      );
+        VALUES (${tokenData.access_token}, ${tokenData.refresh_token}, ${expiresAt}, NOW())
+      `;
       console.log('[docusign/callback] Tokens successfully stored');
     } catch (dbErr) {
       console.error('[docusign/callback] Database error storing tokens:', dbErr);

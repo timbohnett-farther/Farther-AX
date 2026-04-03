@@ -21,7 +21,8 @@
  * ```
  */
 
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import * as crypto from 'crypto';
 
 // ── Environment Variables ─────────────────────────────────────────────────────
@@ -95,17 +96,17 @@ export async function getStoredToken(): Promise<{
   expires_at: Date;
 } | null> {
   try {
-    const result = await pool.query<{
+    const result = await prisma.$queryRaw<Array<{
       access_token: string;
       refresh_token: string;
       expires_at: Date;
-    }>(`
+    }>>`
       SELECT access_token, refresh_token, expires_at
       FROM docusign_tokens
       ORDER BY created_at DESC
       LIMIT 1
-    `);
-    return result.rows[0] ?? null;
+    `;
+    return result[0] ?? null;
   } catch (err) {
     console.warn('[docusign] Could not read docusign_tokens:', err);
     return null;
@@ -144,11 +145,10 @@ export async function refreshAccessToken(): Promise<string | null> {
 
     const expiresAt = new Date(Date.now() + data.expires_in * 1000);
 
-    await pool.query(
-      `INSERT INTO docusign_tokens (access_token, refresh_token, expires_at, created_at)
-       VALUES ($1, $2, $3, NOW())`,
-      [data.access_token, data.refresh_token, expiresAt],
-    );
+    await prisma.$executeRaw`
+      INSERT INTO docusign_tokens (access_token, refresh_token, expires_at, created_at)
+      VALUES (${data.access_token}, ${data.refresh_token}, ${expiresAt}, NOW())
+    `;
 
     console.log('[docusign] Token refreshed successfully');
     return data.access_token;
@@ -409,10 +409,10 @@ export function parseWebhookPayload(payload: string): DocuSignWebhookPayload | n
  */
 export async function getLastSyncTimestamp(): Promise<Date | null> {
   try {
-    const result = await pool.query<{ last_synced_at: Date }>(
-      `SELECT last_synced_at FROM docusign_sync_state ORDER BY id DESC LIMIT 1`
-    );
-    return result.rows[0]?.last_synced_at ?? null;
+    const result = await prisma.$queryRaw<Array<{ last_synced_at: Date }>>`
+      SELECT last_synced_at FROM docusign_sync_state ORDER BY id DESC LIMIT 1
+    `;
+    return result[0]?.last_synced_at ?? null;
   } catch (err) {
     console.warn('[docusign] Could not read sync state:', err);
     return null;
@@ -424,11 +424,10 @@ export async function getLastSyncTimestamp(): Promise<Date | null> {
  */
 export async function updateLastSyncTimestamp(timestamp: Date = new Date()): Promise<void> {
   try {
-    await pool.query(
-      `INSERT INTO docusign_sync_state (last_synced_at, created_at)
-       VALUES ($1, NOW())`,
-      [timestamp]
-    );
+    await prisma.$executeRaw`
+      INSERT INTO docusign_sync_state (last_synced_at, created_at)
+      VALUES (${timestamp}, NOW())
+    `;
   } catch (err) {
     console.error('[docusign] Could not update sync state:', err);
   }

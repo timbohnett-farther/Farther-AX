@@ -1,5 +1,6 @@
 import { getValidToken, DocuSignEnvelope, DocuSignSigner } from '@/lib/docusign';
-import pool from '@/lib/db';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 const BASE_URI = process.env.DOCUSIGN_BASE_URI ?? 'https://demo.docusign.net';
 const API_ACCOUNT_ID = process.env.DOCUSIGN_API_ACCOUNT_ID ?? '';
@@ -101,11 +102,9 @@ export async function syncEnvelopesToDb(
 
   for (let i = 0; i < envelopes.length; i += BATCH_SIZE) {
     const batch = envelopes.slice(i, i + BATCH_SIZE);
-    const client = await pool.connect();
 
-    try {
-      await client.query('BEGIN');
-
+    // Use Prisma transaction for atomic batch upsert
+    await prisma.$transaction(async (tx) => {
       for (const env of batch) {
         // Classify envelope type
         const envelopeType = env.emailSubject.toLowerCase().includes('iaa')
@@ -113,12 +112,14 @@ export async function syncEnvelopesToDb(
           : 'paperwork';
 
         // Upsert envelope
-        await client.query(
-          `INSERT INTO docusign_envelopes (
+        await tx.$executeRaw`
+          INSERT INTO docusign_envelopes (
             envelope_id, status, email_subject, sent_date_time,
             completed_date_time, status_changed_at, envelope_type,
             raw_json, last_synced_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+          ) VALUES (${env.envelopeId}, ${env.status}, ${env.emailSubject}, ${env.sentDateTime ?? null},
+                    ${env.completedDateTime ?? null}, ${env.statusChangedDateTime ?? null}, ${envelopeType},
+                    ${JSON.stringify(env)}, NOW())
           ON CONFLICT (envelope_id) DO UPDATE SET
             status = EXCLUDED.status,
             email_subject = EXCLUDED.email_subject,
@@ -128,53 +129,25 @@ export async function syncEnvelopesToDb(
             envelope_type = EXCLUDED.envelope_type,
             raw_json = EXCLUDED.raw_json,
             last_synced_at = NOW(),
-            updated_at = NOW()`,
-          [
-            env.envelopeId,
-            env.status,
-            env.emailSubject,
-            env.sentDateTime ?? null,
-            env.completedDateTime ?? null,
-            env.statusChangedDateTime ?? null,
-            envelopeType,
-            JSON.stringify(env),
-          ],
-        );
+            updated_at = NOW()
+        `;
         upsertedEnvelopes++;
 
         // Upsert signers: delete + re-insert for this envelope
-        await client.query(
-          `DELETE FROM docusign_signers WHERE envelope_id = $1`,
-          [env.envelopeId],
-        );
+        await tx.$executeRaw`DELETE FROM docusign_signers WHERE envelope_id = ${env.envelopeId}`;
 
         for (const signer of env.signers) {
-          await client.query(
-            `INSERT INTO docusign_signers (
+          await tx.$executeRaw`
+            INSERT INTO docusign_signers (
               envelope_id, signer_name, signer_email, status,
               signed_date_time, delivered_date_time, sent_date_time
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-            [
-              env.envelopeId,
-              signer.name,
-              signer.email,
-              signer.status,
-              signer.signedDateTime ?? null,
-              signer.deliveredDateTime ?? null,
-              signer.sentDateTime ?? null,
-            ],
-          );
+            ) VALUES (${env.envelopeId}, ${signer.name}, ${signer.email}, ${signer.status},
+                      ${signer.signedDateTime ?? null}, ${signer.deliveredDateTime ?? null}, ${signer.sentDateTime ?? null})
+          `;
           upsertedSigners++;
         }
       }
-
-      await client.query('COMMIT');
-    } catch (err) {
-      await client.query('ROLLBACK');
-      throw err;
-    } finally {
-      client.release();
-    }
+    });
   }
 
   console.log(
@@ -190,34 +163,34 @@ export async function matchAndClassify(): Promise<{
   unmatchedCount: number;
 }> {
   // Get all unmatched envelopes
-  const unmatchedResult = await pool.query<{
+  const unmatchedResult = await prisma.$queryRaw<Array<{
     envelope_id: string;
     email_subject: string;
-  }>(
-    `SELECT envelope_id, email_subject
-     FROM docusign_envelopes
-     WHERE matched_advisor_name IS NULL`,
-  );
+  }>>`
+    SELECT envelope_id, email_subject
+    FROM docusign_envelopes
+    WHERE matched_advisor_name IS NULL
+  `;
 
-  if (unmatchedResult.rows.length === 0) {
+  if (unmatchedResult.length === 0) {
     return { matchedCount: 0, unmatchedCount: 0 };
   }
 
   // Build advisor email map from transition_clients
-  const clientsResult = await pool.query<{
+  const clientsResult = await prisma.$queryRaw<Array<{
     advisor_name: string;
     primary_email: string | null;
     secondary_email: string | null;
-  }>(
-    `SELECT DISTINCT advisor_name, primary_email, secondary_email
-     FROM transition_clients
-     WHERE primary_email IS NOT NULL`,
-  );
+  }>>`
+    SELECT DISTINCT advisor_name, primary_email, secondary_email
+    FROM transition_clients
+    WHERE primary_email IS NOT NULL
+  `;
 
   const advisorEmails = new Map<string, Set<string>>();
   const advisorNames: string[] = [];
 
-  for (const row of clientsResult.rows) {
+  for (const row of clientsResult) {
     const name = row.advisor_name;
     if (!advisorEmails.has(name)) {
       advisorEmails.set(name, new Set());
@@ -231,13 +204,12 @@ export async function matchAndClassify(): Promise<{
   let matchedCount = 0;
   let unmatchedCount = 0;
 
-  for (const row of unmatchedResult.rows) {
+  for (const row of unmatchedResult) {
     // Get signers for this envelope
-    const signersResult = await pool.query<{ signer_email: string }>(
-      `SELECT signer_email FROM docusign_signers WHERE envelope_id = $1`,
-      [row.envelope_id],
-    );
-    const signerEmails = signersResult.rows.map((s) => s.signer_email.toLowerCase());
+    const signersResult = await prisma.$queryRaw<Array<{ signer_email: string }>>`
+      SELECT signer_email FROM docusign_signers WHERE envelope_id = ${row.envelope_id}
+    `;
+    const signerEmails = signersResult.map((s) => s.signer_email.toLowerCase());
 
     let matchedAdvisor: string | null = null;
     let matchMethod: string | null = null;
@@ -280,12 +252,11 @@ export async function matchAndClassify(): Promise<{
     }
 
     if (matchedAdvisor && matchMethod) {
-      await pool.query(
-        `UPDATE docusign_envelopes
-         SET matched_advisor_name = $1, match_method = $2, updated_at = NOW()
-         WHERE envelope_id = $3`,
-        [matchedAdvisor, matchMethod, row.envelope_id],
-      );
+      await prisma.$executeRaw`
+        UPDATE docusign_envelopes
+        SET matched_advisor_name = ${matchedAdvisor}, match_method = ${matchMethod}, updated_at = NOW()
+        WHERE envelope_id = ${row.envelope_id}
+      `;
       matchedCount++;
     } else {
       unmatchedCount++;
@@ -302,28 +273,28 @@ export async function matchAndClassify(): Promise<{
 
 export async function saveSnapshot(): Promise<number | null> {
   // Build snapshot: advisor → { envelopes, households }
-  const envelopesResult = await pool.query<{
+  const envelopesResult = await prisma.$queryRaw<Array<{
     envelope_id: string;
     status: string;
     matched_advisor_name: string | null;
-  }>(
-    `SELECT envelope_id, status, matched_advisor_name FROM docusign_envelopes`,
-  );
+  }>>`
+    SELECT envelope_id, status, matched_advisor_name FROM docusign_envelopes
+  `;
 
-  const householdsResult = await pool.query<{
+  const householdsResult = await prisma.$queryRaw<Array<{
     advisor_name: string;
     household_name: string;
-  }>(
-    `SELECT DISTINCT advisor_name, household_name
-     FROM transition_clients
-     WHERE advisor_name IS NOT NULL AND household_name IS NOT NULL`,
-  );
+  }>>`
+    SELECT DISTINCT advisor_name, household_name
+    FROM transition_clients
+    WHERE advisor_name IS NOT NULL AND household_name IS NOT NULL
+  `;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const snapshotData: Record<string, any> = {};
   const advisorSet = new Set<string>();
 
-  for (const env of envelopesResult.rows) {
+  for (const env of envelopesResult) {
     const advisor = env.matched_advisor_name ?? '__unmatched__';
     advisorSet.add(advisor);
     if (!snapshotData[advisor]) {
@@ -332,7 +303,7 @@ export async function saveSnapshot(): Promise<number | null> {
     snapshotData[advisor].envelopes[env.envelope_id] = env.status;
   }
 
-  for (const row of householdsResult.rows) {
+  for (const row of householdsResult) {
     const advisor = row.advisor_name;
     if (!snapshotData[advisor]) {
       snapshotData[advisor] = { envelopes: {}, households: new Set<string>() };
@@ -352,23 +323,16 @@ export async function saveSnapshot(): Promise<number | null> {
     };
   }
 
-  const householdCount = householdsResult.rows.length;
+  const householdCount = householdsResult.length;
 
-  const result = await pool.query<{ id: number }>(
-    `INSERT INTO docusign_sync_snapshots (
+  const result = await prisma.$queryRaw<Array<{ id: number }>>`
+    INSERT INTO docusign_sync_snapshots (
       snapshot_type, snapshot_data, advisor_count, envelope_count, household_count
-    ) VALUES ($1, $2, $3, $4, $5)
-    RETURNING id`,
-    [
-      'full',
-      JSON.stringify(serializable),
-      advisorSet.size,
-      envelopesResult.rows.length,
-      householdCount,
-    ],
-  );
+    ) VALUES ('full', ${JSON.stringify(serializable)}, ${advisorSet.size}, ${envelopesResult.length}, ${householdCount})
+    RETURNING id
+  `;
 
-  const snapshotId = result.rows[0]?.id ?? null;
+  const snapshotId = result[0]?.id ?? null;
   console.log(`[docusign-sync] Saved snapshot #${snapshotId}`);
   return snapshotId;
 }
