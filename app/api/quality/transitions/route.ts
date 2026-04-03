@@ -63,6 +63,8 @@ export async function GET(request: NextRequest) {
       ],
     });
 
+    type ClientResult = typeof clients[number];
+
     // Fetch workbook quality summaries
     const workbooks = await prisma.transitionWorkbook.findMany({
       where: workbookFilter ? { sheet_id: workbookFilter } : undefined,
@@ -183,7 +185,7 @@ export async function GET(request: NextRequest) {
         last_synced_at: wb.last_synced_at.toISOString(),
       })),
       top_alerts: topAlerts,
-      records: clients.map(client => ({
+      records: clients.map((client: ClientResult) => ({
         id: client.id,
         sheet_id: client.sheet_id,
         sheet_row_index: client.sheet_row_index,
