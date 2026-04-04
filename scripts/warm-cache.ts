@@ -11,7 +11,7 @@
  */
 
 import { writeThroughCache } from '../lib/cached-fetchers';
-import pool from '../lib/db';
+import { prisma } from '../lib/prisma';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
@@ -130,7 +130,7 @@ async function main() {
   console.log(`[Warm] Cache warm-up complete at ${new Date().toISOString()}`);
   console.log('[Warm] ═══════════════════════════════════════════════════');
 
-  await pool.end();
+  await prisma.$disconnect();
   process.exit(0);
 }
 

@@ -15,7 +15,7 @@ import { getSyncState, setSyncState, invalidatePattern } from '../lib/redis-clie
 import { withPgCache } from '../lib/pg-cache';
 import { getPipelineDeals } from '../lib/hubspot';
 import { getAppUrl } from '../lib/app-url';
-import pool from '../lib/db';
+import { prisma } from '../lib/prisma';
 
 // ── Sync Advisors ───────────────────────────────────────────────────────────
 
@@ -142,8 +142,8 @@ async function main() {
     console.error('[Sync] Fatal error:', err);
   }
 
-  // Close DB pool
-  await pool.end();
+  // Disconnect Prisma
+  await prisma.$disconnect();
   process.exit(0);
 }
 

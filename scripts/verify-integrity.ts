@@ -11,7 +11,7 @@
 
 import { getFromRedis } from '../lib/redis-client';
 import { getFromBucket } from '../lib/bucket-client';
-import pool from '../lib/db';
+import { prisma } from '../lib/prisma';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
@@ -147,7 +147,7 @@ async function main() {
   }
   console.log('[Verify] ═══════════════════════════════════════════════════');
 
-  await pool.end();
+  await prisma.$disconnect();
   process.exit(allPassed ? 0 : 1);
 }
 

@@ -14,6 +14,6 @@ export const config = {
      * - /fonts/**, /images/** (static assets)
      * - favicon.ico
      */
-    "/((?!auth|api/auth|api/sync|api/webhooks|api/test-prisma|forms|api/u4-2b|_next/static|_next/image|fonts|images|favicon\\.ico).*)",
+    "/((?!auth|api/auth|api/health|api/diagnostics|api/sync|api/webhooks|api/test-prisma|forms|api/u4-2b|api/tech-intake|_next/static|_next/image|fonts|images|favicon\\.ico).*)",
   ],
 };
