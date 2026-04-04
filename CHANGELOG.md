@@ -6,6 +6,38 @@ Format: Each entry includes completion status, feature name, date, scope, status
 
 ---
 
+## [Completed] Commission Analytics — Full Drill-Down Implementation — 2026-04-04
+
+**What**: Complete commission analytics section with firm → team → advisor drill-down hierarchy
+
+**Scope**:
+- 4 new API routes: overview, team detail, advisor detail, generic drilldown
+- 3 new pages: `/commission`, `/commission/team/[teamId]`, `/commission/advisor/[advisorId]`
+- 7 new shared components: PeriodSelector, CommissionDrillPanel, CommissionWaterfall, RevenueBreakdown, TierCalculationTable, SplitsTable, AdvisorTrendChart
+- Billing DB client (`lib/billing-db.ts`) connecting to billing portal database via BILLING_DATABASE_URL
+- Sidebar nav updated with Commission link
+
+**Status**: ✅ Deployed — 18 files, 3,013 lines added, build passes (0 errors)
+
+**Files**:
+- `app/api/commission/route.ts` — Overview API (summary, teams, regions, tiers, firm trend)
+- `app/api/commission/team/[teamId]/route.ts` — Team detail API
+- `app/api/commission/advisor/[advisorId]/route.ts` — Advisor detail API (waterfall, tiers, splits, recruiter)
+- `app/api/commission/drilldown/route.ts` — Generic metric/dimension drill API
+- `app/commission/page.tsx` — Overview page (KPI cards, charts, team table with inline expand)
+- `app/commission/team/[teamId]/page.tsx` — Team detail page (KPIs, trend, advisor table)
+- `app/commission/advisor/[advisorId]/page.tsx` — Advisor detail page (waterfall, revenue breakdown, tiers, splits, recruiter, trend)
+- `components/commission/*.tsx` — 7 shared components
+- `lib/billing-db.ts` — Billing portal database connection
+- `lib/billing-cache.ts` — Caching layer for billing queries
+- `components/Sidebar.tsx` — Added Commission nav item
+
+**Requires**: `BILLING_DATABASE_URL` env var on Railway pointing to billing portal DB
+
+**Commit**: `9f0353f`
+
+---
+
 ## [Completed] Prisma Migration — Complete Database Migration to ORM — 2026-04-03
 
 **What**: Migrated all 52 API endpoints and library functions from raw SQL (pool queries) to Prisma ORM
