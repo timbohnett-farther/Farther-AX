@@ -6,317 +6,29 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { PHASES, PHASE_ORDER, type Phase } from '@/lib/onboarding-tasks-v2';
 import { useTheme } from '@/lib/theme-provider';
+import {
+  formatAUM,
+  formatPct,
+  STAGE_LABELS,
+  STAGE_ORDER,
+  stageIndex,
+  type ProfileTab,
+} from '@/components/advisor-detail/types';
+import {
+  Section,
+  Field,
+  Grid,
+  Badge,
+  StageBadge,
+  IntelCard,
+  EmptyState,
+  StatCard,
+} from '@/components/advisor-detail/shared';
+import { AdvisorHeader } from '@/components/advisor-detail/AdvisorHeader';
+import { ComplexityPanel } from '@/components/advisor-detail/ComplexityPanel';
+import { TeamAssignments } from '@/components/advisor-detail/TeamAssignments';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
-
-// ── Design tokens ─────────────────────────────────────────────────────────────
-
-
-const STAGE_LABELS: Record<string, string> = {
-  '2496931': 'Step 1 – First Meeting',
-  '2496932': 'Step 2 – Financial Model',
-  '2496934': 'Step 3 – Advisor Demo',
-  '100409509': 'Step 4 – Discovery Day',
-  '2496935': 'Step 5 – Offer Review',
-  '2496936': 'Step 6 – Offer Accepted',
-  '100411705': 'Step 7 – Launched',
-  '31214941': 'Holding Pattern',
-  '2496937': 'Prospect Passed',
-  '26572965': 'Farther Passed',
-};
-
-const STAGE_ORDER = ['2496931', '2496932', '2496934', '100409509', '2496935', '2496936', '100411705'];
-
-function stageIndex(stageId: string) {
-  return STAGE_ORDER.indexOf(stageId);
-}
-
-function formatAUM(n: string | number | null | undefined): string {
-  const v = typeof n === 'string' ? parseFloat(n) : (n ?? 0);
-  if (!v || isNaN(v)) return '—';
-  if (v >= 1_000_000_000) return `$${(v / 1_000_000_000).toFixed(1)}B`;
-  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(0)}M`;
-  if (v >= 1_000) return `$${(v / 1_000).toFixed(0)}K`;
-  return `$${v.toLocaleString()}`;
-}
-
-function formatPct(n: string | number | null | undefined): string {
-  const v = typeof n === 'string' ? parseFloat(n) : (n ?? 0);
-  if (!v || isNaN(v)) return '—';
-  return `${v.toFixed(1)}%`;
-}
-
-// ── Shared UI Components ──────────────────────────────────────────────────────
-function Section({ title, children, highlight, icon }: { title: string; children: React.ReactNode; highlight?: boolean; icon?: string }) {
-  const { THEME } = useTheme();
-  return (
-    <div style={{
-      background: THEME.colors.surface, border: `1px solid ${highlight ? THEME.colors.teal : THEME.colors.border}`,
-      borderRadius: 10, marginBottom: 20, overflow: 'hidden',
-      boxShadow: highlight ? '0 0 0 1px rgba(29,118,130,0.2)' : undefined,
-    }}>
-      <div style={{
-        padding: '12px 20px', borderBottom: `1px solid ${highlight ? 'rgba(29,118,130,0.15)' : THEME.colors.border}`,
-        background: highlight ? 'rgba(29,118,130,0.05)' : '#2a2a2a',
-        display: 'flex', alignItems: 'center', gap: 8,
-      }}>
-        {icon && <span style={{ fontSize: 14 }}>{icon}</span>}
-        <h3 style={{ fontSize: 12, fontWeight: 700, color: highlight ? THEME.colors.teal : THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          {title}
-        </h3>
-      </div>
-      <div style={{ padding: '16px 20px' }}>{children}</div>
-    </div>
-  );
-}
-
-function Field({ label, value, wide, highlight }: { label: string; value: React.ReactNode; wide?: boolean; highlight?: boolean }) {
-  const { THEME } = useTheme();
-  if (!value || value === '—' || value === 'null') return null;
-  return (
-    <div style={{ marginBottom: 12, gridColumn: wide ? 'span 2' : undefined }}>
-      <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</p>
-      <p style={{ fontSize: 14, color: highlight ? THEME.colors.teal : THEME.colors.text, fontWeight: highlight ? 600 : 400, lineHeight: 1.5 }}>{value}</p>
-    </div>
-  );
-}
-
-function Grid({ children, cols = 3 }: { children: React.ReactNode; cols?: number }) {
-  const { THEME } = useTheme();
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '0 24px' }}>
-      {children}
-    </div>
-  );
-}
-
-function Badge({ label, color }: { label: string; color?: string }) {
-  const { THEME } = useTheme();
-  const c = color ?? THEME.colors.teal;
-  return (
-    <span style={{
-      display: 'inline-block', padding: '3px 10px', borderRadius: 6,
-      background: `${c}28`, color: c, fontSize: 12, fontWeight: 600,
-      marginRight: 6, marginBottom: 6, border: `1px solid ${c}40`,
-    }}>{label}</span>
-  );
-}
-
-function StageBadge({ stageId }: { stageId: string }) {
-  const { THEME } = useTheme();
-  const isLate = ['2496936', '100411705'].includes(stageId);
-  return (
-    <span style={{
-      display: 'inline-block', padding: '4px 12px', borderRadius: 20,
-      background: isLate ? 'rgba(29,118,130,0.22)' : 'rgba(91,106,113,0.18)',
-      color: isLate ? '#5ec4cf' : THEME.colors.text, fontSize: 12, fontWeight: 600,
-      border: `1px solid ${isLate ? 'rgba(29,118,130,0.35)' : 'rgba(91,106,113,0.25)'}`,
-    }}>
-      {STAGE_LABELS[stageId] ?? stageId}
-    </span>
-  );
-}
-
-function IntelCard({ label, items, color, icon }: { label: string; items: string[]; color: string; icon: string }) {
-  const { THEME } = useTheme();
-  if (!items || items.length === 0) return null;
-  return (
-    <div style={{
-      padding: '14px 16px', borderRadius: 8, border: `1px solid ${color}22`,
-      background: `${color}08`, marginBottom: 12,
-    }}>
-      <p style={{ fontSize: 11, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
-        {icon} {label}
-      </p>
-      <ul style={{ margin: 0, paddingLeft: 18 }}>
-        {items.map((item, i) => (
-          <li key={i} style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.6, marginBottom: 4 }}>{item}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function EmptyState({ message }: { message: string }) {
-  const { THEME } = useTheme();
-  return <p style={{ fontSize: 13, color: THEME.colors.textMuted, textAlign: 'center', padding: '24px 0' }}>{message}</p>;
-}
-
-function StatCard({ label, value, color }: { label: string; value: string | number; color?: string }) {
-  const { THEME } = useTheme();
-  return (
-    <div style={{
-      padding: '16px 20px', borderRadius: 8, background: 'rgba(91,106,113,0.04)',
-      border: `1px solid ${THEME.colors.border}`, textAlign: 'center',
-    }}>
-      <p style={{ fontSize: 11, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</p>
-      <p style={{ fontSize: 24, fontWeight: 700, color: color ?? THEME.colors.text, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>{value}</p>
-    </div>
-  );
-}
-
-// ── Complexity Panel ──────────────────────────────────────────────────────────
-interface ComplexityFactor { category: string; factor: string; points: number; maxPoints: number; detail: string; }
-interface ComplexityData { score: number; tier: string; tierColor: string; factors: ComplexityFactor[]; staffingRec: string; estimatedDays: number; }
-
-function ComplexityPanel({ dealId }: { dealId: string }) {
-  const { THEME } = useTheme();
-  const { data, isLoading } = useSWR<ComplexityData>(
-    dealId ? `/api/command-center/complexity?dealId=${dealId}` : null, fetcher
-  );
-  const [expanded, setExpanded] = useState(false);
-  if (isLoading || !data || !data.score) return null;
-  const { score, tier, tierColor, factors, staffingRec, estimatedDays } = data;
-
-  return (
-    <Section title="Transition Complexity" highlight icon="◉">
-      <div onClick={() => setExpanded(!expanded)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: expanded ? 16 : 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 12px', borderRadius: 20, background: `${tierColor}18`, border: `1px solid ${tierColor}30` }}>
-            <span style={{ fontSize: 20, fontWeight: 700, color: tierColor, fontFamily: "'Inter', system-ui, sans-serif" , fontVariantNumeric: 'tabular-nums' }}>{score}</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: tierColor }}>{tier}</span>
-          </div>
-          <div style={{ width: 80, height: 6, background: 'rgba(91,106,113,0.08)', borderRadius: 3, overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${Math.min((score / 105) * 100, 100)}%`, background: tierColor, borderRadius: 3 }} />
-          </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <span style={{ fontSize: 12, color: THEME.colors.textMuted }}>Est. {estimatedDays} days</span>
-          <span style={{ fontSize: 14, color: THEME.colors.textMuted }}>{expanded ? '▲' : '▼'}</span>
-        </div>
-      </div>
-      {expanded && (
-        <>
-          <div style={{ padding: '10px 14px', borderRadius: 6, marginBottom: 16, background: `${tierColor}08`, border: `1px solid ${tierColor}15` }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: tierColor, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Staffing Recommendation</p>
-            <p style={{ fontSize: 13, color: THEME.colors.text, lineHeight: 1.5 }}>{staffingRec}</p>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {factors.map((f, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0', borderBottom: i < factors.length - 1 ? `1px solid ${THEME.colors.border}` : 'none' }}>
-                <div style={{ width: 90, fontSize: 10, fontWeight: 600, color: THEME.colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{f.category}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: THEME.colors.text }}>{f.factor}</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: f.points > 0 ? tierColor : THEME.colors.textMuted }}>{f.points}/{f.maxPoints}</span>
-                  </div>
-                  <p style={{ fontSize: 11, color: THEME.colors.textMuted, lineHeight: 1.4 }}>{f.detail}</p>
-                </div>
-                <div style={{ width: 50, height: 4, background: 'rgba(91,106,113,0.08)', borderRadius: 2, overflow: 'hidden', flexShrink: 0 }}>
-                  <div style={{ height: '100%', borderRadius: 2, width: f.maxPoints > 0 ? `${(f.points / f.maxPoints) * 100}%` : '0%', background: f.points > 0 ? tierColor : 'transparent' }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-    </Section>
-  );
-}
-
-// ── Team Assignment Panel ─────────────────────────────────────────────────────
-const ASSIGNMENT_ROLES = ['AXM', 'AXA', 'CTM', 'CTA'] as const;
-const ROLE_LABELS: Record<string, string> = { 'AXM': 'Advisor Experience Manager', 'AXA': 'Advisor Experience Associate', 'CTM': 'Customer Transition Manager', 'CTA': 'Customer Transition Associate' };
-
-interface AssignmentRow { deal_id: string; role: string; member_id: string; member_name: string; member_email: string; member_phone: string | null; member_calendar: string | null; member_role: string; }
-interface AssignmentMember { id: string; name: string; email: string; role: string; phone: string | null; calendar_link: string | null; }
-interface StaffRec { role: string; recommended: AssignmentMember | null; alternatives: AssignmentMember[]; reason: string; current_load: number; projected_load: number; capacity_status: 'green' | 'amber' | 'red'; }
-
-function TeamAssignmentPanel({ dealId }: { dealId: string }) {
-  const { THEME } = useTheme();
-  const ROLE_COLORS_MAP: Record<string, string> = { 'AXM': THEME.colors.teal, 'AXA': THEME.colors.teal, 'CTM': '#c8a951', 'CTA': '#c8a951' };
-  const { data: assignmentData, mutate: mutateAssignments } = useSWR<{ assignments: AssignmentRow[] }>(`/api/command-center/assignments?dealId=${dealId}`, fetcher);
-  const { data: teamData } = useSWR<{ members: AssignmentMember[] }>('/api/command-center/team?active=true', fetcher);
-  const { data: recData } = useSWR<{ recommendations: StaffRec[] }>(`/api/command-center/staff-recommendation?dealId=${dealId}`, fetcher);
-  const [saving, setSaving] = useState<string | null>(null);
-  const [showRec, setShowRec] = useState(false);
-
-  const assignments = assignmentData?.assignments ?? [];
-  const allMembers = teamData?.members ?? [];
-  const recommendations = recData?.recommendations ?? [];
-
-  const getAssignedMemberId = (role: string): string | null => {
-    const a = assignments.find(a => a.role === role);
-    return a ? a.member_id : null;
-  };
-
-  const handleAssign = useCallback(async (role: string, memberId: string | null) => {
-    if (!memberId) return;
-    setSaving(role);
-    try {
-      await fetch('/api/command-center/assignments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deal_id: dealId, role, member_id: memberId }) });
-      mutateAssignments();
-    } catch { /* silent */ }
-    setSaving(null);
-  }, [dealId, mutateAssignments]);
-
-  const handleRemove = useCallback(async (role: string) => {
-    setSaving(role);
-    await fetch(`/api/command-center/assignments?dealId=${dealId}&role=${role}`, { method: 'DELETE' });
-    mutateAssignments();
-    setSaving(null);
-  }, [dealId, mutateAssignments]);
-
-  return (
-    <Section title="Team Assignments" highlight icon="●">
-      {recommendations.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <button onClick={() => setShowRec(!showRec)} style={{ width: '100%', padding: '10px 14px', borderRadius: 6, background: 'rgba(142,68,173,0.06)', border: '1px solid rgba(142,68,173,0.15)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#8e44ad' }}>AI Staffing Recommendations Available</span>
-            <span style={{ fontSize: 12, color: '#8e44ad' }}>{showRec ? '▲' : '▼'}</span>
-          </button>
-          {showRec && (
-            <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {recommendations.map(rec => (
-                <div key={rec.role} style={{ padding: '10px 14px', borderRadius: 6, background: rec.capacity_status === 'red' ? 'rgba(192,57,43,0.04)' : rec.capacity_status === 'amber' ? 'rgba(178,125,46,0.04)' : 'rgba(39,174,96,0.04)', border: `1px solid ${rec.capacity_status === 'red' ? 'rgba(192,57,43,0.15)' : rec.capacity_status === 'amber' ? 'rgba(178,125,46,0.15)' : 'rgba(39,174,96,0.15)'}` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: ROLE_COLORS_MAP[rec.role] || THEME.colors.textMuted }}>{rec.role}</span>
-                    {rec.recommended && (
-                      <button onClick={() => handleAssign(rec.role, rec.recommended!.id)} style={{ padding: '3px 10px', borderRadius: 4, fontSize: 11, fontWeight: 600, background: THEME.colors.teal, color: THEME.colors.textSecondary, border: 'none', cursor: 'pointer' }}>
-                        Assign {rec.recommended.name.split(' ')[0]}
-                      </button>
-                    )}
-                  </div>
-                  <p style={{ fontSize: 11, color: THEME.colors.textMuted, lineHeight: 1.4 }}>{rec.reason}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
-        {ASSIGNMENT_ROLES.map(role => {
-          const currentMemberId = getAssignedMemberId(role);
-          const roleMembers = allMembers.filter(m => m.role === role);
-          const roleColor = ROLE_COLORS_MAP[role] || THEME.colors.textMuted;
-          const currentAssignment = assignments.find(a => a.role === role);
-          return (
-            <div key={role} style={{ padding: '12px 14px', borderRadius: 8, background: currentMemberId ? `${roleColor}08` : THEME.colors.surface, border: `1px solid ${currentMemberId ? `${roleColor}25` : THEME.colors.border}` }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <div>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: roleColor, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{role}</span>
-                  <p style={{ fontSize: 10, color: THEME.colors.textMuted }}>{ROLE_LABELS[role]}</p>
-                </div>
-                {currentMemberId && <button onClick={() => handleRemove(role)} style={{ fontSize: 10, color: THEME.colors.error, background: 'none', border: 'none', cursor: 'pointer' }}>Remove</button>}
-              </div>
-              <select value={currentMemberId ?? ''} onChange={e => { const val = e.target.value || null; if (val) handleAssign(role, val); }} disabled={saving === role} style={{ width: '100%', padding: '7px 10px', borderRadius: 5, border: `1px solid ${THEME.colors.border}`, background: THEME.colors.textSecondary, fontSize: 13, color: THEME.colors.text, cursor: 'pointer' }}>
-                <option value="">— Select {role} —</option>
-                {roleMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-              </select>
-              {currentAssignment && (
-                <div style={{ marginTop: 6, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {currentAssignment.member_email && <a href={`mailto:${currentAssignment.member_email}`} style={{ fontSize: 10, color: THEME.colors.teal, textDecoration: 'none' }}>Email</a>}
-                  {currentAssignment.member_phone && <a href={`tel:${currentAssignment.member_phone}`} style={{ fontSize: 10, color: THEME.colors.teal, textDecoration: 'none' }}>{currentAssignment.member_phone}</a>}
-                  {currentAssignment.member_calendar && <a href={currentAssignment.member_calendar} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: THEME.colors.teal, textDecoration: 'none' }}>Calendar</a>}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </Section>
-  );
-}
 
 // ── U4 & 2B Intake Card ──────────────────────────────────────────────────────
 function U4Card({ dealId, contactId, contactEmail, advisorName }: { dealId: string; contactId: string | null; contactEmail: string | null; advisorName: string }) {
@@ -979,7 +691,7 @@ function TeamContactsTab({ dealId, allContacts }: { dealId: string; allContacts:
   const { THEME } = useTheme();
   return (
     <>
-      <TeamAssignmentPanel dealId={dealId} />
+      <TeamAssignments dealId={dealId} />
       {allContacts.length > 0 && (
         <Section title={`Associated Contacts (${allContacts.length})`} icon="●">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
@@ -1494,7 +1206,7 @@ function ClientOnboardingTab({ data, isLoading }: { data: any; isLoading: boolea
 // ══════════════════════════════════════════════════════════════════════════════
 // MAIN ADVISOR PROFILE PAGE
 // ══════════════════════════════════════════════════════════════════════════════
-type ProfileTab = 'overview' | 'financials' | 'engagements' | 'tech' | 'team' | 'tasks' | 'onboarding';
+// ProfileTab imported from types
 
 export default function AdvisorProfilePage() {
   const { THEME } = useTheme();
