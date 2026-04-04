@@ -33,7 +33,8 @@ export async function GET(request: Request) {
 
     const whereClause = whereClauses.length > 0 ? ' WHERE ' + whereClauses.join(' AND ') : '';
 
-    const result = await prisma.$queryRaw<Array<{
+    const query = `SELECT * FROM team_members${whereClause} ORDER BY role, name`;
+    const result = await prisma.$queryRawUnsafe<Array<{
       id: number;
       name: string;
       email: string;
@@ -43,7 +44,7 @@ export async function GET(request: Request) {
       active: boolean;
       created_at: Date;
       updated_at: Date;
-    }>>`SELECT * FROM team_members${Prisma.raw(whereClause)} ORDER BY role, name`;
+    }>>(query);
 
     return NextResponse.json({ members: result });
   } catch (err) {
@@ -129,7 +130,8 @@ export async function PATCH(request: Request) {
       .map(([k, v]) => `${k} = ${typeof v === 'string' ? `'${v.replace(/'/g, "''")}'` : v}`)
       .join(', ');
 
-    const result = await prisma.$queryRaw<Array<{
+    const updateQuery = `UPDATE team_members SET ${setClause}, updated_at = NOW() WHERE id = ${id} RETURNING *`;
+    const result = await prisma.$queryRawUnsafe<Array<{
       id: number;
       name: string;
       email: string;
@@ -139,11 +141,7 @@ export async function PATCH(request: Request) {
       active: boolean;
       created_at: Date;
       updated_at: Date;
-    }>>`
-      UPDATE team_members SET ${Prisma.raw(setClause)}, updated_at = NOW()
-      WHERE id = ${id}
-      RETURNING *
-    `;
+    }>>(updateQuery);
 
     if (result.length === 0) {
       return NextResponse.json({ error: 'Team member not found' }, { status: 404 });

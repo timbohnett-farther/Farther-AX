@@ -20,7 +20,15 @@ export async function GET(request: Request) {
 
     const whereClause = whereClauses.length > 0 ? ' WHERE ' + whereClauses.join(' AND ') : '';
 
-    const result = await prisma.$queryRaw<Array<{
+    const query = `
+      SELECT a.*, t.name as member_name, t.email as member_email, t.phone as member_phone,
+             t.calendar_link as member_calendar, t.role as member_role
+      FROM advisor_assignments a
+      JOIN team_members t ON a.member_id = t.id
+      ${whereClause}
+      ORDER BY a.role, a.assigned_at
+    `;
+    const result = await prisma.$queryRawUnsafe<Array<{
       id: number;
       deal_id: string;
       role: string;
@@ -32,14 +40,7 @@ export async function GET(request: Request) {
       member_phone: string | null;
       member_calendar: string | null;
       member_role: string;
-    }>>`
-      SELECT a.*, t.name as member_name, t.email as member_email, t.phone as member_phone,
-             t.calendar_link as member_calendar, t.role as member_role
-      FROM advisor_assignments a
-      JOIN team_members t ON a.member_id = t.id
-      ${Prisma.raw(whereClause)}
-      ORDER BY a.role, a.assigned_at
-    `;
+    }>>(query);
 
     return NextResponse.json({ assignments: result });
   } catch (err) {
