@@ -7,25 +7,12 @@ import {
   matchEnvelopesToAdvisors,
   DocuSignEnvelope,
 } from '@/lib/docusign-client';
-import Redis from 'ioredis';
+import { getRedis } from '@/lib/redis-client';
 
 // ── Env vars ──────────────────────────────────────────────────────────────────
 const INTEGRATION_KEY = process.env.DOCUSIGN_INTEGRATION_KEY ?? '';
 const NEXTAUTH_URL = process.env.NEXTAUTH_URL ?? '';
 const AUTH_SERVER = process.env.DOCUSIGN_AUTH_SERVER ?? 'https://account.docusign.com';
-const REDIS_URL = process.env.REDIS_URL;
-
-// ── Redis Client ──────────────────────────────────────────────────────────────
-
-async function getRedisClient(): Promise<Redis | null> {
-  if (!REDIS_URL) return null;
-  try {
-    const client = new Redis(REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000 });
-    return client;
-  } catch {
-    return null;
-  }
-}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -44,13 +31,12 @@ async function buildAuthUrl(): Promise<string> {
   );
 
   // Add CSRF state token if Redis is available
-  const redis = await getRedisClient();
+  const redis = getRedis();
   if (redis) {
     try {
       const state = crypto.randomUUID();
       const key = `docusign-oauth-state-${state}`;
       await redis.set(key, '1', 'EX', 600); // 10-minute TTL
-      await redis.quit();
       authUrl += `&state=${state}`;
     } catch (err) {
       console.warn('[docusign] Failed to set OAuth state in Redis:', err);

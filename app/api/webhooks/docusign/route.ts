@@ -19,21 +19,7 @@ import {
   parseWebhookPayload,
   type DocuSignWebhookPayload,
 } from '@/lib/docusign-client';
-import Redis from 'ioredis';
-
-// ── Redis Client ──────────────────────────────────────────────────────────────
-
-const REDIS_URL = process.env.REDIS_URL;
-
-async function getRedisClient(): Promise<Redis | null> {
-  if (!REDIS_URL) return null;
-  try {
-    const client = new Redis(REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000 });
-    return client;
-  } catch {
-    return null;
-  }
-}
+import { getRedis } from '@/lib/redis-client';
 
 // ── POST handler ──────────────────────────────────────────────────────────────
 
@@ -64,13 +50,12 @@ export async function POST(req: NextRequest) {
 
     // 4. Check idempotency (prevent duplicate processing on retry)
     const idempotencyKey = `docusign-wh-${data.data.envelopeId}-${data.event}`;
-    const redis = await getRedisClient();
+    const redis = getRedis();
     if (redis) {
       try {
         const existing = await redis.get(idempotencyKey);
         if (existing) {
           console.log(`[docusign/webhook] Deduplicated webhook: ${idempotencyKey}`);
-          await redis.quit();
           return NextResponse.json({ received: true, deduplicated: true });
         }
       } catch (err) {
@@ -138,7 +123,6 @@ export async function POST(req: NextRequest) {
     if (redis) {
       try {
         await redis.set(idempotencyKey, '1', 'EX', 86400); // 24 hours
-        await redis.quit();
       } catch (err) {
         console.warn('[docusign/webhook] Failed to set idempotency key in Redis:', err);
       }

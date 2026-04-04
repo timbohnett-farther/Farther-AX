@@ -1,25 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import Redis from 'ioredis';
+import { getRedis } from '@/lib/redis-client';
 
 // ── Env vars ──────────────────────────────────────────────────────────────────
 const INTEGRATION_KEY = process.env.DOCUSIGN_INTEGRATION_KEY ?? '';
 const SECRET_KEY = process.env.DOCUSIGN_SECRET_KEY ?? '';
 const NEXTAUTH_URL = process.env.NEXTAUTH_URL ?? '';
 const AUTH_SERVER = process.env.DOCUSIGN_AUTH_SERVER ?? 'https://account.docusign.com';
-const REDIS_URL = process.env.REDIS_URL;
-
-// ── Redis Client ──────────────────────────────────────────────────────────────
-
-async function getRedisClient(): Promise<Redis | null> {
-  if (!REDIS_URL) return null;
-  try {
-    const client = new Redis(REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000 });
-    return client;
-  } catch {
-    return null;
-  }
-}
 
 // ── GET handler ───────────────────────────────────────────────────────────────
 // DocuSign redirects here with ?code=... after the user authorizes the app.
@@ -65,13 +52,12 @@ export async function GET(req: NextRequest) {
 
   // Validate CSRF state token if Redis is available
   if (state) {
-    const redis = await getRedisClient();
+    const redis = getRedis();
     if (redis) {
       try {
         const key = `docusign-oauth-state-${state}`;
         const value = await redis.get(key);
         await redis.del(key); // Delete after validation
-        await redis.quit();
 
         if (!value) {
           console.error('[docusign/callback] Invalid or expired OAuth state');
