@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
 
 // ── Valid roles ──────────────────────────────────────────────────────────────
 const TEAM_ROLES = [
@@ -22,19 +21,7 @@ export async function GET(request: Request) {
     const role = searchParams.get('role');
     const active = searchParams.get('active');
 
-    let whereClauses: string[] = [];
-
-    if (role) {
-      whereClauses.push(`role = '${role}'`);
-    }
-    if (active !== null) {
-      whereClauses.push(`active = ${active !== 'false'}`);
-    }
-
-    const whereClause = whereClauses.length > 0 ? ' WHERE ' + whereClauses.join(' AND ') : '';
-
-    const query = `SELECT * FROM team_members${whereClause} ORDER BY role, name`;
-    const result = await prisma.$queryRawUnsafe<Array<{
+    type TeamMemberRow = {
       id: number;
       name: string;
       email: string;
@@ -44,7 +31,29 @@ export async function GET(request: Request) {
       active: boolean;
       created_at: Date;
       updated_at: Date;
-    }>>(query);
+    };
+
+    let result: TeamMemberRow[];
+
+    if (role && active !== null) {
+      const isActive = active !== 'false';
+      result = await prisma.$queryRaw<TeamMemberRow[]>`
+        SELECT * FROM team_members WHERE role = ${role} AND active = ${isActive} ORDER BY role, name
+      `;
+    } else if (role) {
+      result = await prisma.$queryRaw<TeamMemberRow[]>`
+        SELECT * FROM team_members WHERE role = ${role} ORDER BY role, name
+      `;
+    } else if (active !== null) {
+      const isActive = active !== 'false';
+      result = await prisma.$queryRaw<TeamMemberRow[]>`
+        SELECT * FROM team_members WHERE active = ${isActive} ORDER BY role, name
+      `;
+    } else {
+      result = await prisma.$queryRaw<TeamMemberRow[]>`
+        SELECT * FROM team_members ORDER BY role, name
+      `;
+    }
 
     return NextResponse.json({ members: result });
   } catch (err) {
@@ -109,39 +118,41 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: `Invalid role. Must be one of: ${TEAM_ROLES.join(', ')}` }, { status: 400 });
     }
 
-    const fields: string[] = [];
-    const values: Record<string, any> = {};
-
+    const allowedFields = ['name', 'email', 'role', 'phone', 'calendar_link', 'active'];
+    const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(updates)) {
-      if (['name', 'email', 'role', 'phone', 'calendar_link', 'active'].includes(key)) {
-        fields.push(`${key} = ${Prisma.sql`${key === 'email' ? (value as string).toLowerCase().trim() : value}`}`);
-        values[key] = key === 'email' ? (value as string).toLowerCase().trim() : value;
+      if (allowedFields.includes(key)) {
+        sanitized[key] = key === 'email' && typeof value === 'string'
+          ? value.toLowerCase().trim()
+          : value;
       }
     }
 
-    if (fields.length === 0) {
+    if (Object.keys(sanitized).length === 0) {
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
     }
 
-    fields.push(`updated_at = NOW()`);
+    type TeamMemberRow = {
+      id: number; name: string; email: string; role: string;
+      phone: string | null; calendar_link: string | null;
+      active: boolean; created_at: Date; updated_at: Date;
+    };
 
-    // Build dynamic SET clause
-    const setClause = Object.entries(values)
-      .map(([k, v]) => `${k} = ${typeof v === 'string' ? `'${v.replace(/'/g, "''")}'` : v}`)
-      .join(', ');
+    // Build parameterized SET clause
+    const setClauses: string[] = [];
+    const params: unknown[] = [];
+    let paramIdx = 1;
 
-    const updateQuery = `UPDATE team_members SET ${setClause}, updated_at = NOW() WHERE id = ${id} RETURNING *`;
-    const result = await prisma.$queryRawUnsafe<Array<{
-      id: number;
-      name: string;
-      email: string;
-      role: string;
-      phone: string | null;
-      calendar_link: string | null;
-      active: boolean;
-      created_at: Date;
-      updated_at: Date;
-    }>>(updateQuery);
+    for (const [key, value] of Object.entries(sanitized)) {
+      setClauses.push(`${key} = $${paramIdx}`);
+      params.push(value);
+      paramIdx++;
+    }
+    setClauses.push('updated_at = NOW()');
+    params.push(Number(id));
+
+    const query = `UPDATE team_members SET ${setClauses.join(', ')} WHERE id = $${paramIdx} RETURNING *`;
+    const result = await prisma.$queryRawUnsafe<TeamMemberRow[]>(query, ...params);
 
     if (result.length === 0) {
       return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
@@ -165,6 +176,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'id query param is required' }, { status: 400 });
     }
 
+    const numericId = Number(id);
     const result = await prisma.$queryRaw<Array<{
       id: number;
       name: string;
@@ -177,7 +189,7 @@ export async function DELETE(request: Request) {
       updated_at: Date;
     }>>`
       UPDATE team_members SET active = FALSE, updated_at = NOW()
-      WHERE id = ${id}
+      WHERE id = ${numericId}
       RETURNING *
     `;
 

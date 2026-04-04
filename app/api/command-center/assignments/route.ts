@@ -1,6 +1,19 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+
+type AssignmentRow = {
+  id: number;
+  deal_id: string;
+  role: string;
+  member_id: number;
+  assigned_by: string | null;
+  assigned_at: Date;
+  member_name: string;
+  member_email: string;
+  member_phone: string | null;
+  member_calendar: string | null;
+  member_role: string;
+};
 
 // ── GET: Get assignments for a deal (or all assignments) ────────────────────
 export async function GET(request: Request) {
@@ -9,38 +22,35 @@ export async function GET(request: Request) {
     const dealId = searchParams.get('dealId');
     const memberId = searchParams.get('memberId');
 
-    let whereClauses: string[] = [];
-
-    if (dealId) {
-      whereClauses.push(`a.deal_id = '${dealId}'`);
-    }
-    if (memberId) {
-      whereClauses.push(`a.member_id = ${memberId}`);
-    }
-
-    const whereClause = whereClauses.length > 0 ? ' WHERE ' + whereClauses.join(' AND ') : '';
-
-    const query = `
+    const baseQuery = `
       SELECT a.*, t.name as member_name, t.email as member_email, t.phone as member_phone,
              t.calendar_link as member_calendar, t.role as member_role
       FROM advisor_assignments a
       JOIN team_members t ON a.member_id = t.id
-      ${whereClause}
-      ORDER BY a.role, a.assigned_at
     `;
-    const result = await prisma.$queryRawUnsafe<Array<{
-      id: number;
-      deal_id: string;
-      role: string;
-      member_id: number;
-      assigned_by: string | null;
-      assigned_at: Date;
-      member_name: string;
-      member_email: string;
-      member_phone: string | null;
-      member_calendar: string | null;
-      member_role: string;
-    }>>(query);
+
+    let result: AssignmentRow[];
+
+    if (dealId && memberId) {
+      result = await prisma.$queryRawUnsafe<AssignmentRow[]>(
+        `${baseQuery} WHERE a.deal_id = $1 AND a.member_id = $2 ORDER BY a.role, a.assigned_at`,
+        dealId, Number(memberId)
+      );
+    } else if (dealId) {
+      result = await prisma.$queryRawUnsafe<AssignmentRow[]>(
+        `${baseQuery} WHERE a.deal_id = $1 ORDER BY a.role, a.assigned_at`,
+        dealId
+      );
+    } else if (memberId) {
+      result = await prisma.$queryRawUnsafe<AssignmentRow[]>(
+        `${baseQuery} WHERE a.member_id = $1 ORDER BY a.role, a.assigned_at`,
+        Number(memberId)
+      );
+    } else {
+      result = await prisma.$queryRawUnsafe<AssignmentRow[]>(
+        `${baseQuery} ORDER BY a.role, a.assigned_at`
+      );
+    }
 
     return NextResponse.json({ assignments: result });
   } catch (err) {

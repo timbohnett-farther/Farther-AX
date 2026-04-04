@@ -13,27 +13,32 @@ const globalForPrisma = global as unknown as {
   pool: Pool | undefined;
 };
 
-// Create connection pool
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error('DATABASE_URL environment variable is not set');
-}
+function getPrismaClient(): PrismaClient {
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
 
-if (!globalForPrisma.pool) {
-  globalForPrisma.pool = new Pool({ connectionString });
-}
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error('DATABASE_URL environment variable is not set');
+  }
 
-// Create Prisma adapter
-const adapter = new PrismaPg(globalForPrisma.pool);
+  if (!globalForPrisma.pool) {
+    globalForPrisma.pool = new Pool({ connectionString });
+  }
 
-// Initialize Prisma client with adapter
-if (!globalForPrisma.prisma) {
+  const adapter = new PrismaPg(globalForPrisma.pool);
   globalForPrisma.prisma = new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
+
+  return globalForPrisma.prisma;
 }
 
-export const prisma = globalForPrisma.prisma;
+// Lazy proxy: only connects when a property is accessed at runtime
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    return Reflect.get(getPrismaClient(), prop);
+  },
+});
 
 export default prisma;

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { listSheetsInFolder } from '@/lib/google-sheets';
 import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
 
 // ── GET — List all workbooks in the Drive folder + their assignment status ────
 

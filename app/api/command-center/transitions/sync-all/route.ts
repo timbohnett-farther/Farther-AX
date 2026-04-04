@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
 
 const SYNC_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
 
