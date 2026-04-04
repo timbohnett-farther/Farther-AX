@@ -15,6 +15,7 @@ import {
   UserGroupIcon,
   BellAlertIcon,
   CpuChipIcon,
+  BanknotesIcon,
 } from "@heroicons/react/24/outline";
 import { ThemeToggle } from "./ThemeToggle";
 import { useTheme } from "@/lib/theme-provider";
@@ -45,6 +46,7 @@ const coreOps = [
   { label: "Transitions", href: "/command-center/transitions", icon: RectangleStackIcon },
   { label: "Team", href: "/command-center/team", icon: UserGroupIcon },
   { label: "Complexity", href: "/command-center/complexity", icon: ChartBarIcon },
+  { label: "Commission", href: "/commission", icon: BanknotesIcon },
   { label: "Metrics", href: "/command-center/metrics", icon: ChartBarIcon },
   { label: "AI Assistant", href: "/command-center/ai", icon: SparklesIcon },
   { label: "Agents", href: "/command-center/agents", icon: CpuChipIcon },
