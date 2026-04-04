@@ -210,6 +210,43 @@ export default function KeyDocumentsPage() {
             ))}
           </div>
         </div>
+
+        {/* Schwab Custodian Positioning */}
+        <div className="mt-16">
+          <h2 className="text-3xl font-bold mb-3 font-serif text-[var(--color-text)]">
+            Custodian Positioning: <span style={{ color: THEME.colors.gold }}>Charles Schwab</span>
+          </h2>
+          <p className="text-sm text-[var(--color-text-secondary)] mb-8">
+            Farther&apos;s primary custodial relationship is with Charles Schwab Advisor Services. Key benefits to communicate to transitioning advisors:
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              { benefit: 'Institutional Pricing', detail: 'Access to institutional share classes, ETF discounts, and competitive custody fees that reduce total cost to clients.' },
+              { benefit: 'Investment Product Access', detail: 'Broad product shelf including equities, fixed income, ETFs, mutual funds, options, alternatives, and structured products.' },
+              { benefit: 'Dedicated Service Team', detail: 'Assigned Schwab relationship manager for Farther advisors with priority support queue and escalation path.' },
+              { benefit: 'Technology Integration', detail: 'Schwab Advisor Center seamlessly integrates with Farther\'s portfolio management, billing, and reporting systems.' },
+              { benefit: 'ACAT Transfer Capabilities', detail: 'Streamlined automated transfers via DTCC ACAT system. Most equity/ETF transfers complete in 3-5 business days.' },
+              { benefit: 'Client Experience', detail: 'Schwab investor portal and mobile app give clients direct visibility into their accounts alongside advisor access.' },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="rounded-xl p-5 bg-[var(--color-surface)] border border-[var(--color-border)]"
+              >
+                <h3 className="text-base font-bold mb-2 text-[var(--color-text)]" style={{ color: THEME.colors.teal }}>
+                  {item.benefit}
+                </h3>
+                <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{item.detail}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 rounded-lg p-4 border" style={{ borderColor: THEME.colors.gold + '4D', backgroundColor: THEME.colors.gold + '0D' }}>
+            <p className="text-sm text-[var(--color-text)]">
+              <strong style={{ color: THEME.colors.gold }}>Talking Point:</strong> Schwab custodies over $9 trillion in client assets for independent advisors. Farther advisors benefit from this scale through institutional pricing, technology, and service — while maintaining full independence and ownership of their practice.
+            </p>
+          </div>
+        </div>
       </div>
     </PageLayout>
   );
