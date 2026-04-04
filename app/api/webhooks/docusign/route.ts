@@ -19,6 +19,21 @@ import {
   parseWebhookPayload,
   type DocuSignWebhookPayload,
 } from '@/lib/docusign-client';
+import Redis from 'ioredis';
+
+// ── Redis Client ──────────────────────────────────────────────────────────────
+
+const REDIS_URL = process.env.REDIS_URL;
+
+async function getRedisClient(): Promise<Redis | null> {
+  if (!REDIS_URL) return null;
+  try {
+    const client = new Redis(REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000 });
+    return client;
+  } catch {
+    return null;
+  }
+}
 
 // ── POST handler ──────────────────────────────────────────────────────────────
 
@@ -47,7 +62,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 4. Extract envelope data
+    // 4. Check idempotency (prevent duplicate processing on retry)
+    const idempotencyKey = `docusign-wh-${data.data.envelopeId}-${data.event}`;
+    const redis = await getRedisClient();
+    if (redis) {
+      try {
+        const existing = await redis.get(idempotencyKey);
+        if (existing) {
+          console.log(`[docusign/webhook] Deduplicated webhook: ${idempotencyKey}`);
+          await redis.quit();
+          return NextResponse.json({ received: true, deduplicated: true });
+        }
+      } catch (err) {
+        console.warn('[docusign/webhook] Failed to check idempotency in Redis:', err);
+        // Graceful degradation: continue without dedup
+      }
+    }
+
+    // 5. Extract envelope data
     const {
       envelopeId,
       status,
@@ -62,11 +94,11 @@ export async function POST(req: NextRequest) {
       `[docusign/webhook] Received ${data.event} for envelope ${envelopeId} (status: ${status})`
     );
 
-    // 5. Determine if this is an IAA or paperwork envelope
+    // 6. Determine if this is an IAA or paperwork envelope
     const subjectLower = (emailSubject ?? '').toLowerCase();
     const isIAA = subjectLower.includes('iaa');
 
-    // 6. Update database (upsert by signer email match) using Prisma
+    // 7. Update database (upsert by signer email match) using Prisma
     if (signerEmails.length > 0) {
       if (isIAA) {
         // Update all transition clients matching any of the signer emails (IAA envelope)
@@ -99,10 +131,20 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 7. Log number of clients updated
+    // 8. Log number of clients updated
     console.log(`[docusign/webhook] Updated transition clients with ${isIAA ? 'IAA' : 'Paperwork'} status for emails: ${signerEmails.join(', ')}`);
 
-    // 8. Return success (MUST return 200 or DocuSign will retry)
+    // 9. Mark webhook as processed in Redis (24h TTL)
+    if (redis) {
+      try {
+        await redis.set(idempotencyKey, '1', 'EX', 86400); // 24 hours
+        await redis.quit();
+      } catch (err) {
+        console.warn('[docusign/webhook] Failed to set idempotency key in Redis:', err);
+      }
+    }
+
+    // 10. Return success (MUST return 200 or DocuSign will retry)
     return NextResponse.json({
       received: true,
       envelopeId,

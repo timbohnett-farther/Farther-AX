@@ -6,6 +6,7 @@ import { Prisma } from '@prisma/client';
 import { TASKS } from '@/lib/onboarding-tasks-v2';
 import { calculateDueDate, getDay0Date, getLaunchDate } from '@/lib/due-date-calculator';
 import { calculateTaskStatus, getTaskResponsiblePerson, formatTaskAlert, type TaskAlert as TaskAlertType, type ResponsiblePerson } from '@/lib/task-status';
+import { withPgCache } from '@/lib/pg-cache';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const PIPELINE_ID = '751770';
@@ -93,6 +94,18 @@ async function fetchManagedAccountsByAdvisor(): Promise<Record<string, { totalMv
   } while (after);
 
   return map;
+}
+
+// ── Cached wrappers for HubSpot fetches ─────────────────────────────────────
+
+async function getCachedOnboardingDeals(): Promise<HubSpotDeal[]> {
+  const result = await withPgCache('alerts-deals', fetchOnboardingDeals, { ttlMs: 15 * 60 * 1000 });
+  return result.data;
+}
+
+async function getCachedManagedAccounts(): Promise<Record<string, { totalMv: number; count: number }>> {
+  const result = await withPgCache('alerts-managed-accounts', fetchManagedAccountsByAdvisor, { ttlMs: 15 * 60 * 1000 });
+  return result.data;
 }
 
 // ── AUM Pace targets (matches advisor-hub logic) ────────────────────────────
@@ -217,7 +230,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const [dealsResult, sentimentResult, managedResult] = await Promise.allSettled([
-      fetchOnboardingDeals(),
+      getCachedOnboardingDeals(),
       prisma.$queryRaw<Array<{
         deal_id: string;
         deal_name: string | null;
@@ -247,7 +260,7 @@ export async function GET(req: NextRequest) {
         WHERE prev.tier IS NOT NULL
         ORDER BY h.deal_id, h.scored_at DESC
       `,
-      fetchManagedAccountsByAdvisor(),
+      getCachedManagedAccounts(),
     ]);
 
     deals = dealsResult.status === 'fulfilled' ? dealsResult.value : [];

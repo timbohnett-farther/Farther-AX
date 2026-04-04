@@ -175,19 +175,21 @@ export default function Sidebar() {
     >
       {/* Logo / Brand */}
       <div className="px-6 pt-8 pb-5 border-b" style={{ borderColor: THEME.colors.border }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src="/logo-light.png"
           alt="Farther"
+          width={160}
+          height={40}
           className="mb-2 object-contain object-left hidden dark:block"
-          style={{ width: '160px', height: 'auto' }}
+          priority
         />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src="/logo-dark.png"
           alt="Farther"
+          width={160}
+          height={40}
           className="mb-2 object-contain object-left block dark:hidden"
-          style={{ width: '160px', height: 'auto' }}
+          priority
         />
         <p className="text-xs tracking-widest uppercase" style={{ color: THEME.colors.sidebarTextFaint }}>
           Terminal AX

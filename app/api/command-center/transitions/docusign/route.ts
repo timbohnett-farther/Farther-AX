@@ -3,14 +3,29 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import {
   getValidToken,
-  fetchEnvelopes,
+  fetchAllEnvelopes,
   matchEnvelopesToAdvisors,
   DocuSignEnvelope,
-} from '@/lib/docusign';
+} from '@/lib/docusign-client';
+import Redis from 'ioredis';
 
 // ── Env vars ──────────────────────────────────────────────────────────────────
 const INTEGRATION_KEY = process.env.DOCUSIGN_INTEGRATION_KEY ?? '';
 const NEXTAUTH_URL = process.env.NEXTAUTH_URL ?? '';
+const AUTH_SERVER = process.env.DOCUSIGN_AUTH_SERVER ?? 'https://account.docusign.com';
+const REDIS_URL = process.env.REDIS_URL;
+
+// ── Redis Client ──────────────────────────────────────────────────────────────
+
+async function getRedisClient(): Promise<Redis | null> {
+  if (!REDIS_URL) return null;
+  try {
+    const client = new Redis(REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000 });
+    return client;
+  } catch {
+    return null;
+  }
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -18,15 +33,32 @@ function buildRedirectUri(): string {
   return `${NEXTAUTH_URL}/api/command-center/transitions/docusign/callback`;
 }
 
-function buildAuthUrl(): string {
+async function buildAuthUrl(): Promise<string> {
   const redirectUri = buildRedirectUri();
-  return (
-    `https://account-d.docusign.com/oauth/auth` +
+  let authUrl = (
+    `${AUTH_SERVER}/oauth/auth` +
     `?response_type=code` +
     `&scope=signature` +
     `&client_id=${INTEGRATION_KEY}` +
     `&redirect_uri=${encodeURIComponent(redirectUri)}`
   );
+
+  // Add CSRF state token if Redis is available
+  const redis = await getRedisClient();
+  if (redis) {
+    try {
+      const state = crypto.randomUUID();
+      const key = `docusign-oauth-state-${state}`;
+      await redis.set(key, '1', 'EX', 600); // 10-minute TTL
+      await redis.quit();
+      authUrl += `&state=${state}`;
+    } catch (err) {
+      console.warn('[docusign] Failed to set OAuth state in Redis:', err);
+      // Graceful degradation: continue without state param
+    }
+  }
+
+  return authUrl;
 }
 
 // ── POST handler ──────────────────────────────────────────────────────────────
@@ -38,7 +70,7 @@ export async function POST() {
 
     if (!accessToken) {
       return NextResponse.json(
-        { error: 'not_authenticated', authUrl: buildAuthUrl() },
+        { error: 'not_authenticated', authUrl: await buildAuthUrl() },
         { status: 401 },
       );
     }
@@ -46,11 +78,12 @@ export async function POST() {
     // 2. Fetch envelopes from last 180 days
     let envelopes: DocuSignEnvelope[];
     try {
-      envelopes = await fetchEnvelopes(accessToken, 180);
+      const fromDate = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000);
+      envelopes = await fetchAllEnvelopes(accessToken, fromDate);
     } catch (err) {
       if (err instanceof Error && err.message === 'DOCUSIGN_AUTH_EXPIRED') {
         return NextResponse.json(
-          { error: 'not_authenticated', authUrl: buildAuthUrl() },
+          { error: 'not_authenticated', authUrl: await buildAuthUrl() },
           { status: 401 },
         );
       }

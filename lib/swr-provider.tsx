@@ -68,7 +68,8 @@ const CRITICAL_ENDPOINTS = [
   '/api/command-center/alerts',
   '/api/command-center/team',
   '/api/command-center/metrics',
-  '/api/command-center/complexity',
+  '/api/command-center/complexity/scores',
+  '/api/command-center/transitions/tran-aum',
 ];
 
 function Prefetcher() {

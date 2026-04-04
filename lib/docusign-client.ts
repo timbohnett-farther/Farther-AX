@@ -30,6 +30,7 @@ const BASE_URI = process.env.DOCUSIGN_BASE_URI ?? 'https://demo.docusign.net';
 const API_ACCOUNT_ID = process.env.DOCUSIGN_API_ACCOUNT_ID ?? '';
 const INTEGRATION_KEY = process.env.DOCUSIGN_INTEGRATION_KEY ?? '';
 const SECRET_KEY = process.env.DOCUSIGN_SECRET_KEY ?? '';
+const AUTH_SERVER = process.env.DOCUSIGN_AUTH_SERVER ?? 'https://account.docusign.com';
 
 /**
  * Get HMAC secret at runtime for testability
@@ -120,7 +121,7 @@ export async function refreshAccessToken(): Promise<string | null> {
   const credentials = Buffer.from(`${INTEGRATION_KEY}:${SECRET_KEY}`).toString('base64');
 
   try {
-    const res = await fetch('https://account-d.docusign.com/oauth/token', {
+    const res = await fetch(`${AUTH_SERVER}/oauth/token`, {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${credentials}`,

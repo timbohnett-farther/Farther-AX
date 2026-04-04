@@ -1,4 +1,4 @@
-import { getValidToken, DocuSignEnvelope, DocuSignSigner } from '@/lib/docusign';
+import { getValidToken, DocuSignEnvelope, DocuSignSigner } from '@/lib/docusign-client';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
@@ -176,6 +176,25 @@ export async function matchAndClassify(): Promise<{
     return { matchedCount: 0, unmatchedCount: 0 };
   }
 
+  // Batch-fetch ALL signers for unmatched envelopes in a single query
+  const unmatchedIds = unmatchedResult.map(r => r.envelope_id);
+  const allSignersResult = await prisma.$queryRaw<Array<{
+    envelope_id: string;
+    signer_email: string;
+  }>>`
+    SELECT envelope_id, signer_email
+    FROM docusign_signers
+    WHERE envelope_id = ANY(ARRAY[${Prisma.join(unmatchedIds)}]::text[])
+  `;
+
+  // Build in-memory lookup: envelopeId → signerEmails[]
+  const signersByEnvelope = new Map<string, string[]>();
+  for (const row of allSignersResult) {
+    const emails = signersByEnvelope.get(row.envelope_id) ?? [];
+    emails.push(row.signer_email.toLowerCase());
+    signersByEnvelope.set(row.envelope_id, emails);
+  }
+
   // Build advisor email map from transition_clients
   const clientsResult = await prisma.$queryRaw<Array<{
     advisor_name: string;
@@ -205,11 +224,8 @@ export async function matchAndClassify(): Promise<{
   let unmatchedCount = 0;
 
   for (const row of unmatchedResult) {
-    // Get signers for this envelope
-    const signersResult = await prisma.$queryRaw<Array<{ signer_email: string }>>`
-      SELECT signer_email FROM docusign_signers WHERE envelope_id = ${row.envelope_id}
-    `;
-    const signerEmails = signersResult.map((s) => s.signer_email.toLowerCase());
+    // Use the pre-fetched signer map instead of per-envelope query
+    const signerEmails = signersByEnvelope.get(row.envelope_id) ?? [];
 
     let matchedAdvisor: string | null = null;
     let matchMethod: string | null = null;

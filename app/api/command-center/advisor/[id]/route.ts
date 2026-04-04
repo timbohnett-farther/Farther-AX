@@ -164,26 +164,41 @@ async function fetchAssociatedContact(dealId: string) {
     }
   }
 
-  // Step 4: Fetch additional associated contacts (for Team & Contacts tab)
+  // Step 4: Fetch all associated contacts in a single batch request
   const allContacts = [];
-  for (const assoc of contactAssocs) {
-    if (assoc.toObjectId === primaryContactId) {
-      allContacts.push(contact);
-      continue;
-    }
+  const otherContactIds = contactAssocs
+    .map((a: { toObjectId: string }) => a.toObjectId)
+    .filter((id: string) => id !== primaryContactId);
+
+  if (otherContactIds.length > 0) {
     try {
-      const otherRes = await fetch(
-        `https://api.hubapi.com/crm/v3/objects/contacts/${assoc.toObjectId}?properties=firstname,lastname,email,phone,company,city,state`,
-        { headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` } }
+      const batchRes = await fetch(
+        'https://api.hubapi.com/crm/v3/objects/contacts/batch/read',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${HUBSPOT_PAT}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            properties: ['firstname', 'lastname', 'email', 'phone', 'company', 'city', 'state'],
+            inputs: otherContactIds.map((id: string) => ({ id })),
+          }),
+        }
       );
-      if (otherRes.ok) {
-        const otherData = await otherRes.json();
-        allContacts.push({ id: otherData.id, ...otherData.properties });
+      if (batchRes.ok) {
+        const batchData = await batchRes.json();
+        for (const c of batchData.results ?? []) {
+          allContacts.push({ id: c.id, ...c.properties });
+        }
       }
     } catch {
-      // Skip failed contact fetches
+      // Batch fetch failed — continue with just primary contact
     }
   }
+
+  // Primary contact always first
+  allContacts.unshift(contact);
 
   return { contact, pinnedNote, allContacts };
 }

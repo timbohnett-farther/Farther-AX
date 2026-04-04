@@ -221,3 +221,71 @@ model advisor_graduations {
   graduated_at DateTime @default(now()) @db.Timestamptz(6)
   graduated_by String?
 }
+
+model DocuSignToken {
+  id            Int      @id @default(autoincrement())
+  access_token  String
+  refresh_token String
+  expires_at    DateTime
+  created_at    DateTime @default(now())
+
+  @@map("docusign_tokens")
+}
+
+model DocuSignEnvelope {
+  id                    Int      @id @default(autoincrement())
+  envelope_id           String   @unique
+  status                String
+  email_subject         String?
+  sent_date_time        String?
+  completed_date_time   String?
+  status_changed_at     String?
+  envelope_type         String?
+  matched_advisor_name  String?
+  match_method          String?
+  raw_json              Json?
+  last_synced_at        DateTime @default(now())
+  created_at            DateTime @default(now())
+  updated_at            DateTime @default(now())
+
+  @@index([status])
+  @@index([matched_advisor_name])
+  @@index([envelope_type])
+  @@map("docusign_envelopes")
+}
+
+model DocuSignSigner {
+  id                  Int      @id @default(autoincrement())
+  envelope_id         String
+  signer_name         String
+  signer_email        String
+  status              String?
+  signed_date_time    String?
+  delivered_date_time String?
+  sent_date_time      String?
+  created_at          DateTime @default(now())
+
+  @@index([envelope_id])
+  @@index([signer_email])
+  @@map("docusign_signers")
+}
+
+model DocuSignSyncState {
+  id             Int      @id @default(autoincrement())
+  last_synced_at DateTime
+  created_at     DateTime @default(now())
+
+  @@map("docusign_sync_state")
+}
+
+model DocuSignSyncSnapshot {
+  id              Int      @id @default(autoincrement())
+  snapshot_type   String
+  snapshot_data   Json
+  advisor_count   Int      @default(0)
+  envelope_count  Int      @default(0)
+  household_count Int      @default(0)
+  created_at      DateTime @default(now())
+
+  @@map("docusign_sync_snapshots")
+}

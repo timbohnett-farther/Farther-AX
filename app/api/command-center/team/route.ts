@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { withPgCache, clearPgCache } from '@/lib/pg-cache';
 
 // ── Valid roles ──────────────────────────────────────────────────────────────
 const TEAM_ROLES = [
@@ -21,41 +22,51 @@ export async function GET(request: Request) {
     const role = searchParams.get('role');
     const active = searchParams.get('active');
 
-    type TeamMemberRow = {
-      id: number;
-      name: string;
-      email: string;
-      role: string;
-      phone: string | null;
-      calendar_link: string | null;
-      active: boolean;
-      created_at: Date;
-      updated_at: Date;
-    };
+    const cacheKey = `team-members${role ? `-${role}` : ''}${active !== null ? `-active-${active}` : ''}`;
 
-    let result: TeamMemberRow[];
+    const result = await withPgCache(
+      cacheKey,
+      async () => {
+        type TeamMemberRow = {
+          id: number;
+          name: string;
+          email: string;
+          role: string;
+          phone: string | null;
+          calendar_link: string | null;
+          active: boolean;
+          created_at: Date;
+          updated_at: Date;
+        };
 
-    if (role && active !== null) {
-      const isActive = active !== 'false';
-      result = await prisma.$queryRaw<TeamMemberRow[]>`
-        SELECT * FROM team_members WHERE role = ${role} AND active = ${isActive} ORDER BY role, name
-      `;
-    } else if (role) {
-      result = await prisma.$queryRaw<TeamMemberRow[]>`
-        SELECT * FROM team_members WHERE role = ${role} ORDER BY role, name
-      `;
-    } else if (active !== null) {
-      const isActive = active !== 'false';
-      result = await prisma.$queryRaw<TeamMemberRow[]>`
-        SELECT * FROM team_members WHERE active = ${isActive} ORDER BY role, name
-      `;
-    } else {
-      result = await prisma.$queryRaw<TeamMemberRow[]>`
-        SELECT * FROM team_members ORDER BY role, name
-      `;
-    }
+        let result: TeamMemberRow[];
 
-    return NextResponse.json({ members: result });
+        if (role && active !== null) {
+          const isActive = active !== 'false';
+          result = await prisma.$queryRaw<TeamMemberRow[]>`
+            SELECT * FROM team_members WHERE role = ${role} AND active = ${isActive} ORDER BY role, name
+          `;
+        } else if (role) {
+          result = await prisma.$queryRaw<TeamMemberRow[]>`
+            SELECT * FROM team_members WHERE role = ${role} ORDER BY role, name
+          `;
+        } else if (active !== null) {
+          const isActive = active !== 'false';
+          result = await prisma.$queryRaw<TeamMemberRow[]>`
+            SELECT * FROM team_members WHERE active = ${isActive} ORDER BY role, name
+          `;
+        } else {
+          result = await prisma.$queryRaw<TeamMemberRow[]>`
+            SELECT * FROM team_members ORDER BY role, name
+          `;
+        }
+
+        return { members: result };
+      },
+      { ttlMs: 60 * 60 * 1000 } // 1 hour
+    );
+
+    return NextResponse.json(result.data);
   } catch (err) {
     console.error('[team GET]', err);
     const message = err instanceof Error ? err.message : String(err);
@@ -92,6 +103,9 @@ export async function POST(request: Request) {
       VALUES (${name}, ${email.toLowerCase().trim()}, ${role}, ${phone || null}, ${calendar_link || null})
       RETURNING *
     `;
+
+    // Invalidate team cache on mutations
+    await clearPgCache('team-members').catch(() => {});
 
     return NextResponse.json({ member: result[0] }, { status: 201 });
   } catch (err) {
@@ -158,6 +172,9 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
     }
 
+    // Invalidate team cache on mutations
+    await clearPgCache('team-members').catch(() => {});
+
     return NextResponse.json({ member: result[0] });
   } catch (err) {
     console.error('[team PATCH]', err);
@@ -196,6 +213,9 @@ export async function DELETE(request: Request) {
     if (result.length === 0) {
       return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
     }
+
+    // Invalidate team cache on mutations
+    await clearPgCache('team-members').catch(() => {});
 
     return NextResponse.json({ member: result[0] });
   } catch (err) {

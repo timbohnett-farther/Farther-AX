@@ -10,6 +10,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { withPgCache } from '@/lib/pg-cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,29 +32,33 @@ interface AdvisorSentimentRow {
 
 export async function GET() {
   try {
-    const result = await prisma.$queryRaw<AdvisorSentimentRow[]>`
-      SELECT
-        deal_id,
-        deal_name,
-        contact_id,
-        composite_score,
-        activity_score,
-        tone_score,
-        milestone_score,
-        recency_score,
-        tier,
-        deal_stage,
-        engagements_analyzed,
-        signals,
-        updated_at
-      FROM advisor_sentiment
-      ORDER BY deal_name ASC
-    `;
+    const result = await withPgCache(
+      'sentiment-scores',
+      async () => {
+        const rows = await prisma.$queryRaw<AdvisorSentimentRow[]>`
+          SELECT
+            deal_id,
+            deal_name,
+            contact_id,
+            composite_score,
+            activity_score,
+            tone_score,
+            milestone_score,
+            recency_score,
+            tier,
+            deal_stage,
+            engagements_analyzed,
+            signals,
+            updated_at
+          FROM advisor_sentiment
+          ORDER BY deal_name ASC
+        `;
+        return { scores: rows, count: rows.length };
+      },
+      { ttlMs: 30 * 60 * 1000 } // 30 minutes
+    );
 
-    return NextResponse.json({
-      scores: result,
-      count: result.length,
-    });
+    return NextResponse.json(result.data);
   } catch (err) {
     console.error('[sentiment/scores]', err);
     const message = err instanceof Error ? err.message : String(err);

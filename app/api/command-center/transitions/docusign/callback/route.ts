@@ -1,10 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import Redis from 'ioredis';
 
 // ── Env vars ──────────────────────────────────────────────────────────────────
 const INTEGRATION_KEY = process.env.DOCUSIGN_INTEGRATION_KEY ?? '';
 const SECRET_KEY = process.env.DOCUSIGN_SECRET_KEY ?? '';
 const NEXTAUTH_URL = process.env.NEXTAUTH_URL ?? '';
+const AUTH_SERVER = process.env.DOCUSIGN_AUTH_SERVER ?? 'https://account.docusign.com';
+const REDIS_URL = process.env.REDIS_URL;
+
+// ── Redis Client ──────────────────────────────────────────────────────────────
+
+async function getRedisClient(): Promise<Redis | null> {
+  if (!REDIS_URL) return null;
+  try {
+    const client = new Redis(REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000 });
+    return client;
+  } catch {
+    return null;
+  }
+}
 
 // ── GET handler ───────────────────────────────────────────────────────────────
 // DocuSign redirects here with ?code=... after the user authorizes the app.
@@ -31,6 +46,7 @@ export async function GET(req: NextRequest) {
   const code = searchParams.get('code');
   const error = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
+  const state = searchParams.get('state');
 
   // Handle OAuth errors from DocuSign
   if (error) {
@@ -47,11 +63,34 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  // Validate CSRF state token if Redis is available
+  if (state) {
+    const redis = await getRedisClient();
+    if (redis) {
+      try {
+        const key = `docusign-oauth-state-${state}`;
+        const value = await redis.get(key);
+        await redis.del(key); // Delete after validation
+        await redis.quit();
+
+        if (!value) {
+          console.error('[docusign/callback] Invalid or expired OAuth state');
+          return NextResponse.redirect(
+            `${NEXTAUTH_URL}/command-center/transitions?docusign=error&reason=invalid_state`,
+          );
+        }
+      } catch (err) {
+        console.warn('[docusign/callback] Failed to validate state in Redis:', err);
+        // Graceful degradation: continue without state validation
+      }
+    }
+  }
+
   try {
     // ── Exchange authorization code for tokens ───────────────────────────────
     const credentials = Buffer.from(`${INTEGRATION_KEY}:${SECRET_KEY}`).toString('base64');
 
-    const tokenRes = await fetch('https://account-d.docusign.com/oauth/token', {
+    const tokenRes = await fetch(`${AUTH_SERVER}/oauth/token`, {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${credentials}`,

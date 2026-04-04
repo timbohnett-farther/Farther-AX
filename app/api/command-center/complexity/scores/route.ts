@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { computeComplexityScore } from '@/lib/complexity-score';
+import { getCached } from '@/lib/cached-fetchers';
 
 const HUBSPOT_PAT = process.env.HUBSPOT_ACCESS_TOKEN || process.env.HUBSPOT_PAT || '';
 const TEAMS_OBJECT_TYPE = '2-43222882';
@@ -49,96 +50,100 @@ function quickScore(deal: Record<string, string | null | undefined>) {
  */
 export async function GET() {
   try {
-    if (!HUBSPOT_PAT) {
-      return NextResponse.json({ error: 'HUBSPOT_ACCESS_TOKEN not configured' }, { status: 500 });
-    }
+    const result = await getCached('metrics', 'complexity-scores', async () => {
+      if (!HUBSPOT_PAT) {
+        throw new Error('HUBSPOT_ACCESS_TOKEN not configured');
+      }
 
-    // Fetch all active pipeline deals
-    const dealsRes = await fetch(
-      `https://api.hubapi.com/crm/v3/objects/deals?properties=${DEAL_PROPS}&limit=100`,
-      { headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` } }
-    );
-
-    if (!dealsRes.ok) {
-      console.error('[complexity/scores] Failed to fetch deals:', dealsRes.status);
-      return NextResponse.json({ error: 'Failed to fetch deals from HubSpot' }, { status: 500 });
-    }
-
-    const dealsData = await dealsRes.json();
-    const allDeals = dealsData.results ?? [];
-
-    // Filter to active stages only
-    const activeDeals = allDeals.filter((deal: { properties: { dealstage?: string } }) =>
-      ACTIVE_STAGES.includes(deal.properties.dealstage ?? '')
-    );
-
-    console.log(`[complexity/scores] Processing ${activeDeals.length} active deals`);
-
-    // Build map of dealId → properties
-    const dealMap: Record<string, Record<string, string | null>> = {};
-    for (const deal of activeDeals) {
-      dealMap[deal.id] = deal.properties;
-    }
-
-    // For deals in advanced stages, fetch team data
-    const advancedStages = ['2496935', '2496936', '100411705'];
-    const advancedDealIds = Object.entries(dealMap)
-      .filter(([, props]) => advancedStages.includes(props.dealstage ?? ''))
-      .map(([id]) => id);
-
-    // Fetch team records (parallel, max 10 concurrent)
-    const teamData: Record<string, Record<string, string | null> | null> = {};
-    const CONCURRENCY = 10;
-
-    for (let i = 0; i < advancedDealIds.length; i += CONCURRENCY) {
-      const batch = advancedDealIds.slice(i, i + CONCURRENCY);
-      const results = await Promise.allSettled(
-        batch.map(async (dealId) => {
-          const assocRes = await fetch(
-            `https://api.hubapi.com/crm/v4/objects/deals/${dealId}/associations/${TEAMS_OBJECT_TYPE}`,
-            { headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` } }
-          );
-          if (!assocRes.ok) return { dealId, team: null };
-
-          const assocData = await assocRes.json();
-          const results = assocData.results ?? [];
-          if (results.length === 0) return { dealId, team: null };
-
-          const teamId = results[0].toObjectId;
-          const teamRes = await fetch(
-            `https://api.hubapi.com/crm/v3/objects/${TEAMS_OBJECT_TYPE}/${teamId}?properties=${TEAM_PROPS}`,
-            { headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` } }
-          );
-          if (!teamRes.ok) return { dealId, team: null };
-
-          const teamObj = await teamRes.json();
-          return { dealId, team: teamObj.properties ?? null };
-        })
+      // Fetch all active pipeline deals
+      const dealsRes = await fetch(
+        `https://api.hubapi.com/crm/v3/objects/deals?properties=${DEAL_PROPS}&limit=100`,
+        { headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` } }
       );
 
-      for (const result of results) {
-        if (result.status === 'fulfilled' && result.value) {
-          teamData[result.value.dealId] = result.value.team;
+      if (!dealsRes.ok) {
+        console.error('[complexity/scores] Failed to fetch deals:', dealsRes.status);
+        throw new Error('Failed to fetch deals from HubSpot');
+      }
+
+      const dealsData = await dealsRes.json();
+      const allDeals = dealsData.results ?? [];
+
+      // Filter to active stages only
+      const activeDeals = allDeals.filter((deal: { properties: { dealstage?: string } }) =>
+        ACTIVE_STAGES.includes(deal.properties.dealstage ?? '')
+      );
+
+      console.log(`[complexity/scores] Processing ${activeDeals.length} active deals`);
+
+      // Build map of dealId → properties
+      const dealMap: Record<string, Record<string, string | null>> = {};
+      for (const deal of activeDeals) {
+        dealMap[deal.id] = deal.properties;
+      }
+
+      // For deals in advanced stages, fetch team data
+      const advancedStages = ['2496935', '2496936', '100411705'];
+      const advancedDealIds = Object.entries(dealMap)
+        .filter(([, props]) => advancedStages.includes(props.dealstage ?? ''))
+        .map(([id]) => id);
+
+      // Fetch team records (parallel, max 10 concurrent)
+      const teamData: Record<string, Record<string, string | null> | null> = {};
+      const CONCURRENCY = 10;
+
+      for (let i = 0; i < advancedDealIds.length; i += CONCURRENCY) {
+        const batch = advancedDealIds.slice(i, i + CONCURRENCY);
+        const results = await Promise.allSettled(
+          batch.map(async (dealId) => {
+            const assocRes = await fetch(
+              `https://api.hubapi.com/crm/v4/objects/deals/${dealId}/associations/${TEAMS_OBJECT_TYPE}`,
+              { headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` } }
+            );
+            if (!assocRes.ok) return { dealId, team: null };
+
+            const assocData = await assocRes.json();
+            const results = assocData.results ?? [];
+            if (results.length === 0) return { dealId, team: null };
+
+            const teamId = results[0].toObjectId;
+            const teamRes = await fetch(
+              `https://api.hubapi.com/crm/v3/objects/${TEAMS_OBJECT_TYPE}/${teamId}?properties=${TEAM_PROPS}`,
+              { headers: { 'Authorization': `Bearer ${HUBSPOT_PAT}` } }
+            );
+            if (!teamRes.ok) return { dealId, team: null };
+
+            const teamObj = await teamRes.json();
+            return { dealId, team: teamObj.properties ?? null };
+          })
+        );
+
+        for (const result of results) {
+          if (result.status === 'fulfilled' && result.value) {
+            teamData[result.value.dealId] = result.value.team;
+          }
         }
       }
-    }
 
-    // Compute scores
-    const scores: Record<string, { score: number; tier: string; tierColor: string; estimatedDays: number }> = {};
+      // Compute scores
+      const scores: Record<string, { score: number; tier: string; tierColor: string; estimatedDays: number }> = {};
 
-    for (const [dealId, props] of Object.entries(dealMap)) {
-      const team = teamData[dealId] ?? null;
-      const result = team ? computeComplexityScore(props, team, []) : quickScore(props);
-      scores[dealId] = {
-        score: result.score,
-        tier: result.tier,
-        tierColor: result.tierColor,
-        estimatedDays: result.estimatedDays,
-      };
-    }
+      for (const [dealId, props] of Object.entries(dealMap)) {
+        const team = teamData[dealId] ?? null;
+        const computedResult = team ? computeComplexityScore(props, team, []) : quickScore(props);
+        scores[dealId] = {
+          score: computedResult.score,
+          tier: computedResult.tier,
+          tierColor: computedResult.tierColor,
+          estimatedDays: computedResult.estimatedDays,
+        };
+      }
 
-    console.log(`[complexity/scores] Computed scores for ${Object.keys(scores).length} deals`);
-    return NextResponse.json(scores);
+      console.log(`[complexity/scores] Computed scores for ${Object.keys(scores).length} deals`);
+      return scores;
+    });
+
+    return NextResponse.json(result.data);
   } catch (err) {
     console.error('[complexity/scores]', err);
     const message = err instanceof Error ? err.message : String(err);
