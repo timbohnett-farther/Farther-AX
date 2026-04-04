@@ -81,8 +81,10 @@ export async function GET(req: NextRequest) {
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     // ── Count total matching rows ──────────────────────────────────────────
-    const countResult = await prisma.$queryRaw<Array<{ total: bigint }>>(
-      Prisma.sql([`SELECT COUNT(*) as total FROM transition_clients ${whereClause}`], ...filterParams)
+    const countQuery = `SELECT COUNT(*) as total FROM transition_clients ${whereClause}`;
+    const countResult = await prisma.$queryRawUnsafe<Array<{ total: bigint }>>(
+      countQuery,
+      ...filterParams
     );
     const total = parseInt(countResult[0].total.toString());
 
@@ -92,39 +94,42 @@ export async function GET(req: NextRequest) {
     const limitIdx = filterParams.length + 1;
     const offsetIdx = filterParams.length + 2;
 
-    const rows = await prisma.$queryRaw<TransitionClientRow[]>(
-      Prisma.sql([`
-        SELECT
-          id,
-          sheet_id,
-          workbook_name,
-          advisor_name,
-          farther_contact,
-          household_name,
-          account_type,
-          account_name,
-          status_of_iaa,
-          status_of_account_paperwork,
-          portal_status,
-          document_readiness,
-          primary_first_name,
-          primary_last_name,
-          primary_email,
-          new_account_number,
-          contra_account_firm,
-          contra_account_numbers,
-          fee_schedule,
-          notes,
-          docusign_iaa_status,
-          docusign_paperwork_status,
-          billing_setup,
-          welcome_gift_box,
-          portal_invites
-        FROM transition_clients
-        ${whereClause}
-        ORDER BY advisor_name ASC, id ASC
-        LIMIT $${limitIdx} OFFSET $${offsetIdx}
-      `], ...paginationParams)
+    const selectQuery = `
+      SELECT
+        id,
+        sheet_id,
+        workbook_name,
+        advisor_name,
+        farther_contact,
+        household_name,
+        account_type,
+        account_name,
+        status_of_iaa,
+        status_of_account_paperwork,
+        portal_status,
+        document_readiness,
+        primary_first_name,
+        primary_last_name,
+        primary_email,
+        new_account_number,
+        contra_account_firm,
+        contra_account_numbers,
+        fee_schedule,
+        notes,
+        docusign_iaa_status,
+        docusign_paperwork_status,
+        billing_setup,
+        welcome_gift_box,
+        portal_invites
+      FROM transition_clients
+      ${whereClause}
+      ORDER BY advisor_name ASC, id ASC
+      LIMIT $${limitIdx} OFFSET $${offsetIdx}
+    `;
+
+    const rows = await prisma.$queryRawUnsafe<TransitionClientRow[]>(
+      selectQuery,
+      ...paginationParams
     );
 
     // ── Fetch TRAN AUM & Revenue data ────────────────────────────────────────

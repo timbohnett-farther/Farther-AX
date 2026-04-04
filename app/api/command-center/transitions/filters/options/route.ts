@@ -12,19 +12,16 @@ export async function GET(req: NextRequest) {
       whereClause += ` AND advisor_name = $${params.length}`;
     }
 
+    const iaaQuery = `SELECT DISTINCT status_of_iaa as val FROM transition_clients ${whereClause} AND status_of_iaa IS NOT NULL AND status_of_iaa != '' ORDER BY 1`;
+    const pwQuery = `SELECT DISTINCT status_of_account_paperwork as val FROM transition_clients ${whereClause} AND status_of_account_paperwork IS NOT NULL AND status_of_account_paperwork != '' ORDER BY 1`;
+    const portalQuery = `SELECT DISTINCT portal_status as val FROM transition_clients ${whereClause} AND portal_status IS NOT NULL AND portal_status != '' ORDER BY 1`;
+    const readinessQuery = `SELECT DISTINCT document_readiness as val FROM transition_clients ${whereClause} AND document_readiness IS NOT NULL AND document_readiness != '' ORDER BY 1`;
+
     const [iaaResult, pwResult, portalResult, readinessResult] = await Promise.all([
-      prisma.$queryRaw<Array<{ val: string }>>(
-        Prisma.sql([`SELECT DISTINCT status_of_iaa as val FROM transition_clients ${whereClause} AND status_of_iaa IS NOT NULL AND status_of_iaa != '' ORDER BY 1`], ...params)
-      ),
-      prisma.$queryRaw<Array<{ val: string }>>(
-        Prisma.sql([`SELECT DISTINCT status_of_account_paperwork as val FROM transition_clients ${whereClause} AND status_of_account_paperwork IS NOT NULL AND status_of_account_paperwork != '' ORDER BY 1`], ...params)
-      ),
-      prisma.$queryRaw<Array<{ val: string }>>(
-        Prisma.sql([`SELECT DISTINCT portal_status as val FROM transition_clients ${whereClause} AND portal_status IS NOT NULL AND portal_status != '' ORDER BY 1`], ...params)
-      ),
-      prisma.$queryRaw<Array<{ val: string }>>(
-        Prisma.sql([`SELECT DISTINCT document_readiness as val FROM transition_clients ${whereClause} AND document_readiness IS NOT NULL AND document_readiness != '' ORDER BY 1`], ...params)
-      ),
+      prisma.$queryRawUnsafe<Array<{ val: string }>>(iaaQuery, ...params),
+      prisma.$queryRawUnsafe<Array<{ val: string }>>(pwQuery, ...params),
+      prisma.$queryRawUnsafe<Array<{ val: string }>>(portalQuery, ...params),
+      prisma.$queryRawUnsafe<Array<{ val: string }>>(readinessQuery, ...params),
     ]);
 
     return NextResponse.json({

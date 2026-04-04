@@ -22,7 +22,21 @@ export async function GET(req: NextRequest) {
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    const result = await prisma.$queryRaw<Array<{
+    const query = `
+      SELECT
+        COUNT(DISTINCT advisor_name) as total_advisors,
+        COUNT(*) as total_accounts,
+        COUNT(DISTINCT household_name) as total_households,
+        COUNT(*) FILTER (WHERE status_of_iaa = 'Completed' OR LOWER(docusign_iaa_status) = 'completed') as iaa_signed,
+        COUNT(*) FILTER (WHERE status_of_account_paperwork = 'Completed' OR LOWER(docusign_paperwork_status) = 'completed') as paperwork_signed,
+        COUNT(*) FILTER (WHERE portal_status IN ('Complete', 'Active', 'Portal Created')) as portal_complete,
+        COUNT(*) FILTER (WHERE document_readiness IS NOT NULL AND document_readiness != 'Ready to Send Documents' AND document_readiness != '') as pending_documents,
+        COUNT(*) FILTER (WHERE document_readiness = 'Ready to Send Documents') as ready_count
+      FROM transition_clients
+      ${whereClause}
+    `;
+
+    const result = await prisma.$queryRawUnsafe<Array<{
       total_advisors: bigint;
       total_accounts: bigint;
       total_households: bigint;
@@ -31,21 +45,7 @@ export async function GET(req: NextRequest) {
       portal_complete: bigint;
       pending_documents: bigint;
       ready_count: bigint;
-    }>>(
-      Prisma.sql([`
-        SELECT
-          COUNT(DISTINCT advisor_name) as total_advisors,
-          COUNT(*) as total_accounts,
-          COUNT(DISTINCT household_name) as total_households,
-          COUNT(*) FILTER (WHERE status_of_iaa = 'Completed' OR LOWER(docusign_iaa_status) = 'completed') as iaa_signed,
-          COUNT(*) FILTER (WHERE status_of_account_paperwork = 'Completed' OR LOWER(docusign_paperwork_status) = 'completed') as paperwork_signed,
-          COUNT(*) FILTER (WHERE portal_status IN ('Complete', 'Active', 'Portal Created')) as portal_complete,
-          COUNT(*) FILTER (WHERE document_readiness IS NOT NULL AND document_readiness != 'Ready to Send Documents' AND document_readiness != '') as pending_documents,
-          COUNT(*) FILTER (WHERE document_readiness = 'Ready to Send Documents') as ready_count
-        FROM transition_clients
-        ${whereClause}
-      `], ...params)
-    );
+    }>>(query, ...params);
 
     const row = result[0];
     const totalAccounts = parseInt(row.total_accounts.toString()) || 1;
