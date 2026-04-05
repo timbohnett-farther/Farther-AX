@@ -11,6 +11,26 @@ import { Prisma } from '@prisma/client';
 export async function GET() {
   const results: Record<string, unknown> = {};
 
+  // 0. Show which database we're connected to
+  try {
+    const dbUrl = process.env.DATABASE_URL ?? '';
+    // Only show host:port/dbname for security — no password
+    const match = dbUrl.match(/@([^/]+)\/([^?]+)/);
+    results.database_target = { host: match?.[1] ?? 'unknown', db: match?.[2] ?? 'unknown' };
+  } catch {
+    results.database_target = { error: 'Could not parse DATABASE_URL' };
+  }
+
+  // 0b. List all tables in this database
+  try {
+    const tables = await prisma.$queryRaw<Array<{ tablename: string }>>`
+      SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename
+    `;
+    results.existing_tables = { ok: true, count: tables.length, tables: tables.map(t => t.tablename) };
+  } catch (err) {
+    results.existing_tables = { ok: false, error: err instanceof Error ? err.message : String(err) };
+  }
+
   // 1. Test team_members table
   try {
     const members = await prisma.$queryRaw<Array<{ id: number; name: string; role: string }>>`
@@ -110,6 +130,263 @@ export async function GET() {
     timestamp: new Date().toISOString(),
     results,
   });
+}
+
+/**
+ * POST /api/diagnostics/onboarding
+ *
+ * Creates ALL missing tables needed for the onboarding system.
+ * Uses the app's own Prisma connection so it hits the correct database.
+ */
+export async function POST() {
+  const results: string[] = [];
+
+  try {
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS onboarding_tasks (
+        id          SERIAL PRIMARY KEY,
+        deal_id     VARCHAR(64) NOT NULL,
+        task_key    VARCHAR(128) NOT NULL,
+        phase       VARCHAR(32) NOT NULL,
+        completed   BOOLEAN NOT NULL DEFAULT FALSE,
+        completed_by VARCHAR(255),
+        completed_at TIMESTAMPTZ,
+        notes       TEXT,
+        due_date    DATE,
+        is_legacy   BOOLEAN DEFAULT FALSE,
+        updated_at  TIMESTAMPTZ DEFAULT NOW(),
+        CONSTRAINT onboarding_tasks_deal_task_unique UNIQUE(deal_id, task_key)
+      )
+    `);
+    results.push('onboarding_tasks: created');
+
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS idx_onboarding_tasks_deal_id ON onboarding_tasks(deal_id)`);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS team_members (
+        id          SERIAL PRIMARY KEY,
+        name        VARCHAR(255) NOT NULL,
+        email       VARCHAR(255) NOT NULL UNIQUE,
+        role        VARCHAR(64) NOT NULL,
+        phone       VARCHAR(32),
+        calendar_link VARCHAR(512),
+        active      BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at  TIMESTAMPTZ DEFAULT NOW(),
+        updated_at  TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    results.push('team_members: created');
+
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS idx_team_members_role ON team_members(role)`);
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS idx_team_members_active ON team_members(active)`);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS advisor_assignments (
+        id          SERIAL PRIMARY KEY,
+        deal_id     VARCHAR(64) NOT NULL,
+        role        VARCHAR(64) NOT NULL,
+        member_id   INTEGER NOT NULL REFERENCES team_members(id),
+        assigned_at TIMESTAMPTZ DEFAULT NOW(),
+        assigned_by VARCHAR(255),
+        CONSTRAINT advisor_assignments_deal_role_unique UNIQUE(deal_id, role)
+      )
+    `);
+    results.push('advisor_assignments: created');
+
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS idx_advisor_assignments_deal_id ON advisor_assignments(deal_id)`);
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS idx_advisor_assignments_member_id ON advisor_assignments(member_id)`);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS advisor_drive_links (
+        id          SERIAL PRIMARY KEY,
+        deal_id     VARCHAR(64) NOT NULL UNIQUE,
+        folder_url  TEXT NOT NULL,
+        folder_name VARCHAR(255) DEFAULT 'Advisor Folder',
+        updated_by  VARCHAR(255),
+        updated_at  TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    results.push('advisor_drive_links: created');
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS api_cache (
+        cache_key   VARCHAR(255) PRIMARY KEY,
+        data        JSONB NOT NULL,
+        expires_at  TIMESTAMPTZ NOT NULL,
+        created_at  TIMESTAMPTZ DEFAULT NOW(),
+        updated_at  TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    results.push('api_cache: created');
+
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS idx_api_cache_expires_at ON api_cache(expires_at)`);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS advisor_sentiment (
+        id                  SERIAL PRIMARY KEY,
+        deal_id             VARCHAR(64) NOT NULL UNIQUE,
+        deal_name           VARCHAR(255),
+        contact_id          VARCHAR(64),
+        composite_score     NUMERIC(5,2) NOT NULL,
+        tier                VARCHAR(32) NOT NULL,
+        activity_score      NUMERIC(5,2),
+        tone_score          NUMERIC(5,2),
+        milestone_score     NUMERIC(5,2),
+        recency_score       NUMERIC(5,2),
+        deal_stage          VARCHAR(64),
+        engagements_analyzed INTEGER DEFAULT 0,
+        signals             JSONB,
+        scored_at           TIMESTAMPTZ DEFAULT NOW(),
+        updated_at          TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    results.push('advisor_sentiment: created');
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS advisor_sentiment_history (
+        id              SERIAL PRIMARY KEY,
+        deal_id         VARCHAR(64) NOT NULL,
+        composite_score NUMERIC(5,2) NOT NULL,
+        tier            VARCHAR(32) NOT NULL,
+        activity_score  NUMERIC(5,2),
+        tone_score      NUMERIC(5,2),
+        milestone_score NUMERIC(5,2),
+        recency_score   NUMERIC(5,2),
+        signal_summary  JSONB,
+        scored_at       TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    results.push('advisor_sentiment_history: created');
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS managed_accounts (
+        id              SERIAL PRIMARY KEY,
+        advisor_name    VARCHAR(255) NOT NULL,
+        current_value   DECIMAL(18,2) DEFAULT 0,
+        fee_rate_bps    DECIMAL(8,4) DEFAULT 0,
+        monthly_fee_amount DECIMAL(14,2) DEFAULT 0,
+        hubspot_object_id VARCHAR(64),
+        synced_at       TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    results.push('managed_accounts: created');
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS managed_accounts_summary (
+        advisor_name    VARCHAR(255) PRIMARY KEY,
+        total_aum       DECIMAL(18,2) DEFAULT 0,
+        total_monthly_revenue DECIMAL(14,2) DEFAULT 0,
+        account_count   INTEGER DEFAULT 0,
+        weighted_fee_bps DECIMAL(8,4) DEFAULT 0,
+        synced_at       TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    results.push('managed_accounts_summary: created');
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS quiz_attempts (
+        id              SERIAL PRIMARY KEY,
+        user_email      VARCHAR(255) NOT NULL,
+        user_name       VARCHAR(255),
+        topic_slug      VARCHAR(128) NOT NULL,
+        attempt_number  INTEGER NOT NULL DEFAULT 1,
+        score           INTEGER NOT NULL,
+        total_questions  INTEGER NOT NULL DEFAULT 10,
+        passed          BOOLEAN NOT NULL DEFAULT FALSE,
+        questions_json  JSONB NOT NULL,
+        answers_json    JSONB NOT NULL,
+        completed_at    TIMESTAMPTZ DEFAULT NOW(),
+        CONSTRAINT quiz_attempts_user_topic_attempt UNIQUE(user_email, topic_slug, attempt_number)
+      )
+    `);
+    results.push('quiz_attempts: created');
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS docusign_tokens (
+        id SERIAL PRIMARY KEY,
+        access_token TEXT NOT NULL,
+        refresh_token TEXT NOT NULL,
+        expires_at TIMESTAMPTZ NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    results.push('docusign_tokens: created');
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS docusign_envelopes (
+        id SERIAL PRIMARY KEY,
+        envelope_id VARCHAR(128) UNIQUE NOT NULL,
+        status VARCHAR(64),
+        email_subject TEXT,
+        sent_date_time VARCHAR(64),
+        completed_date_time VARCHAR(64),
+        status_changed_at VARCHAR(64),
+        envelope_type VARCHAR(32),
+        matched_advisor_name VARCHAR(255),
+        match_method VARCHAR(64),
+        raw_json JSONB,
+        last_synced_at TIMESTAMPTZ DEFAULT NOW(),
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    results.push('docusign_envelopes: created');
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS docusign_signers (
+        id SERIAL PRIMARY KEY,
+        envelope_id VARCHAR(128) NOT NULL,
+        signer_name VARCHAR(255),
+        signer_email VARCHAR(255),
+        status VARCHAR(64),
+        signed_date_time VARCHAR(64),
+        delivered_date_time VARCHAR(64),
+        sent_date_time VARCHAR(64),
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    results.push('docusign_signers: created');
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS docusign_sync_state (
+        id SERIAL PRIMARY KEY,
+        last_synced_at TIMESTAMPTZ NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    results.push('docusign_sync_state: created');
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS docusign_sync_snapshots (
+        id SERIAL PRIMARY KEY,
+        snapshot_type VARCHAR(64),
+        snapshot_data JSONB,
+        advisor_count INTEGER DEFAULT 0,
+        envelope_count INTEGER DEFAULT 0,
+        household_count INTEGER DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    results.push('docusign_sync_snapshots: created');
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS advisor_graduations (
+        deal_id VARCHAR(64) PRIMARY KEY,
+        graduated_at TIMESTAMPTZ DEFAULT NOW(),
+        graduated_by VARCHAR(255)
+      )
+    `);
+    results.push('advisor_graduations: created');
+
+    return NextResponse.json({ status: 'success', tables_created: results });
+  } catch (err) {
+    return NextResponse.json({
+      status: 'error',
+      tables_created: results,
+      error: err instanceof Error ? err.message : String(err),
+    }, { status: 500 });
+  }
 }
 
 export const dynamic = 'force-dynamic';
