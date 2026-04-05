@@ -49,33 +49,33 @@ export async function GET(request: Request) {
     const memberId = searchParams.get('memberId');
 
     // 1. Get active team members for the requested role
-    let memberQuery = 'SELECT * FROM team_members WHERE active = TRUE';
-    const memberParams: (string | number)[] = [];
-
-    if (memberId) {
-      memberQuery += ` AND id = $${memberParams.length + 1}`;
-      memberParams.push(parseInt(memberId));
-    } else {
-      memberQuery += ` AND role = $${memberParams.length + 1}`;
-      memberParams.push(role);
-    }
-    memberQuery += ' ORDER BY name';
-
-    const members = await prisma.$queryRaw<Array<{
+    type TeamMemberRow = {
       id: number;
       name: string;
       email: string;
       role: string;
       active: boolean;
-    }>>`${memberQuery}` as any;
+    };
+
+    let members: TeamMemberRow[];
+
+    if (memberId) {
+      members = await prisma.$queryRaw<TeamMemberRow[]>`
+        SELECT * FROM team_members WHERE active = TRUE AND id = ${parseInt(memberId)} ORDER BY name
+      `;
+    } else {
+      members = await prisma.$queryRaw<TeamMemberRow[]>`
+        SELECT * FROM team_members WHERE active = TRUE AND role = ${role} ORDER BY name
+      `;
+    }
 
     if (members.length === 0) {
       return NextResponse.json({ workload: [], maxCapacity: MAX_CAPACITY });
     }
 
     // 2. Get all assignments for these members
-    const memberIds = members.map((m: { id: number }) => m.id);
-    const assignmentsResult = await prisma.$queryRaw<Array<{
+    const memberIds = members.map((m) => m.id);
+    const assignments = await prisma.$queryRaw<Array<{
       deal_id: string;
       member_id: number;
       role: string;
@@ -83,10 +83,10 @@ export async function GET(request: Request) {
       SELECT a.deal_id, a.member_id, a.role
       FROM advisor_assignments a
       WHERE a.member_id = ANY(ARRAY[${Prisma.join(memberIds)}]::int[])
-    ` as any;
+    `;
 
     // 3. Get complexity scores for all assigned deals
-    const dealIds = Array.from(new Set(assignmentsResult.rows.map((a: { deal_id: string }) => a.deal_id)));
+    const dealIds = Array.from(new Set(assignments.map((a) => a.deal_id)));
 
     const DEAL_PROPS = [
       'dealname', 'dealstage', 'createdate',
@@ -134,11 +134,11 @@ export async function GET(request: Request) {
     }
 
     // 4. Build workload entries
-    const workload: WorkloadEntry[] = members.map((m: { id: number; name: string; email: string; role: string }) => {
-      const memberAssignments = assignmentsResult.rows.filter(
-        (a: { member_id: number }) => a.member_id === m.id
+    const workload: WorkloadEntry[] = members.map((m) => {
+      const memberAssignments = assignments.filter(
+        (a) => a.member_id === m.id
       );
-      const deals = memberAssignments.map((a: { deal_id: string }) => {
+      const deals = memberAssignments.map((a) => {
         const ds = dealScores[a.deal_id] || { score: 0, tier: 'Low', deal_name: 'Unknown', dealstage: '' };
         return {
           deal_id: a.deal_id,
@@ -149,7 +149,7 @@ export async function GET(request: Request) {
         };
       });
 
-      const totalComplexity = deals.reduce((sum: number, d: { complexity_score: number }) => sum + d.complexity_score, 0);
+      const totalComplexity = deals.reduce((sum, d) => sum + d.complexity_score, 0);
       const capacityPct = Math.round((totalComplexity / MAX_CAPACITY) * 100);
 
       let status: 'green' | 'amber' | 'red' = 'green';
