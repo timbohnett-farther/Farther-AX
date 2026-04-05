@@ -126,12 +126,24 @@ function WorkloadDashboard() {
     );
   }
 
-  const workload: WorkloadEntry[] = data?.workload ?? [];
+  const workload: WorkloadEntry[] = Array.isArray(data?.workload) ? data.workload : [];
   const maxCapacity: number = data?.maxCapacity ?? 250;
 
-  const totalAdvisors = workload.reduce((sum, w) => sum + w.active_deals, 0);
+  // Handle API error responses
+  if (data?.error) {
+    return (
+      <div className="p-5">
+        <div className="rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/20 p-4">
+          <p className="text-sm font-medium text-red-800 dark:text-red-300">Unable to load workload data</p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{data.error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const totalAdvisors = workload.reduce((sum, w) => sum + (w.active_deals ?? 0), 0);
   const avgComplexity = workload.length > 0
-    ? Math.round(workload.reduce((sum, w) => sum + w.total_complexity, 0) / workload.length)
+    ? Math.round(workload.reduce((sum, w) => sum + (w.total_complexity ?? 0), 0) / workload.length)
     : 0;
   const overloaded = workload.filter(w => w.capacity_status === 'red').length;
 
@@ -418,12 +430,12 @@ function AdvisorChecklist({ deal, roleFilter }: { deal: DealWithDates; roleFilte
   if (day0) qp.set('day0_date', day0);
   if (launch) qp.set('launch_date', launch);
 
-  const { data, mutate } = useSWR(
+  const { data, mutate, error: checklistError } = useSWR(
     `/api/command-center/checklist/${deal.id}${qp.toString() ? `?${qp}` : ''}`,
     fetcher,
     { refreshInterval: 43_200_000 }
   );
-  const tasks: TaskRow[] = data?.tasks ?? [];
+  const tasks: TaskRow[] = Array.isArray(data?.tasks) ? data.tasks : [];
   const filteredTasks = roleFilter === 'all' ? tasks : tasks.filter(t => t.owner === roleFilter);
   const completedCount = filteredTasks.filter(t => t.completed).length;
   const overdueCount = filteredTasks.filter(t => !t.completed && isOverdue(t.due_date)).length;
@@ -440,6 +452,21 @@ function AdvisorChecklist({ deal, roleFilter }: { deal: DealWithDates; roleFilte
   }
 
   const pct = filteredTasks.length ? Math.round((completedCount / filteredTasks.length) * 100) : 0;
+
+  // Show inline error if checklist API failed
+  if (checklistError || data?.error) {
+    return (
+      <DataCard className="mb-6">
+        <div className="flex items-center justify-between pb-4 border-b mb-4" style={{ borderColor: THEME.colors.border }}>
+          <div>
+            <h3 className="text-base font-bold font-serif mb-1" style={{ color: THEME.colors.text }}>{deal.dealname}</h3>
+            <span className="text-xs text-red-400">Failed to load tasks: {data?.details || data?.error || 'Network error'}</span>
+          </div>
+          <button onClick={() => mutate()} className="px-3 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg border-none cursor-pointer">Retry</button>
+        </div>
+      </DataCard>
+    );
+  }
 
   return (
     <DataCard className="mb-6">
@@ -537,8 +564,10 @@ export default function OnboardingTracker() {
     return <div className="px-10 py-16" style={{ color: THEME.colors.error }}>Failed to load data.</div>;
   }
 
-  const onboardingDeals = (data?.deals ?? []).filter(
+  const rawDeals = Array.isArray(data?.deals) ? data.deals : [];
+  const onboardingDeals = rawDeals.filter(
     (d: { dealstage: string; dealname?: string; daysSinceLaunch?: number | null }) => {
+      if (!d?.dealstage) return false;
       if (!ONBOARDING_STAGE_IDS.includes(d.dealstage)) return false;
       if (d.dealname?.toLowerCase().includes('test')) return false;
       if (d.dealstage === '100411705') {
